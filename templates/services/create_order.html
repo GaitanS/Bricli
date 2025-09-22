@@ -1,0 +1,549 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Postează o comandă - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+.step-wizard {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.step-wizard .step {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin: 0 1rem;
+}
+
+.step-wizard .step .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.step-wizard .step.active .step-number {
+    background: var(--bs-primary);
+    color: white;
+}
+
+.step-wizard .step.completed .step-number {
+    background: var(--bs-success);
+    color: white;
+}
+
+.step-wizard .step .step-title {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.step-wizard .step.active .step-title {
+    color: var(--bs-primary);
+    font-weight: 600;
+}
+
+.step-wizard .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 0.5rem);
+    width: 2rem;
+    height: 2px;
+    background: #e9ecef;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.step-wizard .step.completed:not(:last-child)::after {
+    background: var(--bs-success);
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.category-card {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    text-decoration: none;
+    color: inherit;
+}
+
+.category-card:hover {
+    border-color: var(--bs-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    color: inherit;
+    text-decoration: none;
+}
+
+.category-card.selected {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.category-card i {
+    font-size: 2rem;
+    color: var(--bs-primary);
+    margin-bottom: 0.5rem;
+}
+
+.category-card .category-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.step-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.step-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.location-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.urgency-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.urgency-card {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.urgency-card:hover,
+.urgency-card.selected {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.budget-range {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    margin: 1rem 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Step Wizard -->
+            <div class="step-wizard">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Categorie</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Locație</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Detalii</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Finalizare</div>
+                </div>
+            </div>
+
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <form method="post" id="orderForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Step 1: Category Selection -->
+                        <div class="step-content active" id="step-1">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold">Ce tip de serviciu cauți?</h3>
+                                <p class="text-muted">Selectează categoria care se potrivește cel mai bine nevoilor tale</p>
+                            </div>
+
+                            <div class="category-grid">
+                                {% for service in services %}
+                                <div class="category-card" data-service="{{ service.id }}" data-name="{{ service.name }}">
+                                    <i class="{{ service.icon|default:'fas fa-tools' }}"></i>
+                                    <p class="category-name">{{ service.name }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-4">
+                                <button type="button" class="btn btn-primary btn-lg" id="step1Next" disabled>
+                                    Continuă <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Location -->
+                        <div class="step-content" id="step-2">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold">Unde este localizată lucrarea?</h3>
+                                <p class="text-muted">Selectează județul și orașul pentru a găsi meșteri din zona ta</p>
+                            </div>
+
+                            <div class="location-selector">
+                                <div>
+                                    <label for="{{ form.county.id_for_label }}" class="form-label fw-semibold">Județul *</label>
+                                    {{ form.county }}
+                                </div>
+                                <div>
+                                    <label for="{{ form.city.id_for_label }}" class="form-label fw-semibold">Orașul *</label>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.address.id_for_label }}" class="form-label fw-semibold">Adresa exactă (opțional)</label>
+                                {{ form.address }}
+                                <div class="form-text">Adresa va fi vizibilă doar meșterilor care primesc comanda</div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary btn-lg" id="step2Prev">
+                                    <i class="fas fa-arrow-left me-2"></i>Înapoi
+                                </button>
+                                <button type="button" class="btn btn-primary btn-lg" id="step2Next" disabled>
+                                    Continuă <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Details -->
+                        <div class="step-content" id="step-3">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold">Descrie lucrarea în detaliu</h3>
+                                <p class="text-muted">Cu cât mai multe detalii oferi, cu atât ofertele vor fi mai precise</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">Titlul comenzii *</label>
+                                {{ form.title }}
+                                <div class="form-text">Ex: Renovare baie completă, Instalare aer condiționat în living</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">Descrierea detaliată *</label>
+                                {{ form.description }}
+                                <div class="form-text">Descrie materialele necesare, dimensiunile, starea actuală, etc.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Cât de urgent este? *</label>
+                                <div class="urgency-options">
+                                    <div class="urgency-card" data-urgency="low">
+                                        <i class="fas fa-clock text-success mb-2"></i>
+                                        <h6>Flexibil</h6>
+                                        <small class="text-muted">În următoarele săptămâni</small>
+                                    </div>
+                                    <div class="urgency-card" data-urgency="medium">
+                                        <i class="fas fa-calendar text-warning mb-2"></i>
+                                        <h6>Normal</h6>
+                                        <small class="text-muted">În următoarele zile</small>
+                                    </div>
+                                    <div class="urgency-card" data-urgency="high">
+                                        <i class="fas fa-exclamation-triangle text-danger mb-2"></i>
+                                        <h6>Urgent</h6>
+                                        <small class="text-muted">Cât mai repede</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.preferred_date.id_for_label }}" class="form-label fw-semibold">Data preferată (opțional)</label>
+                                {{ form.preferred_date }}
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary btn-lg" id="step3Prev">
+                                    <i class="fas fa-arrow-left me-2"></i>Înapoi
+                                </button>
+                                <button type="button" class="btn btn-primary btn-lg" id="step3Next" disabled>
+                                    Continuă <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Budget & Finalize -->
+                        <div class="step-content" id="step-4">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold">Care este bugetul tău?</h3>
+                                <p class="text-muted">Stabilește o fourchette de preț pentru a primi oferte relevante</p>
+                            </div>
+
+                            <div class="budget-range">
+                                <div>
+                                    <label for="{{ form.budget_min.id_for_label }}" class="form-label fw-semibold">De la (RON)</label>
+                                    {{ form.budget_min }}
+                                </div>
+                                <div class="text-center">
+                                    <i class="fas fa-minus text-muted"></i>
+                                </div>
+                                <div>
+                                    <label for="{{ form.budget_max.id_for_label }}" class="form-label fw-semibold">Până la (RON)</label>
+                                    {{ form.budget_max }}
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mt-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Sfat:</strong> Un buget realist te ajută să primești oferte mai precise și să eviți surprizele neplăcute.
+                            </div>
+
+                            <!-- Order Summary -->
+                            <div class="card bg-light mt-4">
+                                <div class="card-body">
+                                    <h5 class="fw-bold mb-3">Rezumatul comenzii</h5>
+                                    <div class="row">
+                                        <div class="col-sm-4"><strong>Serviciu:</strong></div>
+                                        <div class="col-sm-8" id="summary-service">-</div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-sm-4"><strong>Locație:</strong></div>
+                                        <div class="col-sm-8" id="summary-location">-</div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-sm-4"><strong>Titlu:</strong></div>
+                                        <div class="col-sm-8" id="summary-title">-</div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-sm-4"><strong>Urgență:</strong></div>
+                                        <div class="col-sm-8" id="summary-urgency">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary btn-lg" id="step4Prev">
+                                    <i class="fas fa-arrow-left me-2"></i>Înapoi
+                                </button>
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-check me-2"></i>Postează comanda
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Hidden form fields -->
+                        <input type="hidden" name="service" id="selected-service">
+                        <input type="hidden" name="urgency" id="selected-urgency">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentStep = 1;
+    const totalSteps = 4;
+
+    // Form data storage
+    let formData = {
+        service: null,
+        serviceName: '',
+        county: '',
+        city: '',
+        urgency: '',
+        title: '',
+        description: ''
+    };
+
+    // Step navigation functions
+    function showStep(step) {
+        // Hide all steps
+        document.querySelectorAll('.step-content').forEach(content => {
+            content.classList.remove('active');
+        });
+
+        // Show current step
+        document.getElementById(`step-${step}`).classList.add('active');
+
+        // Update step wizard
+        document.querySelectorAll('.step').forEach((stepEl, index) => {
+            stepEl.classList.remove('active', 'completed');
+            if (index + 1 < step) {
+                stepEl.classList.add('completed');
+            } else if (index + 1 === step) {
+                stepEl.classList.add('active');
+            }
+        });
+
+        currentStep = step;
+        updateSummary();
+    }
+
+    function nextStep() {
+        if (currentStep < totalSteps) {
+            showStep(currentStep + 1);
+        }
+    }
+
+    function prevStep() {
+        if (currentStep > 1) {
+            showStep(currentStep - 1);
+        }
+    }
+
+    // Step 1: Category selection
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove previous selection
+            document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+
+            // Select current
+            this.classList.add('selected');
+
+            // Store data
+            formData.service = this.dataset.service;
+            formData.serviceName = this.dataset.name;
+            document.getElementById('selected-service').value = formData.service;
+
+            // Enable next button
+            document.getElementById('step1Next').disabled = false;
+        });
+    });
+
+    document.getElementById('step1Next').addEventListener('click', nextStep);
+
+    // Step 2: Location
+    const countySelect = document.getElementById('{{ form.county.id_for_label }}');
+    const citySelect = document.getElementById('{{ form.city.id_for_label }}');
+
+    function checkStep2Completion() {
+        const hasCounty = countySelect.value !== '';
+        const hasCity = citySelect.value !== '';
+        document.getElementById('step2Next').disabled = !(hasCounty && hasCity);
+
+        if (hasCounty && hasCity) {
+            formData.county = countySelect.options[countySelect.selectedIndex].text;
+            formData.city = citySelect.options[citySelect.selectedIndex].text;
+        }
+    }
+
+    countySelect.addEventListener('change', checkStep2Completion);
+    citySelect.addEventListener('change', checkStep2Completion);
+
+    document.getElementById('step2Prev').addEventListener('click', prevStep);
+    document.getElementById('step2Next').addEventListener('click', nextStep);
+
+    // Step 3: Details
+    document.querySelectorAll('.urgency-card').forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove previous selection
+            document.querySelectorAll('.urgency-card').forEach(c => c.classList.remove('selected'));
+
+            // Select current
+            this.classList.add('selected');
+
+            // Store data
+            formData.urgency = this.dataset.urgency;
+            document.getElementById('selected-urgency').value = formData.urgency;
+
+            checkStep3Completion();
+        });
+    });
+
+    const titleInput = document.getElementById('{{ form.title.id_for_label }}');
+    const descriptionInput = document.getElementById('{{ form.description.id_for_label }}');
+
+    function checkStep3Completion() {
+        const hasTitle = titleInput.value.trim() !== '';
+        const hasDescription = descriptionInput.value.trim() !== '';
+        const hasUrgency = formData.urgency !== '';
+
+        document.getElementById('step3Next').disabled = !(hasTitle && hasDescription && hasUrgency);
+
+        if (hasTitle) formData.title = titleInput.value;
+        if (hasDescription) formData.description = descriptionInput.value;
+    }
+
+    titleInput.addEventListener('input', checkStep3Completion);
+    descriptionInput.addEventListener('input', checkStep3Completion);
+
+    document.getElementById('step3Prev').addEventListener('click', prevStep);
+    document.getElementById('step3Next').addEventListener('click', nextStep);
+
+    // Step 4: Budget & Summary
+    document.getElementById('step4Prev').addEventListener('click', prevStep);
+
+    // Update summary
+    function updateSummary() {
+        if (currentStep >= 4) {
+            document.getElementById('summary-service').textContent = formData.serviceName || '-';
+            document.getElementById('summary-location').textContent =
+                (formData.county && formData.city) ? `${formData.city}, ${formData.county}` : '-';
+            document.getElementById('summary-title').textContent = formData.title || '-';
+
+            let urgencyText = '-';
+            if (formData.urgency === 'low') urgencyText = 'Flexibil';
+            else if (formData.urgency === 'medium') urgencyText = 'Normal';
+            else if (formData.urgency === 'high') urgencyText = 'Urgent';
+
+            document.getElementById('summary-urgency').textContent = urgencyText;
+        }
+    }
+
+    // Form submission
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+        // Ensure all hidden fields are populated
+        if (!formData.service || !formData.urgency) {
+            e.preventDefault();
+            alert('Te rugăm să completezi toate câmpurile obligatorii.');
+            return false;
+        }
+    });
+
+    // Initialize
+    showStep(1);
+});
+</script>
+{% endblock %}

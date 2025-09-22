@@ -1,0 +1,378 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bricli - Găsește meșterul potrivit pentru tine{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-white py-5">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6 hero-content">
+                <div class="fade-in">
+                    <h1 class="display-4 fw-bold mb-4 text-shadow">
+                        Găsește meșterul potrivit pentru tine
+                    </h1>
+                    <p class="lead mb-4 text-shadow">
+                        Conectăm clienții cu meșteri verificați din România.
+                        Postează gratuit cererea ta și primește oferte de la specialiști din zona ta.
+                    </p>
+
+                    <!-- Trust Indicators -->
+                    <div class="d-flex gap-3 mb-4 flex-wrap">
+                        <div class="trust-indicator">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Meșteri verificați</span>
+                        </div>
+                        <div class="trust-indicator">
+                            <i class="fas fa-clock"></i>
+                            <span>Răspuns în 24h</span>
+                        </div>
+                        <div class="trust-indicator">
+                            <i class="fas fa-star"></i>
+                            <span>Recenzii reale</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search Form -->
+                <div class="card shadow-lg">
+                    <div class="card-body p-4">
+                        <form method="GET" action="{% url 'core:search' %}">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <input type="text" name="q" class="form-control form-control-lg"
+                                           placeholder="ex. renovare casă" value="{{ request.GET.q }}"
+                                           list="popular-services">
+                                    <datalist id="popular-services">
+                                        <option value="Renovare baie">
+                                        <option value="Instalare aer condiționat">
+                                        <option value="Vopsit apartament">
+                                        <option value="Montaj parchet">
+                                        <option value="Reparații instalații sanitare">
+                                        <option value="Amenajare grădină">
+                                        <option value="Montaj gresie și faianță">
+                                        <option value="Instalații electrice">
+                                        <option value="Reparații acoperiș">
+                                        <option value="Curățenie după renovare">
+                                        <option value="Montaj mobilier">
+                                        <option value="Transport și mutare">
+                                    </datalist>
+                                </div>
+                                <div class="col-md-4">
+                                    <select name="county" class="form-select form-select-lg">
+                                        <option value="">Alege județul</option>
+                                        {% for county in counties %}
+                                            <option value="{{ county.id }}">{{ county.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-success btn-lg w-100">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Popular Services -->
+                        <div class="mt-3">
+                            <small class="text-muted">Servicii populare:</small>
+                            <div class="mt-2">
+                                <a href="{% url 'core:search' %}?q=renovare+baie" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Renovare baie</a>
+                                <a href="{% url 'core:search' %}?q=vopsit+apartament" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Vopsit apartament</a>
+                                <a href="{% url 'core:search' %}?q=montaj+parchet" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Montaj parchet</a>
+                                <a href="{% url 'core:search' %}?q=instalatii+sanitare" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Instalații sanitare</a>
+                                <a href="{% url 'core:search' %}?q=amenajare+gradina" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Amenajare grădină</a>
+                                <a href="{% url 'core:search' %}?q=transport+mutare" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Transport și mutare</a>
+                                <a href="{% url 'core:search' %}?q=curatenie+menaj" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Curățenie și menaj</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg me-3">
+                        <i class="fas fa-plus me-2"></i>Postează o comandă
+                    </a>
+                    <a href="{% url 'accounts:craftsman_register' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Devino meșter
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 text-center">
+                <img src="{% static 'images/hero-illustration.svg' %}" alt="Meșteri la lucru" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="stat-card fade-in">
+                    <i class="fas fa-users text-primary fs-2 mb-3"></i>
+                    <div class="stat-number text-primary">{{ site_settings.total_craftsmen|default:"1,000+" }}</div>
+                    <div class="stat-label">Meșteri înregistrați</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card fade-in">
+                    <i class="fas fa-check-circle text-success fs-2 mb-3"></i>
+                    <div class="stat-number text-success">{{ site_settings.total_completed_jobs|default:"5,000+" }}</div>
+                    <div class="stat-label">Lucrări finalizate</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card fade-in">
+                    <i class="fas fa-star text-warning fs-2 mb-3"></i>
+                    <div class="stat-number text-warning">{{ site_settings.total_reviews|default:"3,000+" }}</div>
+                    <div class="stat-label">Recenzii pozitive</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card fade-in">
+                    <i class="fas fa-shield-alt text-info fs-2 mb-3"></i>
+                    <div class="stat-number text-info">100%</div>
+                    <div class="stat-label">Meșteri verificați</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Service Categories -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5 fade-in">
+            <h2 class="fw-bold text-gradient">Servicii populare</h2>
+            <p class="text-muted">Găsește specialiști pentru toate nevoile tale</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for category in service_categories %}
+            <div class="col-lg-3 col-md-6 slide-up">
+                <a href="{% url 'services:category_detail' category.slug %}" class="text-decoration-none">
+                    <div class="service-category-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="service-category-icon bg-gradient-primary mx-auto">
+                                <i class="{{ category.icon|default:'fas fa-tools' }}"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">{{ category.name }}</h5>
+                            <p class="card-text text-muted">{{ category.description|truncatewords:10 }}</p>
+                            <small class="text-primary fw-medium">
+                                <i class="fas fa-arrow-right me-1"></i>Vezi specialiști
+                            </small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'services:categories' %}" class="btn btn-outline-primary">
+                Vezi toate serviciile <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- How it Works -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Cum funcționează</h2>
+            <p class="text-muted">Simplu, rapid și sigur</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 text-center">
+                <div class="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <span class="fs-3 fw-bold">1</span>
+                </div>
+                <h4>Postează cererea</h4>
+                <p class="text-muted">Descrie lucrarea de care ai nevoie și primește oferte gratuite de la meșteri din zona ta.</p>
+            </div>
+            
+            <div class="col-lg-4 text-center">
+                <div class="step-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <span class="fs-3 fw-bold">2</span>
+                </div>
+                <h4>Compară ofertele</h4>
+                <p class="text-muted">Analizează profilurile meșterilor, recenziile și prețurile pentru a face cea mai bună alegere.</p>
+            </div>
+            
+            <div class="col-lg-4 text-center">
+                <div class="step-icon bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <span class="fs-3 fw-bold">3</span>
+                </div>
+                <h4>Finalizează lucrarea</h4>
+                <p class="text-muted">Colaborează cu meșterul ales și lasă o recenzie pentru a ajuta comunitatea.</p>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'core:how_it_works' %}" class="btn btn-primary">
+                Află mai multe <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Craftsmen -->
+{% if top_craftsmen %}
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Meșteri de top</h2>
+            <p class="text-muted">Specialiști cu cele mai bune recenzii</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for craftsman in top_craftsmen %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        {% if craftsman.user.profile_picture %}
+                            <img src="{{ craftsman.user.profile_picture.url }}" alt="{{ craftsman.user.get_full_name }}" 
+                                 class="rounded-circle mb-3" style="width: 80px; height: 80px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                 style="width: 80px; height: 80px;">
+                                <i class="fas fa-user fs-3"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <h5 class="card-title">{{ craftsman.user.get_full_name|default:craftsman.user.username }}</h5>
+                        <p class="text-muted">{{ craftsman.company_name|default:"Meșter independent" }}</p>
+                        
+                        <div class="mb-2">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= craftsman.average_rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="text-muted ms-2">({{ craftsman.total_reviews }} recenzii)</span>
+                        </div>
+                        
+                        <p class="text-muted small">{{ craftsman.city }}, {{ craftsman.county }}</p>
+                        
+                        <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}" class="btn btn-outline-primary">
+                            Vezi profilul
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'accounts:craftsmen_list' %}" class="btn btn-outline-primary">
+                Vezi toți meșterii <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Testimonials -->
+{% if featured_testimonials %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Ce spun clienții noștri</h2>
+            <p class="text-muted">Experiențe reale de la utilizatorii Bricli</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for testimonial in featured_testimonials %}
+            <div class="col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= testimonial.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        
+                        <p class="card-text">"{{ testimonial.content }}"</p>
+                        
+                        <div class="d-flex align-items-center mt-3">
+                            {% if testimonial.image %}
+                                <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}" 
+                                     class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                     style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <div>
+                                <h6 class="mb-0">{{ testimonial.name }}</h6>
+                                <small class="text-muted">{{ testimonial.location }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-4">Gata să începi?</h2>
+        <p class="lead mb-4">Alătură-te miilor de români care și-au găsit meșterul perfect pe Bricli</p>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg me-3 mb-3">
+                    <i class="fas fa-plus me-2"></i>Postează o comandă gratuită
+                </a>
+                <a href="{% url 'accounts:craftsman_register' %}" class="btn btn-outline-light btn-lg mb-3">
+                    <i class="fas fa-user-plus me-2"></i>Înregistrează-te ca meșter
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+.hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+.step-icon {
+    font-size: 2rem;
+}
+</style>
+{% endblock %}

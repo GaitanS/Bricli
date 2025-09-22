@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block title %}Portfolio - {{ craftsman.user.get_full_name|default:craftsman.user.username }} - Bricli{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Acasă</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:profile' %}">Profil</a></li>
+                    <li class="breadcrumb-item active">Portfolio</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-1">Portfolio</h1>
+                    <p class="text-muted">Gestionează imaginile cu lucrările tale</p>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                        <i class="fas fa-plus me-2"></i>Adaugă imagine
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bulkUploadModal">
+                        <i class="fas fa-upload me-2"></i>Încărcare multiplă
+                    </button>
+                </div>
+            </div>
+
+            <!-- Portfolio Grid -->
+            {% if portfolio_images %}
+                <div class="row g-4">
+                    {% for image in portfolio_images %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="position-relative">
+                                <img src="{{ image.image.url }}" class="card-img-top" alt="{{ image.title }}" style="height: 200px; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 p-2">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ image.id }}">
+                                                <i class="fas fa-edit me-2"></i>Editează
+                                            </a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item text-danger" href="#" onclick="deletePortfolioItem({{ image.id }})">
+                                                <i class="fas fa-trash me-2"></i>Șterge
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title">{{ image.title|default:"Fără titlu" }}</h6>
+                                {% if image.description %}
+                                    <p class="card-text small text-muted">{{ image.description|truncatewords:15 }}</p>
+                                {% endif %}
+                                <small class="text-muted">{{ image.created_at|date:"d M Y" }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav aria-label="Portfolio pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Următor</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <i class="fas fa-images text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3">Portfolio gol</h4>
+                    <p class="text-muted mb-4">Încarcă imagini cu lucrările tale pentru a atrage mai mulți clienți</p>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                        <i class="fas fa-plus me-2"></i>Adaugă prima imagine
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Portfolio Stats -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Statistici Portfolio
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary mb-0">{{ portfolio_images.count }}</h4>
+                            <small class="text-muted">Imagini</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success mb-0">{{ craftsman.total_reviews }}</h4>
+                            <small class="text-muted">Recenzii</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Sfaturi pentru Portfolio
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <small>Încarcă imagini de calitate înaltă</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <small>Adaugă descrieri detaliate</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <small>Arată diverse tipuri de lucrări</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <small>Actualizează regulat portfolio-ul</small>
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <small>Folosește imagini înainte/după</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adaugă imagine în portfolio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'accounts:portfolio_upload' %}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ upload_form.image.id_for_label }}" class="form-label">{{ upload_form.image.label }}</label>
+                        {{ upload_form.image }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ upload_form.title.id_for_label }}" class="form-label">{{ upload_form.title.label }}</label>
+                        {{ upload_form.title }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ upload_form.description.id_for_label }}" class="form-label">{{ upload_form.description.label }}</label>
+                        {{ upload_form.description }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Încarcă</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Upload Modal -->
+<div class="modal fade" id="bulkUploadModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Încărcare multiplă</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'accounts:bulk_portfolio_upload' %}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ bulk_upload_form.images.id_for_label }}" class="form-label">{{ bulk_upload_form.images.label }}</label>
+                        {{ bulk_upload_form.images }}
+                        <div class="form-text">{{ bulk_upload_form.images.help_text }}</div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Poți selecta până la 10 imagini odată. Fiecare imagine poate avea maximum 5MB.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Încarcă toate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function deletePortfolioItem(itemId) {
+    if (confirm('Ești sigur că vrei să ștergi această imagine din portfolio?')) {
+        fetch(`/accounts/portfolio/delete/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('A apărut o eroare. Te rugăm să încerci din nou.');
+            }
+        })
+        .catch(error => {
+            alert('A apărut o eroare. Te rugăm să încerci din nou.');
+        });
+    }
+}
+</script>
+{% endblock %}

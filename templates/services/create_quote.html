@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Trimite Ofertă - {{ order.title }} - Bricli{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/custom.css' %}" rel="stylesheet">
+<style>
+.quote-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.order-summary {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 2rem;
+}
+
+.price-input-group {
+    position: relative;
+}
+
+.price-input-group .form-control {
+    padding-right: 50px;
+}
+
+.price-currency {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.btn-submit-quote {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    color: white;
+    padding: 1rem 3rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-submit-quote:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    color: white;
+}
+
+.quote-tips {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.tip-item {
+    display: flex;
+    align-items-start;
+    margin-bottom: 1rem;
+}
+
+.tip-item:last-child {
+    margin-bottom: 0;
+}
+
+.tip-icon {
+    background: #007bff;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content-center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.urgency-indicator {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.urgency-low { background-color: #d4edda; color: #155724; }
+.urgency-medium { background-color: #fff3cd; color: #856404; }
+.urgency-high { background-color: #f8d7da; color: #721c24; }
+.urgency-urgent { background-color: #f5c6cb; color: #721c24; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="quote-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-paper-plane me-3"></i>Trimite Ofertă
+                </h1>
+                <p class="mb-0 opacity-75">Creează o ofertă personalizată pentru această comandă</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'services:order_detail' order.pk %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Înapoi la Comandă
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <h5 class="mb-3">
+                    <i class="fas fa-info-circle text-primary me-2"></i>Rezumat Comandă
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="text-primary">{{ order.title }}</h6>
+                        <p class="text-muted mb-2">{{ order.description|truncatewords:30 }}</p>
+                        <p class="mb-1">
+                            <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                            {{ order.city.name }}, {{ order.county.name }}
+                        </p>
+                        <p class="mb-0">
+                            <i class="fas fa-tag text-muted me-2"></i>
+                            {{ order.service.category.name }} - {{ order.service.name }}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="mb-2">
+                            <strong>Buget Client:</strong><br>
+                            {% if order.budget_min and order.budget_max %}
+                                <span class="text-success">{{ order.budget_min }} - {{ order.budget_max }} RON</span>
+                            {% elif order.budget_min %}
+                                <span class="text-success">De la {{ order.budget_min }} RON</span>
+                            {% elif order.budget_max %}
+                                <span class="text-success">Până la {{ order.budget_max }} RON</span>
+                            {% else %}
+                                <span class="text-muted">De discutat</span>
+                            {% endif %}
+                        </div>
+                        <span class="urgency-indicator urgency-{{ order.urgency }}">
+                            <i class="fas fa-clock me-1"></i>{{ order.get_urgency_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote Form -->
+            <div class="form-container">
+                <h5 class="mb-4">
+                    <i class="fas fa-edit text-success me-2"></i>Detalii Ofertă
+                </h5>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label for="id_price" class="form-label">
+                                    <i class="fas fa-euro-sign text-primary me-2"></i>
+                                    <strong>Preț Ofertă *</strong>
+                                </label>
+                                <div class="price-input-group">
+                                    {{ form.price|add_class:"form-control form-control-lg" }}
+                                    <span class="price-currency">RON</span>
+                                </div>
+                                {% if form.price.help_text %}
+                                    <small class="form-text text-muted">{{ form.price.help_text }}</small>
+                                {% endif %}
+                                {% if form.price.errors %}
+                                    <div class="text-danger mt-1">{{ form.price.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label for="id_estimated_duration" class="form-label">
+                                    <i class="fas fa-clock text-primary me-2"></i>
+                                    <strong>Durată Estimată</strong>
+                                </label>
+                                {{ form.estimated_duration|add_class:"form-control" }}
+                                <small class="form-text text-muted">Ex: 2-3 zile, 1 săptămână, 2 ore</small>
+                                {% if form.estimated_duration.errors %}
+                                    <div class="text-danger mt-1">{{ form.estimated_duration.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_description" class="form-label">
+                            <i class="fas fa-file-alt text-primary me-2"></i>
+                            <strong>Descrierea Ofertei *</strong>
+                        </label>
+                        {{ form.description|add_class:"form-control" }}
+                        <small class="form-text text-muted">
+                            Descrie în detaliu cum vei realiza lucrarea, ce materiale vei folosi, 
+                            și orice alte informații relevante pentru client.
+                        </small>
+                        {% if form.description.errors %}
+                            <div class="text-danger mt-1">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-submit-quote">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            Trimite Oferta
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar with Tips -->
+        <div class="col-lg-4">
+            <div class="quote-tips">
+                <h6 class="mb-3">
+                    <i class="fas fa-lightbulb text-warning me-2"></i>
+                    Sfaturi pentru o Ofertă de Succes
+                </h6>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">
+                        <i class="fas fa-euro-sign"></i>
+                    </div>
+                    <div>
+                        <strong>Preț Competitiv</strong><br>
+                        <small class="text-muted">Oferă un preț fair și competitiv bazat pe complexitatea lucrării.</small>
+                    </div>
+                </div>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div>
+                        <strong>Descriere Detaliată</strong><br>
+                        <small class="text-muted">Explică clar cum vei realiza lucrarea și ce include prețul.</small>
+                    </div>
+                </div>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <strong>Timp Realist</strong><br>
+                        <small class="text-muted">Estimează o durată realistă pentru finalizarea lucrării.</small>
+                    </div>
+                </div>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div>
+                        <strong>Profesionalism</strong><br>
+                        <small class="text-muted">Folosește un limbaj profesional și politicos în descriere.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Your Profile Summary -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-user text-primary me-2"></i>Profilul Tău
+                    </h6>
+                    <div class="d-flex align-items-center mb-3">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" 
+                                 alt="{{ user.get_full_name }}" 
+                                 class="rounded-circle me-3" 
+                                 style="width: 50px; height: 50px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                 style="width: 50px; height: 50px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <strong>{{ user.get_full_name|default:user.username }}</strong><br>
+                            {% if user.craftsman_profile.company_name %}
+                                <small class="text-muted">{{ user.craftsman_profile.company_name }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="border-end">
+                                <h6 class="text-warning mb-0">
+                                    <i class="fas fa-star"></i> {{ user.craftsman_profile.average_rating|floatformat:1 }}
+                                </h6>
+                                <small class="text-muted">Rating</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border-end">
+                                <h6 class="text-info mb-0">{{ user.craftsman_profile.total_reviews }}</h6>
+                                <small class="text-muted">Recenzii</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <h6 class="text-success mb-0">{{ user.craftsman_profile.total_jobs_completed }}</h6>
+                            <small class="text-muted">Lucrări</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Format price input
+    const priceInput = document.getElementById('id_price');
+    if (priceInput) {
+        priceInput.addEventListener('input', function(e) {
+            // Remove non-numeric characters except decimal point
+            let value = e.target.value.replace(/[^\d.]/g, '');
+            
+            // Ensure only one decimal point
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            
+            // Limit decimal places to 2
+            if (parts[1] && parts[1].length > 2) {
+                value = parts[0] + '.' + parts[1].substring(0, 2);
+            }
+            
+            e.target.value = value;
+        });
+    }
+    
+    // Auto-resize description textarea
+    const descriptionTextarea = document.getElementById('id_description');
+    if (descriptionTextarea) {
+        descriptionTextarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+});
+</script>
+{% endblock %}

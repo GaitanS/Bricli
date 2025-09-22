@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Înregistrare Meșter - Bricli</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .registration-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-container">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold mb-2">Înregistrare Meșter</h2>
+                        <p class="text-muted">Găsește clienți în zona ta</p>
+                    </div>
+                    
+                    <!-- Benefits -->
+                    <div class="row mb-4 text-center">
+                        <div class="col-4">
+                            <i class="fas fa-search text-primary fs-3 mb-2"></i>
+                            <h6 class="small">Găsește clienți</h6>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-handshake text-success fs-3 mb-2"></i>
+                            <h6 class="small">Relații directe</h6>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-star text-warning fs-3 mb-2"></i>
+                            <h6 class="small">Construiește reputația</h6>
+                        </div>
+                    </div>
+                    
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.trade.id_for_label }}" class="form-label">Meseria principală</label>
+                            {{ form.trade }}
+                            {% if form.trade.errors %}
+                                <div class="text-danger small">{{ form.trade.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.county.id_for_label }}" class="form-label">Județul</label>
+                            {{ form.county }}
+                            {% if form.county.errors %}
+                                <div class="text-danger small">{{ form.county.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.password.id_for_label }}" class="form-label">Parola</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small">{{ form.password.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label small" for="terms">
+                                Prin înregistrare, sunt de acord cu 
+                                <a href="#" class="text-decoration-none">Termenii și Condițiile</a> 
+                                și <a href="#" class="text-decoration-none">Politica de Confidențialitate</a> Bricli.
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Înregistrare gratuită
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <p class="mb-2">Ai deja un cont? 
+                            <a href="{% url 'accounts:login' %}" class="text-decoration-none fw-bold">Conectează-te</a>
+                        </p>
+                        <p class="mb-0">Cauți un meșter? 
+                            <a href="{% url 'accounts:simple_register' %}" class="text-decoration-none fw-bold text-primary">
+                                Înregistrează-te ca client
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics -->
+            <div class="text-center mt-4 text-white">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="mb-1">
+                            <i class="fas fa-briefcase fs-4"></i>
+                        </div>
+                        <small>Peste 1000 de lucrări disponibile lunar</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-1">
+                            <i class="fas fa-money-bill-wave fs-4"></i>
+                        </div>
+                        <small>Câștiguri medii de 2500 RON/lună</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

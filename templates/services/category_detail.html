@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - Bricli{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Acasă</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'services:categories' %}">Servicii</a></li>
+                    <li class="breadcrumb-item active">{{ category.name }}</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex align-items-center mb-3">
+                <i class="{{ category.icon }} text-primary fs-1 me-3"></i>
+                <div>
+                    <h1 class="mb-1">{{ category.name }}</h1>
+                    <p class="text-muted mb-0">{{ category.description }}</p>
+                </div>
+            </div>
+            
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h4 class="text-primary mb-0">{{ craftsmen_count }}</h4>
+                            <small class="text-muted">Meșteri disponibili</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h4 class="text-success mb-0">{{ completed_orders }}</h4>
+                            <small class="text-muted">Lucrări finalizate</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h4 class="text-warning mb-0">4.8</h4>
+                            <small class="text-muted">Rating mediu</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h4 class="text-info mb-0">24h</h4>
+                            <small class="text-muted">Timp mediu răspuns</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <a href="{% url 'services:create_order' %}?category={{ category.slug }}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-plus me-2"></i>Postează o comandă
+            </a>
+            <a href="{% url 'accounts:craftsmen_list' %}?category={{ category.slug }}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-users me-2"></i>Vezi meșterii
+            </a>
+        </div>
+    </div>
+    
+    <!-- Featured Craftsmen -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-4">Meșteri recomandate pentru {{ category.name }}</h3>
+            
+            {% if featured_craftsmen %}
+                <div class="row">
+                    {% for craftsman in featured_craftsmen %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        {% if craftsman.user.profile_picture %}
+                                            <img src="{{ craftsman.user.profile_picture.url }}" alt="{{ craftsman.user.get_full_name }}" 
+                                                 class="rounded-circle me-3" width="60" height="60">
+                                        {% else %}
+                                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                                 style="width: 60px; height: 60px;">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <h5 class="mb-1">{{ craftsman.user.get_full_name }}</h5>
+                                            <div class="text-warning mb-1">
+                                                {% for i in "12345" %}
+                                                    <i class="fas fa-star"></i>
+                                                {% endfor %}
+                                                <span class="text-muted ms-1">(4.8)</span>
+                                            </div>
+                                            <small class="text-muted">{{ craftsman.county }}</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="card-text">{{ craftsman.description|truncatewords:20 }}</p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-primary fw-bold">{{ craftsman.hourly_rate|default:"La cerere" }} RON/oră</span>
+                                        <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}" class="btn btn-outline-primary btn-sm">
+                                            Vezi profil
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-users text-muted" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3">Nu sunt meșteri disponibili momentan</h4>
+                    <p class="text-muted">Postează o comandă și meșterii din zona ta te vor contacta!</p>
+                    <a href="{% url 'services:create_order' %}?category={{ category.slug }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Postează o comandă
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Popular Services in Category -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-4">Servicii populare în {{ category.name }}</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Renovare completă</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Reparații urgente</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Consultanță tehnică</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Întreținere preventivă</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Instalări noi</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Modernizări</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Inspecții tehnice</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Servicii de urgență</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

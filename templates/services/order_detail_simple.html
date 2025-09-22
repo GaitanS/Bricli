@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ order.title }} - Bricli{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ order.title }}</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Detalii Comandă</h5>
+                    <p><strong>Descriere:</strong> {{ order.description }}</p>
+                    <p><strong>Status:</strong> {{ order.get_status_display }}</p>
+                    <p><strong>Locație:</strong> {{ order.city.name }}, {{ order.county.name }}</p>
+                    
+                    {% if order.budget_min or order.budget_max %}
+                    <p><strong>Buget:</strong> 
+                        {% if order.budget_min and order.budget_max %}
+                            {{ order.budget_min }} - {{ order.budget_max }} RON
+                        {% elif order.budget_min %}
+                            De la {{ order.budget_min }} RON
+                        {% else %}
+                            Până la {{ order.budget_max }} RON
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5>Oferte ({{ quotes.count }})</h5>
+                    
+                    {% if quotes %}
+                        {% for quote in quotes %}
+                        <div class="border p-3 mb-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6>{{ quote.craftsman.user.get_full_name|default:quote.craftsman.user.username }}</h6>
+                                    <p>{{ quote.description }}</p>
+                                </div>
+                                <div>
+                                    <strong>{{ quote.price }} RON</strong>
+                                </div>
+                            </div>
+                            
+                            {% if user == order.client and quote.status == 'pending' %}
+                            <div class="mt-2">
+                                <form method="post" action="{% url 'services:accept_quote' quote.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-sm">Acceptă</button>
+                                </form>
+                                <form method="post" action="{% url 'services:reject_quote' quote.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Respinge</button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Nu au fost primite oferte încă.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Client</h6>
+                    <p>{{ order.client.get_full_name|default:order.client.username }}</p>
+                </div>
+            </div>
+            
+            {% if can_quote %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <a href="{% url 'services:create_quote' order.pk %}" class="btn btn-primary w-100">
+                        Trimite Ofertă
+                    </a>
+                </div>
+            </div>
+            {% elif user == order.client and order.status == 'draft' %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <a href="{% url 'services:edit_order' order.pk %}" class="btn btn-outline-primary w-100 mb-2">
+                        Editează Comanda
+                    </a>
+                    <form method="post" action="{% url 'services:publish_order' order.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100">
+                            Publică Comanda
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

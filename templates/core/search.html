@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}Rezultate căutare - Bricli{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Acasă</a></li>
+                    <li class="breadcrumb-item active">Rezultate căutare</li>
+                </ol>
+            </nav>
+
+            <h1 class="mb-4">
+                Rezultate pentru "{{ query }}"
+                {% if county %}în {{ county.name }}{% endif %}
+            </h1>
+
+            {% if query %}
+            <div class="alert alert-info">
+                <i class="fas fa-search me-2"></i>
+                Ai căutat: <strong>{{ query }}</strong>
+                {% if county %}în județul <strong>{{ county.name }}</strong>{% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Search Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" action="{% url 'core:search' %}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="text" name="q" class="form-control" 
+                                       placeholder="Ce serviciu cauți?" value="{{ query }}"
+                                       list="popular-services">
+                                <datalist id="popular-services">
+                                    <option value="Renovare baie">
+                                    <option value="Instalare aer condiționat">
+                                    <option value="Vopsit apartament">
+                                    <option value="Montaj parchet">
+                                    <option value="Reparații instalații sanitare">
+                                    <option value="Amenajare grădină">
+                                    <option value="Montaj gresie și faianță">
+                                    <option value="Instalații electrice">
+                                    <option value="Reparații acoperiș">
+                                    <option value="Curățenie după renovare">
+                                    <option value="Montaj mobilier">
+                                    <option value="Transport și mutare">
+                                </datalist>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="county" class="form-select">
+                                    <option value="">Toate județele</option>
+                                    {% for c in counties %}
+                                        <option value="{{ c.id }}" {% if county and county.id == c.id %}selected{% endif %}>
+                                            {{ c.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="rating" class="form-select">
+                                    <option value="">Orice rating</option>
+                                    <option value="4.5" {% if rating_min == '4.5' %}selected{% endif %}>4.5+ stele</option>
+                                    <option value="4.0" {% if rating_min == '4.0' %}selected{% endif %}>4.0+ stele</option>
+                                    <option value="3.5" {% if rating_min == '3.5' %}selected{% endif %}>3.5+ stele</option>
+                                    <option value="3.0" {% if rating_min == '3.0' %}selected{% endif %}>3.0+ stele</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i> Caută
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Search Statistics -->
+            {% if search_performed %}
+            <div class="alert alert-info">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Rezultate căutare:</strong>
+                        {% if query %}pentru "{{ query }}"{% endif %}
+                        {% if county %}în {{ county.name }}{% endif %}
+                        {% if rating_min %}cu rating {{ rating_min }}+{% endif %}
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <small class="text-muted">
+                            {{ verified_craftsmen }} din {{ total_craftsmen }} meșteri verificați
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Results -->
+            <div class="row">
+                <div class="col-lg-8">
+                    {% if craftsmen %}
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 class="mb-0">Meșteri găsiți ({{ page_obj.paginator.count }})</h3>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <input type="radio" class="btn-check" name="sort" id="sort-rating" autocomplete="off" checked>
+                                <label class="btn btn-outline-primary" for="sort-rating">
+                                    <i class="fas fa-star me-1"></i>Rating
+                                </label>
+                                <input type="radio" class="btn-check" name="sort" id="sort-reviews" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="sort-reviews">
+                                    <i class="fas fa-comments me-1"></i>Recenzii
+                                </label>
+                                <input type="radio" class="btn-check" name="sort" id="sort-experience" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="sort-experience">
+                                    <i class="fas fa-briefcase me-1"></i>Experiență
+                                </label>
+                            </div>
+                        </div>
+                        {% for craftsman in craftsmen %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-2 text-center">
+                                        {% if craftsman.user.profile_picture %}
+                                            <img src="{{ craftsman.user.profile_picture.url }}" 
+                                                 class="rounded-circle" width="80" height="80" alt="Profil">
+                                        {% else %}
+                                            <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                                 style="width: 80px; height: 80px;">
+                                                <i class="fas fa-user fs-3"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-7">
+                                        <h5 class="card-title">{{ craftsman.user.get_full_name|default:craftsman.user.email }}</h5>
+                                        <p class="text-muted mb-1">
+                                            <i class="fas fa-tools me-1"></i>{{ craftsman.trade }}
+                                        </p>
+                                        <p class="text-muted mb-1">
+                                            <i class="fas fa-map-marker-alt me-1"></i>{{ craftsman.county.name }}
+                                        </p>
+                                        {% if craftsman.description %}
+                                        <p class="card-text">{{ craftsman.description|truncatewords:20 }}</p>
+                                        {% endif %}
+                                        
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= craftsman.average_rating|floatformat:0|add:0 %}
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star text-muted"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <span class="ms-1 text-muted">({{ craftsman.reviews_count }} recenzii)</span>
+                                            </div>
+                                            {% if craftsman.user.is_verified %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Verificat
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 text-end">
+                                        <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}" 
+                                           class="btn btn-outline-primary mb-2 w-100">
+                                            Vezi profil
+                                        </a>
+                                        <a href="{% url 'services:create_order' %}?craftsman={{ craftsman.pk }}" 
+                                           class="btn btn-primary w-100">
+                                            Contactează
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-search text-muted" style="font-size: 4rem;"></i>
+                            <h3 class="mt-3">Nu am găsit rezultate</h3>
+                            <p class="text-muted">
+                                {% if query %}
+                                    Nu am găsit meșteri pentru "{{ query }}"
+                                    {% if county %}în {{ county.name }}{% endif %}.
+                                {% else %}
+                                    Te rugăm să introduci un termen de căutare.
+                                {% endif %}
+                            </p>
+                            <div class="mt-4">
+                                <a href="{% url 'services:create_order' %}" class="btn btn-primary me-3">
+                                    <i class="fas fa-plus me-2"></i>Postează o comandă
+                                </a>
+                                <a href="{% url 'services:categories' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-list me-2"></i>Vezi toate serviciile
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-lightbulb me-2"></i>Sugestii
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Servicii populare:</h6>
+                            <div class="mb-3">
+                                <a href="{% url 'core:search' %}?q=renovare+baie" class="badge bg-light text-dark text-decoration-none me-1 mb-1">Renovare baie</a>
+                                <a href="{% url 'core:search' %}?q=vopsit+apartament" class="badge bg-light text-dark text-decoration-none me-1 mb-1">Vopsit apartament</a>
+                                <a href="{% url 'core:search' %}?q=montaj+parchet" class="badge bg-light text-dark text-decoration-none me-1 mb-1">Montaj parchet</a>
+                                <a href="{% url 'core:search' %}?q=instalatii+sanitare" class="badge bg-light text-dark text-decoration-none me-1 mb-1">Instalații sanitare</a>
+                                <a href="{% url 'core:search' %}?q=amenajare+gradina" class="badge bg-light text-dark text-decoration-none me-1 mb-1">Amenajare grădină</a>
+                            </div>
+
+                            <h6>Categorii populare:</h6>
+                            <ul class="list-unstyled">
+                                <li><a href="{% url 'services:category_detail' 'renovari-constructii' %}" class="text-decoration-none">Renovări și Construcții</a></li>
+                                <li><a href="{% url 'services:category_detail' 'instalatii-sanitare' %}" class="text-decoration-none">Instalații Sanitare</a></li>
+                                <li><a href="{% url 'services:category_detail' 'instalatii-electrice' %}" class="text-decoration-none">Instalații Electrice</a></li>
+                                <li><a href="{% url 'services:category_detail' 'curatenie-menaj' %}" class="text-decoration-none">Curățenie și Menaj</a></li>
+                                <li><a href="{% url 'services:category_detail' 'gradinarit-peisagistica' %}" class="text-decoration-none">Grădinărit</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-plus me-2"></i>Nu găsești ce cauți?
+                            </h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <p class="text-muted">Postează gratuit o comandă și lasă meșterii să vină la tine!</p>
+                            <a href="{% url 'services:create_order' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Postează comandă
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

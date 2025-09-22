@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Deconectat - Bricli{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <i class="fas fa-sign-out-alt text-success" style="font-size: 4rem;"></i>
+                    <h2 class="mt-4 mb-3">Te-ai deconectat cu succes!</h2>
+                    <p class="text-muted mb-4">
+                        Mulțumim că ai folosit Bricli. Sperăm să te vedem din nou curând!
+                    </p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'core:home' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-home me-2"></i>Înapoi la pagina principală
+                        </a>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Conectează-te din nou
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="mt-4">
+                <h5 class="mb-3">Sau explorează Bricli:</h5>
+                <div class="row">
+                    <div class="col-6">
+                        <a href="{% url 'services:categories' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-list me-2"></i>Vezi serviciile
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{% url 'accounts:craftsmen_list' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-users me-2"></i>Găsește meșteri
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
