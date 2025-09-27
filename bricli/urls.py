@@ -11,6 +11,8 @@ urlpatterns = [
     path('', include('core.urls')),
     path('accounts/', include('accounts.urls')),
     path('services/', include('services.urls')),
+    path('messages/', include('messaging.urls')),
+    path('moderation/', include('moderation.urls')),
 ]
 
 # Serve media files in development

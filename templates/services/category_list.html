@@ -20,8 +20,8 @@
                         <p class="card-text text-muted">{{ category.description }}</p>
                         
                         <div class="mt-3">
-                            <span class="badge bg-light text-dark">
-                                {{ category.services.count }} servicii
+                            <span class="badge text-white" style="background-color: #8B5CF6;">
+                                {{ category.orders_count|default:0 }} comenzi active
                             </span>
                         </div>
                     </div>

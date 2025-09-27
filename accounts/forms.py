@@ -281,7 +281,7 @@ class SimpleCraftsmanRegistrationForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple(attrs={
             'class': 'form-check-input'
         }),
-        label='Serviciile pe care le oferi (1-5 servicii)'
+        label='Serviciile pe care le oferi (1-10 servicii)'
     )
 
     # Informații opționale
@@ -295,9 +295,20 @@ class SimpleCraftsmanRegistrationForm(forms.ModelForm):
         label='Numele companiei (opțional)'
     )
 
+    bio = forms.CharField(
+        max_length=2000,
+        required=True,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control form-control-lg',
+            'rows': 4,
+            'placeholder': 'Descrie-ți serviciile, experiența și ce te face special. Minim 200 caractere...'
+        }),
+        label='Prezintă-te clienților'
+    )
+
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'phone_number', 'password', 'password_confirm', 'county', 'services', 'company_name')
+        fields = ('first_name', 'last_name', 'email', 'phone_number', 'password', 'password_confirm', 'county', 'services', 'company_name', 'bio')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -362,6 +373,12 @@ class SimpleCraftsmanRegistrationForm(forms.ModelForm):
             validate_company_name(company_name)
         return company_name
 
+    def clean_bio(self):
+        from .validators import validate_bio_length
+        bio = self.cleaned_data.get('bio')
+        validate_bio_length(bio)
+        return bio
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.username = self.cleaned_data['email']  # Use email as username
@@ -379,6 +396,7 @@ class SimpleCraftsmanRegistrationForm(forms.ModelForm):
                 user=user,
                 county=self.cleaned_data['county'],
                 company_name=self.cleaned_data.get('company_name', ''),
+                bio=self.cleaned_data.get('bio', ''),
                 description=f"Meșter specializat în {', '.join([s.name for s in self.cleaned_data['services'][:3]])}"
             )
 
@@ -415,22 +433,29 @@ class ProfileUpdateForm(forms.ModelForm):
         self.fields['last_name'].widget.attrs.update({'class': 'form-control'})
         self.fields['email'].widget.attrs.update({'class': 'form-control'})
         self.fields['phone_number'].widget.attrs.update({'class': 'form-control'})
-        self.fields['profile_picture'].widget.attrs.update({'class': 'form-control'})
-        
+        self.fields['profile_picture'].widget = forms.FileInput(attrs={
+            'class': 'form-control',
+            'style': 'display: none;',
+            'accept': 'image/*'
+        })
+
         # Update labels to Romanian
         self.fields['first_name'].label = 'Prenume'
         self.fields['last_name'].label = 'Nume'
         self.fields['email'].label = 'Adresa de email'
         self.fields['phone_number'].label = 'Număr de telefon'
-        self.fields['profile_picture'].label = 'Poză de profil'
+        self.fields['profile_picture'].label = ''
 
 
 class CraftsmanProfileForm(forms.ModelForm):
+    """Formular pentru profilul meșterului cu noua structură"""
+
     class Meta:
         model = CraftsmanProfile
         fields = (
-            'company_name', 'description', 'experience_years', 'hourly_rate',
-            'service_radius', 'county', 'city', 'address', 'tax_number', 'is_company'
+            'display_name', 'county', 'city', 'coverage_radius_km', 'bio',
+            'profile_photo', 'years_experience', 'hourly_rate', 'min_job_value',
+            'company_cui', 'website_url', 'facebook_url', 'instagram_url'
         )
     
     def __init__(self, *args, **kwargs):
@@ -444,27 +469,33 @@ class CraftsmanProfileForm(forms.ModelForm):
                 self.fields[field].widget.attrs.update({'class': 'form-control'})
         
         # Update labels to Romanian
-        self.fields['company_name'].label = 'Numele companiei'
-        self.fields['description'].label = 'Descriere'
-        self.fields['experience_years'].label = 'Ani de experiență'
-        self.fields['hourly_rate'].label = 'Tarif pe oră (RON)'
-        self.fields['service_radius'].label = 'Raza de serviciu (km)'
+        self.fields['display_name'].label = 'Nume afișat'
         self.fields['county'].label = 'Județul'
         self.fields['city'].label = 'Orașul'
-        self.fields['address'].label = 'Adresa'
-        self.fields['tax_number'].label = 'CUI/CNP'
-        self.fields['is_company'].label = 'Sunt o companie'
+        self.fields['coverage_radius_km'].label = 'Raza de acoperire (km)'
+        self.fields['bio'].label = 'Descrierea ta profesională'
+        self.fields['profile_photo'].label = 'Poză de profil'
+        self.fields['years_experience'].label = 'Ani de experiență (opțional)'
+        self.fields['hourly_rate'].label = 'Tarif orientativ pe oră (RON) - opțional'
+        self.fields['min_job_value'].label = 'Valoarea minimă lucrare (RON) - opțional'
+        self.fields['company_cui'].label = 'CUI/CIF (opțional)'
+        self.fields['website_url'].label = 'Site web (opțional)'
+        self.fields['facebook_url'].label = 'Facebook (opțional)'
+        self.fields['instagram_url'].label = 'Instagram (opțional)'
 
         # Set empty labels for select fields
         self.fields['county'].empty_label = 'Selectează județul'
         self.fields['city'].empty_label = 'Selectează orașul'
         
         # Add help text and validation attributes
-        self.fields['description'].help_text = 'Descrie-ți serviciile și experiența (maxim 1000 caractere)'
-        self.fields['service_radius'].help_text = 'Distanța maximă la care te deplasezi pentru lucrări'
+        self.fields['display_name'].help_text = 'Numele sub care vei apărea pe platformă (nume persoană sau denumire comercială)'
+        self.fields['coverage_radius_km'].help_text = 'Distanța maximă la care te deplasezi pentru lucrări (5-150 km)'
+        self.fields['bio'].help_text = 'Descrie-ți serviciile și experiența (minim 200 caractere)'
+        self.fields['profile_photo'].help_text = 'Poză de profil profesională'
+        self.fields['company_cui'].help_text = 'Pentru badge "Firmă înregistrată" - va fi verificat automat'
 
         # Add validation for numeric fields
-        self.fields['experience_years'].widget.attrs.update({
+        self.fields['years_experience'].widget.attrs.update({
             'type': 'number',
             'min': '0',
             'max': '50',
@@ -477,34 +508,110 @@ class CraftsmanProfileForm(forms.ModelForm):
             'step': '0.01',
             'placeholder': 'ex. 50.00'
         })
-        self.fields['service_radius'].widget.attrs.update({
+        self.fields['min_job_value'].widget.attrs.update({
             'type': 'number',
-            'min': '1',
-            'max': '500',
-            'placeholder': 'ex. 50'
+            'min': '50',
+            'max': '100000',
+            'step': '0.01',
+            'placeholder': 'ex. 200.00'
+        })
+        self.fields['coverage_radius_km'].widget.attrs.update({
+            'type': 'number',
+            'min': '5',
+            'max': '150',
+            'placeholder': 'ex. 25'
         })
 
         # Add validation for text fields
-        self.fields['company_name'].widget.attrs.update({
-            'maxlength': '200',
-            'placeholder': 'ex. SC Construct SRL'
+        self.fields['display_name'].widget.attrs.update({
+            'maxlength': '100',
+            'placeholder': 'ex. Ion Popescu sau SC Construct SRL'
         })
-        self.fields['address'].widget.attrs.update({
-            'maxlength': '255',
-            'placeholder': 'Strada, numărul, etc.'
-        })
-        self.fields['tax_number'].widget.attrs.update({
+        self.fields['company_cui'].widget.attrs.update({
             'maxlength': '20',
-            'placeholder': 'ex. RO12345678 sau 1234567890123'
+            'placeholder': 'ex. RO12345678'
         })
 
-        # Make description a textarea with validation
-        self.fields['description'].widget = forms.Textarea(attrs={
-            'rows': 4,
-            'class': 'form-control',
-            'maxlength': '1000',
-            'placeholder': 'Descrie-ți serviciile, experiența și specializările...'
+        # URL fields
+        self.fields['website_url'].widget.attrs.update({
+            'placeholder': 'https://www.site-ul-tau.ro'
         })
+        self.fields['facebook_url'].widget.attrs.update({
+            'placeholder': 'https://facebook.com/pagina-ta'
+        })
+        self.fields['instagram_url'].widget.attrs.update({
+            'placeholder': 'https://instagram.com/contul-tau'
+        })
+
+        # Make bio a textarea with validation
+        self.fields['bio'].widget = forms.Textarea(attrs={
+            'rows': 5,
+            'class': 'form-control',
+            'maxlength': '2000',
+            'placeholder': 'Descrie-ți serviciile, experiența și ce te face special. Minim 200 caractere...'
+        })
+
+        # Profile photo field
+        self.fields['profile_photo'].widget.attrs.update({
+            'accept': 'image/*'
+        })
+
+    def clean_display_name(self):
+        display_name = self.cleaned_data.get('display_name')
+        validate_display_name(display_name)
+        return display_name
+
+    def clean_coverage_radius_km(self):
+        radius = self.cleaned_data.get('coverage_radius_km')
+        validate_coverage_radius(radius)
+        return radius
+
+    def clean_bio(self):
+        bio = self.cleaned_data.get('bio')
+        validate_bio_length(bio)
+        return bio
+
+    def clean_company_cui(self):
+        cui = self.cleaned_data.get('company_cui')
+        if cui:
+            validate_cui_format(cui)
+        return cui
+
+    def clean_hourly_rate(self):
+        rate = self.cleaned_data.get('hourly_rate')
+        if rate:
+            validate_hourly_rate(rate)
+        return rate
+
+    def clean_min_job_value(self):
+        value = self.cleaned_data.get('min_job_value')
+        if value:
+            validate_min_job_value(value)
+        return value
+
+    def clean_website_url(self):
+        url = self.cleaned_data.get('website_url')
+        if url:
+            validate_url_format(url)
+        return url
+
+    def clean_facebook_url(self):
+        url = self.cleaned_data.get('facebook_url')
+        if url:
+            validate_url_format(url)
+        return url
+
+    def clean_instagram_url(self):
+        url = self.cleaned_data.get('instagram_url')
+        if url:
+            validate_url_format(url)
+        return url
+
+    def clean_profile_photo(self):
+        photo = self.cleaned_data.get('profile_photo')
+        if photo:
+            validate_portfolio_image(photo)
+        return photo
 
 
 class CraftsmanPortfolioForm(forms.ModelForm):
@@ -537,12 +644,38 @@ class CraftsmanPortfolioForm(forms.ModelForm):
         })
 
         # Update labels to Romanian
-        self.fields['image'].label = 'Imagine'
-        self.fields['title'].label = 'Titlu lucrare'
-        self.fields['description'].label = 'Descriere'
+        self.fields['image'].label = 'Imagine lucrare'
+        self.fields['title'].label = 'Titlu lucrare (opțional)'
+        self.fields['description'].label = 'Descriere lucrare (opțional)'
 
         # Make description a textarea
-        self.fields['description'].widget = forms.Textarea(attrs={'rows': 3, 'class': 'form-control'})
+        self.fields['description'].widget = forms.Textarea(attrs={
+            'rows': 3,
+            'class': 'form-control',
+            'placeholder': 'Descrie lucrarea realizată...'
+        })
+
+        # Add help text
+        self.fields['image'].help_text = 'Poză cu lucrarea (fără fețe/date personale vizibile). Max 5MB.'
+        self.fields['title'].help_text = 'Numele lucrării (ex: Renovare baie modernă)'
+        self.fields['description'].help_text = 'Detalii despre lucrarea realizată'
+
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        validate_portfolio_image(image)
+        return image
+
+    def clean_title(self):
+        title = self.cleaned_data.get('title')
+        if title:
+            validate_no_profanity(title)
+        return title
+
+    def clean_description(self):
+        description = self.cleaned_data.get('description')
+        if description:
+            validate_no_profanity(description)
+        return description
 
 
 class BulkPortfolioUploadForm(forms.Form):

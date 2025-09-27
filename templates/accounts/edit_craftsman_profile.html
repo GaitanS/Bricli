@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editează Profilul - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-form-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    
+    .form-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin: 2rem auto;
+        max-width: 800px;
+    }
+    
+    .profile-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #4a5568;
+    }
+    
+    .profile-header h2 {
+        color: #667eea;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .completion-bar {
+        background: #e2e8f0;
+        border-radius: 10px;
+        height: 20px;
+        margin: 1rem 0;
+        overflow: hidden;
+    }
+    
+    .completion-fill {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        height: 100%;
+        transition: width 0.3s ease;
+        border-radius: 10px;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: #f8fafc;
+        border-radius: 15px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .section-title {
+        color: #667eea;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 1rem;
+    }
+    
+    .form-floating > .form-control {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1rem 0.75rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-floating > .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .form-floating > label {
+        color: #64748b;
+        font-weight: 500;
+    }
+    
+    .badge-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .profile-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .badge-complete {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .badge-verified {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .badge-top-rated {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .portfolio-preview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .portfolio-item {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        aspect-ratio: 1;
+        background: #f1f5f9;
+        border: 2px dashed #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+    }
+    
+    .portfolio-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .data-protection-notice {
+        background: #f0f9ff;
+        border: 1px solid #0ea5e9;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+        color: #0c4a6e;
+    }
+    
+    .data-protection-notice .icon {
+        color: #0ea5e9;
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-form-container">
+    <div class="container">
+        <div class="form-card">
+            <div class="profile-header">
+                <h2><i class="fas fa-user-edit"></i> Editează Profilul</h2>
+                <p class="text-muted">Completează-ți profilul pentru a primi mai multe comenzi</p>
+                
+                <!-- Bara de completare profil -->
+                <div class="completion-bar">
+                    <div class="completion-fill" style="width: {{ profile.profile_completion }}%"></div>
+                </div>
+                <small class="text-muted">Profil completat: {{ profile.profile_completion }}%</small>
+                
+                <!-- Badge-uri -->
+                {% if profile.get_badges %}
+                <div class="badge-container">
+                    {% for badge in profile.get_badges %}
+                        <span class="profile-badge badge-{{ badge.type }}">
+                            <i class="fas fa-{{ badge.icon }}"></i>
+                            {{ badge.name }}
+                        </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Notificare protecția datelor -->
+            <div class="data-protection-notice">
+                <i class="fas fa-shield-alt icon"></i>
+                <strong>Protecția datelor:</strong> Nu colectăm acte de identitate sau documente personale. 
+                Datele de contact nu se afișează public până la acceptarea unei oferte.
+            </div>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Informații de bază -->
+                <div class="form-section">
+                    <h5 class="section-title"><i class="fas fa-user"></i> Informații de Bază</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.display_name }}
+                                <label for="{{ form.display_name.id_for_label }}">{{ form.display_name.label }}</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.profile_photo }}
+                                <label for="{{ form.profile_photo.id_for_label }}">{{ form.profile_photo.label }}</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-floating">
+                        {{ form.bio }}
+                        <label for="{{ form.bio.id_for_label }}">{{ form.bio.label }}</label>
+                        <small class="text-muted">Minim 200 caractere - descrie ce tip de lucrări faci</small>
+                    </div>
+                </div>
+                
+                <!-- Locație și acoperire -->
+                <div class="form-section">
+                    <h5 class="section-title"><i class="fas fa-map-marker-alt"></i> Locație și Acoperire</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                {{ form.county }}
+                                <label for="{{ form.county.id_for_label }}">{{ form.county.label }}</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                {{ form.city }}
+                                <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                {{ form.coverage_radius_km }}
+                                <label for="{{ form.coverage_radius_km.id_for_label }}">{{ form.coverage_radius_km.label }}</label>
+                                <small class="text-muted">5-150 km</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informații opționale -->
+                <div class="form-section">
+                    <h5 class="section-title"><i class="fas fa-briefcase"></i> Informații Opționale</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                {{ form.years_experience }}
+                                <label for="{{ form.years_experience.id_for_label }}">{{ form.years_experience.label }}</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                {{ form.hourly_rate }}
+                                <label for="{{ form.hourly_rate.id_for_label }}">{{ form.hourly_rate.label }}</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                {{ form.min_job_value }}
+                                <label for="{{ form.min_job_value.id_for_label }}">{{ form.min_job_value.label }}</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-floating">
+                        {{ form.company_cui }}
+                        <label for="{{ form.company_cui.id_for_label }}">{{ form.company_cui.label }}</label>
+                        <small class="text-muted">Opțional - pentru verificarea companiei</small>
+                    </div>
+                </div>
+                
+                <!-- Link-uri sociale -->
+                <div class="form-section">
+                    <h5 class="section-title"><i class="fas fa-share-alt"></i> Link-uri Sociale (Opțional)</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                {{ form.website_url }}
+                                <label for="{{ form.website_url.id_for_label }}">{{ form.website_url.label }}</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                {{ form.facebook_url }}
+                                <label for="{{ form.facebook_url.id_for_label }}">{{ form.facebook_url.label }}</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                {{ form.instagram_url }}
+                                <label for="{{ form.instagram_url.id_for_label }}">{{ form.instagram_url.label }}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> Salvează Profilul
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -6,11 +6,14 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView, T
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db import models
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
 from .models import User, CraftsmanProfile, CraftsmanPortfolio, County, City
 from .forms import (
     UserRegistrationForm, CraftsmanRegistrationForm, ProfileUpdateForm,
     SimpleUserRegistrationForm, SimpleCraftsmanRegistrationForm,
-    CraftsmanPortfolioForm, BulkPortfolioUploadForm, CraftsmanSkillsForm
+    CraftsmanProfileForm, CraftsmanPortfolioForm, BulkPortfolioUploadForm, CraftsmanSkillsForm
 )
 
 
@@ -48,10 +51,76 @@ class SimpleCraftsmanRegisterView(CreateView):
     success_url = reverse_lazy('core:home')
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        login(self.request, self.object)
-        messages.success(self.request, 'Contul de meșter a fost creat cu succes! Bun venit pe Bricli!')
-        return response
+        # Save the user and profile normally first
+        user = form.save(commit=True)  # This creates user, profile, and services
+
+        # Then deactivate the user for email confirmation
+        user.is_active = False
+        user.save()
+
+        # Send confirmation email
+        self.send_confirmation_email(user)
+
+        # Don't login the user yet - they need to confirm email first
+        messages.success(
+            self.request,
+            f'Contul a fost creat cu succes! Am trimis un email de confirmare la {user.email}. '
+            'Te rugăm să verifici emailul și să apeși pe linkul de confirmare pentru a-ți activa contul.'
+        )
+        return redirect('accounts:registration_complete')
+
+    def send_confirmation_email(self, user):
+        """Send email confirmation to new user"""
+        from django.core.mail import send_mail
+        from django.template.loader import render_to_string
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+        from django.contrib.auth.tokens import default_token_generator
+        from django.conf import settings
+
+        # Generate confirmation token
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        # Build confirmation URL
+        confirmation_url = self.request.build_absolute_uri(
+            f'/accounts/confirm-email/{uid}/{token}/'
+        )
+
+        # Email content
+        subject = 'Confirmă-ți contul Bricli'
+        message = f"""
+Bună {user.get_full_name()},
+
+Bun venit pe Bricli! Pentru a-ți activa contul de meșter, te rugăm să apeși pe linkul de mai jos:
+
+{confirmation_url}
+
+Dacă nu te-ai înregistrat pe Bricli, poți ignora acest email.
+
+Cu respect,
+Echipa Bricli
+        """
+
+        try:
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            # Log error but don't fail registration
+            print(f"Failed to send confirmation email: {e}")
+            # Activate user immediately if email fails
+            user.is_active = True
+            user.save()
+            messages.warning(
+                self.request,
+                'Contul a fost creat dar nu am putut trimite emailul de confirmare. '
+                'Contul tău este activ și te poți conecta acum.'
+            )
 
 
 class CraftsmanRegisterView(CreateView):
@@ -189,6 +258,13 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def form_valid(self, form):
+        # Handle profile picture removal
+        if self.request.POST.get('remove_picture') == 'true':
+            if self.request.user.profile_picture:
+                self.request.user.profile_picture.delete()
+                self.request.user.profile_picture = None
+                self.request.user.save()
+
         messages.success(self.request, 'Profilul a fost actualizat cu succes!')
         return super().form_valid(form)
 
@@ -220,6 +296,7 @@ class CraftsmenListView(ListView):
         return queryset.order_by('-user__is_verified', '-average_rating', '-total_reviews')
 
     def get_context_data(self, **kwargs):
+        from services.models import Service
         context = super().get_context_data(**kwargs)
         context.update({
             'counties': County.objects.all().order_by('name'),
@@ -227,6 +304,7 @@ class CraftsmenListView(ListView):
             'verified_craftsmen': CraftsmanProfile.objects.filter(
                 user__is_active=True, user__is_verified=True
             ).count(),
+            'total_services': Service.objects.filter(is_active=True).count(),
         })
         return context
 
@@ -429,3 +507,173 @@ class CraftsmanOnboardingView(LoginRequiredMixin, TemplateView):
             'current_step': '3',
             'portfolio_form': form
         })
+
+
+class EditCraftsmanProfileView(LoginRequiredMixin, UpdateView):
+    """View pentru editarea profilului de meșter cu noul sistem"""
+    model = CraftsmanProfile
+    form_class = CraftsmanProfileForm
+    template_name = 'accounts/edit_craftsman_profile.html'
+    success_url = reverse_lazy('accounts:profile')
+
+    def get_object(self):
+        profile, created = CraftsmanProfile.objects.get_or_create(
+            user=self.request.user,
+            defaults={
+                'display_name': self.request.user.get_full_name() or self.request.user.username,
+                'bio': 'Meșter profesionist cu experiență în domeniu.',
+            }
+        )
+        return profile
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        # Actualizează procentajul de completare și badge-urile
+        self.object.update_profile_completion()
+        self.object.update_badges()
+        messages.success(self.request, 'Profilul a fost actualizat cu succes!')
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = self.object
+        return context
+
+
+class ManagePortfolioView(LoginRequiredMixin, TemplateView):
+    """View pentru gestionarea portofoliului"""
+    template_name = 'accounts/manage_portfolio.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profile = get_object_or_404(CraftsmanProfile, user=self.request.user)
+        context['portfolio_items'] = CraftsmanPortfolio.objects.filter(
+            craftsman=profile
+        ).order_by('-created_at')
+        context['profile'] = profile
+        return context
+
+    def post(self, request, *args, **kwargs):
+        """Handle portfolio item creation"""
+        profile = get_object_or_404(CraftsmanProfile, user=request.user)
+        form = CraftsmanPortfolioForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            portfolio_item = form.save(commit=False)
+            portfolio_item.craftsman = profile
+            portfolio_item.save()
+
+            # Actualizează procentajul de completare
+            profile.update_profile_completion()
+            profile.update_badges()
+
+            messages.success(request, 'Lucrarea a fost adăugată în portofoliu!')
+            return redirect('accounts:manage_portfolio')
+        else:
+            messages.error(request, 'Eroare la adăugarea lucrării. Verifică datele introduse.')
+            return self.get(request, *args, **kwargs)
+
+
+# AJAX validation views
+@require_http_methods(["POST"])
+@csrf_exempt
+def validate_email_ajax(request):
+    """AJAX endpoint pentru validarea email-ului în timp real"""
+    email = request.POST.get('email', '').strip()
+
+    if not email:
+        return JsonResponse({
+            'valid': False,
+            'message': 'Adresa de email este obligatorie.'
+        })
+
+    # Verifică formatul
+    from django.core.validators import validate_email
+    from django.core.exceptions import ValidationError
+
+    try:
+        validate_email(email)
+    except ValidationError:
+        return JsonResponse({
+            'valid': False,
+            'message': 'Adresa de email nu este validă.'
+        })
+
+    # Verifică dacă există deja în baza de date
+    if User.objects.filter(email=email).exists():
+        return JsonResponse({
+            'valid': False,
+            'message': 'Un utilizator cu această adresă de email există deja.'
+        })
+
+    return JsonResponse({
+        'valid': True,
+        'message': 'Adresa de email este disponibilă.'
+    })
+
+
+@require_http_methods(["POST"])
+@csrf_exempt
+def validate_phone_ajax(request):
+    """AJAX endpoint pentru validarea numărului de telefon în timp real"""
+    phone = request.POST.get('phone', '').strip()
+
+    if not phone:
+        return JsonResponse({
+            'valid': True,  # Telefonul poate fi opțional
+            'message': ''
+        })
+
+    # Verifică formatul românesc
+    import re
+    if not re.match(r'^(\+40|0040|0)[0-9]{9}$', phone.replace(' ', '').replace('-', '')):
+        return JsonResponse({
+            'valid': False,
+            'message': 'Numărul de telefon nu este valid. Folosește formatul românesc (ex: 0721234567).'
+        })
+
+    # Verifică dacă există deja în baza de date
+    if User.objects.filter(phone_number=phone).exists():
+        return JsonResponse({
+            'valid': False,
+            'message': 'Un utilizator cu acest număr de telefon există deja.'
+        })
+
+    return JsonResponse({
+        'valid': True,
+        'message': 'Numărul de telefon este disponibil.'
+    })
+
+
+class RegistrationCompleteView(TemplateView):
+    """View shown after successful registration"""
+    template_name = 'accounts/registration_complete.html'
+
+
+def confirm_email(request, uidb64, token):
+    """Confirm user email and activate account"""
+    from django.utils.http import urlsafe_base64_decode
+    from django.utils.encoding import force_str
+    from django.contrib.auth.tokens import default_token_generator
+
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        messages.success(
+            request,
+            'Emailul a fost confirmat cu succes! Contul tău este acum activ. Bun venit pe Bricli!'
+        )
+        return redirect('core:home')
+    else:
+        messages.error(
+            request,
+            'Linkul de confirmare este invalid sau a expirat. Te rugăm să încerci din nou.'
+        )
+        return redirect('accounts:simple_craftsman_register')

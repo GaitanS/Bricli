@@ -79,43 +79,289 @@ class City(models.Model):
 
 
 class CraftsmanProfile(models.Model):
+    """
+    Profil meșter redesigned pentru protecția datelor și profesionalism.
+    Câmpuri obligatorii: display_name, city/county, coverage_radius_km, categories, bio, profile_photo, portfolio (min 3 poze)
+    """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='craftsman_profile')
-    company_name = models.CharField(max_length=200, blank=True)
-    description = models.TextField(max_length=1000, blank=True)
-    experience_years = models.PositiveIntegerField(default=0)
-    hourly_rate = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
-    service_radius = models.PositiveIntegerField(default=50, help_text="Raza de serviciu în km")
 
-    # Location
-    county = models.ForeignKey(County, on_delete=models.SET_NULL, null=True, blank=True)
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
-    address = models.CharField(max_length=300, blank=True)
+    # CÂMPURI OBLIGATORII (temporar opționale pentru migrație)
+    display_name = models.CharField(
+        max_length=100,
+        blank=True, null=True,
+        help_text="Nume afișat (nume persoană sau denumire comercială)"
+    )
 
-    # Business details
-    tax_number = models.CharField(max_length=50, blank=True, help_text="CUI/CNP")
-    is_company = models.BooleanField(default=False)
+    # Locație obligatorie (temporar opțională pentru migrație)
+    county = models.ForeignKey(County, on_delete=models.CASCADE, null=True, blank=True)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
 
-    # Ratings
+    # Raza de acoperire obligatorie (5-150 km)
+    coverage_radius_km = models.PositiveSmallIntegerField(
+        default=25,
+        help_text="Raza de acoperire în km (5-150)"
+    )
+
+    # Descriere obligatorie (min 200 caractere) (temporar opțională pentru migrație)
+    bio = models.TextField(
+        blank=True, null=True,
+        help_text="Descriere scurtă - ce tip de lucrări faci (minim 200 caractere)"
+    )
+
+    # Poză de profil obligatorie (temporar opțională pentru migrație)
+    profile_photo = models.ImageField(
+        upload_to='profiles/',
+        blank=True, null=True,
+        help_text="Poză de profil"
+    )
+
+    # CÂMPURI OPȚIONALE (dar utile pentru clienți)
+    years_experience = models.PositiveSmallIntegerField(
+        null=True, blank=True,
+        help_text="Ani de experiență"
+    )
+
+    # Tarife orientative
+    hourly_rate = models.DecimalField(
+        max_digits=8, decimal_places=2,
+        null=True, blank=True,
+        help_text="Tarif orientativ (lei/oră)"
+    )
+
+    min_job_value = models.DecimalField(
+        max_digits=10, decimal_places=2,
+        null=True, blank=True,
+        help_text="Valoare minimă lucrare (lei)"
+    )
+
+    # Informații firmă (opțional)
+    company_cui = models.CharField(
+        max_length=20, blank=True,
+        help_text="CUI/CIF (dacă e firmă/PFA) - pentru badge 'Firmă înregistrată'"
+    )
+    company_verified_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Data verificării CUI (setat automat)"
+    )
+
+    # Linkuri publice (opțional)
+    website_url = models.URLField(blank=True, help_text="Site web")
+    facebook_url = models.URLField(blank=True, help_text="Facebook")
+    instagram_url = models.URLField(blank=True, help_text="Instagram")
+
+    # SISTEM DE RATING ȘI REPUTAȚIE
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     total_reviews = models.PositiveIntegerField(default=0)
     total_jobs_completed = models.PositiveIntegerField(default=0)
 
+    # CALCULARE COMPLETARE PROFIL (0-100%)
+    profile_completion = models.PositiveSmallIntegerField(default=0)
+
+    # BADGE-URI AUTOMATE
+    is_profile_complete = models.BooleanField(default=False)
+    is_company_verified = models.BooleanField(default=False)
+    is_top_rated = models.BooleanField(default=False)  # ≥4.5 rating cu min reviews
+    is_active = models.BooleanField(default=False)  # După 3 joburi finalizate
+    is_trusted = models.BooleanField(default=False)  # După 10 recenzii verificate
+
+    # TIMESTAMPS
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "Profil Meșter"
+        verbose_name_plural = "Profile Meșteri"
+
     def __str__(self):
-        return f"{self.user.get_full_name() or self.user.username} - {self.company_name or 'Meseriaș'}"
+        city_name = self.city.name if self.city else "Necunoscut"
+        county_name = self.county.name if self.county else "Necunoscut"
+        return f"{self.display_name} - {city_name}, {county_name}"
+
+    def calculate_profile_completion(self):
+        """Calculează procentajul de completare a profilului (0-100%)"""
+        score = 0
+        total_points = 100
+
+        # Câmpuri obligatorii (60 puncte total)
+        if self.display_name:
+            score += 10
+        if self.county and self.city:
+            score += 10
+        if self.coverage_radius_km and 5 <= self.coverage_radius_km <= 150:
+            score += 10
+        if self.bio and len(self.bio.strip()) >= 200:
+            score += 15
+        if self.profile_photo:
+            score += 15
+
+        # Portfolio (min 3 poze) - 20 puncte
+        portfolio_count = self.portfolio_images.count()
+        if portfolio_count >= 3:
+            score += 20
+        elif portfolio_count > 0:
+            score += (portfolio_count * 20) // 3
+
+        # Servicii/categorii (10 puncte)
+        if hasattr(self, 'services') and self.services.exists():
+            score += 10
+
+        # Câmpuri opționale (10 puncte total)
+        if self.years_experience:
+            score += 3
+        if self.hourly_rate or self.min_job_value:
+            score += 3
+        if self.website_url or self.facebook_url or self.instagram_url:
+            score += 2
+        if self.company_cui:
+            score += 2
+
+        return min(score, total_points)
+
+    def update_profile_completion(self):
+        """Actualizează procentajul de completare și badge-urile"""
+        self.profile_completion = self.calculate_profile_completion()
+        self.is_profile_complete = self.profile_completion == 100
+
+        # Update badge-uri
+        self.update_badges()
+
+        # Salvează fără a declanșa din nou save()
+        CraftsmanProfile.objects.filter(pk=self.pk).update(
+            profile_completion=self.profile_completion,
+            is_profile_complete=self.is_profile_complete,
+            is_company_verified=self.is_company_verified,
+            is_top_rated=self.is_top_rated,
+            is_active=self.is_active,
+            is_trusted=self.is_trusted
+        )
+
+    def update_badges(self):
+        """Actualizează badge-urile bazate pe criterii"""
+        # Badge "Firmă înregistrată" - CUI validat
+        self.is_company_verified = bool(self.company_cui and self.company_verified_at)
+
+        # Badge "Top Rated" - rating ≥4.5 cu minim 5 recenzii
+        self.is_top_rated = (
+            self.average_rating >= 4.5 and
+            self.total_reviews >= 5
+        )
+
+        # Badge "Activ" - după primele 3 joburi finalizate
+        self.is_active = self.total_jobs_completed >= 3
+
+        # Badge "De încredere" - după 10 recenzii verificate
+        self.is_trusted = self.total_reviews >= 10
+
+    def can_bid_on_jobs(self):
+        """Verifică dacă meșterul poate licita (profil complet)"""
+        return (
+            self.is_profile_complete and
+            self.profile_photo and
+            self.portfolio_images.count() >= 3 and
+            len(self.bio.strip()) >= 200 and
+            self.coverage_radius_km
+        )
+
+    def get_badges(self):
+        """Returnează lista de badge-uri active"""
+        badges = []
+
+        if self.is_profile_complete:
+            badges.append({
+                'name': 'Profil complet',
+                'icon': 'fas fa-check-circle',
+                'color': 'success',
+                'description': '100% profil completat'
+            })
+
+        if self.is_company_verified:
+            badges.append({
+                'name': 'Firmă înregistrată',
+                'icon': 'fas fa-building',
+                'color': 'primary',
+                'description': 'CUI validat automat'
+            })
+
+        if self.is_top_rated:
+            badges.append({
+                'name': 'Top Rated',
+                'icon': 'fas fa-star',
+                'color': 'warning',
+                'description': f'Rating {self.average_rating} cu {self.total_reviews} recenzii'
+            })
+
+        if self.is_active:
+            badges.append({
+                'name': 'Activ',
+                'icon': 'fas fa-bolt',
+                'color': 'info',
+                'description': f'{self.total_jobs_completed} lucrări finalizate'
+            })
+
+        if self.is_trusted:
+            badges.append({
+                'name': 'De încredere',
+                'icon': 'fas fa-shield-alt',
+                'color': 'success',
+                'description': f'{self.total_reviews} recenzii verificate'
+            })
+
+        return badges
+
+    def save(self, *args, **kwargs):
+        # Calculează completarea profilului la fiecare salvare
+        self.profile_completion = self.calculate_profile_completion()
+        self.is_profile_complete = self.profile_completion == 100
+        self.update_badges()
+
+        super().save(*args, **kwargs)
 
 
 class CraftsmanPortfolio(models.Model):
-    craftsman = models.ForeignKey(CraftsmanProfile, on_delete=models.CASCADE, related_name='portfolio_images')
-    image = models.ImageField(upload_to='portfolio/')
-    title = models.CharField(max_length=200, blank=True)
-    description = models.TextField(max_length=500, blank=True)
+    """
+    Portofoliu meșter - minim 3 poze obligatorii pentru profil complet.
+    Fără fețe/PII vizibile - doar lucrări.
+    """
+    craftsman = models.ForeignKey(
+        CraftsmanProfile,
+        on_delete=models.CASCADE,
+        related_name='portfolio_images'
+    )
+
+    image = models.ImageField(
+        upload_to='portfolio/%Y/%m/',
+        help_text="Poză cu lucrarea (fără fețe/date personale vizibile)"
+    )
+
+    title = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Titlu lucrare (opțional)"
+    )
+
+    description = models.TextField(
+        max_length=500,
+        blank=True,
+        help_text="Descriere lucrare (opțional)"
+    )
+
+    # Moderare automată
+    is_approved = models.BooleanField(default=True)
+    is_flagged = models.BooleanField(default=False)
+    flagged_reason = models.CharField(max_length=200, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']
+        verbose_name = "Imagine Portofoliu"
+        verbose_name_plural = "Imagini Portofoliu"
 
     def __str__(self):
-        return f"{self.craftsman.user.username} - {self.title or 'Portfolio Image'}"
+        return f"{self.craftsman.display_name} - {self.title or 'Imagine Portofoliu'}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Actualizează completarea profilului meșterului
+        self.craftsman.update_profile_completion()

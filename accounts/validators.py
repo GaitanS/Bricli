@@ -229,13 +229,145 @@ def validate_description(description):
 
 def validate_services_selection(services):
     """
-    Validează selecția de servicii (1-5 servicii).
+    Validează selecția de servicii (1-10 servicii).
     """
     if not services:
         raise ValidationError('Trebuie să selectezi cel puțin un serviciu.')
-    
-    if len(services) > 5:
-        raise ValidationError('Poți selecta maximum 5 servicii.')
-    
+
+    if len(services) > 10:
+        raise ValidationError('Poți selecta maximum 10 servicii.')
+
     if len(services) < 1:
         raise ValidationError('Trebuie să selectezi cel puțin un serviciu.')
+
+
+def validate_coverage_radius(radius):
+    """
+    Validează raza de acoperire (5-150 km).
+    """
+    if radius < 5:
+        raise ValidationError('Raza de acoperire trebuie să fie cel puțin 5 km.')
+
+    if radius > 150:
+        raise ValidationError('Raza de acoperire nu poate fi mai mare de 150 km.')
+
+
+def validate_bio_length(bio):
+    """
+    Validează că biografia are minim 200 caractere.
+    """
+    if not bio:
+        raise ValidationError('Biografia este obligatorie.')
+
+    clean_bio = bio.strip()
+    if len(clean_bio) < 200:
+        raise ValidationError(f'Biografia trebuie să aibă cel puțin 200 caractere. Ai scris {len(clean_bio)} caractere.')
+
+    # Verifică profanity
+    validate_no_profanity(bio)
+
+
+def validate_cui_format(cui):
+    """
+    Validează formatul CUI românesc.
+    """
+    if not cui:
+        return  # Opțional
+
+    # Elimină spațiile și caracterele speciale
+    clean_cui = re.sub(r'[^0-9]', '', cui)
+
+    # CUI românesc: 2-10 cifre
+    if not re.match(r'^\d{2,10}$', clean_cui):
+        raise ValidationError('CUI-ul trebuie să conțină între 2 și 10 cifre.')
+
+    # Verificare cifră de control pentru CUI-uri complete (8+ cifre)
+    if len(clean_cui) >= 8:
+        # Algoritmul de verificare CUI românesc
+        control_key = "753217532"
+        if len(clean_cui) == 10:
+            # CUI cu 10 cifre
+            check_sum = sum(int(clean_cui[i]) * int(control_key[i]) for i in range(9))
+            control_digit = check_sum * 10 % 11
+            if control_digit == 10:
+                control_digit = 0
+
+            if int(clean_cui[9]) != control_digit:
+                raise ValidationError('CUI-ul nu este valid (cifra de control incorectă).')
+
+
+def validate_url_format(url):
+    """
+    Validează formatul URL-ului.
+    """
+    if not url:
+        return  # Opțional
+
+    # Verifică că URL-ul începe cu http:// sau https://
+    if not url.startswith(('http://', 'https://')):
+        raise ValidationError('URL-ul trebuie să înceapă cu http:// sau https://')
+
+    # Verifică că nu conține cuvinte jignitoare
+    validate_no_profanity(url)
+
+
+def validate_hourly_rate(rate):
+    """
+    Validează tariful pe oră.
+    """
+    if rate is None:
+        return  # Opțional
+
+    if rate < 10:
+        raise ValidationError('Tariful pe oră trebuie să fie cel puțin 10 lei.')
+
+    if rate > 1000:
+        raise ValidationError('Tariful pe oră nu poate fi mai mare de 1000 lei.')
+
+
+def validate_min_job_value(value):
+    """
+    Validează valoarea minimă a lucrării.
+    """
+    if value is None:
+        return  # Opțional
+
+    if value < 50:
+        raise ValidationError('Valoarea minimă a lucrării trebuie să fie cel puțin 50 lei.')
+
+    if value > 100000:
+        raise ValidationError('Valoarea minimă a lucrării nu poate fi mai mare de 100.000 lei.')
+
+
+def validate_portfolio_image(image):
+    """
+    Validează imaginea din portofoliu.
+    """
+    if not image:
+        raise ValidationError('Imaginea este obligatorie.')
+
+    # Verifică dimensiunea fișierului (max 5MB)
+    if image.size > 5 * 1024 * 1024:
+        raise ValidationError('Imaginea nu poate fi mai mare de 5MB.')
+
+    # Verifică tipul fișierului
+    allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if hasattr(image, 'content_type') and image.content_type not in allowed_types:
+        raise ValidationError('Tipul de fișier nu este permis. Folosește JPEG, PNG sau WebP.')
+
+
+def validate_display_name(name):
+    """
+    Validează numele afișat.
+    """
+    if not name:
+        raise ValidationError('Numele afișat este obligatoriu.')
+
+    if len(name.strip()) < 2:
+        raise ValidationError('Numele afișat trebuie să aibă cel puțin 2 caractere.')
+
+    if len(name) > 100:
+        raise ValidationError('Numele afișat nu poate fi mai lung de 100 caractere.')
+
+    # Verifică profanity
+    validate_no_profanity(name)

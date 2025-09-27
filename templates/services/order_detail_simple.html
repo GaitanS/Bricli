@@ -213,8 +213,24 @@
             <div class="card mt-3">
                 <div class="card-body">
                     <a href="{% url 'services:create_quote' order.pk %}" class="btn btn-primary w-100">
-                        Trimite Ofertă
+                        <i class="fas fa-paper-plane me-2"></i>Trimite Ofertă
                     </a>
+                </div>
+            </div>
+            {% elif user.user_type == 'craftsman' and quote_disabled_reason %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <button class="btn btn-secondary w-100" disabled title="{{ quote_disabled_reason }}">
+                        <i class="fas fa-lock me-2"></i>Nu poți licita
+                    </button>
+                    <small class="text-muted d-block mt-2">
+                        <i class="fas fa-info-circle me-1"></i>{{ quote_disabled_reason }}
+                    </small>
+                    {% if 'Profil incomplet' in quote_disabled_reason %}
+                    <a href="{% url 'accounts:edit_craftsman_profile' %}" class="btn btn-outline-primary btn-sm mt-2 w-100">
+                        <i class="fas fa-user-edit me-2"></i>Completează profilul
+                    </a>
+                    {% endif %}
                 </div>
             </div>
             {% elif user == order.client %}

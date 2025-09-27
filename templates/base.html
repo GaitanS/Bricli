@@ -56,21 +56,29 @@
                                 {{ user.get_full_name|default:user.username }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profilul meu</a></li>
-                                <li><a class="dropdown-item" href="{% url 'services:my_orders' %}">Comenzile mele</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                    <i class="fas fa-user me-2"></i>Profilul meu
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'messaging:conversation_list' %}">
+                                    <i class="fas fa-envelope me-2"></i>Mesajele mele
+                                    <span id="unread-badge" class="badge bg-danger ms-2" style="display: none;">0</span>
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'services:my_orders' %}">
+                                    <i class="fas fa-clipboard-list me-2"></i>Comenzile mele
+                                </a></li>
                                 {% if user.user_type == 'craftsman' %}
                                     <li><a class="dropdown-item" href="{% url 'services:craftsman_services' %}">
                                         <i class="fas fa-tools me-2"></i>Serviciile mele
                                     </a></li>
-                                    <li><a class="dropdown-item" href="{% url 'services:available_orders' %}">
-                                        <i class="fas fa-clipboard-list me-2"></i>Comenzi Disponibile
-                                    </a></li>
+
                                     <li><a class="dropdown-item" href="{% url 'services:wallet' %}">
                                         <i class="fas fa-wallet me-2"></i>Wallet Credit
                                     </a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Deconectare</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Deconectare
+                                </a></li>
                             </ul>
                         </li>
                     {% else %}
@@ -78,7 +86,7 @@
                             <a class="nav-link" href="{% url 'accounts:login' %}">Conectare</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-gradient ms-2" href="{% url 'accounts:register' %}">Înregistrare</a>
+                            <a class="btn ms-2" href="{% url 'accounts:register' %}" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); border: none; color: white; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 500;">Înregistrare</a>
                         </li>
                     {% endif %}
                 </ul>

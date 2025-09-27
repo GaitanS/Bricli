@@ -12,6 +12,7 @@ from .models import ServiceCategory, Service, Order, Quote, Review, ReviewImage,
 from .forms import OrderForm, ReviewForm, ReviewImageForm, MultipleReviewImageForm, QuoteForm, CraftsmanServiceForm
 from accounts.models import CraftsmanProfile, County, City
 from .decorators import CraftsmanRequiredMixin, ClientRequiredMixin, can_post_orders, can_post_services
+from moderation.decorators import order_creation_limit, quote_creation_limit, review_creation_limit, RateLimitMixin
 
 
 class ServiceCategoryListView(ListView):
@@ -20,7 +21,9 @@ class ServiceCategoryListView(ListView):
     context_object_name = 'categories'
 
     def get_queryset(self):
-        return ServiceCategory.objects.filter(is_active=True)
+        return ServiceCategory.objects.filter(is_active=True).annotate(
+            orders_count=Count('services__order', filter=Q(services__order__status='published'))
+        )
 
 
 class ServiceCategoryDetailView(DetailView):
@@ -35,10 +38,17 @@ class ServiceCategoryDetailView(DetailView):
             service__category=self.object,
             status='published'
         )[:6]
-        # Add craftsmen count and featured craftsmen
+
+        # Add statistics for the category
         context['craftsmen_count'] = CraftsmanProfile.objects.filter(
             services__service__category=self.object
         ).distinct().count()
+
+        context['completed_orders_count'] = Order.objects.filter(
+            service__category=self.object,
+            status='completed'
+        ).count()
+
         context['featured_craftsmen'] = CraftsmanProfile.objects.filter(
             services__service__category=self.object,
             user__is_verified=True
@@ -47,10 +57,14 @@ class ServiceCategoryDetailView(DetailView):
         return context
 
 
-class CreateOrderView(ClientRequiredMixin, CreateView):
+class CreateOrderView(ClientRequiredMixin, RateLimitMixin, CreateView):
     model = Order
     template_name = 'services/create_order.html'
     form_class = OrderForm
+
+    # Rate limiting configuration
+    rate_limit_type = 'order_creation'
+    rate_limit_redirect_url = 'services:my_orders'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -80,12 +94,24 @@ class OrderDetailView(DetailView):
         context['quotes'] = order.quotes.select_related('craftsman__user').order_by('-created_at')
 
         # Check if current user can quote (is craftsman and order is published)
-        context['can_quote'] = (
-            self.request.user.is_authenticated and
-            self.request.user.user_type == 'craftsman' and
-            order.status == 'published' and
-            not order.quotes.filter(craftsman=self.request.user.craftsman_profile).exists()
-        )
+        can_quote = False
+        quote_disabled_reason = None
+
+        if self.request.user.is_authenticated and self.request.user.user_type == 'craftsman':
+            if order.status != 'published':
+                quote_disabled_reason = 'Comanda nu este disponibilă pentru oferte'
+            elif not hasattr(self.request.user, 'craftsman_profile'):
+                quote_disabled_reason = 'Trebuie să îți completezi profilul de meșter'
+            elif not self.request.user.craftsman_profile.can_bid_on_jobs():
+                completion = self.request.user.craftsman_profile.profile_completion
+                quote_disabled_reason = f'Profil incomplet ({completion}%) - completează profilul pentru a licita'
+            elif order.quotes.filter(craftsman=self.request.user.craftsman_profile).exists():
+                quote_disabled_reason = 'Ai trimis deja o ofertă pentru această comandă'
+            else:
+                can_quote = True
+
+        context['can_quote'] = can_quote
+        context['quote_disabled_reason'] = quote_disabled_reason
 
         return context
 
@@ -115,10 +141,13 @@ class MyOrdersView(LoginRequiredMixin, ListView):
         return Order.objects.filter(client=self.request.user).order_by('-created_at')
 
 
-class CreateQuoteView(LoginRequiredMixin, CreateView):
+class CreateQuoteView(LoginRequiredMixin, RateLimitMixin, CreateView):
     model = Quote
     template_name = 'services/create_quote.html'
     fields = ['price', 'description', 'estimated_duration']
+
+    # Rate limiting configuration
+    rate_limit_type = 'quote_creation'
 
     def dispatch(self, request, *args, **kwargs):
         self.order = get_object_or_404(Order, pk=kwargs['order_pk'])
@@ -131,6 +160,31 @@ class CreateQuoteView(LoginRequiredMixin, CreateView):
         if self.order.status != 'published':
             messages.error(request, 'Nu poți trimite oferte pentru această comandă.')
             return redirect('services:order_detail', pk=self.order.pk)
+
+        # Check if craftsman has complete profile (GATING)
+        if not hasattr(request.user, 'craftsman_profile'):
+            messages.error(request, 'Trebuie să îți completezi profilul de meșter mai întâi.')
+            return redirect('accounts:edit_craftsman_profile')
+
+        craftsman_profile = request.user.craftsman_profile
+        if not craftsman_profile.can_bid_on_jobs():
+            missing_items = []
+            if not craftsman_profile.profile_photo:
+                missing_items.append('poză de profil')
+            if craftsman_profile.portfolio_images.count() < 3:
+                missing_items.append(f'{3 - craftsman_profile.portfolio_images.count()} poze portofoliu')
+            if not craftsman_profile.bio or len(craftsman_profile.bio.strip()) < 200:
+                missing_items.append('descriere completă (min. 200 caractere)')
+            if not craftsman_profile.coverage_radius_km:
+                missing_items.append('raza de acoperire')
+
+            missing_text = ', '.join(missing_items)
+            messages.error(
+                request,
+                f'Pentru a putea licita, trebuie să îți completezi profilul. Lipsesc: {missing_text}. '
+                f'Profilul tău este {craftsman_profile.profile_completion}% complet.'
+            )
+            return redirect('accounts:edit_craftsman_profile')
 
         # Check if craftsman already has a quote for this order
         if Quote.objects.filter(order=self.order, craftsman=request.user.craftsman_profile).exists():
@@ -471,90 +525,7 @@ class MyOrdersView(LoginRequiredMixin, ListView):
         return Order.objects.filter(client=self.request.user).order_by('-created_at')
 
 
-class AvailableOrdersView(LoginRequiredMixin, ListView):
-    """View for craftsmen to see available orders"""
-    model = Order
-    template_name = 'services/available_orders.html'
-    context_object_name = 'orders'
-    paginate_by = 20
 
-    def dispatch(self, request, *args, **kwargs):
-        # Only allow craftsmen to access this view
-        if not hasattr(request.user, 'craftsmanprofile'):
-            messages.error(request, 'Doar meșterii pot accesa această pagină.')
-            return redirect('core:home')
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_queryset(self):
-        queryset = Order.objects.filter(status='published').order_by('-created_at')
-
-        # Filter by search query
-        search_query = self.request.GET.get('q')
-        if search_query:
-            queryset = queryset.filter(
-                Q(title__icontains=search_query) |
-                Q(description__icontains=search_query) |
-                Q(service__category__name__icontains=search_query)
-            )
-
-        # Filter by category
-        category_id = self.request.GET.get('category')
-        if category_id:
-            queryset = queryset.filter(service__category_id=category_id)
-
-        # Filter by county
-        county_id = self.request.GET.get('county')
-        if county_id:
-            queryset = queryset.filter(county_id=county_id)
-
-        # Filter by city
-        city_id = self.request.GET.get('city')
-        if city_id:
-            queryset = queryset.filter(city_id=city_id)
-
-        # Filter by urgency
-        urgency = self.request.GET.get('urgency')
-        if urgency:
-            queryset = queryset.filter(urgency=urgency)
-
-        # Filter by budget range
-        min_budget = self.request.GET.get('min_budget')
-        max_budget = self.request.GET.get('max_budget')
-        if min_budget:
-            queryset = queryset.filter(budget_min__gte=min_budget)
-        if max_budget:
-            queryset = queryset.filter(budget_max__lte=max_budget)
-
-        return queryset.select_related('service__category', 'county', 'city', 'client')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['categories'] = ServiceCategory.objects.filter(is_active=True).order_by('name')
-        context['counties'] = County.objects.all().order_by('name')
-
-        # Add current filter values to context
-        context['current_filters'] = {
-            'q': self.request.GET.get('q', ''),
-            'category': self.request.GET.get('category', ''),
-            'county': self.request.GET.get('county', ''),
-            'city': self.request.GET.get('city', ''),
-            'urgency': self.request.GET.get('urgency', ''),
-            'min_budget': self.request.GET.get('min_budget', ''),
-            'max_budget': self.request.GET.get('max_budget', ''),
-        }
-
-        # Add cities for selected county
-        county_id = self.request.GET.get('county')
-        if county_id:
-            context['cities'] = City.objects.filter(county_id=county_id).order_by('name')
-        else:
-            context['cities'] = []
-
-        # Add statistics
-        context['total_orders'] = self.get_queryset().count()
-        context['urgency_choices'] = Order.URGENCY_CHOICES
-
-        return context
 
 
 # MyBuilder-style Lead System Views

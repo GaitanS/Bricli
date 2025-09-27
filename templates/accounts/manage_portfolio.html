@@ -1,0 +1,388 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Portofoliu - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .portfolio-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    
+    .portfolio-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin: 2rem auto;
+        max-width: 1000px;
+    }
+    
+    .portfolio-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #4a5568;
+    }
+    
+    .portfolio-header h2 {
+        color: #667eea;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .portfolio-item {
+        position: relative;
+        background: #f8fafc;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .portfolio-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .portfolio-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+    }
+    
+    .portfolio-content {
+        padding: 1rem;
+    }
+    
+    .portfolio-title {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .portfolio-description {
+        color: #6b7280;
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+    
+    .portfolio-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .action-btn {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-edit {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-delete {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .action-btn:hover {
+        transform: scale(1.1);
+    }
+    
+    .add-portfolio-item {
+        border: 2px dashed #cbd5e1;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #64748b;
+    }
+    
+    .add-portfolio-item:hover {
+        border-color: #667eea;
+        background: #f0f4ff;
+        color: #667eea;
+    }
+    
+    .add-portfolio-item i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .portfolio-requirements {
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+        color: #92400e;
+    }
+    
+    .portfolio-requirements .icon {
+        color: #f59e0b;
+        margin-right: 0.5rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .form-floating > .form-control {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-floating > .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .status-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .status-approved {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-flagged {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="portfolio-container">
+    <div class="container">
+        <div class="portfolio-card">
+            <div class="portfolio-header">
+                <h2><i class="fas fa-images"></i> Portofoliul Meu</h2>
+                <p class="text-muted">Adaugă minimum 3 poze cu lucrările tale pentru a putea licita</p>
+                
+                <!-- Cerințe portofoliu -->
+                <div class="portfolio-requirements">
+                    <i class="fas fa-info-circle icon"></i>
+                    <strong>Cerințe:</strong> Minimum 3 poze cu lucrări, fără fețe sau date personale vizibile. 
+                    Pozele vor fi moderate înainte de aprobare.
+                </div>
+            </div>
+            
+            <div class="portfolio-grid">
+                <!-- Portofoliu existent -->
+                {% for item in portfolio_items %}
+                <div class="portfolio-item">
+                    {% if item.is_flagged %}
+                        <span class="status-badge status-flagged">
+                            <i class="fas fa-flag"></i> Semnalat
+                        </span>
+                    {% elif item.is_approved %}
+                        <span class="status-badge status-approved">
+                            <i class="fas fa-check"></i> Aprobat
+                        </span>
+                    {% else %}
+                        <span class="status-badge status-pending">
+                            <i class="fas fa-clock"></i> În așteptare
+                        </span>
+                    {% endif %}
+                    
+                    <div class="portfolio-actions">
+                        <button class="action-btn btn-edit" onclick="editPortfolioItem({{ item.id }})" title="Editează">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn btn-delete" onclick="deletePortfolioItem({{ item.id }})" title="Șterge">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.title }}" class="portfolio-image">
+                    {% else %}
+                        <div class="portfolio-image">
+                            <i class="fas fa-image fa-3x"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="portfolio-content">
+                        <h5 class="portfolio-title">{{ item.title }}</h5>
+                        <p class="portfolio-description">{{ item.description|truncatewords:15 }}</p>
+                        {% if item.is_flagged %}
+                            <small class="text-danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Motiv: {{ item.flagged_reason }}
+                            </small>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <!-- Adaugă item nou -->
+                {% if portfolio_items.count < 10 %}
+                <div class="portfolio-item add-portfolio-item" data-bs-toggle="modal" data-bs-target="#addPortfolioModal">
+                    <i class="fas fa-plus"></i>
+                    <h5>Adaugă Lucrare</h5>
+                    <p class="text-center">Încarcă o poză cu o lucrare realizată</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if portfolio_items.count < 3 %}
+            <div class="text-center">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Atenție:</strong> Ai nevoie de minimum 3 poze în portofoliu pentru a putea licita la proiecte.
+                    <br>
+                    Poze curente: {{ portfolio_items.count }}/3 minimum
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="text-center">
+                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Înapoi la Profil
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pentru adăugare/editare portofoliu -->
+<div class="modal fade" id="addPortfolioModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus"></i> Adaugă Lucrare în Portofoliu
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="portfolioForm" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Titlu lucrare" required>
+                        <label for="title">Titlu Lucrare</label>
+                    </div>
+                    
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="description" name="description" placeholder="Descriere" style="height: 100px" required></textarea>
+                        <label for="description">Descriere Lucrare</label>
+                        <small class="text-muted">Descrie ce ai realizat, materialele folosite, etc.</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Poză Lucrare</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+                        <small class="text-muted">Formateacceptate: JPG, PNG, WebP. Mărime maximă: 5MB</small>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Important:</strong> Nu include fețe de persoane sau date personale în poze. 
+                        Pozele vor fi verificate înainte de aprobare.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                <button type="submit" form="portfolioForm" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvează
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editPortfolioItem(itemId) {
+    // Implementare editare item portofoliu
+    window.location.href = `/accounts/portfolio/edit/${itemId}/`;
+}
+
+function deletePortfolioItem(itemId) {
+    if (confirm('Ești sigur că vrei să ștergi această lucrare din portofoliu?')) {
+        fetch(`/accounts/portfolio/delete/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Eroare la ștergerea lucrării.');
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

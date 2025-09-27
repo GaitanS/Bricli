@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'core',
     'accounts',
     'services',
+    'messaging',
+    'moderation',
 ]
 
 MIDDLEWARE = [
@@ -163,6 +165,8 @@ AUTH_USER_MODEL = 'accounts.User'
 
 # Email settings (for development)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@bricli.ro'
+EMAIL_HOST_USER = 'noreply@bricli.ro'
 
 # Language and localization
 LANGUAGE_CODE = 'ro-ro'

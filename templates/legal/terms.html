@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termenii și Condițiile - Bricli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+        .brand-color {
+            color: #8B5CF6;
+        }
+        .brand-bg {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold brand-color" href="{% url 'core:home' %}">
+                <i class="fas fa-hammer me-2"></i>Bricli
+            </a>
+            <a href="{% url 'core:home' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Înapoi la site
+            </a>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-5">
+                        <h1 class="brand-color mb-4">
+                            <i class="fas fa-file-contract me-3"></i>Termenii și Condițiile
+                        </h1>
+                        
+                        <p class="text-muted mb-4">
+                            <strong>Data ultimei actualizări:</strong> {{ "now"|date:"d.m.Y" }}
+                        </p>
+
+                        <div class="mb-4">
+                            <h3 class="brand-color">1. Introducere</h3>
+                            <p>Bun venit pe Bricli! Acești Termeni și Condiții ("Termeni") reglementează utilizarea platformei noastre de conectare între clienți și meșteri calificați.</p>
+                            <p>Prin accesarea și utilizarea serviciilor Bricli, acceptați să respectați acești Termeni în totalitate.</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="brand-color">2. Definiții</h3>
+                            <ul>
+                                <li><strong>Platforma:</strong> Website-ul și aplicația Bricli</li>
+                                <li><strong>Utilizatori:</strong> Toate persoanele care accesează platforma</li>
+                                <li><strong>Clienți:</strong> Utilizatori care caută servicii de meșteșugărit</li>
+                                <li><strong>Meșteri:</strong> Profesioniști care oferă servicii prin platformă</li>
+                                <li><strong>Servicii:</strong> Activitățile de meșteșugărit oferite prin platformă</li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="brand-color">3. Înregistrarea Contului</h3>
+                            <p>Pentru a utiliza serviciile Bricli, trebuie să:</p>
+                            <ul>
+                                <li>Aveți cel puțin 18 ani</li>
+                                <li>Furnizați informații corecte și complete</li>
+                                <li>Mențineți confidențialitatea datelor de autentificare</li>
+                                <li>Notificați imediat orice utilizare neautorizată a contului</li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="brand-color">4. Obligațiile Meșterilor</h3>
+                            <p>Meșterii care se înregistrează pe platformă se angajează să:</p>
+                            <ul>
+                                <li>Dețină competențele și autorizațiile necesare</li>
+                                <li>Furnizeze servicii de calitate</li>
+                                <li>Respecte termenele convenite cu clienții</li>
+                                <li>Mențină un comportament profesional</li>
+                                <li>Actualizeze regulat informațiile din profil</li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="brand-color">5. Obligațiile Clienților</h3>
+                            <p>Clienții se angajează să:</p>
+                            <ul>
+                                <li>Furnizeze informații corecte despre proiect</li>
+                                <li>Respecte acordurile făcute cu meșterii</li>
+                                <li>Efectueze plățile conform termenilor stabiliți</li>
+                                <li>Mențină un comportament respectuos</li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="brand-color">6. Plăți și Comisioane</h3>
+                            <p>Bricli poate percepe comisioane pentru serviciile oferite. Detaliile despre comisioane vor fi comunicate transparent în profil.</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="brand-color">7. Responsabilități</h3>
+                            <p>Bricli facilitează conectarea între clienți și meșteri, dar nu este responsabilă pentru:</p>
+                            <ul>
+                                <li>Calitatea serviciilor furnizate</li>
+                                <li>Disputele între utilizatori</li>
+                                <li>Daunele rezultate din utilizarea serviciilor</li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="brand-color">8. Proprietatea Intelectuală</h3>
+                            <p>Conținutul platformei Bricli este protejat prin drepturi de autor. Utilizatorii nu pot reproduce, distribui sau modifica conținutul fără acordul scris.</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="brand-color">9. Suspendarea Contului</h3>
+                            <p>Bricli își rezervă dreptul de a suspenda sau închide conturile care încalcă acești Termeni.</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="brand-color">10. Modificări</h3>
+                            <p>Acești Termeni pot fi modificați periodic. Utilizatorii vor fi notificați despre modificările importante.</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="brand-color">11. Contact</h3>
+                            <p>Pentru întrebări despre acești Termeni, ne puteți contacta la:</p>
+                            <ul>
+                                <li><strong>Email:</strong> legal@bricli.ro</li>
+                                <li><strong>Telefon:</strong> +40 21 123 4567</li>
+                                <li><strong>Adresă:</strong> București, România</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Notă:</strong> Prin utilizarea platformei Bricli, confirmați că ați citit, înțeles și acceptat acești Termeni și Condiții.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="brand-bg text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; {{ "now"|date:"Y" }} Bricli. Toate drepturile rezervate.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

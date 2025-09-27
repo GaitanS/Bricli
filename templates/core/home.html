@@ -101,7 +101,7 @@
                                 <i class="fas fa-list me-2"></i>Comenzile mele
                             </a>
                         {% elif user.user_type == 'craftsman' %}
-                            <a href="{% url 'services:available_orders' %}" class="btn btn-light btn-lg me-3">
+                            <a href="{% url 'services:categories' %}" class="btn btn-light btn-lg me-3">
                                 <i class="fas fa-search me-2"></i>Caută comenzi
                             </a>
                             <a href="{% url 'services:craftsman_services' %}" class="btn btn-outline-light btn-lg">
@@ -134,41 +134,7 @@
     </div>
 </section>
 
-<!-- Statistics -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-md-3">
-                <div class="stat-card fade-in">
-                    <i class="fas fa-users text-primary fs-2 mb-3"></i>
-                    <div class="stat-number text-primary">{{ site_settings.total_craftsmen|default:"1,000+" }}</div>
-                    <div class="stat-label">Meșteri înregistrați</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card fade-in">
-                    <i class="fas fa-check-circle fs-2 mb-3" style="color: #8B5CF6;"></i>
-                    <div class="stat-number" style="color: #8B5CF6;">{{ site_settings.total_completed_jobs|default:"5,000+" }}</div>
-                    <div class="stat-label">Lucrări finalizate</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card fade-in">
-                    <i class="fas fa-star fs-2 mb-3" style="color: #8B5CF6;"></i>
-                    <div class="stat-number text-warning">{{ site_settings.total_reviews|default:"3,000+" }}</div>
-                    <div class="stat-label">Recenzii pozitive</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card fade-in">
-                    <i class="fas fa-shield-alt text-info fs-2 mb-3"></i>
-                    <div class="stat-number text-info">100%</div>
-                    <div class="stat-label">Meșteri verificați</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+
 
 <!-- Service Categories -->
 <section class="py-5">
@@ -189,7 +155,12 @@
                             </div>
                             <h5 class="card-title fw-bold">{{ category.name }}</h5>
                             <p class="card-text text-muted">{{ category.description|truncatewords:10 }}</p>
-                            <small class="text-primary fw-medium">
+                            <div class="mb-2">
+                                <span class="badge text-white" style="background-color: #8B5CF6;">
+                                    {{ category.orders_count|default:0 }} comenzi active
+                                </span>
+                            </div>
+                            <small class="fw-medium" style="color: #8B5CF6;">
                                 <i class="fas fa-arrow-right me-1"></i>Vezi specialiști
                             </small>
                         </div>

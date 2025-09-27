@@ -17,36 +17,20 @@
                 </div>
             </div>
             
-            <div class="row text-center">
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body">
-                            <h4 class="text-primary mb-0">{{ craftsmen_count }}</h4>
-                            <small class="text-muted">Meșteri disponibili</small>
+            <div class="row g-4 text-center">
+                <div class="col-md-6">
+                    <div class="card bg-light border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h3 class="mb-2 fw-bold" style="color: #8B5CF6;">{{ category.craftsmen_count|default:0 }}</h3>
+                            <p class="text-muted mb-0">Meșteri înregistrați</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body">
-                            <h4 class="mb-0" style="color: #8B5CF6;">{{ completed_orders }}</h4>
-                            <small class="text-muted">Lucrări finalizate</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body">
-                            <h4 class="mb-0" style="color: #8B5CF6;">4.8</h4>
-                            <small class="text-muted">Rating mediu</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body">
-                            <h4 class="mb-0" style="color: #8B5CF6;">24h</h4>
-                            <small class="text-muted">Timp mediu răspuns</small>
+                <div class="col-md-6">
+                    <div class="card bg-light border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h3 class="mb-2 fw-bold" style="color: #8B5CF6;">{{ category.completed_orders_count|default:0 }}</h3>
+                            <p class="text-muted mb-0">Proiecte finalizate</p>
                         </div>
                     </div>
                 </div>
@@ -116,10 +100,7 @@
                 <div class="text-center py-4">
                     <i class="fas fa-users text-muted" style="font-size: 3rem;"></i>
                     <h4 class="mt-3">Nu sunt meșteri disponibili momentan</h4>
-                    <p class="text-muted">Postează o comandă și meșterii din zona ta te vor contacta!</p>
-                    <a href="{% url 'services:create_order' %}?category={{ category.slug }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Postează o comandă
-                    </a>
+                    <p class="text-muted">Folosește butonul de mai sus pentru a posta o comandă și meșterii din zona ta te vor contacta!</p>
                 </div>
             {% endif %}
         </div>
@@ -168,10 +149,7 @@
                 <div class="text-center py-4">
                     <i class="fas fa-clipboard-list text-muted" style="font-size: 3rem;"></i>
                     <h4 class="mt-3">Nu sunt comenzi recente</h4>
-                    <p class="text-muted">Fii primul care postează o comandă pentru {{ category.name }}!</p>
-                    <a href="{% url 'services:create_order' %}?category={{ category.slug }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Postează prima comandă
-                    </a>
+                    <p class="text-muted">Fii primul care postează o comandă pentru {{ category.name }} folosind butonul de mai sus!</p>
                 </div>
             {% endif %}
         </div>
@@ -180,24 +158,32 @@
     <!-- Popular Services in Category -->
     <div class="row">
         <div class="col-12">
-            <h3 class="mb-4">Servicii populare în {{ category.name }}</h3>
+            <h3 class="mb-4">Servicii disponibile în {{ category.name }}</h3>
             <div class="row">
-                <div class="col-md-6">
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-check me-2" style="color: #8B5CF6;"></i>Renovare completă</li>
-                        <li class="mb-2"><i class="fas fa-check me-2" style="color: #8B5CF6;"></i>Reparații urgente</li>
-                        <li class="mb-2"><i class="fas fa-check me-2" style="color: #8B5CF6;"></i>Consultanță tehnică</li>
-                        <li class="mb-2"><i class="fas fa-check me-2" style="color: #8B5CF6;"></i>Întreținere preventivă</li>
-                    </ul>
+                {% for service in category.services.all %}
+                    {% if forloop.counter0|divisibleby:2 and forloop.counter0 == 0 %}
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                    {% elif forloop.counter0|divisibleby:2 and forloop.counter0 > 0 %}
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                    {% endif %}
+
+                    <li class="mb-2">
+                        <i class="fas fa-check me-2" style="color: #8B5CF6;"></i>{{ service.name }}
+                    </li>
+
+                    {% if forloop.last %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                {% empty %}
+                <div class="col-12">
+                    <p class="text-muted">Nu există servicii disponibile în această categorie momentan.</p>
                 </div>
-                <div class="col-md-6">
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-check me-2" style="color: #8B5CF6;"></i>Instalări noi</li>
-                        <li class="mb-2"><i class="fas fa-check me-2" style="color: #8B5CF6;"></i>Modernizări</li>
-                        <li class="mb-2"><i class="fas fa-check me-2" style="color: #8B5CF6;"></i>Inspecții tehnice</li>
-                        <li class="mb-2"><i class="fas fa-check me-2" style="color: #8B5CF6;"></i>Servicii de urgență</li>
-                    </ul>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>

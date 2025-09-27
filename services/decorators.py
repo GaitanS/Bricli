@@ -1,5 +1,5 @@
 from functools import wraps
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 
@@ -11,8 +11,7 @@ def craftsman_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            messages.error(request, 'Trebuie să te autentifici pentru a accesa această pagină.')
-            return redirect('accounts:login')
+            return render(request, 'auth_required.html')
         
         if request.user.user_type != 'craftsman':
             messages.error(request, 'Doar meșterii pot accesa această pagină.')
@@ -33,8 +32,7 @@ def client_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            messages.error(request, 'Trebuie să te autentifici pentru a accesa această pagină.')
-            return redirect('accounts:login')
+            return render(request, 'auth_required.html')
         
         if request.user.user_type != 'client':
             messages.error(request, 'Doar clienții pot accesa această pagină.')
@@ -52,8 +50,7 @@ def user_type_required(user_type):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
             if not request.user.is_authenticated:
-                messages.error(request, 'Trebuie să te autentifici pentru a accesa această pagină.')
-                return redirect('accounts:login')
+                return render(request, 'auth_required.html')
             
             if request.user.user_type != user_type:
                 if user_type == 'craftsman':
@@ -78,8 +75,7 @@ def order_owner_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            messages.error(request, 'Trebuie să te autentifici pentru a accesa această pagină.')
-            return redirect('accounts:login')
+            return render(request, 'auth_required.html')
         
         # This decorator is meant to be used with views that have access to an order
         # The actual order ownership check should be done in the view itself
@@ -95,8 +91,7 @@ class UserTypeMixin:
     
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            messages.error(request, 'Trebuie să te autentifici pentru a accesa această pagină.')
-            return redirect('accounts:login')
+            return render(request, 'auth_required.html')
         
         if self.required_user_type and request.user.user_type != self.required_user_type:
             if self.required_user_type == 'craftsman':
@@ -160,17 +155,21 @@ def can_quote_on_order(user, order):
     """
     if not user.is_authenticated or user.user_type != 'craftsman':
         return False
-    
+
     if not hasattr(user, 'craftsman_profile'):
         return False
-    
+
     if order.status != 'published':
         return False
-    
+
+    # Check if craftsman has complete profile (GATING)
+    if not user.craftsman_profile.can_bid_on_jobs():
+        return False
+
     # Check if craftsman already has a quote for this order
     if order.quotes.filter(craftsman=user.craftsman_profile).exists():
         return False
-    
+
     return True
 
 

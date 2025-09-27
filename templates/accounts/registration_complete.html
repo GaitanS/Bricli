@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Înregistrare completă - Bricli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .back-to-site {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-site:hover {
+            color: #f8f9fa;
+            transform: translateX(-5px);
+        }
+
+        .registration-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .registration-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #8B5CF6;
+            margin-bottom: 1rem;
+        }
+
+        .success-title {
+            color: #8B5CF6;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-outline-primary {
+            color: #8B5CF6;
+            border-color: #8B5CF6;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #8B5CF6;
+            border-color: #8B5CF6;
+            transform: translateY(-2px);
+        }
+
+        .email-steps {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .step-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            background: #8B5CF6;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .alert-info {
+            background-color: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.2);
+            color: #6D28D9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to site link -->
+    <a href="{% url 'core:home' %}" class="back-to-site">
+        <i class="fas fa-arrow-left me-2"></i>Înapoi la site
+    </a>
+
+    <div class="registration-container">
+        <div class="registration-card">
+            <div class="card-body p-5 text-center">
+                <!-- Success Icon -->
+                <div class="success-icon">
+                    <i class="fas fa-envelope-circle-check"></i>
+                </div>
+
+                <!-- Title -->
+                <h1 class="success-title h2">Înregistrare completă!</h1>
+                
+                <!-- Success Message -->
+                <p class="lead mb-4">
+                    Contul tău de meșter a fost creat cu succes! 🎉
+                </p>
+
+                <!-- Email Confirmation Steps -->
+                <div class="email-steps">
+                    <h5 class="mb-3" style="color: #8B5CF6;">
+                        <i class="fas fa-info-circle me-2"></i>Următorii pași:
+                    </h5>
+                    
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="text-start">
+                            <strong>Verifică emailul</strong><br>
+                            <small class="text-muted">Am trimis un email de confirmare la adresa ta</small>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="text-start">
+                            <strong>Apasă pe linkul de confirmare</strong><br>
+                            <small class="text-muted">Găsește emailul și apasă pe butonul de confirmare</small>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="text-start">
+                            <strong>Începe să lucrezi!</strong><br>
+                            <small class="text-muted">Contul tău va fi activat și te vei putea conecta</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Important Note -->
+                <div class="alert alert-info">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Important:</strong> Verifică și folderul de spam/junk dacă nu găsești emailul în inbox.
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                    <a href="{% url 'core:home' %}" class="btn btn-primary me-md-2">
+                        <i class="fas fa-home me-2"></i>Înapoi la pagina principală
+                    </a>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Conectează-te
+                    </a>
+                </div>
+
+                <!-- Help Section -->
+                <div class="mt-4 pt-4 border-top">
+                    <p class="text-muted mb-2">
+                        <strong>Nu ai primit emailul?</strong>
+                    </p>
+                    <p class="small text-muted">
+                        Contactează-ne la <a href="mailto:support@bricli.ro" style="color: #8B5CF6;">support@bricli.ro</a> 
+                        și te vom ajuta să-ți activezi contul.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

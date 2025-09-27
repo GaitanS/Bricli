@@ -10,4 +10,8 @@ urlpatterns = [
     path('faq/', views.FAQView.as_view(), name='faq'),
     path('contact/', views.ContactView.as_view(), name='contact'),
     path('search/', views.SearchView.as_view(), name='search'),
+
+    # Legal pages
+    path('terms/', views.TermsView.as_view(), name='terms'),
+    path('privacy/', views.PrivacyView.as_view(), name='privacy'),
 ]

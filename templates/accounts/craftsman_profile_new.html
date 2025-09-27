@@ -1,0 +1,486 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ profile.display_name }} - Meșter pe Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        object-fit: cover;
+    }
+    
+    .profile-name {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 1rem 0 0.5rem 0;
+    }
+    
+    .profile-location {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 1rem;
+    }
+    
+    .badge-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1rem 0;
+    }
+    
+    .profile-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .badge-complete {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    
+    .badge-verified {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    
+    .badge-top-rated {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    
+    .completion-bar {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        height: 8px;
+        margin: 1rem 0;
+        overflow: hidden;
+    }
+    
+    .completion-fill {
+        background: white;
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+    
+    .info-section {
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        color: #667eea;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: #f8fafc;
+        border-radius: 10px;
+    }
+    
+    .info-icon {
+        color: #667eea;
+        font-size: 1.1rem;
+    }
+    
+    .info-label {
+        font-weight: 500;
+        color: #374151;
+    }
+    
+    .info-value {
+        color: #6b7280;
+    }
+    
+    .portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .portfolio-item {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .portfolio-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .portfolio-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+    
+    .portfolio-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+        color: white;
+        padding: 1rem;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .portfolio-item:hover .portfolio-overlay {
+        transform: translateY(0);
+    }
+    
+    .contact-section {
+        background: #f8fafc;
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .btn-contact {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin: 0.5rem;
+    }
+    
+    .btn-contact:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+    
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .social-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .social-link:hover {
+        transform: scale(1.1);
+        color: white;
+    }
+    
+    .data-protection-notice {
+        background: #f0f9ff;
+        border: 1px solid #0ea5e9;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+        color: #0c4a6e;
+        font-size: 0.875rem;
+    }
+    
+    .rating-display {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .stars {
+        color: #fbbf24;
+    }
+    
+    .rating-count {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="profile-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-3 text-center">
+                {% if profile.profile_photo %}
+                    <img src="{{ profile.profile_photo.url }}" alt="{{ profile.display_name }}" class="profile-avatar">
+                {% else %}
+                    <div class="profile-avatar d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.2);">
+                        <i class="fas fa-user fa-3x"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-9">
+                <h1 class="profile-name">{{ profile.display_name }}</h1>
+                <div class="profile-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ profile.city.name }}, {{ profile.county.name }}
+                    {% if profile.coverage_radius_km %}
+                        • Rază {{ profile.coverage_radius_km }} km
+                    {% endif %}
+                </div>
+                
+                <!-- Rating -->
+                {% if profile.user.received_reviews.exists %}
+                <div class="rating-display">
+                    <div class="stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= profile.average_rating %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span>{{ profile.average_rating|floatformat:1 }}</span>
+                    <span class="rating-count">({{ profile.user.received_reviews.count }} recenzii)</span>
+                </div>
+                {% endif %}
+                
+                <!-- Badge-uri -->
+                {% if profile.get_badges %}
+                <div class="badge-container">
+                    {% for badge in profile.get_badges %}
+                        <span class="profile-badge badge-{{ badge.type }}">
+                            <i class="fas fa-{{ badge.icon }}"></i>
+                            {{ badge.name }}
+                        </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Bara completare profil (doar pentru proprietar) -->
+                {% if user == profile.user %}
+                <div class="completion-bar">
+                    <div class="completion-fill" style="width: {{ profile.profile_completion }}%"></div>
+                </div>
+                <small>Profil completat: {{ profile.profile_completion }}%</small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Descriere -->
+            {% if profile.bio %}
+            <div class="profile-card">
+                <div class="info-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user-circle"></i>
+                        Despre mine
+                    </h3>
+                    <p>{{ profile.bio|linebreaks }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Portofoliu -->
+            {% if portfolio_items %}
+            <div class="profile-card">
+                <div class="info-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-images"></i>
+                        Portofoliu ({{ portfolio_items.count }} lucrări)
+                    </h3>
+                    <div class="portfolio-grid">
+                        {% for item in portfolio_items %}
+                        {% if item.is_approved %}
+                        <div class="portfolio-item" data-bs-toggle="modal" data-bs-target="#portfolioModal{{ item.id }}">
+                            <img src="{{ item.image.url }}" alt="{{ item.title }}" class="portfolio-image">
+                            <div class="portfolio-overlay">
+                                <h6>{{ item.title }}</h6>
+                                <p class="mb-0">{{ item.description|truncatewords:10 }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Informații de contact -->
+            <div class="profile-card">
+                <div class="contact-section">
+                    <h4><i class="fas fa-envelope"></i> Contact</h4>
+                    
+                    <!-- Notificare protecția datelor -->
+                    <div class="data-protection-notice">
+                        <i class="fas fa-shield-alt"></i>
+                        <strong>Protecția datelor:</strong> Datele de contact se afișează doar după acceptarea unei oferte.
+                    </div>
+                    
+                    <button class="btn btn-contact">
+                        <i class="fas fa-comments"></i> Trimite Mesaj
+                    </button>
+                    
+                    {% if profile.can_bid_on_jobs %}
+                    <button class="btn btn-contact">
+                        <i class="fas fa-handshake"></i> Solicită Ofertă
+                    </button>
+                    {% else %}
+                    <div class="alert alert-warning mt-2">
+                        <small><i class="fas fa-exclamation-triangle"></i> Profilul nu este complet pentru a primi oferte</small>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Link-uri sociale -->
+                    {% if profile.website_url or profile.facebook_url or profile.instagram_url %}
+                    <div class="social-links">
+                        {% if profile.website_url %}
+                        <a href="{{ profile.website_url }}" target="_blank" class="social-link" title="Website">
+                            <i class="fas fa-globe"></i>
+                        </a>
+                        {% endif %}
+                        {% if profile.facebook_url %}
+                        <a href="{{ profile.facebook_url }}" target="_blank" class="social-link" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        {% endif %}
+                        {% if profile.instagram_url %}
+                        <a href="{{ profile.instagram_url }}" target="_blank" class="social-link" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Informații profesionale -->
+            <div class="profile-card">
+                <div class="info-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-briefcase"></i>
+                        Informații Profesionale
+                    </h4>
+                    <div class="info-grid">
+                        {% if profile.years_experience %}
+                        <div class="info-item">
+                            <i class="fas fa-calendar-alt info-icon"></i>
+                            <div>
+                                <div class="info-label">Experiență</div>
+                                <div class="info-value">{{ profile.years_experience }} ani</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.hourly_rate %}
+                        <div class="info-item">
+                            <i class="fas fa-money-bill-wave info-icon"></i>
+                            <div>
+                                <div class="info-label">Tarif orar</div>
+                                <div class="info-value">{{ profile.hourly_rate }} RON/oră</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.min_job_value %}
+                        <div class="info-item">
+                            <i class="fas fa-coins info-icon"></i>
+                            <div>
+                                <div class="info-label">Valoare minimă</div>
+                                <div class="info-value">{{ profile.min_job_value }} RON</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.is_company_verified %}
+                        <div class="info-item">
+                            <i class="fas fa-building info-icon"></i>
+                            <div>
+                                <div class="info-label">Companie</div>
+                                <div class="info-value">Verificată</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modale pentru portofoliu -->
+{% for item in portfolio_items %}
+{% if item.is_approved %}
+<div class="modal fade" id="portfolioModal{{ item.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ item.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="{{ item.image.url }}" alt="{{ item.title }}" class="img-fluid rounded">
+                {% if item.description %}
+                <p class="mt-3">{{ item.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+{% endblock %}

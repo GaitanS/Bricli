@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, ListView
-from django.db.models import Q
+from django.db.models import Q, Count
+from django.db import models
 from services.models import ServiceCategory, Order
 from accounts.models import CraftsmanProfile, County, City
 from .models import SiteSettings, Testimonial, FAQ
@@ -20,9 +21,11 @@ class HomeView(TemplateView):
 
         context.update({
             'site_settings': site_settings,
-            'service_categories': ServiceCategory.objects.filter(is_active=True)[:8],
+            'service_categories': ServiceCategory.objects.filter(is_active=True).annotate(
+                orders_count=models.Count('services__order', filter=models.Q(services__order__status='published'))
+            )[:8],
             'featured_testimonials': Testimonial.objects.filter(is_featured=True)[:3],
-            'recent_orders': Order.objects.filter(status='published')[:6],
+
             'top_craftsmen': CraftsmanProfile.objects.filter(
                 user__is_verified=True
             ).order_by('-average_rating', '-total_reviews')[:6],
@@ -89,13 +92,13 @@ class SearchView(ListView):
         # Enhanced search with weighted scoring
         if query:
             # Primary matches (higher weight)
-            primary_matches = Q(description__icontains=query)
+            primary_matches = Q(bio__icontains=query)
 
             # Secondary matches (medium weight)
             secondary_matches = (
                 Q(user__first_name__icontains=query) |
                 Q(user__last_name__icontains=query) |
-                Q(company_name__icontains=query)
+                Q(display_name__icontains=query)
             )
 
             # Apply search filters
@@ -157,3 +160,11 @@ class SearchView(ListView):
             'search_performed': bool(query or county_id or rating_min),
         })
         return context
+
+
+class TermsView(TemplateView):
+    template_name = 'legal/terms.html'
+
+
+class PrivacyView(TemplateView):
+    template_name = 'legal/privacy.html'

@@ -6,6 +6,16 @@ from accounts.models import County, City
 
 class OrderForm(forms.ModelForm):
     """Form for creating new orders"""
+
+    preferred_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control'
+        }),
+        label='Data preferată (opțional)'
+    )
+
     class Meta:
         model = Order
         fields = (
@@ -34,7 +44,8 @@ class OrderForm(forms.ModelForm):
         self.fields['service'].label = 'Serviciu'
         self.fields['county'].label = 'Județ'
         self.fields['city'].label = 'Oraș'
-        self.fields['address'].label = 'Adresă (opțional)'
+        self.fields['address'].label = 'Unde este localizată lucrarea?'
+        self.fields['address'].required = True
         self.fields['budget_min'].label = 'Buget minim (RON)'
         self.fields['budget_max'].label = 'Buget maxim (RON)'
         self.fields['urgency'].label = 'Urgență'
@@ -61,8 +72,9 @@ class OrderForm(forms.ModelForm):
             'maxlength': '2000'
         })
         self.fields['address'].widget.attrs.update({
-            'placeholder': 'Strada, numărul, etc.',
-            'maxlength': '255'
+            'placeholder': 'Strada, numărul, etajul, apartamentul, etc.',
+            'maxlength': '300',
+            'required': True
         })
 
         # Add validation for budget fields

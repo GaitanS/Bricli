@@ -42,6 +42,149 @@
             justify-content: center;
             padding: 20px;
         }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #f8f9ff;
+            color: #8B5CF6;
+        }
+
+        .accordion-button:focus {
+            box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25);
+        }
+
+        .service-item {
+            transition: opacity 0.3s ease;
+        }
+
+        .badge {
+            font-size: 0.75em;
+        }
+
+        .form-control:focus {
+            border-color: #8B5CF6;
+            box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+        }
+
+        .btn-primary {
+            background-color: #8B5CF6;
+            border-color: #8B5CF6;
+        }
+
+        .btn-primary:hover {
+            background-color: #7C3AED;
+            border-color: #7C3AED;
+        }
+
+        .services-grid {
+            background-color: #f8f9fa;
+        }
+
+        .services-grid .form-check {
+            margin-bottom: 0.25rem;
+        }
+
+        .services-grid .form-check-label {
+            font-size: 0.875rem;
+            line-height: 1.2;
+        }
+
+        .category-section {
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 0.75rem;
+        }
+
+        .category-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .category-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem !important;
+        }
+
+        /* Progress Steps Styles */
+        .progress-steps {
+            margin: 2rem 0;
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            border: 3px solid #e9ecef;
+        }
+
+        .step-item.active .step-circle {
+            background-color: #8B5CF6;
+            color: white;
+            border-color: #8B5CF6;
+        }
+
+        .step-item.completed .step-circle {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .step-label {
+            font-size: 0.875rem;
+            text-align: center;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .step-item.active .step-label {
+            color: #8B5CF6;
+            font-weight: 600;
+        }
+
+        .step-item.completed .step-label {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .step-line {
+            height: 3px;
+            background-color: #e9ecef;
+            flex: 1;
+            margin: 0 1rem;
+            margin-top: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .step-line.completed {
+            background-color: #28a745;
+        }
+
+        .step-content {
+            min-height: 400px;
+        }
+
+        .step-header h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .step-header p {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -51,114 +194,227 @@
     </a>
 
     <div class="registration-container">
-        <div class="col-md-6 col-lg-5">
+        <div class="col-lg-8 col-xl-7">
             <div class="card shadow-lg border-0">
-                <div class="card-body p-5">
+                <div class="card-body p-4">
+                    <!-- Header -->
                     <div class="text-center mb-4">
                         <h2 class="fw-bold mb-2">Înregistrare Meșter</h2>
                         <p class="text-muted">Găsește clienți în zona ta</p>
                     </div>
-                    
-                    <!-- Benefits -->
-                    <div class="row mb-4 text-center">
-                        <div class="col-4">
-                            <i class="fas fa-search fs-3 mb-2" style="color: #8B5CF6;"></i>
-                            <h6 class="small">Găsește clienți</h6>
-                        </div>
-                        <div class="col-4">
-                            <i class="fas fa-handshake fs-3 mb-2" style="color: #8B5CF6;"></i>
-                            <h6 class="small">Relații directe</h6>
-                        </div>
-                        <div class="col-4">
-                            <i class="fas fa-star fs-3 mb-2" style="color: #8B5CF6;"></i>
-                            <h6 class="small">Construiește reputația</h6>
+
+                    <!-- Progress Steps -->
+                    <div class="progress-steps mb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="step-item active" data-step="1">
+                                <div class="step-circle">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="step-label">Profilul tău</div>
+                            </div>
+                            <div class="step-line"></div>
+                            <div class="step-item" data-step="2">
+                                <div class="step-circle">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <div class="step-label">Informații business</div>
+                            </div>
+                            <div class="step-line"></div>
+                            <div class="step-item" data-step="3">
+                                <div class="step-circle">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <div class="step-label">Serviciile tale</div>
+                            </div>
                         </div>
                     </div>
                     
-                    <form method="post" class="needs-validation" novalidate>
+                    <form method="post" id="registrationForm" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.first_name.id_for_label }}" class="form-label">Prenume</label>
-                            {{ form.first_name }}
-                            {% if form.first_name.errors %}
-                                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
-                            {% endif %}
+
+                        <!-- Step 1: Personal Profile -->
+                        <div class="step-content" id="step-1">
+                            <div class="step-header mb-4">
+                                <h4 class="fw-bold" style="color: #8B5CF6;">Pasul 1: Profilul tău</h4>
+                                <p class="text-muted">Introdu informațiile tale personale pentru a crea contul</p>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                        <i class="fas fa-user me-2" style="color: #8B5CF6;"></i>Prenume
+                                    </label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                        <i class="fas fa-user me-2" style="color: #8B5CF6;"></i>Nume de familie
+                                    </label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                                        <i class="fas fa-envelope me-2" style="color: #8B5CF6;"></i>Adresa de email
+                                    </label>
+                                    <small class="text-muted d-block mb-1">Aceasta va fi folosită pentru autentificare</small>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.phone_number.id_for_label }}" class="form-label">
+                                        <i class="fas fa-phone me-2" style="color: #8B5CF6;"></i>Numărul tău de telefon
+                                    </label>
+                                    <small class="text-muted d-block mb-1">Clienții te vor contacta pe acest număr</small>
+                                    {{ form.phone_number }}
+                                    {% if form.phone_number.errors %}
+                                        <div class="text-danger small">{{ form.phone_number.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="{{ form.password.id_for_label }}" class="form-label">
+                                        <i class="fas fa-lock me-2" style="color: #8B5CF6;"></i>Parola
+                                    </label>
+                                    {{ form.password }}
+                                    {% if form.password.errors %}
+                                        <div class="text-danger small">{{ form.password.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.password_confirm.id_for_label }}" class="form-label">
+                                        <i class="fas fa-lock me-2" style="color: #8B5CF6;"></i>Confirmă parola
+                                    </label>
+                                    {{ form.password_confirm }}
+                                    {% if form.password_confirm.errors %}
+                                        <div class="text-danger small">{{ form.password_confirm.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-primary btn-lg px-4" onclick="nextStep(2)">
+                                    Următorul pas <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Nume de familie</label>
-                            {{ form.last_name }}
-                            {% if form.last_name.errors %}
-                                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-                            {{ form.email }}
-                            {% if form.email.errors %}
-                                <div class="text-danger small">{{ form.email.errors.0 }}</div>
-                            {% endif %}
+                        <!-- Step 2: Business Information -->
+                        <div class="step-content" id="step-2" style="display: none;">
+                            <div class="step-header mb-4">
+                                <h4 class="fw-bold" style="color: #8B5CF6;">Pasul 2: Informații business</h4>
+                                <p class="text-muted">Spune-ne mai multe despre activitatea ta profesională</p>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.county.id_for_label }}" class="form-label">
+                                        <i class="fas fa-map-marker-alt me-2" style="color: #8B5CF6;"></i>Județul în care lucrezi
+                                    </label>
+                                    <small class="text-muted d-block mb-1">Zona principală unde oferi servicii</small>
+                                    {{ form.county }}
+                                    {% if form.county.errors %}
+                                        <div class="text-danger small">{{ form.county.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.company_name.id_for_label }}" class="form-label">
+                                        <i class="fas fa-building me-2" style="color: #8B5CF6;"></i>Numele companiei tale
+                                    </label>
+                                    <small class="text-muted d-block mb-1">Opțional - dacă ai o firmă înregistrată</small>
+                                    {{ form.company_name }}
+                                    {% if form.company_name.errors %}
+                                        <div class="text-danger small">{{ form.company_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.bio.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user-edit me-2" style="color: #8B5CF6;"></i>Prezintă-te clienților
+                                </label>
+                                <small class="text-muted d-block mb-1">Descrie experiența ta, specializările și ce te face special (minim 200 caractere)</small>
+                                {{ form.bio }}
+                                {% if form.bio.errors %}
+                                    <div class="text-danger small">{{ form.bio.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="prevStep(1)">
+                                    <i class="fas fa-arrow-left me-2"></i>Pasul anterior
+                                </button>
+                                <button type="button" class="btn btn-primary btn-lg px-4" onclick="nextStep(3)">
+                                    Următorul pas <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="{{ form.phone_number.id_for_label }}" class="form-label">Număr de telefon</label>
-                            {{ form.phone_number }}
-                            {% if form.phone_number.errors %}
-                                <div class="text-danger small">{{ form.phone_number.errors.0 }}</div>
-                            {% endif %}
-                        </div>
+                        <!-- Step 3: Services -->
+                        <div class="step-content" id="step-3" style="display: none;">
+                            <div class="step-header mb-4">
+                                <h4 class="fw-bold" style="color: #8B5CF6;">Pasul 3: Serviciile tale</h4>
+                                <p class="text-muted">Selectează serviciile pe care le oferi clienților (1-10 servicii)</p>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="{{ form.county.id_for_label }}" class="form-label">Județul</label>
-                            {{ form.county }}
-                            {% if form.county.errors %}
-                                <div class="text-danger small">{{ form.county.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="{{ form.password_confirm.id_for_label }}" class="form-label">Confirmă parola</label>
-                            {{ form.password_confirm }}
-                            {% if form.password_confirm.errors %}
-                                <div class="text-danger small">{{ form.password_confirm.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Servicii -->
-                        <div class="mb-4">
-                            <label class="form-label">Serviciile pe care le oferi (selectează 1-5 servicii)</label>
-                            <div class="alert alert-info small">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Selectează serviciile în care te specializezi. Poți alege între 1 și 5 servicii.
+                            <div class="alert" style="background-color: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.2); color: #6D28D9;">
+                                <i class="fas fa-info-circle me-2" style="color: #8B5CF6;"></i>
+                                <strong>Servicii selectate: <span id="selected-count" style="color: #6D28D9;">0</span>/10</strong>
+                                <div class="mt-1 small">Alege serviciile în care te specializezi pentru a fi găsit de clienții potriviți</div>
                             </div>
 
                             {% if form.services_by_category %}
                                 <div class="services-selection">
-                                    {% for category_name, services in form.services_by_category.items %}
+                                    <!-- Search box for services -->
                                     <div class="mb-3">
-                                        <h6 class="text-primary mb-2">
-                                            <i class="fas fa-tools me-1"></i>{{ category_name }}
-                                        </h6>
-                                        <div class="row">
-                                            {% for service in services %}
-                                            <div class="col-md-6 mb-2">
-                                                <div class="form-check">
-                                                    <input class="form-check-input service-checkbox"
-                                                           type="checkbox"
-                                                           name="services"
-                                                           value="{{ service.id }}"
-                                                           id="service_{{ service.id }}">
-                                                    <label class="form-check-label" for="service_{{ service.id }}">
-                                                        {{ service.name }}
-                                                    </label>
+                                        <input type="text" class="form-control" id="service-search" placeholder="Caută servicii..." autocomplete="off">
+                                    </div>
+
+                                    <!-- Compact services grid -->
+                                    <div class="services-grid" style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 1rem;">
+                                        {% for category_name, services in form.services_by_category.items %}
+                                            <div class="category-section mb-3" data-category="{{ category_name|lower }}">
+                                                <h6 class="mb-2 category-title" style="color: #8B5CF6;">
+                                                    <i class="fas fa-tools me-1"></i>{{ category_name }}
+                                                </h6>
+                                                <div class="row g-2">
+                                                    {% for service in services %}
+                                                    <div class="col-md-6 service-item" data-service-name="{{ service.name|lower }}" data-category="{{ category_name|lower }}">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input service-checkbox"
+                                                                   type="checkbox"
+                                                                   name="services"
+                                                                   value="{{ service.id }}"
+                                                                   id="service_{{ service.id }}">
+                                                            <label class="form-check-label small" for="service_{{ service.id }}">
+                                                                {{ service.name }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
                                                 </div>
                                             </div>
-                                            {% endfor %}
-                                        </div>
+                                        {% endfor %}
                                     </div>
-                                    {% endfor %}
+
+                                    <!-- Clear search button -->
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="clear-search" style="display: none;">
+                                            <i class="fas fa-times me-1"></i>Șterge căutarea
+                                        </button>
+                                    </div>
                                 </div>
                             {% else %}
                                 {{ form.services }}
@@ -168,42 +424,24 @@
                                 <div class="text-danger small mt-2">{{ form.services.errors.0 }}</div>
                             {% endif %}
 
-                            <div class="mt-2">
-                                <small class="text-muted">
-                                    <span id="selected-count">0</span> servicii selectate (maxim 5)
-                                </small>
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="prevStep(2)">
+                                    <i class="fas fa-arrow-left me-2"></i>Pasul anterior
+                                </button>
+                                <button type="submit" class="btn btn-success btn-lg px-4">
+                                    <i class="fas fa-check me-2"></i>Înregistrează-te gratuit
+                                </button>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="{{ form.company_name.id_for_label }}" class="form-label">Numele companiei (opțional)</label>
-                            {{ form.company_name }}
-                            {% if form.company_name.errors %}
-                                <div class="text-danger small">{{ form.company_name.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="{{ form.password.id_for_label }}" class="form-label">Parola</label>
-                            {{ form.password }}
-                            {% if form.password.errors %}
-                                <div class="text-danger small">{{ form.password.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="form-check mb-3">
+                        <!-- Terms and conditions (always visible) -->
+                        <div class="form-check mt-4 mb-3">
                             <input class="form-check-input" type="checkbox" id="terms" required>
                             <label class="form-check-label small" for="terms">
-                                Prin înregistrare, sunt de acord cu 
-                                <a href="#" class="text-decoration-none">Termenii și Condițiile</a> 
-                                și <a href="#" class="text-decoration-none">Politica de Confidențialitate</a> Bricli.
+                                Prin înregistrare, sunt de acord cu
+                                <a href="{% url 'core:terms' %}" target="_blank" style="color: #8B5CF6; text-decoration: none;">Termenii și Condițiile</a>
+                                și <a href="{% url 'core:privacy' %}" target="_blank" style="color: #8B5CF6; text-decoration: none;">Politica de Confidențialitate</a> Bricli.
                             </label>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-lg" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%); border: none; color: white;">
-                                <i class="fas fa-user-plus me-2"></i>Înregistrare gratuită
-                            </button>
                         </div>
                     </form>
                     
@@ -211,7 +449,7 @@
                     
                     <div class="text-center">
                         <p class="mb-2">Ai deja un cont? 
-                            <a href="{% url 'accounts:login' %}" class="text-decoration-none fw-bold">Conectează-te</a>
+                            <a href="{% url 'accounts:login' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">Conectează-te</a>
                         </p>
                         <p class="mb-0">Cauți un meșter?
                             <a href="{% url 'accounts:simple_register' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">
@@ -246,10 +484,228 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    function showStep(stepNumber) {
+        // Hide all steps
+        for (let i = 1; i <= totalSteps; i++) {
+            const stepContent = document.getElementById(`step-${i}`);
+            const stepItem = document.querySelector(`[data-step="${i}"]`);
+
+            if (stepContent) {
+                stepContent.style.display = i === stepNumber ? 'block' : 'none';
+            }
+
+            if (stepItem) {
+                stepItem.classList.remove('active', 'completed');
+                if (i < stepNumber) {
+                    stepItem.classList.add('completed');
+                } else if (i === stepNumber) {
+                    stepItem.classList.add('active');
+                }
+            }
+        }
+
+        // Update step lines
+        const stepLines = document.querySelectorAll('.step-line');
+        stepLines.forEach((line, index) => {
+            line.classList.toggle('completed', index < stepNumber - 1);
+        });
+
+        currentStep = stepNumber;
+    }
+
+    async function nextStep(stepNumber) {
+        // Show loading state
+        const nextButton = document.querySelector(`#step-${currentStep} button[onclick*="nextStep"]`);
+        if (nextButton) {
+            nextButton.disabled = true;
+            nextButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Verificare...';
+        }
+
+        const isValid = await validateCurrentStep();
+
+        // Restore button state
+        if (nextButton) {
+            nextButton.disabled = false;
+            nextButton.innerHTML = 'Următorul pas <i class="fas fa-arrow-right ms-2"></i>';
+        }
+
+        if (isValid) {
+            showStep(stepNumber);
+        }
+    }
+
+    function prevStep(stepNumber) {
+        showStep(stepNumber);
+    }
+
+    async function validateCurrentStep() {
+        const currentStepElement = document.getElementById(`step-${currentStep}`);
+        const requiredFields = currentStepElement.querySelectorAll('input[required], select[required], textarea[required]');
+        let isValid = true;
+
+        // Basic required field validation
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                showFieldError(field, 'Acest câmp este obligatoriu.');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+                hideFieldError(field);
+            }
+        });
+
+        // Special validation for step 1
+        if (currentStep === 1) {
+            // Password match validation
+            const password = document.querySelector('input[name="password"]');
+            const passwordConfirm = document.querySelector('input[name="password_confirm"]');
+
+            if (password && passwordConfirm && password.value !== passwordConfirm.value) {
+                passwordConfirm.classList.add('is-invalid');
+                showFieldError(passwordConfirm, 'Parolele nu se potrivesc.');
+                isValid = false;
+            }
+
+            // AJAX validation for email and phone
+            const emailField = document.querySelector('input[name="email"]');
+            const phoneField = document.querySelector('input[name="phone_number"]');
+
+            if (emailField && emailField.value.trim()) {
+                const emailValid = await validateEmailAjax(emailField.value);
+                if (!emailValid.valid) {
+                    emailField.classList.add('is-invalid');
+                    showFieldError(emailField, emailValid.message);
+                    isValid = false;
+                } else {
+                    emailField.classList.remove('is-invalid');
+                    hideFieldError(emailField);
+                }
+            }
+
+            if (phoneField && phoneField.value.trim()) {
+                const phoneValid = await validatePhoneAjax(phoneField.value);
+                if (!phoneValid.valid) {
+                    phoneField.classList.add('is-invalid');
+                    showFieldError(phoneField, phoneValid.message);
+                    isValid = false;
+                } else {
+                    phoneField.classList.remove('is-invalid');
+                    hideFieldError(phoneField);
+                }
+            }
+        }
+
+        // Special validation for step 3 (at least one service selected)
+        if (currentStep === 3) {
+            const selectedServices = document.querySelectorAll('.service-checkbox:checked');
+            if (selectedServices.length === 0) {
+                alert('Te rugăm să selectezi cel puțin un serviciu.');
+                isValid = false;
+            }
+        }
+
+        return isValid;
+    }
+
+    async function validateEmailAjax(email) {
+        try {
+            const response = await fetch('/accounts/api/validate-email/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `email=${encodeURIComponent(email)}`
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Email validation error:', error);
+            return { valid: true, message: '' }; // Fallback to allow progression
+        }
+    }
+
+    async function validatePhoneAjax(phone) {
+        try {
+            const response = await fetch('/accounts/api/validate-phone/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `phone=${encodeURIComponent(phone)}`
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Phone validation error:', error);
+            return { valid: true, message: '' }; // Fallback to allow progression
+        }
+    }
+
+    function showFieldError(field, message) {
+        // Remove existing error message
+        hideFieldError(field);
+
+        // Create and show new error message
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'text-danger small mt-1 field-error';
+        errorDiv.textContent = message;
+        field.parentNode.appendChild(errorDiv);
+    }
+
+    function hideFieldError(field) {
+        const existingError = field.parentNode.querySelector('.field-error');
+        if (existingError) {
+            existingError.remove();
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
         const selectedCountSpan = document.getElementById('selected-count');
-        const maxServices = 5;
+        const serviceSearch = document.getElementById('service-search');
+        const clearSearchBtn = document.getElementById('clear-search');
+        const maxServices = 10;
+
+        // Initialize first step
+        showStep(1);
+
+        // Add real-time validation for email and phone
+        const emailField = document.querySelector('input[name="email"]');
+        const phoneField = document.querySelector('input[name="phone_number"]');
+
+        if (emailField) {
+            emailField.addEventListener('blur', async function() {
+                if (this.value.trim()) {
+                    const result = await validateEmailAjax(this.value);
+                    if (!result.valid) {
+                        this.classList.add('is-invalid');
+                        showFieldError(this, result.message);
+                    } else {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                        hideFieldError(this);
+                    }
+                }
+            });
+        }
+
+        if (phoneField) {
+            phoneField.addEventListener('blur', async function() {
+                if (this.value.trim()) {
+                    const result = await validatePhoneAjax(this.value);
+                    if (!result.valid) {
+                        this.classList.add('is-invalid');
+                        showFieldError(this, result.message);
+                    } else {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                        hideFieldError(this);
+                    }
+                }
+            });
+        }
 
         function updateSelectedCount() {
             const checkedBoxes = document.querySelectorAll('.service-checkbox:checked');
@@ -278,10 +734,62 @@
             }
         }
 
+        // Search functionality
+        function filterServices() {
+            const searchTerm = serviceSearch.value.toLowerCase().trim();
+            const serviceItems = document.querySelectorAll('.service-item');
+            const categoryTitles = document.querySelectorAll('.category-title');
+            const categorySections = document.querySelectorAll('.category-section');
+
+            // Show/hide clear button
+            clearSearchBtn.style.display = searchTerm ? 'inline-block' : 'none';
+
+            if (searchTerm === '') {
+                // Show all services and categories
+                serviceItems.forEach(item => item.style.display = 'block');
+                categorySections.forEach(section => section.style.display = 'block');
+                return;
+            }
+
+            // Filter services
+            serviceItems.forEach(item => {
+                const serviceName = item.getAttribute('data-service-name');
+                const categoryName = item.getAttribute('data-category');
+
+                if ((serviceName && serviceName.includes(searchTerm)) ||
+                    (categoryName && categoryName.includes(searchTerm))) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show/hide category sections based on visible services
+            categorySections.forEach(section => {
+                const visibleServices = section.querySelectorAll('.service-item[style="display: block"], .service-item:not([style*="display: none"])');
+                section.style.display = visibleServices.length > 0 ? 'block' : 'none';
+            });
+        }
+
+        function clearSearch() {
+            serviceSearch.value = '';
+            filterServices();
+            serviceSearch.focus();
+        }
+
         // Add event listeners to all checkboxes
         serviceCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', updateSelectedCount);
         });
+
+        // Add event listeners
+        if (serviceSearch) {
+            serviceSearch.addEventListener('input', filterServices);
+        }
+
+        if (clearSearchBtn) {
+            clearSearchBtn.addEventListener('click', clearSearch);
+        }
 
         // Initial count update
         updateSelectedCount();
@@ -291,7 +799,9 @@
         if (form) {
             form.addEventListener('submit', function(e) {
                 const checkedBoxes = document.querySelectorAll('.service-checkbox:checked');
+                const termsCheckbox = document.getElementById('terms');
 
+                // Validate services selection
                 if (checkedBoxes.length === 0) {
                     e.preventDefault();
                     alert('Te rugăm să selectezi cel puțin un serviciu.');
@@ -301,6 +811,14 @@
                 if (checkedBoxes.length > maxServices) {
                     e.preventDefault();
                     alert(`Poți selecta maximum ${maxServices} servicii.`);
+                    return false;
+                }
+
+                // Validate terms acceptance
+                if (!termsCheckbox.checked) {
+                    e.preventDefault();
+                    alert('Trebuie să accepți Termenii și Condițiile pentru a te înregistra.');
+                    termsCheckbox.focus();
                     return false;
                 }
             });
