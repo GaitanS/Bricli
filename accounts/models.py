@@ -23,6 +23,34 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.username} ({self.get_user_type_display()})"
 
+    def get_whatsapp_link(self):
+        """Generate WhatsApp link from phone number"""
+        if self.phone_number:
+            # Remove any non-digit characters and format for WhatsApp
+            clean_number = ''.join(filter(str.isdigit, self.phone_number))
+            if clean_number.startswith('0'):
+                # Romanian number starting with 0, replace with +40
+                clean_number = '40' + clean_number[1:]
+            elif not clean_number.startswith('40'):
+                # Add Romanian country code if not present
+                clean_number = '40' + clean_number
+            return f"https://wa.me/{clean_number}"
+        return None
+
+    def get_formatted_phone(self):
+        """Get formatted phone number for display"""
+        if self.phone_number:
+            clean_number = ''.join(filter(str.isdigit, self.phone_number))
+            if len(clean_number) >= 10:
+                if clean_number.startswith('40'):
+                    # Format as +40 XXX XXX XXX
+                    return f"+40 {clean_number[2:5]} {clean_number[5:8]} {clean_number[8:]}"
+                elif clean_number.startswith('0'):
+                    # Format as 0XXX XXX XXX
+                    return f"{clean_number[:4]} {clean_number[4:7]} {clean_number[7:]}"
+            return self.phone_number
+        return None
+
 
 class County(models.Model):
     name = models.CharField(max_length=100, unique=True)

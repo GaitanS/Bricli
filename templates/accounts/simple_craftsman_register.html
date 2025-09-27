@@ -15,10 +15,25 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%);
             min-height: 100vh;
             margin: 0;
             padding: 0;
+        }
+
+        .back-to-site {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-site:hover {
+            color: rgba(255, 255, 255, 0.8);
+            transform: translateX(-5px);
         }
         .registration-container {
             min-height: 100vh;
@@ -30,6 +45,11 @@
     </style>
 </head>
 <body>
+    <!-- Back to site link -->
+    <a href="{% url 'core:home' %}" class="back-to-site">
+        <i class="fas fa-arrow-left me-2"></i>Înapoi la Bricli
+    </a>
+
     <div class="registration-container">
         <div class="col-md-6 col-lg-5">
             <div class="card shadow-lg border-0">
@@ -42,15 +62,15 @@
                     <!-- Benefits -->
                     <div class="row mb-4 text-center">
                         <div class="col-4">
-                            <i class="fas fa-search text-primary fs-3 mb-2"></i>
+                            <i class="fas fa-search fs-3 mb-2" style="color: #8B5CF6;"></i>
                             <h6 class="small">Găsește clienți</h6>
                         </div>
                         <div class="col-4">
-                            <i class="fas fa-handshake text-success fs-3 mb-2"></i>
+                            <i class="fas fa-handshake fs-3 mb-2" style="color: #8B5CF6;"></i>
                             <h6 class="small">Relații directe</h6>
                         </div>
                         <div class="col-4">
-                            <i class="fas fa-star text-warning fs-3 mb-2"></i>
+                            <i class="fas fa-star fs-3 mb-2" style="color: #8B5CF6;"></i>
                             <h6 class="small">Construiește reputația</h6>
                         </div>
                     </div>
@@ -59,18 +79,18 @@
                         {% csrf_token %}
                         
                         <div class="mb-3">
-                            <label for="{{ form.trade.id_for_label }}" class="form-label">Meseria principală</label>
-                            {{ form.trade }}
-                            {% if form.trade.errors %}
-                                <div class="text-danger small">{{ form.trade.errors.0 }}</div>
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">Prenume</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="mb-3">
-                            <label for="{{ form.county.id_for_label }}" class="form-label">Județul</label>
-                            {{ form.county }}
-                            {% if form.county.errors %}
-                                <div class="text-danger small">{{ form.county.errors.0 }}</div>
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Nume de familie</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
                             {% endif %}
                         </div>
                         
@@ -79,6 +99,87 @@
                             {{ form.email }}
                             {% if form.email.errors %}
                                 <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.phone_number.id_for_label }}" class="form-label">Număr de telefon</label>
+                            {{ form.phone_number }}
+                            {% if form.phone_number.errors %}
+                                <div class="text-danger small">{{ form.phone_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.county.id_for_label }}" class="form-label">Județul</label>
+                            {{ form.county }}
+                            {% if form.county.errors %}
+                                <div class="text-danger small">{{ form.county.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.password_confirm.id_for_label }}" class="form-label">Confirmă parola</label>
+                            {{ form.password_confirm }}
+                            {% if form.password_confirm.errors %}
+                                <div class="text-danger small">{{ form.password_confirm.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Servicii -->
+                        <div class="mb-4">
+                            <label class="form-label">Serviciile pe care le oferi (selectează 1-5 servicii)</label>
+                            <div class="alert alert-info small">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Selectează serviciile în care te specializezi. Poți alege între 1 și 5 servicii.
+                            </div>
+
+                            {% if form.services_by_category %}
+                                <div class="services-selection">
+                                    {% for category_name, services in form.services_by_category.items %}
+                                    <div class="mb-3">
+                                        <h6 class="text-primary mb-2">
+                                            <i class="fas fa-tools me-1"></i>{{ category_name }}
+                                        </h6>
+                                        <div class="row">
+                                            {% for service in services %}
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input service-checkbox"
+                                                           type="checkbox"
+                                                           name="services"
+                                                           value="{{ service.id }}"
+                                                           id="service_{{ service.id }}">
+                                                    <label class="form-check-label" for="service_{{ service.id }}">
+                                                        {{ service.name }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.services }}
+                            {% endif %}
+
+                            {% if form.services.errors %}
+                                <div class="text-danger small mt-2">{{ form.services.errors.0 }}</div>
+                            {% endif %}
+
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <span id="selected-count">0</span> servicii selectate (maxim 5)
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.company_name.id_for_label }}" class="form-label">Numele companiei (opțional)</label>
+                            {{ form.company_name }}
+                            {% if form.company_name.errors %}
+                                <div class="text-danger small">{{ form.company_name.errors.0 }}</div>
                             {% endif %}
                         </div>
                         
@@ -100,7 +201,7 @@
                         </div>
                         
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-success btn-lg">
+                            <button type="submit" class="btn btn-lg" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%); border: none; color: white;">
                                 <i class="fas fa-user-plus me-2"></i>Înregistrare gratuită
                             </button>
                         </div>
@@ -112,8 +213,8 @@
                         <p class="mb-2">Ai deja un cont? 
                             <a href="{% url 'accounts:login' %}" class="text-decoration-none fw-bold">Conectează-te</a>
                         </p>
-                        <p class="mb-0">Cauți un meșter? 
-                            <a href="{% url 'accounts:simple_register' %}" class="text-decoration-none fw-bold text-primary">
+                        <p class="mb-0">Cauți un meșter?
+                            <a href="{% url 'accounts:simple_register' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">
                                 Înregistrează-te ca client
                             </a>
                         </p>
@@ -143,5 +244,143 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
+        const selectedCountSpan = document.getElementById('selected-count');
+        const maxServices = 5;
+
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.service-checkbox:checked');
+            const count = checkedBoxes.length;
+
+            selectedCountSpan.textContent = count;
+
+            // Disable unchecked boxes if max reached
+            serviceCheckboxes.forEach(checkbox => {
+                if (!checkbox.checked && count >= maxServices) {
+                    checkbox.disabled = true;
+                    checkbox.parentElement.classList.add('text-muted');
+                } else if (count < maxServices) {
+                    checkbox.disabled = false;
+                    checkbox.parentElement.classList.remove('text-muted');
+                }
+            });
+
+            // Update color based on count
+            if (count === 0) {
+                selectedCountSpan.className = 'text-muted';
+            } else if (count <= maxServices) {
+                selectedCountSpan.className = 'text-success';
+            } else {
+                selectedCountSpan.className = 'text-danger';
+            }
+        }
+
+        // Add event listeners to all checkboxes
+        serviceCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedCount);
+        });
+
+        // Initial count update
+        updateSelectedCount();
+
+        // Form validation
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const checkedBoxes = document.querySelectorAll('.service-checkbox:checked');
+
+                if (checkedBoxes.length === 0) {
+                    e.preventDefault();
+                    alert('Te rugăm să selectezi cel puțin un serviciu.');
+                    return false;
+                }
+
+                if (checkedBoxes.length > maxServices) {
+                    e.preventDefault();
+                    alert(`Poți selecta maximum ${maxServices} servicii.`);
+                    return false;
+                }
+            });
+        }
+
+        // Password strength indicator
+        const passwordInput = document.querySelector('input[name="password"]');
+        const passwordConfirmInput = document.querySelector('input[name="password_confirm"]');
+
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                let feedback = [];
+
+                if (password.length >= 8) strength++;
+                else feedback.push('cel puțin 8 caractere');
+
+                if (/[A-Z]/.test(password)) strength++;
+                else feedback.push('o literă mare');
+
+                if (/[a-z]/.test(password)) strength++;
+                else feedback.push('o literă mică');
+
+                if (/\d/.test(password)) strength++;
+                else feedback.push('o cifră');
+
+                // Remove existing feedback
+                const existingFeedback = this.parentElement.querySelector('.password-feedback');
+                if (existingFeedback) {
+                    existingFeedback.remove();
+                }
+
+                // Add new feedback
+                if (password.length > 0) {
+                    const feedbackDiv = document.createElement('div');
+                    feedbackDiv.className = 'password-feedback small mt-1';
+
+                    if (strength < 4) {
+                        feedbackDiv.className += ' text-warning';
+                        feedbackDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-1"></i>Parola trebuie să conțină: ${feedback.join(', ')}`;
+                    } else {
+                        feedbackDiv.className += ' text-success';
+                        feedbackDiv.innerHTML = '<i class="fas fa-check me-1"></i>Parola este puternică';
+                    }
+
+                    this.parentElement.appendChild(feedbackDiv);
+                }
+            });
+        }
+
+        // Password confirmation validation
+        if (passwordConfirmInput) {
+            passwordConfirmInput.addEventListener('input', function() {
+                const password = passwordInput ? passwordInput.value : '';
+                const confirmPassword = this.value;
+
+                // Remove existing feedback
+                const existingFeedback = this.parentElement.querySelector('.password-confirm-feedback');
+                if (existingFeedback) {
+                    existingFeedback.remove();
+                }
+
+                if (confirmPassword.length > 0) {
+                    const feedbackDiv = document.createElement('div');
+                    feedbackDiv.className = 'password-confirm-feedback small mt-1';
+
+                    if (password === confirmPassword) {
+                        feedbackDiv.className += ' text-success';
+                        feedbackDiv.innerHTML = '<i class="fas fa-check me-1"></i>Parolele se potrivesc';
+                    } else {
+                        feedbackDiv.className += ' text-danger';
+                        feedbackDiv.innerHTML = '<i class="fas fa-times me-1"></i>Parolele nu se potrivesc';
+                    }
+
+                    this.parentElement.appendChild(feedbackDiv);
+                }
+            });
+        }
+    });
+    </script>
 </body>
 </html>

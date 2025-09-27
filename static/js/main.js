@@ -36,17 +36,77 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, 5000);
 
-    // Form validation enhancement
+    // Enhanced form validation
     const forms = document.querySelectorAll('.needs-validation');
     forms.forEach(function(form) {
         form.addEventListener('submit', function(event) {
             if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
+
+                // Show first invalid field
+                const firstInvalid = form.querySelector(':invalid');
+                if (firstInvalid) {
+                    firstInvalid.focus();
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
             form.classList.add('was-validated');
         });
+
+        // Real-time validation for input fields
+        const inputs = form.querySelectorAll('input, textarea, select');
+        inputs.forEach(function(input) {
+            input.addEventListener('blur', function() {
+                if (this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid') && this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+        });
     });
+
+    // Phone number validation
+    const phoneInputs = document.querySelectorAll('input[type="tel"]');
+    phoneInputs.forEach(function(input) {
+        input.addEventListener('input', function(e) {
+            // Allow only numbers, spaces, +, -, (, )
+            let value = e.target.value.replace(/[^0-9+\-\s\(\)]/g, '');
+            e.target.value = value;
+        });
+    });
+
+    // Budget validation - ensure min <= max
+    const budgetMinInput = document.querySelector('#id_budget_min');
+    const budgetMaxInput = document.querySelector('#id_budget_max');
+
+    if (budgetMinInput && budgetMaxInput) {
+        function validateBudgetRange() {
+            const min = parseFloat(budgetMinInput.value) || 0;
+            const max = parseFloat(budgetMaxInput.value) || 0;
+
+            if (min > 0 && max > 0 && min > max) {
+                budgetMaxInput.setCustomValidity('Bugetul maxim trebuie să fie mai mare decât minimul');
+                budgetMinInput.setCustomValidity('Bugetul minim trebuie să fie mai mic decât maximul');
+            } else {
+                budgetMaxInput.setCustomValidity('');
+                budgetMinInput.setCustomValidity('');
+            }
+        }
+
+        budgetMinInput.addEventListener('input', validateBudgetRange);
+        budgetMaxInput.addEventListener('input', validateBudgetRange);
+    }
 
     // Search form enhancements
     const searchForm = document.querySelector('#search-form');
@@ -107,9 +167,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const allStars = this.closest('.rating-input').querySelectorAll('.star');
             allStars.forEach((s, i) => {
                 if (i < rating) {
-                    s.classList.add('text-warning');
+                    s.style.color = '#8B5CF6';
                 } else {
-                    s.classList.remove('text-warning');
+                    s.style.color = '#6b7280';
                 }
             });
         });

@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invită Meșteri - {{ order.title }} - Bricli{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/custom.css' %}" rel="stylesheet">
+<style>
+.invite-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.craftsman-card {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.craftsman-card:hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.craftsman-card.selected {
+    border-color: #8B5CF6;
+    background-color: rgba(139, 92, 246, 0.1);
+}
+
+.craftsman-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.rating-stars {
+    color: #ffc107;
+}
+
+.btn-invite {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    color: white;
+    padding: 1rem 3rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-invite:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    color: white;
+}
+
+.btn-invite:disabled {
+    background: #6c757d;
+    transform: none;
+    box-shadow: none;
+}
+
+.order-summary {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="invite-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-user-plus me-3"></i>Invită Meșteri
+                </h1>
+                <p class="mb-0 opacity-75">Selectează meșterii pe care vrei să îi inviți să oferteze</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'services:order_detail' order.pk %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Înapoi la Comandă
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Order Summary -->
+    <div class="order-summary">
+        <h5 class="mb-3">
+            <i class="fas fa-info-circle text-primary me-2"></i>Rezumat Comandă
+        </h5>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <h6 class="text-primary">{{ order.title }}</h6>
+                <p class="text-muted mb-2">{{ order.description|truncatewords:30 }}</p>
+                <p class="mb-1">
+                    <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                    {{ order.city.name }}, {{ order.county.name }}
+                </p>
+                <p class="mb-0">
+                    <i class="fas fa-tag text-muted me-2"></i>
+                    {{ order.service.category.name }} - {{ order.service.name }}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="mb-2">
+                    <strong>Buget:</strong><br>
+                    {% if order.budget_min and order.budget_max %}
+                        <span class="text-success">{{ order.budget_min }} - {{ order.budget_max }} RON</span>
+                    {% elif order.budget_min %}
+                        <span class="text-success">De la {{ order.budget_min }} RON</span>
+                    {% elif order.budget_max %}
+                        <span class="text-success">Până la {{ order.budget_max }} RON</span>
+                    {% else %}
+                        <span class="text-muted">De discutat</span>
+                    {% endif %}
+                </div>
+                <small class="text-muted">
+                    <i class="fas fa-clock me-1"></i>{{ order.get_urgency_display }}
+                </small>
+            </div>
+        </div>
+        
+        {% if invited_count > 0 %}
+        <div class="mt-3 p-2 bg-info bg-opacity-10 border border-info rounded">
+            <i class="fas fa-info-circle text-info me-2"></i>
+            Ai invitat deja {{ invited_count }} meșteri pentru această comandă.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Craftsmen List -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5>
+                    <i class="fas fa-users text-success me-2"></i>
+                    Meșteri Disponibili ({{ craftsmen.count }})
+                </h5>
+                <div>
+                    <span id="selected-count">0</span> selectați
+                </div>
+            </div>
+
+            {% if craftsmen %}
+                <form method="post" id="invite-form">
+                    {% csrf_token %}
+                    
+                    {% for craftsman in craftsmen %}
+                    <div class="craftsman-card" data-craftsman-id="{{ craftsman.user.id }}">
+                        <div class="d-flex align-items-center">
+                            <div class="form-check me-3">
+                                <input class="form-check-input craftsman-checkbox" 
+                                       type="checkbox" 
+                                       name="craftsman_ids" 
+                                       value="{{ craftsman.user.id }}" 
+                                       id="craftsman_{{ craftsman.user.id }}">
+                            </div>
+                            
+                            {% if craftsman.user.profile_picture %}
+                                <img src="{{ craftsman.user.profile_picture.url }}" 
+                                     alt="{{ craftsman.user.get_full_name }}" 
+                                     class="craftsman-avatar me-3">
+                            {% else %}
+                                <div class="craftsman-avatar bg-primary d-flex align-items-center justify-content-center me-3">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ craftsman.user.get_full_name|default:craftsman.user.username }}</h6>
+                                {% if craftsman.company_name %}
+                                    <p class="text-muted mb-1">{{ craftsman.company_name }}</p>
+                                {% endif %}
+                                
+                                <div class="d-flex align-items-center mb-2">
+                                    {% if craftsman.average_rating > 0 %}
+                                        <div class="rating-stars me-3">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= craftsman.average_rating %}
+                                                    <i class="fas fa-star" style="color: #8B5CF6;"></i>
+                                                {% else %}
+                                                    <i class="far fa-star" style="color: #8B5CF6;"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            <span class="ms-1">{{ craftsman.average_rating|floatformat:1 }}</span>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <small class="text-muted">
+                                        {{ craftsman.total_reviews }} recenzii • 
+                                        {{ craftsman.experience_years }} ani experiență
+                                    </small>
+                                </div>
+                                
+                                {% if craftsman.description %}
+                                    <p class="text-muted mb-0">{{ craftsman.description|truncatewords:20 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="text-end">
+                                {% if craftsman.city %}
+                                    <small class="text-muted">{{ craftsman.city.name }}</small>
+                                {% endif %}
+                                {% if craftsman.hourly_rate %}
+                                    <div class="text-primary">{{ craftsman.hourly_rate }} RON/oră</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-invite" id="invite-btn" disabled>
+                            <i class="fas fa-paper-plane me-2"></i>
+                            Trimite Invitații
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nu sunt meșteri disponibili</h5>
+                    <p class="text-muted">
+                        Nu am găsit meșteri disponibili pentru această categorie în zona ta, 
+                        sau toți meșterii au fost deja invitați sau au ofertat.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        Sfaturi pentru Invitații
+                    </h6>
+                    
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Invită 3-5 meșteri pentru cele mai bune rezultate
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Alege meșteri cu rating ridicat și recenzii pozitive
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Verifică experiența în categoria ta
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Meșterii din zona ta răspund mai repede
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-info-circle text-info me-2"></i>
+                        Cum Funcționează
+                    </h6>
+                    
+                    <ol class="small">
+                        <li>Selectezi meșterii pe care vrei să îi inviți</li>
+                        <li>Ei primesc o notificare cu detaliile comenzii</li>
+                        <li>Meșterii interesați îți vor trimite oferte</li>
+                        <li>Tu alegi pe cine să shortlistezi</li>
+                        <li>Contactul se deblochează automat</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.craftsman-checkbox');
+    const inviteBtn = document.getElementById('invite-btn');
+    const selectedCount = document.getElementById('selected-count');
+    const craftsmanCards = document.querySelectorAll('.craftsman-card');
+    
+    // Handle card clicks
+    craftsmanCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (e.target.type !== 'checkbox') {
+                const checkbox = this.querySelector('.craftsman-checkbox');
+                checkbox.checked = !checkbox.checked;
+                updateSelection();
+            }
+        });
+    });
+    
+    // Handle checkbox changes
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelection);
+    });
+    
+    function updateSelection() {
+        const selected = document.querySelectorAll('.craftsman-checkbox:checked');
+        const count = selected.length;
+        
+        selectedCount.textContent = count;
+        inviteBtn.disabled = count === 0;
+        
+        // Update card styles
+        craftsmanCards.forEach(card => {
+            const checkbox = card.querySelector('.craftsman-checkbox');
+            if (checkbox.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        });
+        
+        // Update button text
+        if (count > 0) {
+            inviteBtn.innerHTML = `<i class="fas fa-paper-plane me-2"></i>Invită ${count} Meșteri`;
+        } else {
+            inviteBtn.innerHTML = `<i class="fas fa-paper-plane me-2"></i>Trimite Invitații`;
+        }
+    }
+});
+</script>
+{% endblock %}

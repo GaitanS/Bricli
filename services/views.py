@@ -4,12 +4,14 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, F
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db.models import Q, Avg, Count
+from django.db import transaction
 from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta
-from .models import ServiceCategory, Service, Order, Quote, Review, ReviewImage, Notification, notify_new_quote, notify_quote_accepted, notify_quote_rejected
-from .forms import OrderForm, ReviewForm, ReviewImageForm, MultipleReviewImageForm, QuoteForm
+from .models import ServiceCategory, Service, Order, Quote, Review, ReviewImage, Notification, notify_new_quote, notify_quote_accepted, notify_quote_rejected, Invitation, Shortlist, CreditWallet, WalletTransaction, CoverageArea, CraftsmanService
+from .forms import OrderForm, ReviewForm, ReviewImageForm, MultipleReviewImageForm, QuoteForm, CraftsmanServiceForm
 from accounts.models import CraftsmanProfile, County, City
+from .decorators import CraftsmanRequiredMixin, ClientRequiredMixin, can_post_orders, can_post_services
 
 
 class ServiceCategoryListView(ListView):
@@ -45,7 +47,7 @@ class ServiceCategoryDetailView(DetailView):
         return context
 
 
-class CreateOrderView(CreateView):
+class CreateOrderView(ClientRequiredMixin, CreateView):
     model = Order
     template_name = 'services/create_order.html'
     form_class = OrderForm
@@ -193,9 +195,10 @@ class AcceptQuoteView(LoginRequiredMixin, DetailView):
             quote.status = 'accepted'
             quote.save()
 
-            # Update order status and assign craftsman
-            quote.order.status = 'in_progress'
+            # Update order status to awaiting confirmation and assign craftsman
+            quote.order.status = 'awaiting_confirmation'
             quote.order.assigned_craftsman = quote.craftsman
+            quote.order.selected_at = timezone.now()
             quote.order.save()
 
             # Reject all other quotes for this order and notify craftsmen
@@ -208,7 +211,7 @@ class AcceptQuoteView(LoginRequiredMixin, DetailView):
             # Notify the accepted craftsman
             notify_quote_accepted(quote)
 
-            messages.success(request, 'Oferta a fost acceptată! Meșterul va fi notificat.')
+            messages.success(request, 'Oferta a fost acceptată! Meșterul va fi notificat să confirme preluarea comenzii.')
         else:
             messages.error(request, 'Nu poți accepta această ofertă.')
 
@@ -232,6 +235,85 @@ class RejectQuoteView(LoginRequiredMixin, DetailView):
             messages.error(request, 'Nu poți respinge această ofertă.')
 
         return redirect('services:order_detail', pk=quote.order.pk)
+
+
+class ConfirmOrderView(LoginRequiredMixin, DetailView):
+    """View for craftsmen to confirm they will take on an order"""
+    model = Order
+
+    def post(self, request, *args, **kwargs):
+        order = self.get_object()
+
+        # Check if user is the assigned craftsman
+        if (not hasattr(request.user, 'craftsman_profile') or
+            order.assigned_craftsman != request.user.craftsman_profile):
+            messages.error(request, 'Nu poți confirma această comandă.')
+            return redirect('services:order_detail', pk=order.pk)
+
+        # Check if order is awaiting confirmation
+        if order.status != 'awaiting_confirmation':
+            messages.error(request, 'Această comandă nu poate fi confirmată.')
+            return redirect('services:order_detail', pk=order.pk)
+
+        # Confirm the order
+        order.status = 'in_progress'
+        order.confirmed_at = timezone.now()
+        order.save()
+
+        # Create notification for client
+        Notification.objects.create(
+            recipient=order.client,
+            notification_type='order_confirmed',
+            title=f'Meșterul a confirmat comanda!',
+            message=f'Meșterul {order.assigned_craftsman.user.get_full_name() or order.assigned_craftsman.user.username} a confirmat că va prelua comanda "{order.title}". Lucrarea poate începe.',
+            order=order
+        )
+
+        messages.success(request, 'Ai confirmat preluarea comenzii! Clientul va fi notificat.')
+        return redirect('services:order_detail', pk=order.pk)
+
+
+class DeclineOrderView(LoginRequiredMixin, DetailView):
+    """View for craftsmen to decline an order after being selected"""
+    model = Order
+
+    def post(self, request, *args, **kwargs):
+        order = self.get_object()
+
+        # Check if user is the assigned craftsman
+        if (not hasattr(request.user, 'craftsman_profile') or
+            order.assigned_craftsman != request.user.craftsman_profile):
+            messages.error(request, 'Nu poți refuza această comandă.')
+            return redirect('services:order_detail', pk=order.pk)
+
+        # Check if order is awaiting confirmation
+        if order.status != 'awaiting_confirmation':
+            messages.error(request, 'Această comandă nu poate fi refuzată.')
+            return redirect('services:order_detail', pk=order.pk)
+
+        # Decline the order - reset to published status
+        order.status = 'published'
+        order.assigned_craftsman = None
+        order.selected_at = None
+        order.save()
+
+        # Reset the accepted quote back to pending
+        accepted_quote = Quote.objects.filter(order=order, status='accepted').first()
+        if accepted_quote:
+            accepted_quote.status = 'declined'
+            accepted_quote.save()
+
+        # Create notification for client
+        Notification.objects.create(
+            recipient=order.client,
+            notification_type='order_declined',
+            title=f'Meșterul a refuzat comanda',
+            message=f'Din păcate, meșterul {request.user.get_full_name() or request.user.username} nu poate prelua comanda "{order.title}". Comanda a fost republicată pentru alte oferte.',
+            order=order
+        )
+
+        messages.success(request, 'Ai refuzat comanda. Clientul va fi notificat și comanda va fi republicată.')
+        return redirect('services:available_orders')
 
 
 class CreateReviewView(LoginRequiredMixin, CreateView):
@@ -473,3 +555,314 @@ class AvailableOrdersView(LoginRequiredMixin, ListView):
         context['urgency_choices'] = Order.URGENCY_CHOICES
 
         return context
+
+
+# MyBuilder-style Lead System Views
+
+# Lead fee configuration - poate fi mutat în settings
+LEAD_FEE_CENTS = 2000  # 20 lei exemplu
+
+
+class InviteCraftsmenView(LoginRequiredMixin, DetailView):
+    """View pentru invitarea meșterilor să oferteze"""
+    model = Order
+    template_name = 'services/invite_craftsmen.html'
+    context_object_name = 'order'
+
+    def dispatch(self, request, *args, **kwargs):
+        order = self.get_object()
+
+        # Check if user owns the order
+        if order.client != request.user:
+            messages.error(request, 'Nu poți invita meșteri pentru această comandă.')
+            return redirect('services:order_detail', pk=order.pk)
+
+        # Check if order is published
+        if order.status != 'published':
+            messages.error(request, 'Comanda trebuie să fie publicată pentru a invita meșteri.')
+            return redirect('services:order_detail', pk=order.pk)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = self.get_object()
+
+        # Get craftsmen in the same category and area
+        craftsmen = CraftsmanProfile.objects.filter(
+            services__service__category=order.service.category,
+            user__user_type='craftsman'
+        ).select_related('user', 'county', 'city').distinct()
+
+        # Filter by location if coverage area exists
+        # TODO: Implement distance-based filtering
+
+        # Exclude already invited craftsmen
+        invited_craftsmen_ids = order.invitations.values_list('craftsman_id', flat=True)
+        craftsmen = craftsmen.exclude(user_id__in=invited_craftsmen_ids)
+
+        # Exclude craftsmen who already quoted
+        quoted_craftsmen_ids = order.quotes.values_list('craftsman__user_id', flat=True)
+        craftsmen = craftsmen.exclude(user_id__in=quoted_craftsmen_ids)
+
+        context['craftsmen'] = craftsmen[:20]  # Limit to 20 for performance
+        context['invited_count'] = order.invitations.count()
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        """Handle craftsman invitations"""
+        order = self.get_object()
+        craftsman_ids = request.POST.getlist('craftsman_ids')
+
+        invited_count = 0
+        for craftsman_id in craftsman_ids:
+            try:
+                craftsman = get_object_or_404(CraftsmanProfile, user_id=craftsman_id)
+                invitation, created = Invitation.objects.get_or_create(
+                    order=order,
+                    craftsman=craftsman.user,
+                    defaults={'invited_by': request.user}
+                )
+                if created:
+                    invited_count += 1
+                    # TODO: Send notification to craftsman
+            except:
+                continue
+
+        if invited_count > 0:
+            messages.success(request, f'Au fost invitați {invited_count} meșteri să oferteze.')
+        else:
+            messages.info(request, 'Nu au fost invitați meșteri noi.')
+
+        return redirect('services:order_detail', pk=order.pk)
+
+
+class ShortlistCraftsmanView(LoginRequiredMixin, DetailView):
+    """MyBuilder-style shortlisting - clientul alege meșterii cu care vrea să vorbească"""
+    model = Order
+
+    def post(self, request, *args, **kwargs):
+        order = self.get_object()
+        craftsman_id = kwargs.get('craftsman_id')
+
+        # Validations
+        if order.client != request.user:
+            messages.error(request, 'Nu poți shortlista meșteri pentru această comandă.')
+            return redirect('services:order_detail', pk=order.pk)
+
+        if order.status not in ['published', 'in_progress']:
+            messages.error(request, 'Nu poți shortlista meșteri pentru această comandă.')
+            return redirect('services:order_detail', pk=order.pk)
+
+        try:
+            craftsman = get_object_or_404(CraftsmanProfile, user_id=craftsman_id)
+
+            with transaction.atomic():
+                # Create or get shortlist entry
+                shortlist, created = Shortlist.objects.get_or_create(
+                    order=order,
+                    craftsman=craftsman.user,
+                    defaults={'lead_fee_amount': LEAD_FEE_CENTS}
+                )
+
+                if not created:
+                    messages.info(request, 'Acest meșter este deja shortlistat.')
+                    return redirect('services:order_detail', pk=order.pk)
+
+                # Handle lead fee charging
+                if LEAD_FEE_CENTS > 0:
+                    wallet, _ = CreditWallet.objects.get_or_create(user=craftsman.user)
+
+                    if wallet.has_sufficient_balance(LEAD_FEE_CENTS):
+                        # Charge the lead fee
+                        wallet.deduct_amount(
+                            LEAD_FEE_CENTS,
+                            'lead_fee',
+                            {
+                                'order_id': order.id,
+                                'client_id': request.user.id,
+                                'order_title': order.title
+                            }
+                        )
+
+                        # Mark contact as revealed
+                        shortlist.charged_at = timezone.now()
+                        shortlist.revealed_contact_at = timezone.now()
+                        shortlist.save(update_fields=['charged_at', 'revealed_contact_at'])
+
+                        messages.success(
+                            request,
+                            f'Meșter shortlistat! Datele de contact au fost deblocate. '
+                            f'Taxa de {shortlist.lead_fee_lei} lei a fost aplicată meșterului.'
+                        )
+
+                        # TODO: Send notification to craftsman about shortlisting and charge
+
+                    else:
+                        messages.warning(
+                            request,
+                            f'Meșter shortlistat, dar nu are credit suficient ({shortlist.lead_fee_lei} lei). '
+                            f'Contactul va fi deblocat după alimentarea contului.'
+                        )
+
+                        # TODO: Send notification to craftsman about insufficient funds
+                else:
+                    # No lead fee - reveal contact immediately
+                    shortlist.revealed_contact_at = timezone.now()
+                    shortlist.save(update_fields=['revealed_contact_at'])
+                    messages.success(request, 'Meșter shortlistat! Datele de contact au fost deblocate.')
+
+        except Exception as e:
+            messages.error(request, 'A apărut o eroare la shortlisting. Încearcă din nou.')
+
+        return redirect('services:order_detail', pk=order.pk)
+
+
+class WalletView(LoginRequiredMixin, DetailView):
+    """View pentru afișarea wallet-ului meșterului"""
+    template_name = 'services/wallet.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, 'Trebuie să te autentifici pentru a accesa wallet-ul.')
+            return redirect('accounts:login')
+        if request.user.user_type != 'craftsman':
+            messages.error(request, 'Doar meșterii au acces la wallet.')
+            return redirect('core:home')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self):
+        wallet, created = CreditWallet.objects.get_or_create(user=self.request.user)
+        return wallet
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        wallet = self.get_object()
+
+        # Get recent transactions
+        context['transactions'] = wallet.transactions.all()[:20]
+
+        # Get shortlists where this craftsman was charged
+        context['shortlists'] = Shortlist.objects.filter(
+            craftsman=self.request.user,
+            charged_at__isnull=False
+        ).select_related('order').order_by('-created_at')[:10]
+
+        return context
+
+
+# Craftsman Services Management Views
+
+class CraftsmanServicesView(CraftsmanRequiredMixin, ListView):
+    """View for craftsmen to manage their services"""
+    model = CraftsmanService
+    template_name = 'services/craftsman_services.html'
+    context_object_name = 'services'
+    paginate_by = 20
+
+    def get_queryset(self):
+        return CraftsmanService.objects.filter(
+            craftsman=self.request.user.craftsman_profile
+        ).select_related('service__category')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['craftsman'] = self.request.user.craftsman_profile
+        context['total_services'] = self.get_queryset().count()
+        return context
+
+
+class AddCraftsmanServiceView(CraftsmanRequiredMixin, CreateView):
+    """View for craftsmen to add new services"""
+    model = CraftsmanService
+    form_class = CraftsmanServiceForm
+    template_name = 'services/add_craftsman_service.html'
+
+    def form_valid(self, form):
+        form.instance.craftsman = self.request.user.craftsman_profile
+
+        # Check if service already exists for this craftsman
+        if CraftsmanService.objects.filter(
+            craftsman=self.request.user.craftsman_profile,
+            service=form.cleaned_data['service']
+        ).exists():
+            messages.error(self.request, 'Ai adăugat deja acest serviciu.')
+            return self.form_invalid(form)
+
+        response = super().form_valid(form)
+        messages.success(self.request, 'Serviciul a fost adăugat cu succes!')
+        return response
+
+    def get_success_url(self):
+        return reverse_lazy('services:craftsman_services')
+
+
+class EditCraftsmanServiceView(CraftsmanRequiredMixin, UpdateView):
+    """View for craftsmen to edit their services"""
+    model = CraftsmanService
+    form_class = CraftsmanServiceForm
+    template_name = 'services/edit_craftsman_service.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+
+        # If the parent dispatch returned a redirect, return it
+        if hasattr(response, 'status_code') and response.status_code == 302:
+            return response
+
+        service = self.get_object()
+
+        # Only allow the owner to edit
+        if service.craftsman.user != request.user:
+            messages.error(request, 'Nu poți edita acest serviciu.')
+            return redirect('services:craftsman_services')
+
+        return response
+
+    def get_queryset(self):
+        return CraftsmanService.objects.filter(
+            craftsman=self.request.user.craftsman_profile
+        )
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Serviciul a fost actualizat cu succes!')
+        return response
+
+    def get_success_url(self):
+        return reverse_lazy('services:craftsman_services')
+
+
+class DeleteCraftsmanServiceView(CraftsmanRequiredMixin, DetailView):
+    """View for craftsmen to delete their services"""
+    model = CraftsmanService
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+
+        # If the parent dispatch returned a redirect, return it
+        if hasattr(response, 'status_code') and response.status_code == 302:
+            return response
+
+        service = self.get_object()
+
+        # Only allow the owner to delete
+        if service.craftsman.user != request.user:
+            messages.error(request, 'Nu poți șterge acest serviciu.')
+            return redirect('services:craftsman_services')
+
+        return response
+
+    def post(self, request, *args, **kwargs):
+        service = self.get_object()
+        service_name = service.service.name
+        service.delete()
+
+        messages.success(request, f'Serviciul "{service_name}" a fost șters cu succes!')
+        return redirect('services:craftsman_services')
+
+    def get_queryset(self):
+        return CraftsmanService.objects.filter(
+            craftsman=self.request.user.craftsman_profile
+        )

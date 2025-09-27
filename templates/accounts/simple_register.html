@@ -15,10 +15,25 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%);
             min-height: 100vh;
             margin: 0;
             padding: 0;
+        }
+
+        .back-to-site {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-site:hover {
+            color: rgba(255, 255, 255, 0.8);
+            transform: translateX(-5px);
         }
         .registration-container {
             min-height: 100vh;
@@ -30,6 +45,11 @@
     </style>
 </head>
 <body>
+    <!-- Back to site link -->
+    <a href="{% url 'core:home' %}" class="back-to-site">
+        <i class="fas fa-arrow-left me-2"></i>Înapoi la Bricli
+    </a>
+
     <div class="registration-container">
         <div class="col-md-5 col-lg-4">
             <div class="card shadow-lg border-0">
@@ -43,13 +63,37 @@
                         {% csrf_token %}
                         
                         <div class="mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">Prenume</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Nume de familie</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
                             <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
                             {{ form.email }}
                             {% if form.email.errors %}
                                 <div class="text-danger small">{{ form.email.errors.0 }}</div>
                             {% endif %}
                         </div>
-                        
+
+                        <div class="mb-3">
+                            <label for="{{ form.phone_number.id_for_label }}" class="form-label">Număr de telefon (opțional)</label>
+                            {{ form.phone_number }}
+                            {% if form.phone_number.errors %}
+                                <div class="text-danger small">{{ form.phone_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
                         <div class="mb-3">
                             <label for="{{ form.county.id_for_label }}" class="form-label">Județul</label>
                             {{ form.county }}
@@ -57,12 +101,20 @@
                                 <div class="text-danger small">{{ form.county.errors.0 }}</div>
                             {% endif %}
                         </div>
-                        
-                        <div class="mb-4">
+
+                        <div class="mb-3">
                             <label for="{{ form.password.id_for_label }}" class="form-label">Parola</label>
                             {{ form.password }}
                             {% if form.password.errors %}
                                 <div class="text-danger small">{{ form.password.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.password_confirm.id_for_label }}" class="form-label">Confirmă parola</label>
+                            {{ form.password_confirm }}
+                            {% if form.password_confirm.errors %}
+                                <div class="text-danger small">{{ form.password_confirm.errors.0 }}</div>
                             {% endif %}
                         </div>
                         
@@ -76,7 +128,7 @@
                         </div>
                         
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="submit" class="btn btn-lg" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%); border: none; color: white;">
                                 Înregistrare gratuită
                             </button>
                         </div>
@@ -88,8 +140,8 @@
                         <p class="mb-2">Ai deja un cont? 
                             <a href="{% url 'accounts:login' %}" class="text-decoration-none fw-bold">Conectează-te</a>
                         </p>
-                        <p class="mb-0">Ești meșter? 
-                            <a href="{% url 'accounts:simple_craftsman_register' %}" class="text-decoration-none fw-bold text-success">
+                        <p class="mb-0">Ești meșter?
+                            <a href="{% url 'accounts:simple_craftsman_register' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">
                                 Înregistrează-te ca meșter
                             </a>
                         </p>

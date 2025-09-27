@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Wallet - Credit Meșter - Bricli{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/custom.css' %}" rel="stylesheet">
+<style>
+.wallet-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.balance-card {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.balance-amount {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.transaction-item {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.transaction-item:hover {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.transaction-positive {
+    border-left: 4px solid #28a745;
+}
+
+.transaction-negative {
+    border-left: 4px solid #dc3545;
+}
+
+.shortlist-item {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-left: 4px solid #8B5CF6;
+}
+
+.btn-topup {
+    background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-topup:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    color: white;
+}
+
+.info-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wallet-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-wallet me-3"></i>Wallet Credit
+                </h1>
+                <p class="mb-0 opacity-75">Gestionează creditul tău pentru lead-uri și shortlisting</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'services:available_orders' %}" class="btn btn-outline-light">
+                    <i class="fas fa-list me-2"></i>Comenzi Disponibile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Balance Card -->
+            <div class="balance-card text-center">
+                <div class="balance-amount">{{ object.balance_lei|floatformat:2 }} RON</div>
+                <p class="mb-3 opacity-75">Soldul tău curent</p>
+                <button class="btn btn-topup" data-bs-toggle="modal" data-bs-target="#topupModal">
+                    <i class="fas fa-plus me-2"></i>Încarcă Credit
+                </button>
+            </div>
+
+            <!-- How it Works -->
+            <div class="info-card">
+                <h5 class="mb-3">
+                    <i class="fas fa-info-circle text-primary me-2"></i>
+                    Cum Funcționează Sistemul de Lead-uri
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>📋 Când se aplică taxa?</h6>
+                        <ul class="small">
+                            <li>Când un client te <strong>shortlistează</strong></li>
+                            <li>Taxa standard: <strong>20 RON</strong> per lead</li>
+                            <li>Plătești doar pentru contacte reale</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>💰 Ce primești?</h6>
+                        <ul class="small">
+                            <li>Datele de contact ale clientului</li>
+                            <li>Detalii complete despre lucrare</li>
+                            <li>Prioritate în comunicare</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>Sfat:</strong> Menține un sold de cel puțin 100 RON pentru a nu pierde lead-uri importante.
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-history text-info me-2"></i>
+                        Tranzacții Recente
+                    </h5>
+                    
+                    {% if transactions %}
+                        {% for transaction in transactions %}
+                        <div class="transaction-item {% if transaction.amount_cents > 0 %}transaction-positive{% else %}transaction-negative{% endif %}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">
+                                        {% if transaction.amount_cents > 0 %}
+                                            <i class="fas fa-plus-circle text-success me-2"></i>
+                                        {% else %}
+                                            <i class="fas fa-minus-circle text-danger me-2"></i>
+                                        {% endif %}
+                                        {{ transaction.get_reason_display }}
+                                    </h6>
+                                    <small class="text-muted">
+                                        {{ transaction.created_at|date:"d F Y, H:i" }}
+                                        {% if transaction.meta.order_title %}
+                                            • {{ transaction.meta.order_title }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="h6 {% if transaction.amount_cents > 0 %}text-success{% else %}text-danger{% endif %} mb-0">
+                                        {% if transaction.amount_cents > 0 %}+{% endif %}{{ transaction.amount_lei|floatformat:2 }} RON
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                            <h6 class="text-muted">Nu există tranzacții încă</h6>
+                            <p class="text-muted">Tranzacțiile tale vor apărea aici.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Shortlists -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-star me-2" style="color: #8B5CF6;"></i>
+                        Shortlisting Recent
+                    </h6>
+                    
+                    {% if shortlists %}
+                        {% for shortlist in shortlists %}
+                        <div class="shortlist-item">
+                            <h6 class="mb-1">{{ shortlist.order.title }}</h6>
+                            <small class="text-muted">
+                                {{ shortlist.created_at|date:"d M Y" }} • 
+                                Taxa: {{ shortlist.lead_fee_lei|floatformat:2 }} RON
+                            </small>
+                            {% if shortlist.is_contact_revealed %}
+                                <div class="mt-2">
+                                    <span class="badge bg-success">Contact deblocat</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted small">Nu ai fost shortlistat încă.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-chart-bar me-2" style="color: #8B5CF6;"></i>
+                        Statistici
+                    </h6>
+                    
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-0">{{ shortlists.count }}</h4>
+                                <small class="text-muted">Shortlisting</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="mb-0" style="color: #8B5CF6;">
+                                {% widthratio object.balance_cents 100 1 %}
+                            </h4>
+                            <small class="text-muted">Lead-uri posibile</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top-up Modal -->
+<div class="modal fade" id="topupModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle text-primary me-2"></i>
+                    Încarcă Credit
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Momentan:</strong> Încărcarea creditului se face manual. 
+                    Contactează-ne pentru a adăuga credit în contul tău.
+                </div>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5>100 RON</h5>
+                                <small class="text-muted">~5 lead-uri</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5>200 RON</h5>
+                                <small class="text-muted">~10 lead-uri</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <h6>Modalități de plată (în curând):</h6>
+                    <ul class="small">
+                        <li>Card bancar (Visa, Mastercard)</li>
+                        <li>Transfer bancar</li>
+                        <li>PayPal</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Închide</button>
+                <a href="mailto:support@bricli.ro?subject=Incarcare Credit Wallet" class="btn btn-primary">
+                    <i class="fas fa-envelope me-2"></i>Contactează Suportul
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

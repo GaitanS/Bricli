@@ -59,8 +59,14 @@
                                 <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profilul meu</a></li>
                                 <li><a class="dropdown-item" href="{% url 'services:my_orders' %}">Comenzile mele</a></li>
                                 {% if user.user_type == 'craftsman' %}
+                                    <li><a class="dropdown-item" href="{% url 'services:craftsman_services' %}">
+                                        <i class="fas fa-tools me-2"></i>Serviciile mele
+                                    </a></li>
                                     <li><a class="dropdown-item" href="{% url 'services:available_orders' %}">
                                         <i class="fas fa-clipboard-list me-2"></i>Comenzi Disponibile
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{% url 'services:wallet' %}">
+                                        <i class="fas fa-wallet me-2"></i>Wallet Credit
                                     </a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
@@ -72,7 +78,7 @@
                             <a class="nav-link" href="{% url 'accounts:login' %}">Conectare</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-primary ms-2" href="{% url 'accounts:register' %}">Înregistrare</a>
+                            <a class="btn btn-gradient ms-2" href="{% url 'accounts:register' %}">Înregistrare</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -104,8 +110,8 @@
                     <h5 class="fw-bold mb-3">
                         <i class="fas fa-hammer me-2"></i>Bricli
                     </h5>
-                    <p class="text-muted">
-                        Platforma care conectează clienții cu meșteri verificați din România. 
+                    <p class="text-light">
+                        Platforma care conectează clienții cu meșteri verificați din România.
                         Găsește rapid și sigur specialiști pentru toate nevoile tale.
                     </p>
                     <div class="social-links">
@@ -118,36 +124,36 @@
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Pentru clienți</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'services:create_order' %}" class="text-muted text-decoration-none">Postează o comandă</a></li>
-                        <li><a href="{% url 'accounts:craftsmen_list' %}" class="text-muted text-decoration-none">Găsește meșteri</a></li>
-                        <li><a href="{% url 'core:how_it_works' %}" class="text-muted text-decoration-none">Cum funcționează</a></li>
+                        <li><a href="{% url 'services:create_order' %}" class="text-light text-decoration-none">Postează o comandă</a></li>
+                        <li><a href="{% url 'accounts:craftsmen_list' %}" class="text-light text-decoration-none">Găsește meșteri</a></li>
+                        <li><a href="{% url 'core:how_it_works' %}" class="text-light text-decoration-none">Cum funcționează</a></li>
                     </ul>
                 </div>
                 
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Pentru meșteri</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'accounts:craftsman_register' %}" class="text-muted text-decoration-none">Înregistrează-te</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Găsește lucrări</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Avantaje</a></li>
+                        <li><a href="{% url 'accounts:craftsman_register' %}" class="text-light text-decoration-none">Înregistrează-te</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Găsește lucrări</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Avantaje</a></li>
                     </ul>
                 </div>
                 
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Companie</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'core:about' %}" class="text-muted text-decoration-none">Despre noi</a></li>
-                        <li><a href="{% url 'core:contact' %}" class="text-muted text-decoration-none">Contact</a></li>
-                        <li><a href="{% url 'core:faq' %}" class="text-muted text-decoration-none">Întrebări frecvente</a></li>
+                        <li><a href="{% url 'core:about' %}" class="text-light text-decoration-none">Despre noi</a></li>
+                        <li><a href="{% url 'core:contact' %}" class="text-light text-decoration-none">Contact</a></li>
+                        <li><a href="{% url 'core:faq' %}" class="text-light text-decoration-none">Întrebări frecvente</a></li>
                     </ul>
                 </div>
                 
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Suport</h6>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-muted text-decoration-none">Centru de ajutor</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Termeni și condiții</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Politica de confidențialitate</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Centru de ajutor</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Termeni și condiții</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Politica de confidențialitate</a></li>
                     </ul>
                 </div>
             </div>
@@ -156,10 +162,10 @@
             
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <p class="text-muted mb-0">&copy; 2024 Bricli. Toate drepturile rezervate.</p>
+                    <p class="text-light mb-0">&copy; 2024 Bricli. Toate drepturile rezervate.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <p class="text-muted mb-0">Făcut cu <i class="fas fa-heart text-danger"></i> în România</p>
+                    <p class="text-light mb-0">Făcut cu <i class="fas fa-heart text-danger"></i> în România</p>
                 </div>
             </div>
         </div>

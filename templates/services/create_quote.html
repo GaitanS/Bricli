@@ -80,7 +80,7 @@
 }
 
 .tip-icon {
-    background: #007bff;
+    background: #8B5CF6;
     color: white;
     width: 30px;
     height: 30px;
@@ -151,11 +151,11 @@
                         <div class="mb-2">
                             <strong>Buget Client:</strong><br>
                             {% if order.budget_min and order.budget_max %}
-                                <span class="text-success">{{ order.budget_min }} - {{ order.budget_max }} RON</span>
+                                <span style="color: #8B5CF6;">{{ order.budget_min }} - {{ order.budget_max }} RON</span>
                             {% elif order.budget_min %}
-                                <span class="text-success">De la {{ order.budget_min }} RON</span>
+                                <span style="color: #8B5CF6;">De la {{ order.budget_min }} RON</span>
                             {% elif order.budget_max %}
-                                <span class="text-success">Până la {{ order.budget_max }} RON</span>
+                                <span style="color: #8B5CF6;">Până la {{ order.budget_max }} RON</span>
                             {% else %}
                                 <span class="text-muted">De discutat</span>
                             {% endif %}
@@ -170,7 +170,7 @@
             <!-- Quote Form -->
             <div class="form-container">
                 <h5 class="mb-4">
-                    <i class="fas fa-edit text-success me-2"></i>Detalii Ofertă
+                    <i class="fas fa-edit me-2" style="color: #8B5CF6;"></i>Detalii Ofertă
                 </h5>
 
                 <form method="post">
@@ -327,7 +327,7 @@
                             </div>
                         </div>
                         <div class="col-4">
-                            <h6 class="text-success mb-0">{{ user.craftsman_profile.total_jobs_completed }}</h6>
+                            <h6 class="mb-0" style="color: #8B5CF6;">{{ user.craftsman_profile.total_jobs_completed }}</h6>
                             <small class="text-muted">Lucrări</small>
                         </div>
                     </div>

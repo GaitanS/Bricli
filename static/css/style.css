@@ -1,12 +1,12 @@
 /* Bricli Custom Styles */
 
 :root {
-    --primary-color: #667eea;
-    --secondary-color: #764ba2;
-    --success-color: #28a745;
-    --warning-color: #ffc107;
+    --primary-color: #8B5CF6;
+    --secondary-color: #A855F7;
+    --success-color: #8B5CF6;
+    --warning-color: #8B5CF6;
     --danger-color: #dc3545;
-    --info-color: #17a2b8;
+    --info-color: #8B5CF6;
     --light-color: #f8f9fa;
     --dark-color: #343a40;
     --font-family: 'Inter', sans-serif;
@@ -167,7 +167,7 @@ body {
 
 /* Rating Stars */
 .rating-stars {
-    color: var(--warning-color);
+    color: #8B5CF6;
 }
 
 .rating-stars .far {

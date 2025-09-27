@@ -26,7 +26,7 @@ class HomeView(TemplateView):
             'top_craftsmen': CraftsmanProfile.objects.filter(
                 user__is_verified=True
             ).order_by('-average_rating', '-total_reviews')[:6],
-            'counties': County.objects.all()[:10],  # Popular counties
+            'counties': County.objects.all().order_by('name'),  # All counties
         })
         return context
 

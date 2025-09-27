@@ -2,30 +2,31 @@
 
 /* Color Variables */
 :root {
-    --primary-color: #0d6efd;
+    --primary-color: #8B5CF6;
     --secondary-color: #6c757d;
-    --success-color: #198754;
-    --warning-color: #ffc107;
+    --success-color: #8B5CF6;
+    --warning-color: #8B5CF6;
     --danger-color: #dc3545;
-    --info-color: #0dcaf0;
+    --info-color: #8B5CF6;
     --light-color: #f8f9fa;
     --dark-color: #212529;
     --orange-color: #fd7e14;
-    --purple-color: #6f42c1;
+    --purple-color: #8B5CF6;
     
-    /* Custom Brand Colors */
-    --bricli-primary: #2563eb;
+    /* Custom Brand Colors - Updated to Purple Theme */
+    --bricli-primary: #8B5CF6;
     --bricli-secondary: #64748b;
-    --bricli-accent: #f59e0b;
+    --bricli-accent: #A855F7;
     --bricli-success: #10b981;
     --bricli-warning: #f59e0b;
     --bricli-danger: #ef4444;
     
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    --gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --gradient-info: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    /* Gradients - Updated to Purple Theme with Darker Shades */
+    --gradient-primary: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%);
+    --gradient-secondary: linear-gradient(135deg, #A855F7 0%, #9333EA 50%, #7C3AED 100%);
+    --gradient-success: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    --gradient-warning: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    --gradient-info: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%);
     
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -74,8 +75,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary {
-    background: var(--bricli-primary);
-    border-color: var(--bricli-primary);
+    background: var(--gradient-primary);
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 50%, #5B21B6 100%);
+    color: white;
 }
 
 .btn-gradient {
@@ -88,6 +95,148 @@ h1, h2, h3, h4, h5, h6 {
     background: var(--gradient-primary);
     opacity: 0.9;
     color: white;
+}
+
+/* Override all blue elements with purple gradient */
+.btn-success, .btn-info {
+    background: var(--gradient-primary) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.btn-success:hover, .btn-info:hover {
+    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 50%, #5B21B6 100%) !important;
+    color: white !important;
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--bricli-primary);
+    color: var(--bricli-primary);
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: var(--gradient-primary);
+    border-color: transparent;
+    color: white;
+}
+
+/* Text colors */
+.text-primary {
+    color: var(--bricli-primary) !important;
+}
+
+.text-success {
+    color: var(--bricli-primary) !important;
+}
+
+.text-info {
+    color: var(--bricli-primary) !important;
+}
+
+/* Background colors */
+.bg-primary {
+    background: var(--gradient-primary) !important;
+}
+
+.bg-success {
+    background: var(--gradient-primary) !important;
+}
+
+.bg-info {
+    background: var(--gradient-primary) !important;
+}
+
+/* Icons */
+.fas, .far, .fab {
+    color: inherit;
+}
+
+/* Service category icons */
+.service-category-icon {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* Rating stars - purple instead of yellow */
+.text-warning {
+    color: var(--bricli-primary) !important;
+}
+
+.star-rating {
+    color: var(--bricli-primary) !important;
+}
+
+/* Step indicators */
+.step-icon {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* Badges */
+.badge.bg-light {
+    background: rgba(139, 92, 246, 0.1) !important;
+    color: var(--bricli-primary) !important;
+}
+
+/* Links */
+a {
+    color: var(--bricli-primary);
+}
+
+a:hover {
+    color: #6D28D9;
+}
+
+/* Additional blue to purple overrides */
+.text-blue, .text-info {
+    color: var(--bricli-primary) !important;
+}
+
+.bg-blue, .bg-info {
+    background: var(--gradient-primary) !important;
+}
+
+.border-primary {
+    border-color: var(--bricli-primary) !important;
+}
+
+.border-blue, .border-info {
+    border-color: var(--bricli-primary) !important;
+}
+
+/* Hero section gradient */
+.hero-section {
+    background: var(--gradient-primary) !important;
+}
+
+/* CTA section */
+.bg-primary {
+    background: var(--gradient-primary) !important;
+}
+
+/* Step numbers and indicators */
+.step-number {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+}
+
+/* Progress bars */
+.progress-bar {
+    background: var(--gradient-primary) !important;
+}
+
+/* Alerts */
+.alert-primary {
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-color: var(--bricli-primary) !important;
+    color: var(--bricli-primary) !important;
+}
+
+.alert-info {
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-color: var(--bricli-primary) !important;
+    color: var(--bricli-primary) !important;
 }
 
 /* Cards */
@@ -155,6 +304,103 @@ h1, h2, h3, h4, h5, h6 {
 .hero-content {
     position: relative;
     z-index: 1;
+}
+
+/* Hero Image Styling */
+.hero-image-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.hero-image-wrapper {
+    position: relative;
+    max-width: 500px;
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: perspective(1000px) rotateY(-5deg) rotateX(2deg);
+    transition: all 0.3s ease;
+}
+
+.hero-image-wrapper:hover {
+    transform: perspective(1000px) rotateY(-2deg) rotateX(1deg) scale(1.02);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+}
+
+.hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    border-radius: 20px;
+    transition: opacity 0.3s ease;
+}
+
+/* Fallback styling if image fails to load */
+.hero-image-wrapper {
+    min-height: 400px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+}
+
+/* Image loading states */
+.hero-image[loading] {
+    opacity: 0;
+}
+
+.hero-image.loaded {
+    opacity: 1;
+}
+
+/* Add a subtle overlay for better integration */
+.hero-image-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+    border-radius: 20px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Floating animation for hero image */
+@keyframes heroFloat {
+    0%, 100% {
+        transform: perspective(1000px) rotateY(-5deg) rotateX(2deg) translateY(0px);
+    }
+    50% {
+        transform: perspective(1000px) rotateY(-5deg) rotateX(2deg) translateY(-10px);
+    }
+}
+
+.hero-image-wrapper {
+    animation: heroFloat 6s ease-in-out infinite;
+}
+
+.hero-image-wrapper:hover {
+    animation-play-state: paused;
+}
+
+/* Professional depth effect */
+.hero-image-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: -10px;
+    bottom: -10px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.3) 100%);
+    border-radius: 20px;
+    z-index: -1;
+    filter: blur(20px);
+    opacity: 0.6;
 }
 
 /* Service Categories */
@@ -310,11 +556,42 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+    .hero-image-wrapper {
+        max-width: 400px;
+        transform: perspective(800px) rotateY(-3deg) rotateX(1deg);
+    }
+}
+
+@media (max-width: 992px) {
+    .hero-image-wrapper {
+        max-width: 350px;
+        transform: none;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-image-wrapper:hover {
+        transform: scale(1.02);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+}
+
 @media (max-width: 768px) {
     .hero-section {
         padding: 2rem 0;
+        text-align: center;
     }
-    
+
+    /* Hide image on mobile for better performance and UX */
+    .hero-image-container {
+        display: none !important;
+    }
+
+    /* Center content on mobile */
+    .hero-content {
+        text-align: center;
+    }
+
     .stat-number {
         font-size: 2rem;
     }
@@ -385,4 +662,88 @@ h1, h2, h3, h4, h5, h6 {
 
 .bg-gradient-info {
     background: var(--gradient-info);
+}
+
+/* Purple Theme Icons and Elements */
+.text-primary, .badge-primary {
+    color: var(--bricli-primary) !important;
+}
+
+.bg-primary {
+    background: var(--gradient-primary) !important;
+}
+
+/* Button styles - ensuring white text */
+.btn-primary {
+    background: var(--gradient-primary) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 50%, #5B21B6 100%) !important;
+    color: white !important;
+    opacity: 0.9;
+}
+
+/* Ensure all button variants have white text */
+.btn-success, .btn-info, .btn-warning {
+    background: var(--gradient-primary) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.btn-success:hover, .btn-success:focus, .btn-success:active,
+.btn-info:hover, .btn-info:focus, .btn-info:active,
+.btn-warning:hover, .btn-warning:focus, .btn-warning:active {
+    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 50%, #5B21B6 100%) !important;
+    color: white !important;
+    opacity: 0.9;
+}
+
+/* Specific button text color override */
+.btn-primary *, .btn-success *, .btn-info *, .btn-warning * {
+    color: white !important;
+}
+
+/* Global overrides for any remaining blue/green elements */
+.text-success {
+    color: var(--bricli-primary) !important;
+}
+
+.bg-success {
+    background: var(--gradient-primary) !important;
+}
+
+.border-success {
+    border-color: var(--bricli-primary) !important;
+}
+
+.btn-outline-success {
+    border-color: var(--bricli-primary) !important;
+    color: var(--bricli-primary) !important;
+}
+
+.btn-outline-success:hover {
+    background: var(--gradient-primary) !important;
+    border-color: transparent !important;
+    color: white !important;
+}
+
+/* Service Category Icons with Purple Gradient */
+.service-category-icon.bg-gradient-primary {
+    background: var(--gradient-primary) !important;
+}
+
+/* Navbar Brand Purple */
+.navbar-brand {
+    color: var(--bricli-primary) !important;
+}
+
+/* All icons with primary color get purple gradient */
+.text-primary i, .fas.text-primary, .far.text-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }

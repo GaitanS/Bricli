@@ -92,17 +92,43 @@
                 </div>
                 
                 <div class="mt-4">
-                    <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg me-3">
-                        <i class="fas fa-plus me-2"></i>Postează o comandă
-                    </a>
-                    <a href="{% url 'accounts:craftsman_register' %}" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-user-plus me-2"></i>Devino meșter
-                    </a>
+                    {% if user.is_authenticated %}
+                        {% if user.user_type == 'client' %}
+                            <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg me-3">
+                                <i class="fas fa-plus me-2"></i>Postează o comandă
+                            </a>
+                            <a href="{% url 'services:my_orders' %}" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-list me-2"></i>Comenzile mele
+                            </a>
+                        {% elif user.user_type == 'craftsman' %}
+                            <a href="{% url 'services:available_orders' %}" class="btn btn-light btn-lg me-3">
+                                <i class="fas fa-search me-2"></i>Caută comenzi
+                            </a>
+                            <a href="{% url 'services:craftsman_services' %}" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-tools me-2"></i>Serviciile mele
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg me-3">
+                            <i class="fas fa-plus me-2"></i>Postează o comandă
+                        </a>
+                        <a href="{% url 'accounts:craftsman_register' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Devino meșter
+                        </a>
+                    {% endif %}
                 </div>
             </div>
             
-            <div class="col-lg-6 text-center">
-                <img src="{% static 'images/hero-illustration.svg' %}" alt="Meșteri la lucru" class="img-fluid">
+            <div class="col-lg-6 hero-image-container d-none d-lg-block">
+                <div class="hero-image-wrapper">
+                    <img src="{% static 'images/worker.webp' %}"
+                         alt="Meșteri profesioniști la lucru - Bricli conectează clienții cu specialiști verificați"
+                         class="hero-image"
+                         loading="eager"
+                         decoding="async"
+                         onload="this.classList.add('loaded')"
+                         onerror="this.style.display='none'">
+                </div>
             </div>
         </div>
     </div>
@@ -121,14 +147,14 @@
             </div>
             <div class="col-md-3">
                 <div class="stat-card fade-in">
-                    <i class="fas fa-check-circle text-success fs-2 mb-3"></i>
-                    <div class="stat-number text-success">{{ site_settings.total_completed_jobs|default:"5,000+" }}</div>
+                    <i class="fas fa-check-circle fs-2 mb-3" style="color: #8B5CF6;"></i>
+                    <div class="stat-number" style="color: #8B5CF6;">{{ site_settings.total_completed_jobs|default:"5,000+" }}</div>
                     <div class="stat-label">Lucrări finalizate</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card fade-in">
-                    <i class="fas fa-star text-warning fs-2 mb-3"></i>
+                    <i class="fas fa-star fs-2 mb-3" style="color: #8B5CF6;"></i>
                     <div class="stat-number text-warning">{{ site_settings.total_reviews|default:"3,000+" }}</div>
                     <div class="stat-label">Recenzii pozitive</div>
                 </div>
@@ -197,17 +223,17 @@
                 <h4>Postează cererea</h4>
                 <p class="text-muted">Descrie lucrarea de care ai nevoie și primește oferte gratuite de la meșteri din zona ta.</p>
             </div>
-            
+
             <div class="col-lg-4 text-center">
-                <div class="step-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                <div class="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
                     <span class="fs-3 fw-bold">2</span>
                 </div>
                 <h4>Compară ofertele</h4>
                 <p class="text-muted">Analizează profilurile meșterilor, recenziile și prețurile pentru a face cea mai bună alegere.</p>
             </div>
-            
+
             <div class="col-lg-4 text-center">
-                <div class="step-icon bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                <div class="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
                     <span class="fs-3 fw-bold">3</span>
                 </div>
                 <h4>Finalizează lucrarea</h4>
@@ -253,9 +279,9 @@
                         <div class="mb-2">
                             {% for i in "12345" %}
                                 {% if forloop.counter <= craftsman.average_rating %}
-                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star" style="color: #8B5CF6;"></i>
                                 {% else %}
-                                    <i class="far fa-star text-warning"></i>
+                                    <i class="far fa-star" style="color: #8B5CF6;"></i>
                                 {% endif %}
                             {% endfor %}
                             <span class="text-muted ms-2">({{ craftsman.total_reviews }} recenzii)</span>
@@ -298,9 +324,9 @@
                         <div class="mb-3">
                             {% for i in "12345" %}
                                 {% if forloop.counter <= testimonial.rating %}
-                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star" style="color: #8B5CF6;"></i>
                                 {% else %}
-                                    <i class="far fa-star text-warning"></i>
+                                    <i class="far fa-star" style="color: #8B5CF6;"></i>
                                 {% endif %}
                             {% endfor %}
                         </div>

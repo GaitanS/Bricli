@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Order, OrderImage, Quote, Review, ReviewImage
+from .models import Order, OrderImage, Quote, Review, ReviewImage, CraftsmanService, Service
 from accounts.models import County, City
 
 
@@ -39,17 +39,53 @@ class OrderForm(forms.ModelForm):
         self.fields['budget_max'].label = 'Buget maxim (RON)'
         self.fields['urgency'].label = 'Urgență'
         self.fields['preferred_date'].label = 'Data preferată'
+
+        # Set empty labels for select fields
+        self.fields['service'].empty_label = 'Selectează serviciul'
+        self.fields['county'].empty_label = 'Selectează județul'
+        self.fields['city'].empty_label = 'Selectează orașul'
+        self.fields['urgency'].empty_label = 'Selectează urgența'
         
-        # Add placeholders
+        # Add placeholders and validation attributes
         self.fields['title'].widget.attrs.update({
-            'placeholder': 'ex. Renovare baie completă'
+            'placeholder': 'ex. Renovare baie completă',
+            'required': True,
+            'minlength': '5',
+            'maxlength': '200'
         })
         self.fields['description'].widget.attrs.update({
             'placeholder': 'Descrie în detaliu ce lucrări ai nevoie...',
-            'rows': 4
+            'rows': 4,
+            'required': True,
+            'minlength': '20',
+            'maxlength': '2000'
         })
         self.fields['address'].widget.attrs.update({
-            'placeholder': 'Strada, numărul, etc.'
+            'placeholder': 'Strada, numărul, etc.',
+            'maxlength': '255'
+        })
+
+        # Add validation for budget fields
+        self.fields['budget_min'].widget.attrs.update({
+            'type': 'number',
+            'min': '1',
+            'max': '1000000',
+            'step': '1',
+            'placeholder': 'ex. 500'
+        })
+        self.fields['budget_max'].widget.attrs.update({
+            'type': 'number',
+            'min': '1',
+            'max': '1000000',
+            'step': '1',
+            'placeholder': 'ex. 1500'
+        })
+
+        # Add validation for preferred date
+        self.fields['preferred_date'].widget.attrs.update({
+            'type': 'date',
+            'min': '2025-01-01',
+            'max': '2026-12-31'
         })
         
         # Make description a textarea
@@ -161,17 +197,26 @@ class QuoteForm(forms.ModelForm):
         self.fields['description'].label = 'Descrierea ofertei'
         self.fields['estimated_duration'].label = 'Durata estimată'
         
-        # Add placeholders
+        # Add placeholders and validation attributes
         self.fields['price'].widget.attrs.update({
+            'type': 'number',
             'placeholder': 'ex. 1500',
-            'step': '0.01'
+            'step': '0.01',
+            'min': '1',
+            'max': '1000000',
+            'required': True
         })
         self.fields['description'].widget.attrs.update({
             'placeholder': 'Descrie ce include oferta ta...',
-            'rows': 4
+            'rows': 4,
+            'required': True,
+            'minlength': '20',
+            'maxlength': '1000'
         })
         self.fields['estimated_duration'].widget.attrs.update({
-            'placeholder': 'ex. 3-5 zile lucrătoare'
+            'placeholder': 'ex. 3-5 zile lucrătoare',
+            'required': True,
+            'maxlength': '100'
         })
         
         # Make description a textarea
@@ -225,3 +270,68 @@ class OrderSearchForm(forms.Form):
         }),
         label='Buget maxim (RON)'
     )
+
+
+class CraftsmanServiceForm(forms.ModelForm):
+    """Form for craftsmen to add/edit their services"""
+    class Meta:
+        model = CraftsmanService
+        fields = ('service', 'price_from', 'price_to', 'price_unit')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Add CSS classes
+        for field in self.fields:
+            if isinstance(self.fields[field].widget, forms.Select):
+                self.fields[field].widget.attrs.update({'class': 'form-select'})
+            else:
+                self.fields[field].widget.attrs.update({'class': 'form-control'})
+
+        # Update labels to Romanian
+        self.fields['service'].label = 'Serviciu'
+        self.fields['price_from'].label = 'Preț de la (RON)'
+        self.fields['price_to'].label = 'Preț până la (RON)'
+        self.fields['price_unit'].label = 'Unitate de măsură'
+
+        # Set empty labels
+        self.fields['service'].empty_label = 'Selectează serviciul'
+
+        # Add placeholders and validation
+        self.fields['price_from'].widget.attrs.update({
+            'type': 'number',
+            'placeholder': 'ex. 50',
+            'step': '0.01',
+            'min': '0',
+            'max': '100000'
+        })
+        self.fields['price_to'].widget.attrs.update({
+            'type': 'number',
+            'placeholder': 'ex. 150',
+            'step': '0.01',
+            'min': '0',
+            'max': '100000'
+        })
+        self.fields['price_unit'].widget.attrs.update({
+            'placeholder': 'ex. per oră, per mp, per bucată',
+            'maxlength': '50'
+        })
+
+        # Add help text
+        self.fields['price_from'].help_text = 'Prețul minim pentru acest serviciu'
+        self.fields['price_to'].help_text = 'Prețul maxim pentru acest serviciu (opțional)'
+        self.fields['price_unit'].help_text = 'Cum se calculează prețul (ex: per oră, per mp)'
+
+        # Make some fields optional
+        self.fields['price_to'].required = False
+        self.fields['price_unit'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        price_from = cleaned_data.get('price_from')
+        price_to = cleaned_data.get('price_to')
+
+        if price_from and price_to and price_from >= price_to:
+            raise ValidationError('Prețul maxim trebuie să fie mai mare decât prețul minim.')
+
+        return cleaned_data

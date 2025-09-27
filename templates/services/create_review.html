@@ -6,14 +6,7 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Acasă</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'services:my_orders' %}">Comenzile mele</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'services:order_detail' order.pk %}">{{ order.title|truncatechars:30 }}</a></li>
-                    <li class="breadcrumb-item active">Recenzie</li>
-                </ol>
-            </nav>
+
 
             <div class="card">
                 <div class="card-header">
@@ -54,7 +47,7 @@
                                         <label class="form-check-label star-label" for="{{ choice.id_for_label }}">
                                             {% for i in "12345"|make_list %}
                                                 {% if forloop.counter <= choice.choice_value %}
-                                                    <i class="fas fa-star text-warning"></i>
+                                                    <i class="fas fa-star" style="color: #8B5CF6;"></i>
                                                 {% else %}
                                                     <i class="far fa-star text-muted"></i>
                                                 {% endif %}

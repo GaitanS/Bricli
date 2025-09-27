@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Editează Serviciu - Bricli{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'services:craftsman_services' %}" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h1><i class="fas fa-edit me-2"></i>Editează Serviciu</h1>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Editează Detalii Serviciu</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.service.id_for_label }}" class="form-label">
+                                <i class="fas fa-tools me-2"></i>Serviciu *
+                            </label>
+                            {{ form.service }}
+                            {% if form.service.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.service.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Serviciul pe care îl oferi</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.price_from.id_for_label }}" class="form-label">
+                                        <i class="fas fa-money-bill-wave me-2"></i>Preț de la (RON)
+                                    </label>
+                                    {{ form.price_from }}
+                                    {% if form.price_from.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.price_from.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.price_to.id_for_label }}" class="form-label">
+                                        <i class="fas fa-money-bill-wave me-2"></i>Preț până la (RON)
+                                    </label>
+                                    {{ form.price_to }}
+                                    {% if form.price_to.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.price_to.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.price_unit.id_for_label }}" class="form-label">
+                                <i class="fas fa-tag me-2"></i>Unitate de măsură
+                            </label>
+                            {{ form.price_unit }}
+                            {% if form.price_unit.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.price_unit.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Ex: per oră, per mp, per bucată, per proiect</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'services:craftsman_services' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Anulează
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Salvează Modificările
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Current Service Info -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informații Curente</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Serviciu:</strong> {{ object.service.name }}</p>
+                            <p><strong>Categorie:</strong> {{ object.service.category.name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Preț actual:</strong> 
+                                {% if object.price_from and object.price_to %}
+                                    {{ object.price_from }} - {{ object.price_to }} RON
+                                {% elif object.price_from %}
+                                    De la {{ object.price_from }} RON
+                                {% elif object.price_to %}
+                                    Până la {{ object.price_to }} RON
+                                {% else %}
+                                    Preț la cerere
+                                {% endif %}
+                                {% if object.price_unit %}
+                                    / {{ object.price_unit }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

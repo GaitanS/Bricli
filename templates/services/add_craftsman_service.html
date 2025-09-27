@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Adaugă Serviciu - Bricli{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'services:craftsman_services' %}" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h1><i class="fas fa-plus me-2"></i>Adaugă Serviciu Nou</h1>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Detalii Serviciu</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.service.id_for_label }}" class="form-label">
+                                <i class="fas fa-tools me-2"></i>Serviciu *
+                            </label>
+                            {{ form.service }}
+                            {% if form.service.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.service.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Selectează serviciul pe care îl oferi</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.price_from.id_for_label }}" class="form-label">
+                                        <i class="fas fa-money-bill-wave me-2"></i>Preț de la (RON)
+                                    </label>
+                                    {{ form.price_from }}
+                                    {% if form.price_from.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.price_from.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.price_to.id_for_label }}" class="form-label">
+                                        <i class="fas fa-money-bill-wave me-2"></i>Preț până la (RON)
+                                    </label>
+                                    {{ form.price_to }}
+                                    {% if form.price_to.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.price_to.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.price_unit.id_for_label }}" class="form-label">
+                                <i class="fas fa-tag me-2"></i>Unitate de măsură
+                            </label>
+                            {{ form.price_unit }}
+                            {% if form.price_unit.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.price_unit.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Ex: per oră, per mp, per bucată, per proiect</div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Sfaturi pentru prețuri</h6>
+                            <ul class="mb-0">
+                                <li>Poți specifica doar prețul minim, doar prețul maxim, sau ambele</li>
+                                <li>Dacă nu specifici niciun preț, va apărea "Preț la cerere"</li>
+                                <li>Unitatea de măsură ajută clienții să înțeleagă cum calculezi prețul</li>
+                                <li>Prețurile competitive atrag mai mulți clienți</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'services:craftsman_services' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Anulează
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Salvează Serviciul
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Preview Card -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-eye me-2"></i>Previzualizare</h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Așa va apărea serviciul tău în listele de servicii:</p>
+                    <div class="border rounded p-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1" id="preview-service">Selectează un serviciu</h6>
+                                <span class="badge bg-secondary" id="preview-category">Categorie</span>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-primary" id="preview-price">Preț la cerere</div>
+                                <small class="text-muted" id="preview-unit"></small>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>{{ user.get_full_name|default:user.username }}
+                                {% if user.craftsman_profile.company_name %}
+                                    - {{ user.craftsman_profile.company_name }}
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const serviceSelect = document.getElementById('{{ form.service.id_for_label }}');
+    const priceFromInput = document.getElementById('{{ form.price_from.id_for_label }}');
+    const priceToInput = document.getElementById('{{ form.price_to.id_for_label }}');
+    const priceUnitInput = document.getElementById('{{ form.price_unit.id_for_label }}');
+    
+    const previewService = document.getElementById('preview-service');
+    const previewCategory = document.getElementById('preview-category');
+    const previewPrice = document.getElementById('preview-price');
+    const previewUnit = document.getElementById('preview-unit');
+    
+    function updatePreview() {
+        // Update service name and category
+        if (serviceSelect.selectedIndex > 0) {
+            const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+            previewService.textContent = selectedOption.text;
+            // You might need to add data attributes to options for category
+        }
+        
+        // Update price
+        const priceFrom = priceFromInput.value;
+        const priceTo = priceToInput.value;
+        const unit = priceUnitInput.value;
+        
+        let priceText = 'Preț la cerere';
+        if (priceFrom && priceTo) {
+            priceText = `${priceFrom} - ${priceTo} RON`;
+        } else if (priceFrom) {
+            priceText = `De la ${priceFrom} RON`;
+        } else if (priceTo) {
+            priceText = `Până la ${priceTo} RON`;
+        }
+        
+        previewPrice.textContent = priceText;
+        previewUnit.textContent = unit ? `/ ${unit}` : '';
+    }
+    
+    // Add event listeners
+    serviceSelect.addEventListener('change', updatePreview);
+    priceFromInput.addEventListener('input', updatePreview);
+    priceToInput.addEventListener('input', updatePreview);
+    priceUnitInput.addEventListener('input', updatePreview);
+});
+</script>
+{% endblock %}

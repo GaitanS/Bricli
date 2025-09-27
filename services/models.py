@@ -54,6 +54,7 @@ class Order(models.Model):
     STATUS_CHOICES = [
         ('draft', 'Ciornă'),
         ('published', 'Publicată'),
+        ('awaiting_confirmation', 'Așteaptă confirmarea meșterului'),
         ('in_progress', 'În progres'),
         ('completed', 'Finalizată'),
         ('cancelled', 'Anulată'),
@@ -84,7 +85,7 @@ class Order(models.Model):
     preferred_date = models.DateField(null=True, blank=True)
 
     # Status
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    status = models.CharField(max_length=25, choices=STATUS_CHOICES, default='draft')
     assigned_craftsman = models.ForeignKey(
         CraftsmanProfile,
         on_delete=models.SET_NULL,
@@ -97,6 +98,8 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(null=True, blank=True)
+    selected_at = models.DateTimeField(null=True, blank=True, help_text="Când clientul a selectat meșterul")
+    confirmed_at = models.DateTimeField(null=True, blank=True, help_text="Când meșterul a confirmat preluarea")
 
     class Meta:
         ordering = ['-created_at']
@@ -120,6 +123,7 @@ class Quote(models.Model):
         ('pending', 'În așteptare'),
         ('accepted', 'Acceptată'),
         ('rejected', 'Respinsă'),
+        ('declined', 'Refuzată de meșter'),
         ('expired', 'Expirată'),
     ]
 
@@ -183,6 +187,8 @@ class Notification(models.Model):
         ('quote_rejected', 'Ofertă respinsă'),
         ('order_published', 'Comandă publicată'),
         ('order_completed', 'Comandă finalizată'),
+        ('order_confirmed', 'Comandă confirmată de meșter'),
+        ('order_declined', 'Comandă refuzată de meșter'),
         ('review_received', 'Recenzie primită'),
     ]
 
@@ -234,7 +240,7 @@ def notify_quote_accepted(quote):
         recipient=quote.craftsman.user,
         notification_type='quote_accepted',
         title=f'Oferta ta a fost acceptată!',
-        message=f'Clientul a acceptat oferta ta pentru "{quote.order.title}". Poți începe lucrarea.',
+        message=f'Clientul a acceptat oferta ta pentru "{quote.order.title}". Te rugăm să confirmi că poți prelua această comandă.',
         order=quote.order,
         quote=quote
     )
@@ -250,3 +256,153 @@ def notify_quote_rejected(quote):
         order=quote.order,
         quote=quote
     )
+
+
+# MyBuilder-style Lead System Models
+
+class Invitation(models.Model):
+    """Invitații trimise de clienți către meșteri pentru a oferta"""
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='invitations')
+    craftsman = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='invitations')
+    invited_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='sent_invitations')
+
+    STATUS_CHOICES = [
+        ('pending', 'În așteptare'),
+        ('accepted', 'Acceptată'),
+        ('declined', 'Refuzată'),
+    ]
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    responded_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = [('order', 'craftsman')]
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Invitație pentru {self.craftsman.get_full_name()} - {self.order.title}"
+
+
+class Shortlist(models.Model):
+    """Shortlisting MyBuilder-style - clientul alege meșterii cu care vrea să vorbească"""
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='shortlists')
+    craftsman = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='shortlisted_for')
+
+    # Lead fee system
+    lead_fee_amount = models.PositiveIntegerField(default=0, help_text="Taxa în bani (cents)")
+    charged_at = models.DateTimeField(null=True, blank=True, help_text="Când s-a deductat taxa")
+    revealed_contact_at = models.DateTimeField(null=True, blank=True, help_text="Când s-au afișat datele de contact")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [('order', 'craftsman')]
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Shortlist: {self.craftsman.get_full_name()} pentru {self.order.title}"
+
+    @property
+    def lead_fee_lei(self):
+        """Returnează taxa în lei"""
+        return self.lead_fee_amount / 100
+
+    @property
+    def is_contact_revealed(self):
+        """Verifică dacă contactul a fost deblocat"""
+        return self.revealed_contact_at is not None
+
+
+class CreditWallet(models.Model):
+    """Wallet cu credit pentru meșteri - pentru plata lead fees"""
+    user = models.OneToOneField('accounts.User', on_delete=models.CASCADE, related_name='wallet')
+    balance_cents = models.IntegerField(default=0, help_text="Soldul în bani (cents)")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Wallet {self.user.get_full_name()} - {self.balance_lei} lei"
+
+    @property
+    def balance_lei(self):
+        """Returnează soldul în lei"""
+        return self.balance_cents / 100
+
+    def has_sufficient_balance(self, amount_cents):
+        """Verifică dacă are suficient credit"""
+        return self.balance_cents >= amount_cents
+
+    def deduct_amount(self, amount_cents, reason, meta=None):
+        """Deduce o sumă din wallet și creează tranzacția"""
+        if not self.has_sufficient_balance(amount_cents):
+            raise ValueError("Sold insuficient în wallet")
+
+        self.balance_cents -= amount_cents
+        self.save(update_fields=['balance_cents', 'updated_at'])
+
+        return WalletTransaction.objects.create(
+            wallet=self,
+            amount_cents=-amount_cents,
+            reason=reason,
+            meta=meta or {}
+        )
+
+    def add_amount(self, amount_cents, reason, meta=None):
+        """Adaugă o sumă în wallet și creează tranzacția"""
+        self.balance_cents += amount_cents
+        self.save(update_fields=['balance_cents', 'updated_at'])
+
+        return WalletTransaction.objects.create(
+            wallet=self,
+            amount_cents=amount_cents,
+            reason=reason,
+            meta=meta or {}
+        )
+
+
+class WalletTransaction(models.Model):
+    """Istoric tranzacții wallet"""
+    wallet = models.ForeignKey(CreditWallet, on_delete=models.CASCADE, related_name='transactions')
+    amount_cents = models.IntegerField(help_text="Suma în bani (cents) - pozitivă pentru încărcare, negativă pentru taxe")
+
+    REASON_CHOICES = [
+        ('top_up', 'Încărcare credit'),
+        ('lead_fee', 'Taxă lead (shortlist)'),
+        ('refund', 'Rambursare'),
+        ('bonus', 'Bonus'),
+        ('adjustment', 'Ajustare'),
+    ]
+    reason = models.CharField(max_length=64, choices=REASON_CHOICES)
+    meta = models.JSONField(default=dict, blank=True, help_text="Date suplimentare (order_id, client_id, etc.)")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        sign = "+" if self.amount_cents > 0 else ""
+        return f"{sign}{self.amount_lei} lei - {self.get_reason_display()}"
+
+    @property
+    def amount_lei(self):
+        """Returnează suma în lei"""
+        return self.amount_cents / 100
+
+
+class CoverageArea(models.Model):
+    """Zona de acoperire geografică pentru meșteri"""
+    profile = models.OneToOneField('accounts.CraftsmanProfile', on_delete=models.CASCADE, related_name='coverage')
+    base_city = models.ForeignKey('accounts.City', on_delete=models.PROTECT, help_text="Orașul de bază")
+    radius_km = models.PositiveSmallIntegerField(default=30, help_text="Raza de acoperire în km")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.profile.user.get_full_name()} - {self.base_city.name} ({self.radius_km}km)"
+
+    class Meta:
+        verbose_name = "Zonă de acoperire"
+        verbose_name_plural = "Zone de acoperire"
