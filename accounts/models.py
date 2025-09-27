@@ -195,14 +195,17 @@ class CraftsmanProfile(models.Model):
             score += 15
 
         # Portfolio (min 3 poze) - 20 puncte
-        portfolio_count = self.portfolio_images.count()
-        if portfolio_count >= 3:
-            score += 20
-        elif portfolio_count > 0:
-            score += (portfolio_count * 20) // 3
+        # Verifică dacă profilul are un ID (a fost salvat) înainte de a accesa portfolio_images
+        if self.pk:
+            portfolio_count = self.portfolio_images.count()
+            if portfolio_count >= 3:
+                score += 20
+            elif portfolio_count > 0:
+                score += (portfolio_count * 20) // 3
 
         # Servicii/categorii (10 puncte)
-        if hasattr(self, 'services') and self.services.exists():
+        # Verifică dacă profilul are un ID înainte de a accesa serviciile
+        if self.pk and hasattr(self, 'services') and self.services.exists():
             score += 10
 
         # Câmpuri opționale (10 puncte total)

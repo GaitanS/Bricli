@@ -36,6 +36,14 @@ class SimpleRegisterView(CreateView):
     template_name = 'accounts/simple_register.html'
     success_url = reverse_lazy('core:home')
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            if request.user.user_type == 'craftsman':
+                return redirect('services:craftsman_services')
+            else:
+                return redirect('services:my_orders')
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         response = super().form_valid(form)
         login(self.request, self.object)
@@ -49,6 +57,14 @@ class SimpleCraftsmanRegisterView(CreateView):
     form_class = SimpleCraftsmanRegistrationForm
     template_name = 'accounts/simple_craftsman_register.html'
     success_url = reverse_lazy('core:home')
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            if request.user.user_type == 'craftsman':
+                return redirect('services:craftsman_services')
+            else:
+                return redirect('services:my_orders')
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         # Save the user and profile normally first

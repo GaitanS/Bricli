@@ -14,4 +14,7 @@ urlpatterns = [
     # Legal pages
     path('terms/', views.TermsView.as_view(), name='terms'),
     path('privacy/', views.PrivacyView.as_view(), name='privacy'),
+
+    # Debug preview routes (safe to keep under DEBUG only usage)
+    path('debug/404/', views.preview_404, name='preview_404'),
 ]

@@ -6,7 +6,9 @@ from services.models import Service, ServiceCategory
 from .validators import (
     validate_no_profanity, validate_romanian_phone, validate_strong_password,
     validate_email_format, validate_name, validate_company_name,
-    validate_description, validate_services_selection
+    validate_description, validate_services_selection, validate_display_name,
+    validate_coverage_radius, validate_bio_length, validate_hourly_rate,
+    validate_min_job_value
 )
 
 
@@ -395,9 +397,7 @@ class SimpleCraftsmanRegistrationForm(forms.ModelForm):
             craftsman_profile = CraftsmanProfile.objects.create(
                 user=user,
                 county=self.cleaned_data['county'],
-                company_name=self.cleaned_data.get('company_name', ''),
-                bio=self.cleaned_data.get('bio', ''),
-                description=f"Meșter specializat în {', '.join([s.name for s in self.cleaned_data['services'][:3]])}"
+                bio=self.cleaned_data.get('bio', '')
             )
 
             # Add selected services

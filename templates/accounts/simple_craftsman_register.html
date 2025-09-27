@@ -599,6 +599,22 @@
             }
         }
 
+        // Special validation for step 2 (bio length)
+        if (currentStep === 2) {
+            const bioField = document.querySelector('textarea[name="bio"]');
+            if (bioField) {
+                const bioText = bioField.value.trim();
+                if (bioText.length < 200) {
+                    bioField.classList.add('is-invalid');
+                    showFieldError(bioField, `Biografia trebuie să aibă cel puțin 200 caractere. Ai scris ${bioText.length} caractere.`);
+                    isValid = false;
+                } else {
+                    bioField.classList.remove('is-invalid');
+                    hideFieldError(bioField);
+                }
+            }
+        }
+
         // Special validation for step 3 (at least one service selected)
         if (currentStep === 3) {
             const selectedServices = document.querySelectorAll('.service-checkbox:checked');

@@ -138,7 +138,11 @@
                         </a>
                         {% endif %}
                         <a href="{% url 'core:search' %}" class="btn btn-outline-primary btn-lg">
-                            <i class="fas fa-search me-2"></i>Caută meșteri
+                            {% if user.user_type == 'craftsman' %}
+                                <i class="fas fa-search me-2"></i>Caută clienții
+                            {% else %}
+                                <i class="fas fa-search me-2"></i>Caută meșteri
+                            {% endif %}
                         </a>
                     </div>
                 </div>

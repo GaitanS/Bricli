@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Comenzi Disponibile - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-header {
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .filter-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border: none;
+    }
+    
+    .order-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border: none;
+        transition: transform 0.2s, box-shadow 0.2s;
+        height: 100%;
+    }
+    
+    .order-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    
+    .budget-badge {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .urgency-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .urgency-urgent {
+        background-color: #FEE2E2;
+        color: #DC2626;
+    }
+    
+    .urgency-normal {
+        background-color: #FEF3C7;
+        color: #D97706;
+    }
+    
+    .urgency-flexible {
+        background-color: #DBEAFE;
+        color: #2563EB;
+    }
+    
+    .quote-btn {
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    
+    .quote-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        color: white;
+    }
+    
+    .filter-btn {
+        border: 2px solid #E5E7EB;
+        background: white;
+        color: #6B7280;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+    
+    .filter-btn.active {
+        border-color: #8B5CF6;
+        background: #8B5CF6;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="orders-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-list me-3"></i>Comenzi Disponibile
+                </h1>
+                <p class="mb-0 opacity-75">Găsește comenzi potrivite pentru serviciile tale și trimite oferte</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="d-flex flex-column align-items-md-end">
+                    <div class="h4 mb-1">{{ orders|length }}</div>
+                    <small class="opacity-75">comenzi disponibile</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card filter-card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Categorie</label>
+                            <select name="category" class="form-select">
+                                <option value="">Toate categoriile</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.slug }}" 
+                                            {% if current_category == category.slug %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Județ</label>
+                            <select name="county" class="form-select">
+                                <option value="">Toate județele</option>
+                                {% for county in counties %}
+                                    <option value="{{ county }}" 
+                                            {% if current_county == county %}selected{% endif %}>
+                                        {{ county }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn filter-btn me-2">
+                                <i class="fas fa-filter me-2"></i>Filtrează
+                            </button>
+                            <a href="{% url 'services:available_orders' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Resetează
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Grid -->
+    {% if orders %}
+        <div class="row">
+            {% for order in orders %}
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="card order-card">
+                        <div class="card-body">
+                            <!-- Header -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-2 fw-bold">{{ order.title }}</h5>
+                                    <div class="d-flex align-items-center text-muted mb-2">
+                                        <i class="fas fa-map-marker-alt me-2"></i>
+                                        <small>{{ order.city }}, {{ order.county }}</small>
+                                    </div>
+                                </div>
+                                <div class="urgency-badge urgency-{{ order.urgency }}">
+                                    {% if order.urgency == 'urgent' %}
+                                        Urgent
+                                    {% elif order.urgency == 'normal' %}
+                                        Normal
+                                    {% else %}
+                                        Flexibil
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Service Category -->
+                            <div class="mb-3">
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-tools me-1"></i>{{ order.service.name }}
+                                </span>
+                            </div>
+
+                            <!-- Description -->
+                            <p class="card-text text-muted mb-3">
+                                {{ order.description|truncatewords:20 }}
+                            </p>
+
+                            <!-- Budget -->
+                            <div class="mb-3">
+                                <div class="budget-badge text-center">
+                                    {% if order.budget_min and order.budget_max %}
+                                        {{ order.budget_min }} - {{ order.budget_max }} RON
+                                    {% elif order.budget_min %}
+                                        De la {{ order.budget_min }} RON
+                                    {% elif order.budget_max %}
+                                        Până la {{ order.budget_max }} RON
+                                    {% else %}
+                                        Buget de discutat
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Order Info -->
+                            <div class="row text-center mb-3">
+                                <div class="col-6">
+                                    <div class="fw-bold text-primary">{{ order.quotes.count }}</div>
+                                    <small class="text-muted">Oferte</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="fw-bold text-primary">{{ order.created_at|timesince }}</div>
+                                    <small class="text-muted">Postată acum</small>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'services:order_detail' order.pk %}" 
+                                   class="btn quote-btn">
+                                    <i class="fas fa-eye me-2"></i>Vezi detalii și ofertează
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <nav aria-label="Paginare comenzi">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if current_category %}&category={{ current_category }}{% endif %}{% if current_county %}&county={{ current_county }}{% endif %}">Prima</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_county %}&county={{ current_county }}{% endif %}">Anterioară</a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_obj.number }} din {{ page_obj.paginator.num_pages }}</span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_county %}&county={{ current_county }}{% endif %}">Următoarea</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_county %}&county={{ current_county }}{% endif %}">Ultima</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        {% endif %}
+
+    {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
+                     style="width: 120px; height: 120px;">
+                    <i class="fas fa-search" style="font-size: 3rem; color: #8B5CF6;"></i>
+                </div>
+            </div>
+            <h3 class="fw-bold mb-3">Nu sunt comenzi disponibile</h3>
+            <p class="text-muted mb-4 lead">
+                {% if current_category or current_county %}
+                    Nu există comenzi care să corespundă filtrelor selectate. Încearcă să modifici criteriile de căutare.
+                {% else %}
+                    Momentan nu sunt comenzi disponibile pentru ofertare. Verifică din nou mai târziu!
+                {% endif %}
+            </p>
+            {% if current_category or current_county %}
+                <a href="{% url 'services:available_orders' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-times me-2"></i>Elimină filtrele
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

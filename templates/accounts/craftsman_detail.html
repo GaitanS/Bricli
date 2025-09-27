@@ -1,64 +1,94 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ craftsman.display_name|default:"Meșter" }} - {{ craftsman.county.name }} - Bricli{% endblock %}
+{% block title %}{{ craftsman.display_name }} - Meșter {{ craftsman.services.first.service.category.name|default:"Profesionist" }} - Bricli{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<!-- Preview Mode Alert -->
+{% if request.GET.preview %}
+<div class="alert alert-info alert-dismissible fade show m-0" role="alert" style="border-radius: 0; border: none; background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white;">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-eye me-3"></i>
+                <div>
+                    <strong>Mod previzualizare</strong><br>
+                    <small>Așa îți văd clienții profilul pe platformă</small>
+                </div>
+            </div>
+            <div>
+                <a href="{% url 'services:craftsman_services' %}" class="btn btn-light btn-sm me-2">
+                    <i class="fas fa-arrow-left me-1"></i>Înapoi la servicii
+                </a>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
     <!-- Hero Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                <div class="card-body p-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-2 col-sm-3 text-center mb-3 mb-md-0">
-                            {% if craftsman.user.profile_picture %}
-                                <img src="{{ craftsman.user.profile_picture.url }}"
-                                     class="rounded-circle border border-white border-3"
-                                     width="100" height="100" alt="Profil"
-                                     style="object-fit: cover;">
+    <div class="row align-items-center mb-5">
+        <div class="col-md-2 text-center mb-3 mb-md-0">
+            {% if craftsman.profile_photo %}
+                <img src="{{ craftsman.profile_photo.url }}" alt="{{ craftsman.display_name }}"
+                     class="rounded-circle shadow-lg" style="width: 120px; height: 120px; object-fit: cover;">
+            {% else %}
+                <div class="bg-primary text-white rounded-circle shadow-lg d-inline-flex align-items-center justify-content-center"
+                     style="width: 120px; height: 120px; font-size: 2.5rem;">
+                    <i class="fas fa-user"></i>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h1 class="h2 fw-bold mb-2" style="color: #1e293b;">{{ craftsman.display_name }}</h1>
+            <p class="text-muted mb-3">
+                <i class="fas fa-tools me-2"></i>
+                {% for service in craftsman.services.all|slice:":3" %}
+                    {{ service.service.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+                {% if craftsman.services.count > 3 %}
+                    și alte {{ craftsman.services.count|add:"-3" }} servicii
+                {% endif %}
+            </p>
+            <div class="d-flex align-items-center mb-3">
+                <div class="me-4">
+                    {% if craftsman.average_rating %}
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= craftsman.average_rating %}
+                                <i class="fas fa-star text-warning"></i>
                             {% else %}
-                                <div class="bg-white text-dark rounded-circle d-inline-flex align-items-center justify-content-center border border-white border-3"
-                                     style="width: 100px; height: 100px;">
-                                    <i class="fas fa-user" style="font-size: 2.5rem; color: #8B5CF6;"></i>
-                                </div>
+                                <i class="far fa-star text-muted"></i>
                             {% endif %}
+                        {% endfor %}
+                        <span class="ms-2 fw-medium">{{ craftsman.average_rating|floatformat:1 }}</span>
+                        <small class="text-muted ms-1">({{ craftsman.total_reviews }} recenzii)</small>
+                    {% else %}
+                        <span class="text-muted">Fără recenzii încă</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="row text-center">
+                <div class="col-4">
+                    <div class="p-2">
+                        <div class="h4 mb-1" style="color: #8B5CF6;">{{ craftsman.total_reviews }}</div>
+                        <small class="text-muted">Recenzii</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-2">
+                        <div class="h4 mb-1" style="color: #8B5CF6;">{{ craftsman.services.count }}</div>
+                        <small class="text-muted">Servicii</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-2">
+                        <div class="h4 mb-1" style="color: #8B5CF6;">
+                            {% if craftsman.years_experience %}{{ craftsman.years_experience }}+{% else %}5+{% endif %}
                         </div>
-                        <div class="col-md-6 col-sm-9 text-white">
-                            <h1 class="h3 mb-2 fw-bold">
-                                {{ craftsman.display_name|default:craftsman.user.get_full_name|default:"Meșter profesionist" }}
-                            </h1>
-                            {% if craftsman.company_name %}
-                                <p class="mb-2 opacity-90">
-                                    <i class="fas fa-building me-2"></i>{{ craftsman.company_name }}
-                                </p>
-                            {% endif %}
-                            <p class="mb-0 opacity-90">
-                                <i class="fas fa-map-marker-alt me-2"></i>{{ craftsman.county.name }}
-                                {% if craftsman.city %}, {{ craftsman.city.name }}{% endif %}
-                            </p>
-                        </div>
-                        <div class="col-md-4 text-md-end text-center mt-3 mt-md-0">
-                            <div class="row text-center text-white">
-                                <div class="col-4">
-                                    <div class="h4 mb-0 fw-bold">{{ craftsman.total_reviews|default:0 }}</div>
-                                    <small class="opacity-90">Recenzii</small>
-                                </div>
-                                <div class="col-4">
-                                    <div class="h4 mb-0 fw-bold">{{ craftsman.completed_orders|default:0 }}</div>
-                                    <small class="opacity-90">Lucrări</small>
-                                </div>
-                                <div class="col-4">
-                                    <div class="h4 mb-0 fw-bold">
-                                        {% if craftsman.average_rating %}
-                                            {{ craftsman.average_rating|floatformat:1 }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </div>
-                                    <small class="opacity-90">Rating</small>
-                                </div>
-                            </div>
-                        </div>
+                        <small class="text-muted">Ani exp.</small>
                     </div>
                 </div>
             </div>
@@ -70,22 +100,45 @@
             <!-- Contact Actions -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
+                    {% if request.GET.preview %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Mod previzualizare</strong><br>
+                        <small>În mod normal, clienții ar vedea aici butoanele de contact și solicitare ofertă.</small>
+                    </div>
+                    {% elif user == craftsman.user %}
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Acesta este profilul tău</strong><br>
+                        <small>Așa îți văd clienții profilul pe platformă.</small>
+                    </div>
+                    {% endif %}
+                    
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <button class="btn btn-lg w-100 text-white fw-bold"
-                                    style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                            <button class="btn btn-lg w-100 text-white fw-bold {% if user == craftsman.user %}disabled{% endif %}"
+                                    style="background: {% if user == craftsman.user %}#6c757d{% else %}linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%){% endif %};"
+                                    {% if user != craftsman.user %}data-bs-toggle="modal" data-bs-target="#contactModal"{% else %}disabled{% endif %}>
                                 <i class="fas fa-comments me-2"></i>Contactează meșterul
                             </button>
                         </div>
                         <div class="col-md-6">
-                            <button class="btn btn-outline-primary btn-lg w-100 fw-bold">
+                            {% if user != craftsman.user %}
+                            <a href="{% url 'services:create_order' %}?craftsman={{ craftsman.pk }}" 
+                               class="btn btn-outline-primary btn-lg w-100 fw-bold">
+                                <i class="fas fa-plus me-2"></i>Solicită ofertă
+                            </a>
+                            {% else %}
+                            <button class="btn btn-outline-secondary btn-lg w-100 fw-bold disabled" disabled>
                                 <i class="fas fa-plus me-2"></i>Solicită ofertă
                             </button>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="row g-3 mt-2">
                         <div class="col-md-6">
-                            <button class="btn btn-outline-secondary w-100">
+                            <button class="btn btn-outline-secondary w-100 {% if user == craftsman.user %}disabled{% endif %}"
+                                    {% if user != craftsman.user %}data-bs-toggle="modal" data-bs-target="#contactModal"{% else %}disabled{% endif %}>
                                 <i class="fas fa-envelope me-2"></i>Trimite mesaj
                             </button>
                         </div>
@@ -99,14 +152,14 @@
                 </div>
             </div>
             <!-- About Section -->
-            {% if craftsman.bio or craftsman.description %}
+            {% if craftsman.bio %}
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
                     <h5 class="card-title mb-3">
                         <i class="fas fa-user me-2" style="color: #8B5CF6;"></i>Despre meșter
                     </h5>
                     <p class="text-muted mb-0">
-                        {{ craftsman.bio|default:craftsman.description|default:"Meșter profesionist cu experiență în domeniu." }}
+                        {{ craftsman.bio|default:"Meșter profesionist cu experiență în domeniu." }}
                     </p>
                 </div>
             </div>

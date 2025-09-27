@@ -41,9 +41,11 @@
     <!-- Action Buttons -->
     <div class="row mb-4">
         <div class="col-12 text-center">
-            <a href="{% url 'services:create_order' %}?category={{ category.slug }}" class="btn btn-primary btn-lg me-3">
-                <i class="fas fa-plus me-2"></i>Postează o comandă
-            </a>
+            {% if user.user_type != 'craftsman' %}
+                <a href="{% url 'services:create_order' %}?category={{ category.slug }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-plus me-2"></i>Postează o comandă
+                </a>
+            {% endif %}
             <a href="{% url 'accounts:craftsmen_list' %}?category={{ category.slug }}" class="btn btn-outline-primary btn-lg">
                 <i class="fas fa-users me-2"></i>Vezi meșterii
             </a>

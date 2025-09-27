@@ -153,11 +153,13 @@
                                                class="btn btn-outline-primary btn-sm">
                                                 <i class="fas fa-eye me-1"></i>Vezi profil
                                             </a>
-                                            <a href="{% url 'services:create_order' %}?craftsman={{ craftsman.pk }}"
-                                               class="btn btn-sm text-white fw-medium"
-                                               style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                                                <i class="fas fa-comments me-1"></i>Contactează
-                                            </a>
+                                            {% if user != craftsman.user %}
+                                                <a href="{% url 'services:create_order' %}?craftsman={{ craftsman.pk }}"
+                                                   class="btn btn-sm text-white fw-medium"
+                                                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                                                    <i class="fas fa-comments me-1"></i>Contactează
+                                                </a>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -224,9 +226,11 @@
                         </div>
                         <div class="card-body text-center">
                             <p class="text-muted">Postează gratuit o comandă și lasă meșterii să vină la tine!</p>
-                            <a href="{% url 'services:create_order' %}" class="btn btn-primary">
-                                <i class="fas fa-plus me-2"></i>Postează comandă
-                            </a>
+                            {% if user.user_type != 'craftsman' %}
+                                <a href="{% url 'services:create_order' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Postează comandă
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

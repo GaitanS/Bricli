@@ -7,6 +7,12 @@ from accounts.models import CraftsmanProfile, County, City
 from .models import SiteSettings, Testimonial, FAQ
 
 
+def preview_404(request):
+    """Render custom 404 template for preview while DEBUG=True."""
+    response = render(request, '404.html', status=404)
+    return response
+
+
 class HomeView(TemplateView):
     template_name = 'core/home.html'
 
