@@ -9,6 +9,8 @@ from django.db import models
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.core.files.storage import default_storage
 from .models import User, CraftsmanProfile, CraftsmanPortfolio, County, City
 from .forms import (
     UserRegistrationForm, CraftsmanRegistrationForm, ProfileUpdateForm,
@@ -212,8 +214,25 @@ class CraftsmanDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['reviews'] = self.object.received_reviews.all()[:5]
-        context['portfolio'] = self.object.portfolio_images.all()[:6]
+        # Reviews
+        context['reviews'] = getattr(self.object, 'received_reviews', []).all()[:5] if hasattr(self.object, 'received_reviews') else []
+        # Portfolio images (first 6)
+        context['portfolio_images'] = self.object.portfolio_images.all()[:6]
+        # Safe profile photo url with fallback if file missing on disk
+        profile_photo_url = None
+        if self.object.profile_photo and getattr(self.object.profile_photo, 'name', None):
+            try:
+                if default_storage.exists(self.object.profile_photo.name):
+                    profile_photo_url = self.object.profile_photo.url
+            except Exception:
+                profile_photo_url = None
+        if not profile_photo_url:
+            default_media_path = 'profiles/default.jpg'
+            if default_storage.exists(default_media_path):
+                profile_photo_url = settings.MEDIA_URL + default_media_path
+            else:
+                profile_photo_url = '/static/images/worker.webp'
+        context['profile_photo_url'] = profile_photo_url
         return context
 
 
@@ -332,9 +351,8 @@ class CraftsmanDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Add portfolio images
-        context['portfolio_images'] = self.object.portfolio_images.all()[:6]
-        # Add reviews, etc.
+        context['reviews'] = self.object.received_reviews.all()[:5]
+        context['portfolio'] = self.object.portfolio_images.all()[:6]
         return context
 
 

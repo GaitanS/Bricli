@@ -30,8 +30,8 @@
     <!-- Hero Section -->
     <div class="row align-items-center mb-5">
         <div class="col-md-2 text-center mb-3 mb-md-0">
-            {% if craftsman.profile_photo %}
-                <img src="{{ craftsman.profile_photo.url }}" alt="{{ craftsman.display_name }}"
+            {% if profile_photo_url %}
+                <img src="{{ profile_photo_url }}" alt="{{ craftsman.display_name }}"
                      class="rounded-circle shadow-lg" style="width: 120px; height: 120px; object-fit: cover;">
             {% else %}
                 <div class="bg-primary text-white rounded-circle shadow-lg d-inline-flex align-items-center justify-content-center"
@@ -248,45 +248,40 @@
                         {% for review in craftsman.user.received_reviews.all|slice:":3" %}
                         <div class="border-bottom pb-4 mb-4 last:border-0 last:pb-0 last:mb-0">
                             <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3"
-                                         style="width: 40px; height: 40px;">
-                                        <i class="fas fa-user text-muted"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1">{{ review.client.get_full_name|default:"Client verificat" }}</h6>
-                                        <div class="d-flex align-items-center">
-                                            {% for i in "12345" %}
-                                                {% if forloop.counter <= review.rating %}
-                                                    <i class="fas fa-star text-warning"></i>
-                                                {% else %}
-                                                    <i class="far fa-star text-muted"></i>
-                                                {% endif %}
-                                            {% endfor %}
-                                            <span class="ms-2 small text-muted">{{ review.rating }}/5</span>
+                                <div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                                            <i class="fas fa-user text-muted"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ review.author.get_full_name|default:review.author.username }}</strong>
+                                            <div class="text-muted small">{{ review.created_at|date:"d M Y" }}</div>
                                         </div>
                                     </div>
+                                    <div>
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <i class="fas fa-star text-warning"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-muted"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
                                 </div>
-                                <small class="text-muted">{{ review.created_at|date:"d M Y" }}</small>
+                                <span class="badge bg-success">Verificat</span>
                             </div>
-                            <p class="text-muted mb-0">{{ review.comment }}</p>
+                            <p class="mb-0">{{ review.comment }}</p>
+                        </div>
+                        {% empty %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-comments fa-2x mb-3"></i>
+                            <p>Încă nu există recenzii pentru acest meșter.</p>
                         </div>
                         {% endfor %}
-
-                        {% if craftsman.total_reviews > 3 %}
-                        <div class="text-center mt-4">
-                            <a href="{% url 'services:craftsman_reviews' craftsman.pk %}" class="btn btn-outline-primary">
-                                <i class="fas fa-eye me-2"></i>Vezi toate recenziile ({{ craftsman.total_reviews }})
-                            </a>
-                        </div>
-                        {% endif %}
                     {% else %}
-                        <div class="text-center py-5">
-                            <div class="mb-3">
-                                <i class="fas fa-star text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
-                            </div>
-                            <h6 class="text-muted">Încă nu există recenzii</h6>
-                            <p class="text-muted small mb-0">Fii primul care lasă o recenzie pentru acest meșter!</p>
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-comments fa-2x mb-3"></i>
+                            <p>Încă nu există recenzii pentru acest meșter.</p>
                         </div>
                     {% endif %}
                 </div>
@@ -294,188 +289,46 @@
         </div>
 
         <div class="col-lg-4">
-            <!-- Quick Info Card -->
-            <div class="card border-0 shadow-sm mb-4 sticky-top" style="top: 20px;">
+            <!-- Location and Availability -->
+            <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <h6 class="card-title mb-3">
-                        <i class="fas fa-info-circle me-2" style="color: #8B5CF6;"></i>Informații rapide
-                    </h6>
-
-                    <div class="row g-3 text-center mb-4">
-                        <div class="col-4">
-                            <div class="p-2">
-                                <div class="h6 mb-1" style="color: #8B5CF6;">
-                                    {% if craftsman.years_experience %}{{ craftsman.years_experience }}{% else %}5+{% endif %}
-                                </div>
-                                <small class="text-muted">Ani experiență</small>
-                            </div>
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-map-marker-alt me-2" style="color: #8B5CF6;"></i>Locație și Disponibilitate
+                    </h5>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center text-muted">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            {{ craftsman.city.name }}, {{ craftsman.county.name }}
                         </div>
-                        <div class="col-4">
-                            <div class="p-2">
-                                <div class="h6 mb-1" style="color: #8B5CF6;">24h</div>
-                                <small class="text-muted">Timp răspuns</small>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="p-2">
-                                <div class="h6 mb-1" style="color: #8B5CF6;">
-                                    {% if craftsman.user.is_verified %}
-                                        <i class="fas fa-check-circle"></i>
-                                    {% else %}
-                                        <i class="fas fa-clock"></i>
-                                    {% endif %}
-                                </div>
-                                <small class="text-muted">
-                                    {% if craftsman.user.is_verified %}Verificat{% else %}În verificare{% endif %}
-                                </small>
-                            </div>
+                        <div class="d-flex align-items-center text-muted mt-2">
+                            <i class="fas fa-road me-2"></i>
+                            Rază acoperire: {{ craftsman.coverage_radius_km }} km
                         </div>
                     </div>
 
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item px-0 py-2 border-0">
-                            <i class="fas fa-calendar-alt text-muted me-3"></i>
-                            <small>Membru din {{ craftsman.user.date_joined|date:"M Y" }}</small>
-                        </div>
-                        <div class="list-group-item px-0 py-2 border-0">
-                            <i class="fas fa-map-marker-alt text-muted me-3"></i>
-                            <small>{{ craftsman.county.name }}{% if craftsman.city %}, {{ craftsman.city.name }}{% endif %}</small>
-                        </div>
-                        {% if craftsman.coverage_radius_km %}
-                        <div class="list-group-item px-0 py-2 border-0">
-                            <i class="fas fa-route text-muted me-3"></i>
-                            <small>Raza de acoperire: {{ craftsman.coverage_radius_km }} km</small>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <hr class="my-3">
-
-                    <!-- Availability Badge -->
-                    <div class="text-center mb-3">
-                        <span class="badge bg-success px-3 py-2">
-                            <i class="fas fa-clock me-2"></i>Disponibil pentru proiecte noi
-                        </span>
-                    </div>
-
-                    <!-- Data Protection Notice -->
-                    <div class="alert alert-light border-0 mb-0" style="background-color: #f8f9ff;">
-                        <div class="d-flex align-items-start">
-                            <i class="fas fa-shield-alt me-2 mt-1" style="color: #8B5CF6;"></i>
-                            <div>
-                                <small class="fw-medium">Protecția datelor</small>
-                                <div class="small text-muted">
-                                    Datele de contact se dezvăluie doar după acceptarea unei oferte
-                                </div>
-                            </div>
-                        </div>
+                    <h6 class="mb-3">Disponibilitate</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark">Lu - Vi</span>
+                        <span class="badge bg-light text-dark">8:00 - 18:00</span>
+                        <span class="badge bg-light text-dark">Sâmbătă (la cerere)</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Similar Craftsmen -->
+            <!-- Contact Info (Protected) -->
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <h6 class="card-title mb-3">
-                        <i class="fas fa-users me-2" style="color: #8B5CF6;"></i>Meșteri similari
-                    </h6>
-                    <p class="text-muted small mb-3">
-                        Alți specialiști din {{ craftsman.county.name }}
-                    </p>
-                    <a href="{% url 'core:search' %}?county={{ craftsman.county.id }}"
-                       class="btn btn-outline-primary btn-sm w-100">
-                        <i class="fas fa-search me-2"></i>Vezi meșteri similari
-                    </a>
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-lock me-2" style="color: #8B5CF6;"></i>Date de contact
+                    </h5>
+                    <div class="text-muted">
+                        <p><i class="fas fa-info-circle me-2"></i>Contactele devin vizibile după acceptarea unei oferte.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-/* Custom styles for craftsman profile */
-@media (max-width: 768px) {
-    .container-fluid {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    .card-body {
-        padding: 1.5rem !important;
-    }
-
-    .sticky-top {
-        position: relative !important;
-        top: 0 !important;
-    }
-
-    .row.align-items-center .col-md-2 {
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-
-    .row.align-items-center .col-md-6 h1 {
-        font-size: 1.5rem;
-    }
-
-    .row.align-items-center .col-md-4 .row .col-4 .h4 {
-        font-size: 1.2rem;
-    }
-}
-
-.bg-gradient-dark {
-    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.7) 100%);
-}
-
-.last\:border-0:last-child {
-    border-bottom: 0 !important;
-}
-
-.last\:pb-0:last-child {
-    padding-bottom: 0 !important;
-}
-
-.last\:mb-0:last-child {
-    margin-bottom: 0 !important;
-}
-
-.card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
-}
-</style>
-
-<!-- Portfolio Modals -->
-{% for image in portfolio_images %}
-<div class="modal fade" id="portfolioModal{{ image.id }}" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ image.title|default:"Imagine Portfolio" }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img src="{{ image.image.url }}" class="img-fluid rounded" alt="{{ image.title }}">
-                {% if image.description %}
-                    <p class="mt-3 text-muted">{{ image.description }}</p>
-                {% endif %}
-                <small class="text-muted">Adăugată pe {{ image.created_at|date:"d M Y" }}</small>
-            </div>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-<script>
-function loadMoreReviews() {
-    // Implementare pentru încărcarea mai multor recenzii
-    alert('Funcționalitate în dezvoltare');
-}
-</script>
 {% endblock %}
 
 <!-- Contact Modal -->
