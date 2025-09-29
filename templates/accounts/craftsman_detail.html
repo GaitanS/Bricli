@@ -112,19 +112,49 @@
                         <strong>Acesta este profilul tău</strong><br>
                         <small>Așa îți văd clienții profilul pe platformă.</small>
                     </div>
+                    {% elif not user.is_authenticated %}
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Pentru a contacta meșterul</strong><br>
+                        <small>Trebuie să te <a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}" class="alert-link">autentifici</a> sau să îți <a href="{% url 'accounts:register' %}" class="alert-link">creezi un cont</a>.</small>
+                    </div>
+                    {% elif user.is_authenticated and user.user_type == 'craftsman' and user != craftsman.user %}
+                    <div class="alert alert-warning mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Funcționalitate în dezvoltare</strong><br>
+                        <small>Comunicarea între meșteri va fi disponibilă în curând. Momentan, doar clienții pot contacta meșterii.</small>
+                    </div>
                     {% endif %}
                     
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <button class="btn btn-lg w-100 text-white fw-bold {% if user == craftsman.user %}disabled{% endif %}"
-                                    style="background: {% if user == craftsman.user %}#6c757d{% else %}linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%){% endif %};"
-                                    {% if user != craftsman.user %}data-bs-toggle="modal" data-bs-target="#contactModal"{% else %}disabled{% endif %}>
+                            {% if user.is_authenticated and user != craftsman.user and user.user_type != 'craftsman' %}
+                            <button class="btn btn-lg w-100 text-white fw-bold"
+                                    style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);"
+                                    data-bs-toggle="modal" data-bs-target="#contactModal">
                                 <i class="fas fa-comments me-2"></i>Contactează meșterul
                             </button>
+                            {% elif not user.is_authenticated %}
+                            <a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}" 
+                               class="btn btn-lg w-100 text-white fw-bold"
+                               style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                                <i class="fas fa-comments me-2"></i>Contactează meșterul
+                            </a>
+                            {% else %}
+                            <button class="btn btn-lg w-100 text-white fw-bold disabled" disabled
+                                    style="background: #6c757d;">
+                                <i class="fas fa-comments me-2"></i>Contactează meșterul
+                            </button>
+                            {% endif %}
                         </div>
                         <div class="col-md-6">
-                            {% if user != craftsman.user %}
+                            {% if user.is_authenticated and user != craftsman.user and user.user_type != 'craftsman' %}
                             <a href="{% url 'services:create_order' %}?craftsman={{ craftsman.pk }}" 
+                               class="btn btn-outline-primary btn-lg w-100 fw-bold">
+                                <i class="fas fa-plus me-2"></i>Solicită ofertă
+                            </a>
+                            {% elif not user.is_authenticated %}
+                            <a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}" 
                                class="btn btn-outline-primary btn-lg w-100 fw-bold">
                                 <i class="fas fa-plus me-2"></i>Solicită ofertă
                             </a>
@@ -135,15 +165,10 @@
                             {% endif %}
                         </div>
                     </div>
+                    <!-- Remove the redundant "Trimite mesaj" button row -->
                     <div class="row g-3 mt-2">
-                        <div class="col-md-6">
-                            <button class="btn btn-outline-secondary w-100 {% if user == craftsman.user %}disabled{% endif %}"
-                                    {% if user != craftsman.user %}data-bs-toggle="modal" data-bs-target="#contactModal"{% else %}disabled{% endif %}>
-                                <i class="fas fa-envelope me-2"></i>Trimite mesaj
-                            </button>
-                        </div>
-                        <div class="col-md-6">
-                            <small class="text-muted d-flex align-items-center justify-content-center h-100">
+                        <div class="col-12">
+                            <small class="text-muted d-flex align-items-center justify-content-center">
                                 <i class="fas fa-shield-alt me-2"></i>
                                 Datele de contact se dezvăluie după acceptarea ofertei
                             </small>

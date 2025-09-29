@@ -258,6 +258,17 @@ def notify_quote_rejected(quote):
     )
 
 
+def notify_order_request(order, craftsman):
+    """Notify craftsman about new order request"""
+    return Notification.objects.create(
+        recipient=craftsman.user,
+        notification_type='order_published',
+        title=f'Solicitare nouă de ofertă',
+        message=f'Ai primit o solicitare de ofertă pentru "{order.title}" în {order.city.name}, {order.county.name}. Clientul așteaptă oferta ta!',
+        order=order
+    )
+
+
 # MyBuilder-style Lead System Models
 
 class Invitation(models.Model):

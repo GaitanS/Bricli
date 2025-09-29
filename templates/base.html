@@ -28,44 +28,104 @@
                 <i class="fas fa-hammer me-2"></i>Bricli
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <!-- Mobile User Info & Toggle -->
+            <div class="d-flex align-items-center d-lg-none">
+                {% if user.is_authenticated %}
+                    <div class="mobile-user-info me-3">
+                        <span class="text-muted small">Bună, </span>
+                        <span class="fw-semibold text-primary">{{ user.first_name|default:user.username }}</span>
+                    </div>
+                {% endif %}
+                <button class="navbar-toggler border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
             
             <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Mobile User Profile Section -->
+                {% if user.is_authenticated %}
+                    <div class="mobile-user-section d-lg-none border-bottom pb-3 mb-3">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="user-avatar me-3">
+                                <i class="fas fa-user-circle text-primary" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-semibold">{{ user.get_full_name|default:user.username }}</h6>
+                                <small class="text-muted">
+                                    {% if user.user_type == 'client' %}
+                                        <i class="fas fa-user me-1"></i>Client
+                                    {% else %}
+                                        <i class="fas fa-hammer me-1"></i>Meșter
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions for Mobile -->
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <a href="{% url 'messaging:conversation_list' %}" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-envelope me-1"></i>Mesaje
+                                    <span id="mobile-unread-badge" class="badge bg-danger ms-1" style="display: none;">0</span>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="{% url 'services:notifications' %}" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-bell me-1"></i>Notificări
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- Main Navigation -->
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:home' %}">Acasă</a>
+                        <a class="nav-link mobile-nav-link" href="{% url 'core:home' %}">
+                            <i class="fas fa-home me-2 d-lg-none"></i>Acasă
+                        </a>
                     </li>
                     <li class="nav-item">
                         {% if user.is_authenticated and user.user_type == 'craftsman' %}
-                            <a class="nav-link" href="{% url 'services:available_orders' %}">Comenzi disponibile</a>
+                            <a class="nav-link mobile-nav-link" href="{% url 'services:available_orders' %}">
+                                <i class="fas fa-clipboard-list me-2 d-lg-none"></i>Comenzi disponibile
+                            </a>
                         {% else %}
-                            <a class="nav-link" href="{% url 'services:categories' %}">Servicii</a>
+                            <a class="nav-link mobile-nav-link" href="{% url 'services:categories' %}">
+                                <i class="fas fa-tools me-2 d-lg-none"></i>Servicii
+                            </a>
                         {% endif %}
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:craftsmen_list' %}">Meșteri</a>
+                        <a class="nav-link mobile-nav-link" href="{% url 'accounts:craftsmen_list' %}">
+                            <i class="fas fa-users me-2 d-lg-none"></i>Meșteri
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:how_it_works' %}">Cum funcționează</a>
+                        <a class="nav-link mobile-nav-link" href="{% url 'core:how_it_works' %}">
+                            <i class="fas fa-question-circle me-2 d-lg-none"></i>Cum funcționează
+                        </a>
                     </li>
                 </ul>
                 
-                <ul class="navbar-nav">
+                <!-- Desktop User Menu -->
+                <ul class="navbar-nav d-none d-lg-flex">
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user-circle me-1"></i>
                                 {{ user.get_full_name|default:user.username }}
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
                                     <i class="fas fa-user me-2"></i>Profilul meu
                                 </a></li>
                                 <li><a class="dropdown-item" href="{% url 'messaging:conversation_list' %}">
                                     <i class="fas fa-envelope me-2"></i>Mesajele mele
                                     <span id="unread-badge" class="badge bg-danger ms-2" style="display: none;">0</span>
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'services:notifications' %}">
+                                    <i class="fas fa-bell me-2"></i>Notificările mele
                                 </a></li>
                                 {% if user.user_type == 'client' %}
                                     <li><a class="dropdown-item" href="{% url 'services:my_orders' %}">
@@ -79,7 +139,6 @@
                                     <li><a class="dropdown-item" href="{% url 'services:craftsman_services' %}">
                                         <i class="fas fa-tools me-2"></i>Serviciile mele
                                     </a></li>
-
                                     <li><a class="dropdown-item" href="{% url 'services:wallet' %}">
                                         <i class="fas fa-wallet me-2"></i>Wallet Credit
                                     </a></li>
@@ -99,6 +158,55 @@
                         </li>
                     {% endif %}
                 </ul>
+                
+                <!-- Mobile Account Menu -->
+                {% if user.is_authenticated %}
+                    <div class="mobile-account-menu d-lg-none mt-3 pt-3 border-top">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-user-cog me-2"></i>Contul meu
+                        </h6>
+                        
+                        <div class="list-group list-group-flush">
+                            <a href="{% url 'accounts:profile' %}" class="list-group-item list-group-item-action border-0 px-0">
+                                <i class="fas fa-user me-3 text-primary"></i>Profilul meu
+                            </a>
+                            
+                            {% if user.user_type == 'client' %}
+                                <a href="{% url 'services:my_orders' %}" class="list-group-item list-group-item-action border-0 px-0">
+                                    <i class="fas fa-clipboard-list me-3 text-primary"></i>Comenzile mele
+                                </a>
+                            {% endif %}
+                            
+                            {% if user.user_type == 'craftsman' %}
+                                <a href="{% url 'services:my_quotes' %}" class="list-group-item list-group-item-action border-0 px-0">
+                                    <i class="fas fa-handshake me-3 text-primary"></i>Ofertele mele
+                                </a>
+                                <a href="{% url 'services:craftsman_services' %}" class="list-group-item list-group-item-action border-0 px-0">
+                                    <i class="fas fa-tools me-3 text-primary"></i>Serviciile mele
+                                </a>
+                                <a href="{% url 'services:wallet' %}" class="list-group-item list-group-item-action border-0 px-0">
+                                    <i class="fas fa-wallet me-3 text-primary"></i>Wallet Credit
+                                </a>
+                            {% endif %}
+                            
+                            <a href="{% url 'accounts:logout' %}" class="list-group-item list-group-item-action border-0 px-0 text-danger">
+                                <i class="fas fa-sign-out-alt me-3"></i>Deconectare
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Mobile Auth Buttons -->
+                    <div class="mobile-auth-buttons d-lg-none mt-3 pt-3 border-top">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Conectare
+                            </a>
+                            <a href="{% url 'accounts:register' %}" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-2"></i>Înregistrare
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </nav>

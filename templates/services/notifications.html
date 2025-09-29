@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}Notificările mele - Bricli{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 fw-bold mb-2" style="color: #8B5CF6;">
+                        <i class="fas fa-bell me-3"></i>Notificările mele
+                    </h1>
+                    <p class="text-muted mb-0">Toate notificările și actualizările tale</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="row">
+        <div class="col-12">
+            {% if notifications %}
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        {% for notification in notifications %}
+                        <div class="notification-item border-bottom p-4 {% if not notification.is_read %}bg-light{% endif %}">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center mb-3 mb-md-0">
+                                    {% if notification.notification_type == 'new_quote' %}
+                                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-handshake"></i>
+                                        </div>
+                                    {% elif notification.notification_type == 'quote_accepted' %}
+                                        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    {% elif notification.notification_type == 'quote_rejected' %}
+                                        <div class="bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-times-circle"></i>
+                                        </div>
+                                    {% elif notification.notification_type == 'order_published' %}
+                                        <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-clipboard-list"></i>
+                                        </div>
+                                    {% elif notification.notification_type == 'order_confirmed' %}
+                                        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-thumbs-up"></i>
+                                        </div>
+                                    {% elif notification.notification_type == 'order_declined' %}
+                                        <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                    {% elif notification.notification_type == 'order_completed' %}
+                                        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-check-double"></i>
+                                        </div>
+                                    {% elif notification.notification_type == 'review_received' %}
+                                        <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    {% else %}
+                                        <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="mb-2 fw-bold">{{ notification.title }}</h6>
+                                    <p class="text-muted mb-2">{{ notification.message }}</p>
+                                    <div class="d-flex align-items-center text-muted small">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ notification.created_at|timesince }} în urmă
+                                        {% if not notification.is_read %}
+                                            <span class="badge bg-primary ms-2">Nou</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-md-end text-center">
+                                    <div class="d-flex flex-column gap-2">
+                                        {% if notification.order %}
+                                        <a href="{% url 'services:order_detail' notification.order.pk %}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Vezi comanda
+                                        </a>
+                                        {% endif %}
+                                        {% if notification.quote %}
+                                        <a href="{% url 'services:order_detail' notification.quote.order.pk %}" 
+                                           class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-handshake me-1"></i>Vezi oferta
+                                        </a>
+                                        {% endif %}
+                                        {% if notification.review %}
+                                        <a href="{% url 'services:review_detail' notification.review.pk %}" 
+                                           class="btn btn-outline-warning btn-sm">
+                                            <i class="fas fa-star me-1"></i>Vezi recenzia
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Paginare notificări">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">Prima</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterioară</a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Următoarea</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Ultima</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+
+            {% else %}
+                <!-- Empty State -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <i class="fas fa-bell-slash text-muted" style="font-size: 4rem;"></i>
+                        </div>
+                        <h4 class="text-muted mb-3">Nu ai notificări</h4>
+                        <p class="text-muted mb-4">
+                            Când vei primi notificări despre comenzi, oferte sau recenzii, le vei vedea aici.
+                        </p>
+                        {% if user.user_type == 'client' %}
+                        <a href="{% url 'services:create_order' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Creează o comandă
+                        </a>
+                        {% else %}
+                        <a href="{% url 'services:available_orders' %}" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Caută comenzi
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.notification-item:hover {
+    background-color: #f8f9fa !important;
+}
+
+.notification-item.bg-light {
+    border-left: 4px solid #8B5CF6;
+}
+</style>
+{% endblock %}

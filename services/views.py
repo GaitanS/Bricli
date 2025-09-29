@@ -75,12 +75,53 @@ class CreateOrderView(ClientRequiredMixin, RateLimitMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['services'] = ServiceCategory.objects.all().order_by('name')
+        
+        # Handle craftsman parameter for quote requests
+        craftsman_id = self.request.GET.get('craftsman')
+        if craftsman_id:
+            try:
+                craftsman = CraftsmanProfile.objects.get(pk=craftsman_id)
+                context['craftsman'] = craftsman
+                context['is_quote_request'] = True
+                # Get services offered by this craftsman
+                craftsman_services = craftsman.services.all().select_related('service__category')
+                context['craftsman_services'] = craftsman_services
+            except CraftsmanProfile.DoesNotExist:
+                pass
+        
         return context
 
     def form_valid(self, form):
+        # Import the notification function
+        from .models import notify_order_request
+        
         form.instance.client = self.request.user
+        
+        # Handle craftsman parameter for direct quote requests
+        craftsman_id = self.request.GET.get('craftsman')
+        if craftsman_id:
+            try:
+                craftsman = CraftsmanProfile.objects.get(pk=craftsman_id)
+                # Add a note to the order description that this is a direct request
+                if form.instance.description:
+                    form.instance.description += f"\n\n[Solicitare directă către meșterul {craftsman.user.get_full_name() or craftsman.user.username}]"
+                else:
+                    form.instance.description = f"[Solicitare directă către meșterul {craftsman.user.get_full_name() or craftsman.user.username}]"
+            except CraftsmanProfile.DoesNotExist:
+                pass
+        
         response = super().form_valid(form)
         messages.success(self.request, 'Comanda a fost creată cu succes!')
+        
+        # If this was a direct craftsman request, notify the craftsman
+        if craftsman_id:
+            try:
+                craftsman = CraftsmanProfile.objects.get(pk=craftsman_id)
+                # Create notification for the craftsman
+                notify_order_request(self.object, craftsman)
+            except CraftsmanProfile.DoesNotExist:
+                pass
+        
         return response
 
     def get_success_url(self):
@@ -808,3 +849,37 @@ class DeleteCraftsmanServiceView(CraftsmanRequiredMixin, DetailView):
         return CraftsmanService.objects.filter(
             craftsman=self.request.user.craftsman_profile
         )
+
+
+class NotificationsView(LoginRequiredMixin, ListView):
+    """View for displaying user notifications"""
+    model = Notification
+    template_name = 'services/notifications.html'
+    context_object_name = 'notifications'
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Notification.objects.filter(
+            recipient=self.request.user
+        ).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Count unread notifications
+        unread_count = Notification.objects.filter(
+            recipient=self.request.user,
+            is_read=False
+        ).count()
+        
+        context['unread_count'] = unread_count
+        return context
+
+    def get(self, request, *args, **kwargs):
+        # Mark all notifications as read when viewing the page
+        Notification.objects.filter(
+            recipient=request.user,
+            is_read=False
+        ).update(is_read=True, read_at=timezone.now())
+        
+        return super().get(request, *args, **kwargs)

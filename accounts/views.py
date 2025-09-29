@@ -207,33 +207,7 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
 
-class CraftsmanDetailView(DetailView):
-    model = CraftsmanProfile
-    template_name = 'accounts/craftsman_detail.html'
-    context_object_name = 'craftsman'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Reviews
-        context['reviews'] = getattr(self.object, 'received_reviews', []).all()[:5] if hasattr(self.object, 'received_reviews') else []
-        # Portfolio images (first 6)
-        context['portfolio_images'] = self.object.portfolio_images.all()[:6]
-        # Safe profile photo url with fallback if file missing on disk
-        profile_photo_url = None
-        if self.object.profile_photo and getattr(self.object.profile_photo, 'name', None):
-            try:
-                if default_storage.exists(self.object.profile_photo.name):
-                    profile_photo_url = self.object.profile_photo.url
-            except Exception:
-                profile_photo_url = None
-        if not profile_photo_url:
-            default_media_path = 'profiles/default.jpg'
-            if default_storage.exists(default_media_path):
-                profile_photo_url = settings.MEDIA_URL + default_media_path
-            else:
-                profile_photo_url = '/static/images/worker.webp'
-        context['profile_photo_url'] = profile_photo_url
-        return context
 
 
 class CraftsmenListView(ListView):
@@ -351,8 +325,41 @@ class CraftsmanDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['reviews'] = self.object.received_reviews.all()[:5]
-        context['portfolio'] = self.object.portfolio_images.all()[:6]
+        # Reviews
+        context['reviews'] = getattr(self.object, 'received_reviews', []).all()[:5] if hasattr(self.object, 'received_reviews') else []
+        # Portfolio images (first 6)
+        context['portfolio_images'] = self.object.portfolio_images.all()[:6]
+        # Safe profile photo url with fallback if file missing on disk
+        profile_photo_url = None
+        
+        if self.object.profile_photo and getattr(self.object.profile_photo, 'name', None):
+            try:
+                if default_storage.exists(self.object.profile_photo.name):
+                    profile_photo_url = self.object.profile_photo.url
+                else:
+                    # File doesn't exist, try fallback
+                    pass
+            except Exception as e:
+                profile_photo_url = None
+            
+        # Fallback to the user's profile picture if available and exists
+        if not profile_photo_url and hasattr(self.object, 'user') and getattr(self.object.user, 'profile_picture', None):
+            try:
+                user_pic = self.object.user.profile_picture
+                if user_pic and getattr(user_pic, 'name', None) and default_storage.exists(user_pic.name):
+                    profile_photo_url = user_pic.url
+            except Exception as e:
+                profile_photo_url = None
+            
+        # Final fallbacks: default media image, then static placeholder
+        if not profile_photo_url:
+            default_media_path = 'profiles/default.jpg'
+            if default_storage.exists(default_media_path):
+                profile_photo_url = settings.MEDIA_URL + default_media_path
+            else:
+                profile_photo_url = '/static/images/worker.webp'
+        
+        context['profile_photo_url'] = profile_photo_url
         return context
 
 

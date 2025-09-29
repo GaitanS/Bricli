@@ -34,4 +34,7 @@ urlpatterns = [
     path('my-services/add/', views.AddCraftsmanServiceView.as_view(), name='add_craftsman_service'),
     path('my-services/<int:pk>/edit/', views.EditCraftsmanServiceView.as_view(), name='edit_craftsman_service'),
     path('my-services/<int:pk>/delete/', views.DeleteCraftsmanServiceView.as_view(), name='delete_craftsman_service'),
+    
+    # Notifications
+    path('notifications/', views.NotificationsView.as_view(), name='notifications'),
 ]
