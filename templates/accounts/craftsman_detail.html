@@ -34,7 +34,7 @@
     <div class="row align-items-center mb-5">
         <div class="col-md-2 text-center mb-3 mb-md-0">
             {% if profile_photo_url %}
-                {% lazy_img profile_photo_url alt=craftsman.display_name css_class="rounded-circle shadow-lg" width="120" height="120" style="object-fit: cover;" %}
+                <img src="{{ profile_photo_url }}" alt="{{ craftsman.display_name }}" class="rounded-circle shadow-lg" width="120" height="120" style="object-fit: cover;">
             {% else %}
                 <div class="bg-primary text-white rounded-circle shadow-lg d-inline-flex align-items-center justify-content-center"
                      style="width: 120px; height: 120px; font-size: 2.5rem;">
@@ -232,7 +232,7 @@
                         {% for image in portfolio_images %}
                         <div class="col-lg-4 col-md-6">
                             <div class="position-relative overflow-hidden rounded">
-                                {% lazy_img image.image.url alt=image.title css_class="img-fluid w-100" width="300" height="200" style="object-fit: cover; cursor: pointer; transition: transform 0.3s ease;" data_bs_toggle="modal" data_bs_target="#portfolioModal{{ image.id }}" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" %}
+                                <img src="{{ image.image.url }}" alt="{{ image.title }}" class="img-fluid w-100" width="300" height="200" style="object-fit: cover; cursor: pointer; transition: transform 0.3s ease;" data-bs-toggle="modal" data-bs-target="#portfolioModal{{ image.id }}" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                                 {% if image.title %}
                                     <div class="position-absolute bottom-0 start-0 end-0 bg-gradient-dark text-white p-2">
                                         <small class="fw-medium">{{ image.title }}</small>

@@ -39,14 +39,14 @@
                 <!-- Search Form -->
                 <div class="card shadow-xl border-0">
                     <div class="card-body p-4">
-                        <h5 class="card-title text-dark mb-3 fw-bold">Caută servicii în zona ta</h5>
+                        <h5 class="card-title text-dark mb-3 fw-bold" style="color: #6d28d9 !important;">Caută servicii în zona ta</h5>
                         <form method="GET" action="{% url 'core:search' %}">
                             <div class="row g-3 align-items-end">
                                 <div class="col-md-5">
                                     <label class="form-label text-dark">Ce serviciu cauți?</label>
                                     <input type="text" name="q" class="form-control form-control-lg"
                                            placeholder="ex. renovare casă" value="{{ request.GET.q }}"
-                                           list="popular-services">
+                                           list="popular-services" style="border-color: #6d28d9; color: #6d28d9;">
                                     <datalist id="popular-services">
                                         <option value="Renovare baie">
                                         <option value="Instalare aer condiționat">
@@ -64,7 +64,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label text-dark">Județul</label>
-                                    <select name="county" class="form-select form-select-lg">
+                                    <select name="county" class="form-select form-select-lg" style="border-color: #6d28d9; color: #6d28d9;">
                                         <option value="">Alege județul</option>
                                         {% for county in counties %}
                                             <option value="{{ county.id }}">{{ county.name }}</option>
@@ -238,9 +238,9 @@
                 <div class="card h-100 shadow-sm">
                     <div class="card-body text-center">
                         {% if craftsman.profile_photo %}
-                            {% lazy_img craftsman.profile_photo.url alt=craftsman.user.get_full_name css_class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;" %}
+                            <img src="{{ craftsman.profile_photo.url }}" alt="{{ craftsman.user.get_full_name }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;">
                         {% elif craftsman.user.profile_picture %}
-                            {% lazy_img craftsman.user.profile_picture.url alt=craftsman.user.get_full_name css_class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;" %}
+                            <img src="{{ craftsman.user.profile_picture.url }}" alt="{{ craftsman.user.get_full_name }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;">
                         {% else %}
                             <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
                                  style="width: 80px; height: 80px;">
@@ -310,7 +310,7 @@
                         
                         <div class="d-flex align-items-center mt-3">
                             {% if testimonial.image %}
-                                {% lazy_img testimonial.image.url alt=testimonial.name css_class="rounded-circle me-3" width="50" height="50" style="object-fit: cover;" %}
+                                <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}" class="rounded-circle me-3" width="50" height="50" style="object-fit: cover;">
                             {% else %}
                                 <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
                                      style="width: 50px; height: 50px;">

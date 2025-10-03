@@ -1,4 +1,4 @@
-{% extends 'core/base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 {% load pagination_optimized %}
 {% load lazy_loading %}
@@ -26,7 +26,7 @@
     }
     
     .filter-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #764ba2;
         color: white;
     }
     
@@ -51,12 +51,12 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <h1 class="display-5 fw-bold mb-3">Meșteri verificați</h1>
+                    <h1 class="display-5 fw-bold mb-3 text-white">Meșteri verificați</h1>
                     <p class="lead mb-4">Găsește meșterul potrivit pentru proiectul tău. Toți meșterii noștri sunt verificați și evaluați de clienți reali.</p>
                     
                     {% if not user.is_authenticated %}
                     <div class="mb-4">
-                        <a href="{% url 'accounts:register_craftsman' %}" class="btn btn-light btn-lg me-3">
+                        <a href="{% url 'accounts:craftsman_register' %}" class="btn btn-light btn-lg me-3">
                             <i class="fas fa-hammer me-2"></i>Devino meșter
                         </a>
                         <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-lg">
@@ -179,8 +179,10 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-3 text-center">
-                                    {% if craftsman.user.profile_picture %}
-                                        {% lazy_img craftsman.user.profile_picture.url alt="Profil" css_class="rounded-circle" width="80" height="80" %}
+                                    {% if craftsman.profile_photo %}
+                                        <img src="{{ craftsman.profile_photo.url }}" alt="Profil" class="rounded-circle" width="80" height="80" style="object-fit: cover;">
+                                    {% elif craftsman.user.profile_picture %}
+                                        <img src="{{ craftsman.user.profile_picture.url }}" alt="Profil" class="rounded-circle" width="80" height="80" style="object-fit: cover;">
                                     {% else %}
                                         <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center"
                                              style="width: 80px; height: 80px;">
