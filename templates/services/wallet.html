@@ -77,6 +77,30 @@
     padding: 1.5rem;
     margin-bottom: 2rem;
 }
+
+.payment-methods {
+    margin: 20px 0;
+}
+
+.payment-method {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.payment-method i {
+    font-size: 1.2rem;
+    margin-right: 10px;
+    width: 20px;
+}
+
+.payment-method span:first-of-type {
+    flex-grow: 1;
+}
 </style>
 {% endblock %}
 
@@ -261,44 +285,33 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    <strong>Momentan:</strong> Încărcarea creditului se face manual. 
-                    Contactează-ne pentru a adăuga credit în contul tău.
-                </div>
-                
-                <div class="row">
-                    <div class="col-6">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <h5>100 RON</h5>
-                                <small class="text-muted">~5 lead-uri</small>
-                            </div>
-                        </div>
+                <p>Acum poți alimenta portofelul automat cu cardul bancar!</p>
+                <div class="payment-methods">
+                    <div class="payment-method">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Card bancar (Visa, Mastercard)</span>
+                        <span class="badge bg-success">Disponibil</span>
                     </div>
-                    <div class="col-6">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <h5>200 RON</h5>
-                                <small class="text-muted">~10 lead-uri</small>
-                            </div>
-                        </div>
+                    <div class="payment-method">
+                        <i class="fab fa-paypal"></i>
+                        <span>PayPal</span>
+                        <span class="badge bg-warning">În curând</span>
+                    </div>
+                    <div class="payment-method">
+                        <i class="fas fa-university"></i>
+                        <span>Transfer bancar</span>
+                        <span class="badge bg-warning">În curând</span>
                     </div>
                 </div>
-                
-                <div class="mt-3">
-                    <h6>Modalități de plată (în curând):</h6>
-                    <ul class="small">
-                        <li>Card bancar (Visa, Mastercard)</li>
-                        <li>Transfer bancar</li>
-                        <li>PayPal</li>
-                    </ul>
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle"></i>
+                    Plățile sunt procesate securizat prin Stripe. Datele cardului nu sunt stocate pe serverele noastre.
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Închide</button>
-                <a href="mailto:support@bricli.ro?subject=Incarcare Credit Wallet" class="btn btn-primary">
-                    <i class="fas fa-envelope me-2"></i>Contactează Suportul
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                <a href="{% url 'services:payments:wallet_topup' %}" class="btn btn-primary">
+                    <i class="fas fa-credit-card"></i> Alimentează Acum
                 </a>
             </div>
         </div>

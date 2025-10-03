@@ -1,0 +1,440 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Termeni și condiții - Bricli{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 bg-gradient-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-4">Termeni și condiții</h1>
+                <p class="lead">
+                    Regulile și condițiile de utilizare a platformei Bricli.
+                </p>
+                <small class="text-white-50">Ultima actualizare: {{ last_updated|default:"1 ianuarie 2024" }}</small>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Table of Contents -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-3">Cuprins</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><a href="#definitions" class="text-decoration-none">1. Definiții</a></li>
+                                    <li><a href="#acceptance" class="text-decoration-none">2. Acceptarea termenilor</a></li>
+                                    <li><a href="#services" class="text-decoration-none">3. Serviciile Bricli</a></li>
+                                    <li><a href="#registration" class="text-decoration-none">4. Înregistrarea contului</a></li>
+                                    <li><a href="#user-obligations" class="text-decoration-none">5. Obligațiile utilizatorilor</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><a href="#payments" class="text-decoration-none">6. Plăți și taxe</a></li>
+                                    <li><a href="#liability" class="text-decoration-none">7. Limitarea răspunderii</a></li>
+                                    <li><a href="#intellectual-property" class="text-decoration-none">8. Proprietatea intelectuală</a></li>
+                                    <li><a href="#termination" class="text-decoration-none">9. Încetarea serviciilor</a></li>
+                                    <li><a href="#governing-law" class="text-decoration-none">10. Legea aplicabilă</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Terms Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div id="definitions" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-book text-primary me-2"></i>1. Definiții
+                    </h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">Platforma</h5>
+                                    <p class="card-text">
+                                        Site-ul web și aplicația mobilă Bricli, inclusiv toate funcționalitățile și serviciile oferite.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">Utilizator</h5>
+                                    <p class="card-text">
+                                        Orice persoană fizică sau juridică care accesează și utilizează platforma Bricli.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title text-info">Client</h5>
+                                    <p class="card-text">
+                                        Utilizator care solicită servicii prin intermediul platformei Bricli.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title text-warning">Meșter</h5>
+                                    <p class="card-text">
+                                        Utilizator care oferă servicii profesionale prin intermediul platformei Bricli.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="acceptance" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-handshake text-success me-2"></i>2. Acceptarea termenilor
+                    </h2>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Important:</strong> Prin accesarea și utilizarea platformei Bricli, confirmi că ai citit, 
+                        înțeles și accepți să fii legat de acești Termeni și Condiții.
+                    </div>
+                    <p>
+                        Dacă nu ești de acord cu acești termeni, te rugăm să nu utilizezi platforma noastră. 
+                        Ne rezervăm dreptul de a modifica acești termeni în orice moment, iar modificările 
+                        vor intra în vigoare imediat după publicarea lor pe platformă.
+                    </p>
+                </div>
+
+                <div id="services" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-cogs text-info me-2"></i>3. Serviciile Bricli
+                    </h2>
+                    
+                    <h4 class="fw-bold mb-3">3.1 Descrierea serviciilor</h4>
+                    <p>
+                        Bricli este o platformă digitală care facilitează conectarea între clienți și meșteri 
+                        pentru diverse servicii de construcții, renovări și reparații. Platforma oferă:
+                    </p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="fas fa-search text-primary me-2"></i>
+                                    Căutarea și găsirea meșterilor
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-comments text-success me-2"></i>
+                                    Sistem de comunicare integrat
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-star text-warning me-2"></i>
+                                    Sistem de evaluări și recenzii
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="fas fa-credit-card text-info me-2"></i>
+                                    Procesarea plăților securizate
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-shield-alt text-danger me-2"></i>
+                                    Verificarea meșterilor
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-headset text-purple me-2"></i>
+                                    Suport pentru utilizatori
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h4 class="fw-bold mb-3 mt-4">3.2 Limitări ale serviciilor</h4>
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            <strong>Bricli nu este furnizor de servicii.</strong> Noi facilitam doar conectarea 
+                            între clienți și meșteri. Contractul pentru prestarea serviciilor se încheie direct 
+                            între client și meșter.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="registration" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-user-plus text-primary me-2"></i>4. Înregistrarea contului
+                    </h2>
+                    
+                    <h4 class="fw-bold mb-3">4.1 Cerințe pentru înregistrare</h4>
+                    <p>Pentru a utiliza platforma Bricli, trebuie să:</p>
+                    <ul>
+                        <li>Ai cel puțin 18 ani sau să ai acordul părinților/tutorilor legali</li>
+                        <li>Furnizezi informații corecte și complete</li>
+                        <li>Menții informațiile contului actualizate</li>
+                        <li>Păstrezi confidențialitatea datelor de autentificare</li>
+                    </ul>
+                    
+                    <h4 class="fw-bold mb-3">4.2 Verificarea meșterilor</h4>
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <h5 class="card-title text-success">
+                                <i class="fas fa-certificate me-2"></i>Proces de verificare
+                            </h5>
+                            <p class="card-text">
+                                Meșterii trebuie să treacă prin procesul nostru de verificare care include:
+                            </p>
+                            <ul class="mb-0">
+                                <li>Verificarea identității</li>
+                                <li>Confirmarea calificărilor profesionale</li>
+                                <li>Verificarea referințelor</li>
+                                <li>Evaluarea portofoliului de lucrări</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="user-obligations" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-tasks text-warning me-2"></i>5. Obligațiile utilizatorilor
+                    </h2>
+                    
+                    <div class="accordion" id="obligationsAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#obligations1">
+                                    <i class="fas fa-gavel me-2"></i>Respectarea legilor
+                                </button>
+                            </h2>
+                            <div id="obligations1" class="accordion-collapse collapse show" data-bs-parent="#obligationsAccordion">
+                                <div class="accordion-body">
+                                    <p>Utilizatorii se obligă să:</p>
+                                    <ul>
+                                        <li>Respecte toate legile și reglementările aplicabile</li>
+                                        <li>Nu utilizeze platforma pentru activități ilegale</li>
+                                        <li>Respecte drepturile de proprietate intelectuală</li>
+                                        <li>Nu încalce drepturile altor utilizatori</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#obligations2">
+                                    <i class="fas fa-ban me-2"></i>Activități interzise
+                                </button>
+                            </h2>
+                            <div id="obligations2" class="accordion-collapse collapse" data-bs-parent="#obligationsAccordion">
+                                <div class="accordion-body">
+                                    <p>Este strict interzis să:</p>
+                                    <ul>
+                                        <li>Publici conținut fals, înșelător sau defăimător</li>
+                                        <li>Hărțuiești sau ameninți alți utilizatori</li>
+                                        <li>Încerci să ocolești sistemele de securitate</li>
+                                        <li>Utilizezi platforma pentru spam sau publicitate neautorizată</li>
+                                        <li>Creezi conturi false sau multiple</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="payments" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-credit-card text-success me-2"></i>6. Plăți și taxe
+                    </h2>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-primary h-100">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-user me-2"></i>Pentru clienți
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li>• Înregistrarea este gratuită</li>
+                                        <li>• Postarea comenzilor este gratuită</li>
+                                        <li>• Comunicarea cu meșterii este gratuită</li>
+                                        <li>• Taxă de procesare plăți: 2.9% + 1.5 RON</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-success h-100">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-hammer me-2"></i>Pentru meșteri
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li>• Înregistrarea este gratuită</li>
+                                        <li>• Primele 5 oferte pe lună sunt gratuite</li>
+                                        <li>• Oferte suplimentare: 5 RON/ofertă</li>
+                                        <li>• Comision la finalizarea lucrării: 8%</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Notă:</strong> Toate prețurile includ TVA. Taxele pot fi modificate cu un preaviz 
+                        de 30 de zile.
+                    </div>
+                </div>
+
+                <div id="liability" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-exclamation-triangle text-danger me-2"></i>7. Limitarea răspunderii
+                    </h2>
+                    
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-shield-alt me-2"></i>Declarație importantă
+                        </h5>
+                        <p>
+                            Bricli nu este responsabilă pentru calitatea, siguranța sau legalitatea serviciilor 
+                            oferite de meșteri, acuratețea informațiilor furnizate de utilizatori sau capacitatea 
+                            acestora de a îndeplini obligațiile contractuale.
+                        </p>
+                        <hr>
+                        <p class="mb-0">
+                            Utilizarea platformei se face pe propriul risc. Recomandăm verificarea atentă a 
+                            meșterilor înainte de încheierea contractelor.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="termination" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-times-circle text-danger me-2"></i>9. Încetarea serviciilor
+                    </h2>
+                    
+                    <h4 class="fw-bold mb-3">9.1 Suspendarea contului</h4>
+                    <p>
+                        Ne rezervăm dreptul de a suspenda sau închide conturile utilizatorilor care:
+                    </p>
+                    <ul>
+                        <li>Încalcă acești Termeni și Condiții</li>
+                        <li>Furnizează informații false</li>
+                        <li>Se comportă în mod neadecvat față de alți utilizatori</li>
+                        <li>Utilizează platforma în scopuri frauduloase</li>
+                    </ul>
+                    
+                    <h4 class="fw-bold mb-3">9.2 Închiderea voluntară</h4>
+                    <p>
+                        Utilizatorii pot închide conturile în orice moment prin accesarea setărilor contului 
+                        sau prin contactarea echipei de suport.
+                    </p>
+                </div>
+
+                <div id="governing-law" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-balance-scale text-primary me-2"></i>10. Legea aplicabilă
+                    </h2>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Jurisdicția și legea aplicabilă</h5>
+                            <p class="card-text">
+                                Acești Termeni și Condiții sunt guvernați de legea română. Orice dispută 
+                                rezultată din utilizarea platformei Bricli va fi soluționată de instanțele 
+                                competente din România.
+                            </p>
+                            <p class="card-text">
+                                <strong>Sediul social:</strong> Bricli SRL, București, România<br>
+                                <strong>Numărul de înregistrare:</strong> J40/XXXXX/2024<br>
+                                <strong>CUI:</strong> ROXXXXXXXX
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center">
+            <h3 class="fw-bold mb-3">Ai întrebări despre termenii și condițiile noastre?</h3>
+            <p class="text-muted mb-4">
+                Echipa noastră juridică este disponibilă să clarifice orice aspecte.
+            </p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'core:contact' %}" class="btn btn-primary">
+                    <i class="fas fa-envelope me-2"></i>Contactează-ne
+                </a>
+                <a href="mailto:legal@bricli.ro" class="btn btn-outline-primary">
+                    <i class="fas fa-gavel me-2"></i>Departament juridic
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Highlight current section in table of contents
+window.addEventListener('scroll', function() {
+    const sections = document.querySelectorAll('[id]');
+    const tocLinks = document.querySelectorAll('a[href^="#"]');
+    
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 200) {
+            current = section.getAttribute('id');
+        }
+    });
+    
+    tocLinks.forEach(link => {
+        link.classList.remove('fw-bold', 'text-primary');
+        if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('fw-bold', 'text-primary');
+        }
+    });
+});
+</script>
+{% endblock %}

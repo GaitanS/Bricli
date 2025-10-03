@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Politica de confidențialitate - Bricli{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 bg-gradient-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-4">Politica de confidențialitate</h1>
+                <p class="lead">
+                    Transparența și protecția datelor tale personale sunt prioritatea noastră.
+                </p>
+                <small class="text-white-50">Ultima actualizare: {{ last_updated|default:"1 ianuarie 2024" }}</small>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Table of Contents -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-3">Cuprins</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><a href="#introduction" class="text-decoration-none">1. Introducere</a></li>
+                                    <li><a href="#data-collection" class="text-decoration-none">2. Colectarea datelor</a></li>
+                                    <li><a href="#data-usage" class="text-decoration-none">3. Utilizarea datelor</a></li>
+                                    <li><a href="#data-sharing" class="text-decoration-none">4. Partajarea datelor</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><a href="#data-security" class="text-decoration-none">5. Securitatea datelor</a></li>
+                                    <li><a href="#user-rights" class="text-decoration-none">6. Drepturile utilizatorilor</a></li>
+                                    <li><a href="#cookies" class="text-decoration-none">7. Cookies și tehnologii similare</a></li>
+                                    <li><a href="#contact" class="text-decoration-none">8. Contact</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Privacy Policy Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div id="introduction" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-info-circle text-primary me-2"></i>1. Introducere
+                    </h2>
+                    <p>
+                        Bricli SRL ("noi", "compania noastră" sau "Bricli") respectă confidențialitatea utilizatorilor 
+                        și se angajează să protejeze datele personale pe care le colectăm prin intermediul platformei 
+                        noastre web și mobile.
+                    </p>
+                    <p>
+                        Această Politică de Confidențialitate explică cum colectăm, utilizăm, stocăm și protejăm 
+                        informațiile tale personale în conformitate cu Regulamentul General privind Protecția Datelor 
+                        (GDPR) și legislația română aplicabilă.
+                    </p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Important:</strong> Prin utilizarea serviciilor Bricli, confirmi că ai citit și 
+                        înțeles această politică de confidențialitate.
+                    </div>
+                </div>
+
+                <div id="data-collection" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-database text-success me-2"></i>2. Colectarea datelor
+                    </h2>
+                    
+                    <h4 class="fw-bold mb-3">2.1 Date personale pe care le colectăm</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-user text-primary me-2"></i>Date de identificare
+                                    </h5>
+                                    <ul class="list-unstyled">
+                                        <li>• Nume și prenume</li>
+                                        <li>• Adresa de email</li>
+                                        <li>• Număr de telefon</li>
+                                        <li>• Adresa fizică</li>
+                                        <li>• Data nașterii (opțional)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-briefcase text-warning me-2"></i>Date profesionale
+                                    </h5>
+                                    <ul class="list-unstyled">
+                                        <li>• Specializarea profesională</li>
+                                        <li>• Experiența profesională</li>
+                                        <li>• Certificări și licențe</li>
+                                        <li>• Portofoliu de lucrări</li>
+                                        <li>• Evaluări și recenzii</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4 class="fw-bold mb-3 mt-4">2.2 Date colectate automat</h4>
+                    <p>
+                        Când utilizezi platforma Bricli, colectăm automat anumite informații tehnice:
+                    </p>
+                    <ul>
+                        <li>Adresa IP și locația geografică aproximativă</li>
+                        <li>Tipul și versiunea browserului</li>
+                        <li>Sistemul de operare</li>
+                        <li>Paginile vizitate și timpul petrecut pe platformă</li>
+                        <li>Referrer-ul (site-ul de unde ai accesat platforma)</li>
+                    </ul>
+                </div>
+
+                <div id="data-usage" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-cogs text-info me-2"></i>3. Utilizarea datelor
+                    </h2>
+                    
+                    <p>Utilizăm datele tale personale pentru următoarele scopuri:</p>
+                    
+                    <div class="accordion" id="dataUsageAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#usage1">
+                                    <i class="fas fa-handshake me-2"></i>Facilitarea serviciilor
+                                </button>
+                            </h2>
+                            <div id="usage1" class="accordion-collapse collapse show" data-bs-parent="#dataUsageAccordion">
+                                <div class="accordion-body">
+                                    <ul>
+                                        <li>Conectarea clienților cu meșterii potriviți</li>
+                                        <li>Procesarea comenzilor și ofertelor</li>
+                                        <li>Facilitarea comunicării între utilizatori</li>
+                                        <li>Gestionarea plăților și facturilor</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#usage2">
+                                    <i class="fas fa-chart-line me-2"></i>Îmbunătățirea serviciilor
+                                </button>
+                            </h2>
+                            <div id="usage2" class="accordion-collapse collapse" data-bs-parent="#dataUsageAccordion">
+                                <div class="accordion-body">
+                                    <ul>
+                                        <li>Analizarea comportamentului utilizatorilor</li>
+                                        <li>Dezvoltarea de noi funcționalități</li>
+                                        <li>Optimizarea experienței utilizatorului</li>
+                                        <li>Detectarea și prevenirea fraudelor</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="data-security" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-shield-alt text-danger me-2"></i>5. Securitatea datelor
+                    </h2>
+                    
+                    <p>
+                        Implementăm măsuri tehnice și organizatorice adecvate pentru a proteja datele tale personale 
+                        împotriva accesului neautorizat, modificării, divulgării sau distrugerii.
+                    </p>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center mb-4">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas fa-lock fa-lg"></i>
+                                </div>
+                                <h5 class="mt-3">Criptare SSL</h5>
+                                <p class="text-muted small">
+                                    Toate datele sunt transmise prin conexiuni securizate SSL/TLS.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center mb-4">
+                                <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas fa-server fa-lg"></i>
+                                </div>
+                                <h5 class="mt-3">Servere securizate</h5>
+                                <p class="text-muted small">
+                                    Datele sunt stocate pe servere protejate cu acces restricționat.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center mb-4">
+                                <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas fa-eye fa-lg"></i>
+                                </div>
+                                <h5 class="mt-3">Monitorizare 24/7</h5>
+                                <p class="text-muted small">
+                                    Sistemele noastre sunt monitorizate continuu pentru amenințări.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="user-rights" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-balance-scale text-purple me-2"></i>6. Drepturile utilizatorilor
+                    </h2>
+                    
+                    <p>
+                        În conformitate cu GDPR, ai următoarele drepturi cu privire la datele tale personale:
+                    </p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-primary mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">
+                                        <i class="fas fa-eye me-2"></i>Dreptul de acces
+                                    </h5>
+                                    <p class="card-text">
+                                        Poți solicita o copie a datelor personale pe care le deținem despre tine.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-success mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">
+                                        <i class="fas fa-edit me-2"></i>Dreptul de rectificare
+                                    </h5>
+                                    <p class="card-text">
+                                        Poți solicita corectarea datelor inexacte sau incomplete.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-danger mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title text-danger">
+                                        <i class="fas fa-trash me-2"></i>Dreptul la ștergere
+                                    </h5>
+                                    <p class="card-text">
+                                        Poți solicita ștergerea datelor tale în anumite condiții.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-warning mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title text-warning">
+                                        <i class="fas fa-ban me-2"></i>Dreptul la opoziție
+                                    </h5>
+                                    <p class="card-text">
+                                        Poți să te opui prelucrării datelor în anumite circumstanțe.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-primary">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Pentru a-ți exercita drepturile, contactează-ne la 
+                        <a href="mailto:privacy@bricli.ro">privacy@bricli.ro</a> sau prin 
+                        <a href="{% url 'core:contact' %}">formularul de contact</a>.
+                    </div>
+                </div>
+
+                <div id="contact" class="mb-5">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-envelope text-primary me-2"></i>8. Contact
+                    </h2>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Responsabil cu protecția datelor</h5>
+                                    <p class="card-text">
+                                        <strong>Email:</strong> privacy@bricli.ro<br>
+                                        <strong>Telefon:</strong> +40 21 XXX XXXX<br>
+                                        <strong>Adresa:</strong> București, România
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Autoritatea de supraveghere</h5>
+                                    <p class="card-text">
+                                        <strong>ANSPDCP</strong><br>
+                                        Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal<br>
+                                        <a href="https://www.dataprotection.ro" target="_blank">www.dataprotection.ro</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center">
+            <h3 class="fw-bold mb-3">Ai întrebări despre politica de confidențialitate?</h3>
+            <p class="text-muted mb-4">
+                Echipa noastră este disponibilă să răspundă la toate întrebările tale.
+            </p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'core:contact' %}" class="btn btn-primary">
+                    <i class="fas fa-envelope me-2"></i>Contactează-ne
+                </a>
+                <a href="mailto:privacy@bricli.ro" class="btn btn-outline-primary">
+                    <i class="fas fa-shield-alt me-2"></i>Email privacitate
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Highlight current section in table of contents
+window.addEventListener('scroll', function() {
+    const sections = document.querySelectorAll('[id]');
+    const tocLinks = document.querySelectorAll('a[href^="#"]');
+    
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (pageYOffset >= sectionTop - 200) {
+            current = section.getAttribute('id');
+        }
+    });
+    
+    tocLinks.forEach(link => {
+        link.classList.remove('fw-bold', 'text-primary');
+        if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('fw-bold', 'text-primary');
+        }
+    });
+});
+</script>
+{% endblock %}

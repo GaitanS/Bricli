@@ -93,7 +93,9 @@ class SearchView(ListView):
         # Base queryset with active craftsmen
         queryset = CraftsmanProfile.objects.filter(
             user__is_active=True
-        ).select_related('user', 'county', 'city')
+        ).select_related(
+            'user', 'county', 'city'
+        ).prefetch_related('services', 'services__service')
 
         # Enhanced search with weighted scoring
         if query:
@@ -174,3 +176,13 @@ class TermsView(TemplateView):
 
 class PrivacyView(TemplateView):
     template_name = 'legal/privacy.html'
+
+
+def custom_404_view(request, exception):
+    """Custom 404 error handler"""
+    return render(request, '404.html', status=404)
+
+
+def custom_500_view(request):
+    """Custom 500 error handler"""
+    return render(request, '500.html', status=500)

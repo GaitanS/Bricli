@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ notification.title }} - Notificări - Bricli{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'core:home' %}">
+                            <i class="fas fa-home"></i> Acasă
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'notifications:list' %}">
+                            <i class="fas fa-bell"></i> Notificări
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {{ notification.title|truncatewords:5 }}
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Notification Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h4 class="mb-2">
+                                {% if not notification.is_read %}
+                                    <i class="fas fa-circle text-primary me-2" style="font-size: 0.6rem;"></i>
+                                {% endif %}
+                                {{ notification.title }}
+                            </h4>
+                            <div class="d-flex flex-wrap align-items-center gap-3 text-muted">
+                                <span>
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ notification.created_at|date:"d M Y, H:i" }}
+                                </span>
+                                {% if notification.sender %}
+                                    <span>
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ notification.sender.get_full_name|default:notification.sender.username }}
+                                    </span>
+                                {% endif %}
+                                <span class="badge bg-{{ notification.priority|default:'secondary' }}">
+                                    {{ notification.get_priority_display }}
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    {{ notification.get_notification_type_display }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Action buttons -->
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm toggle-read-btn"
+                                    data-notification-id="{{ notification.id }}"
+                                    data-is-read="{{ notification.is_read|yesno:'true,false' }}"
+                                    title="{% if notification.is_read %}Marchează ca necitită{% else %}Marchează ca citită{% endif %}">
+                                {% if notification.is_read %}
+                                    <i class="fas fa-envelope"></i>
+                                {% else %}
+                                    <i class="fas fa-envelope-open"></i>
+                                {% endif %}
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn"
+                                    data-notification-id="{{ notification.id }}"
+                                    title="Șterge notificarea">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Notification content -->
+                    <div class="notification-content mb-4">
+                        <div class="message-content">
+                            {{ notification.message|linebreaks }}
+                        </div>
+                        
+                        {% if notification.data %}
+                            <div class="additional-data mt-4">
+                                <h6 class="text-muted mb-3">Informații suplimentare</h6>
+                                <div class="bg-light p-3 rounded">
+                                    {% for key, value in notification.data.items %}
+                                        <div class="row mb-2">
+                                            <div class="col-sm-4">
+                                                <strong>{{ key|title }}:</strong>
+                                            </div>
+                                            <div class="col-sm-8">
+                                                {% if value|length > 100 %}
+                                                    <div class="expandable-content">
+                                                        <div class="content-preview">
+                                                            {{ value|truncatewords:20 }}
+                                                            <button type="button" class="btn btn-link btn-sm p-0 expand-btn">
+                                                                Afișează mai mult
+                                                            </button>
+                                                        </div>
+                                                        <div class="content-full d-none">
+                                                            {{ value }}
+                                                            <button type="button" class="btn btn-link btn-sm p-0 collapse-btn">
+                                                                Afișează mai puțin
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    {{ value }}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Action URL -->
+                    {% if notification.action_url %}
+                        <div class="action-section">
+                            <hr>
+                            <div class="d-flex justify-content-center">
+                                <a href="{{ notification.action_url }}" class="btn btn-primary">
+                                    <i class="fas fa-external-link-alt me-2"></i>
+                                    Vezi detalii
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            {% if notification.is_read %}
+                                <i class="fas fa-check-circle text-success me-1"></i>
+                                Citită la {{ notification.read_at|date:"d M Y, H:i" }}
+                            {% else %}
+                                <i class="fas fa-circle text-warning me-1"></i>
+                                Necitită
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <a href="{% url 'notifications:list' %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Înapoi la notificări
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Related notifications -->
+            {% if related_notifications %}
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-bell me-2"></i>
+                            Notificări similare
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for related in related_notifications %}
+                                <a href="{% url 'notifications:detail' related.pk %}" 
+                                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">
+                                            {% if not related.is_read %}
+                                                <i class="fas fa-circle text-primary me-1" style="font-size: 0.5rem;"></i>
+                                            {% endif %}
+                                            {{ related.title }}
+                                        </h6>
+                                        <p class="mb-1 text-muted">{{ related.message|truncatewords:15 }}</p>
+                                        <small class="text-muted">{{ related.created_at|timesince }} în urmă</small>
+                                    </div>
+                                    <span class="badge bg-{{ related.priority|default:'secondary' }}">
+                                        {{ related.get_priority_display }}
+                                    </span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Toast container for notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="notification-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-bell text-primary me-2"></i>
+            <strong class="me-auto">Notificare</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/notifications.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize notification manager
+    const notificationManager = new NotificationManager();
+    
+    // Mark as read when viewing (if not already read)
+    {% if not notification.is_read %}
+        notificationManager.toggleReadStatus({{ notification.id }}, true);
+    {% endif %}
+    
+    // Toggle read status
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.toggle-read-btn')) {
+            const btn = e.target.closest('.toggle-read-btn');
+            const notificationId = btn.dataset.notificationId;
+            const isRead = btn.dataset.isRead === 'true';
+            
+            notificationManager.toggleReadStatus(notificationId, !isRead)
+                .then(() => {
+                    // Update button state
+                    btn.dataset.isRead = (!isRead).toString();
+                    const icon = btn.querySelector('i');
+                    
+                    if (!isRead) {
+                        icon.className = 'fas fa-envelope';
+                        btn.title = 'Marchează ca necitită';
+                        showToast('Notificarea a fost marcată ca citită.', 'success');
+                    } else {
+                        icon.className = 'fas fa-envelope-open';
+                        btn.title = 'Marchează ca citită';
+                        showToast('Notificarea a fost marcată ca necitită.', 'info');
+                    }
+                });
+        }
+    });
+    
+    // Delete notification
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-btn')) {
+            const btn = e.target.closest('.delete-btn');
+            const notificationId = btn.dataset.notificationId;
+            
+            if (confirm('Sigur doriți să ștergeți această notificare?')) {
+                notificationManager.deleteNotification(notificationId)
+                    .then(() => {
+                        showToast('Notificarea a fost ștearsă.', 'success');
+                        // Redirect to notifications list after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = "{% url 'notifications:list' %}";
+                        }, 2000);
+                    });
+            }
+        }
+    });
+    
+    // Expandable content functionality
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('expand-btn')) {
+            const container = e.target.closest('.expandable-content');
+            const preview = container.querySelector('.content-preview');
+            const full = container.querySelector('.content-full');
+            
+            preview.classList.add('d-none');
+            full.classList.remove('d-none');
+        }
+        
+        if (e.target.classList.contains('collapse-btn')) {
+            const container = e.target.closest('.expandable-content');
+            const preview = container.querySelector('.content-preview');
+            const full = container.querySelector('.content-full');
+            
+            full.classList.add('d-none');
+            preview.classList.remove('d-none');
+        }
+    });
+});
+
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('notification-toast');
+    const toastBody = toast.querySelector('.toast-body');
+    
+    // Update toast content
+    toastBody.textContent = message;
+    
+    // Update toast style based on type
+    toast.className = `toast bg-${type === 'error' ? 'danger' : type} text-white`;
+    
+    // Show toast
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+</script>
+{% endblock %}

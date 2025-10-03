@@ -1,0 +1,74 @@
+{% extends 'emails/base_email.html' %}
+
+{% block title %}Bun venit la Bricli - {{ user.get_full_name|default:user.username }}{% endblock %}
+
+{% block content %}
+<h2 class="email-title">Bun venit la Bricli! 🎉</h2>
+
+<p class="email-text">Salut {{ user.get_full_name|default:user.username }},</p>
+
+<p class="email-text">
+    Îți mulțumim că te-ai alăturat comunității Bricli! Suntem încântați să te avem alături și să te ajutăm 
+    să găsești {% if user.user_type == 'client' %}meșterii potriviți pentru proiectele tale{% else %}clienții ideali pentru serviciile tale{% endif %}.
+</p>
+
+{% if user.user_type == 'client' %}
+<div class="highlight-box">
+    <p class="highlight-text">
+        <strong>Ca client Bricli, poți:</strong><br>
+        • Să postezi proiecte și să primești oferte de la meșteri verificați<br>
+        • Să compari prețuri și să alegi cea mai bună ofertă<br>
+        • Să comunici direct cu meșterii prin platforma noastră<br>
+        • Să lași recenzii și să ajuți comunitatea să crească
+    </p>
+</div>
+{% else %}
+<div class="highlight-box">
+    <p class="highlight-text">
+        <strong>Ca meșter pe Bricli, poți:</strong><br>
+        • Să îți creezi un profil profesional și să îți prezinți lucrările<br>
+        • Să răspunzi la proiecte care se potrivesc cu expertiza ta<br>
+        • Să îți construiești reputația prin recenzii pozitive<br>
+        • Să îți dezvolți afacerea cu clienți noi
+    </p>
+</div>
+{% endif %}
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="https://bricli.ro/profile" class="email-button">
+        {% if user.user_type == 'client' %}
+        Explorează meșterii
+        {% else %}
+        Completează-ți profilul
+        {% endif %}
+    </a>
+</div>
+
+<p class="email-text">
+    <strong>Următorii pași:</strong>
+</p>
+
+<p class="email-text">
+    {% if user.user_type == 'client' %}
+    1. <strong>Postează primul tău proiect</strong> - Descrie ce lucrări ai nevoie și primește oferte<br>
+    2. <strong>Explorează meșterii</strong> - Caută în baza noastră de meșteri verificați<br>
+    3. <strong>Citește ghidurile noastre</strong> - Află cum să obții cele mai bune rezultate
+    {% else %}
+    1. <strong>Completează-ți profilul</strong> - Adaugă informații despre experiența ta<br>
+    2. <strong>Încarcă lucrări în portofoliu</strong> - Arată-le clienților ce știi să faci<br>
+    3. <strong>Răspunde la proiecte</strong> - Începe să câștigi clienți noi
+    {% endif %}
+</p>
+
+<div class="divider"></div>
+
+<p class="email-text">
+    Dacă ai întrebări sau ai nevoie de ajutor, echipa noastră de suport este aici pentru tine. 
+    Ne poți contacta oricând la <a href="mailto:support@bricli.ro" style="color: #8B5CF6;">support@bricli.ro</a>.
+</p>
+
+<p class="email-text">
+    Îți dorim mult succes pe Bricli!<br>
+    <strong>Echipa Bricli</strong>
+</p>
+{% endblock %}

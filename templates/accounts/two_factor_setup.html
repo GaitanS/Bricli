@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurare Autentificare cu Doi Factori - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .two-factor-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .setup-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .setup-header h1 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .setup-header p {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+
+    .setup-steps {
+        margin-bottom: 2rem;
+    }
+
+    .step {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
+    }
+
+    .step-number {
+        background: #3498db;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .step-content h3 {
+        margin: 0 0 0.5rem 0;
+        color: #2c3e50;
+    }
+
+    .step-content p {
+        margin: 0;
+        color: #555;
+        line-height: 1.6;
+    }
+
+    .qr-code-container {
+        text-align: center;
+        margin: 2rem 0;
+        padding: 2rem;
+        background: white;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+    }
+
+    .qr-code-container img {
+        max-width: 200px;
+        height: auto;
+        margin-bottom: 1rem;
+    }
+
+    .secret-key {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 6px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        word-break: break-all;
+        margin: 1rem 0;
+        border: 1px solid #ddd;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.75rem 2rem;
+        background: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: #95a5a6;
+        margin-right: 1rem;
+    }
+
+    .btn-secondary:hover {
+        background: #7f8c8d;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+    }
+
+    .alert-info {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+    }
+
+    .alert-warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+    }
+
+    .form-actions {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #eee;
+    }
+
+    .error-list {
+        color: #e74c3c;
+        margin: 0.5rem 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .error-list li {
+        margin-bottom: 0.25rem;
+    }
+
+    @media (max-width: 768px) {
+        .two-factor-container {
+            margin: 1rem;
+            padding: 1rem;
+        }
+
+        .step {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .step-number {
+            margin: 0 auto 1rem auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="two-factor-container">
+    <div class="setup-header">
+        <h1>🔐 Configurare Autentificare cu Doi Factori</h1>
+        <p>Adaugă un nivel suplimentar de securitate la contul tău</p>
+    </div>
+
+    <div class="alert alert-info">
+        <strong>Ce este autentificarea cu doi factori?</strong><br>
+        Autentificarea cu doi factori (2FA) adaugă un nivel suplimentar de securitate la contul tău. 
+        După introducerea parolei, vei fi solicitat să introduci un cod generat de aplicația ta de autentificare.
+    </div>
+
+    <div class="setup-steps">
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Instalează o aplicație de autentificare</h3>
+                <p>Descarcă și instalează o aplicație precum Google Authenticator, Authy sau Microsoft Authenticator pe telefonul tău.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>Scanează codul QR</h3>
+                <p>Folosește aplicația de autentificare pentru a scana codul QR de mai jos sau introdu manual cheia secretă.</p>
+            </div>
+        </div>
+
+        <div class="qr-code-container">
+            <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="QR Code pentru 2FA" />
+            <p><strong>Sau introdu manual cheia secretă:</strong></p>
+            <div class="secret-key">{{ secret_key }}</div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>Verifică configurarea</h3>
+                <p>Introdu codul de 6 cifre generat de aplicația ta de autentificare pentru a confirma configurarea.</p>
+            </div>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.token.id_for_label }}">Cod de verificare (6 cifre)</label>
+            {{ form.token }}
+            {% if form.token.errors %}
+                <ul class="error-list">
+                    {% for error in form.token.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>Important:</strong> După activarea 2FA, vei primi coduri de rezervă pe care trebuie să le salvezi într-un loc sigur. 
+            Aceste coduri pot fi folosite pentru accesarea contului în cazul în care pierzi accesul la aplicația de autentificare.
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Anulează</a>
+            <button type="submit" class="btn">Activează 2FA</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

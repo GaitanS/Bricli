@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dezactivare Autentificare cu Doi Factori - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .disable-container {
+        max-width: 500px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .disable-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .disable-header .icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #e74c3c;
+    }
+
+    .disable-header h1 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 1.8rem;
+    }
+
+    .disable-header p {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+
+    .warning-box {
+        background: #fff5f5;
+        border: 2px solid #fed7d7;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        color: #742a2a;
+    }
+
+    .warning-box .warning-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .warning-box h3 {
+        color: #e53e3e;
+        margin: 0 0 1rem 0;
+        font-size: 1.2rem;
+    }
+
+    .warning-box ul {
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+
+    .warning-box li {
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.75rem 2rem;
+        text-decoration: none;
+        border-radius: 6px;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn-danger {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: #95a5a6;
+        color: white;
+        margin-right: 1rem;
+    }
+
+    .btn-secondary:hover {
+        background: #7f8c8d;
+        color: white;
+        text-decoration: none;
+    }
+
+    .form-actions {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #eee;
+    }
+
+    .error-list {
+        color: #e74c3c;
+        margin: 0.5rem 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .error-list li {
+        margin-bottom: 0.25rem;
+        background: #fdf2f2;
+        padding: 0.5rem;
+        border-radius: 4px;
+        border: 1px solid #f5c6cb;
+    }
+
+    .security-info {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #17a2b8;
+    }
+
+    .security-info h4 {
+        color: #17a2b8;
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+    }
+
+    .security-info p {
+        margin: 0;
+        color: #495057;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .disable-container {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+
+        .disable-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .form-actions .btn {
+            display: block;
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="disable-container">
+    <div class="disable-header">
+        <div class="icon">⚠️</div>
+        <h1>Dezactivare Autentificare cu Doi Factori</h1>
+        <p>Ești pe cale să dezactivezi protecția suplimentară a contului tău</p>
+    </div>
+
+    <div class="warning-box">
+        <span class="warning-icon">🚨</span>
+        <h3>Atenție! Risc de securitate</h3>
+        <p>Dezactivarea autentificării cu doi factori va reduce semnificativ securitatea contului tău. Înainte de a continua, te rugăm să iei în considerare:</p>
+        <ul>
+            <li>Contul tău va fi protejat doar de parolă</li>
+            <li>Riscul de acces neautorizat va crește considerabil</li>
+            <li>Codurile de rezervă vor fi șterse permanent</li>
+            <li>Va trebui să configurezi din nou 2FA dacă vrei să o reactivezi</li>
+        </ul>
+    </div>
+
+    <div class="security-info">
+        <h4>💡 Alternativă recomandată</h4>
+        <p>
+            Dacă ai probleme cu aplicația de autentificare, poți regenera codurile de rezervă 
+            sau să configurezi o nouă aplicație în loc să dezactivezi complet 2FA.
+        </p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.password.id_for_label }}">Confirmă cu parola ta</label>
+            {{ form.password }}
+            <small style="color: #7f8c8d; font-size: 0.9rem;">
+                Pentru securitate, introdu parola contului pentru a confirma această acțiune.
+            </small>
+            {% if form.password.errors %}
+                <ul class="error-list">
+                    {% for error in form.password.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Anulează</a>
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Ești sigur că vrei să dezactivezi autentificarea cu doi factori? Această acțiune va reduce securitatea contului tău.')">
+                Dezactivează 2FA
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
+    if (passwordInput) {
+        passwordInput.focus();
+    }
+});
+</script>
+{% endblock %}

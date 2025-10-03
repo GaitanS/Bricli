@@ -1,0 +1,128 @@
+{% extends 'emails/base_email.html' %}
+
+{% block title %}{% if notification_type == 'new_order' %}Comandă nouă{% elif notification_type == 'quote_received' %}Ofertă nouă{% elif notification_type == 'order_accepted' %}Comandă acceptată{% else %}Actualizare comandă{% endif %} - Bricli{% endblock %}
+
+{% block content %}
+{% if notification_type == 'new_order' %}
+    <h2 class="email-title">Comandă nouă disponibilă! 📋</h2>
+    
+    <p class="email-text">Salut {{ craftsman.get_full_name|default:craftsman.username }},</p>
+    
+    <p class="email-text">
+        O nouă comandă care se potrivește cu expertiza ta a fost postată pe Bricli. 
+        Iată detaliile proiectului:
+    </p>
+    
+    <div class="highlight-box">
+        <p class="highlight-text">
+            <strong>{{ order.title }}</strong><br>
+            <strong>Categorie:</strong> {{ order.category.name }}<br>
+            <strong>Locație:</strong> {{ order.location }}<br>
+            <strong>Buget:</strong> {{ order.budget|default:"De negociat" }} RON<br>
+            <strong>Termen:</strong> {{ order.deadline|date:"d.m.Y"|default:"Flexibil" }}
+        </p>
+    </div>
+    
+    <p class="email-text">
+        <strong>Descrierea proiectului:</strong><br>
+        {{ order.description|truncatewords:50 }}
+    </p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="https://bricli.ro/orders/{{ order.id }}" class="email-button">
+            Vezi detaliile și trimite oferta
+        </a>
+    </div>
+
+{% elif notification_type == 'quote_received' %}
+    <h2 class="email-title">Ai primit o ofertă nouă! 💼</h2>
+    
+    <p class="email-text">Salut {{ client.get_full_name|default:client.username }},</p>
+    
+    <p class="email-text">
+        Ai primit o ofertă nouă pentru proiectul tău "{{ order.title }}" de la meșterul 
+        {{ craftsman.get_full_name|default:craftsman.username }}.
+    </p>
+    
+    <div class="highlight-box">
+        <p class="highlight-text">
+            <strong>Detalii ofertă:</strong><br>
+            <strong>Preț:</strong> {{ quote.price }} RON<br>
+            <strong>Durată estimată:</strong> {{ quote.estimated_duration|default:"De discutat" }}<br>
+            <strong>Meșter:</strong> {{ craftsman.get_full_name|default:craftsman.username }}<br>
+            <strong>Rating:</strong> ⭐ {{ craftsman.average_rating|default:"Nou" }}
+        </p>
+    </div>
+    
+    <p class="email-text">
+        <strong>Mesajul meșterului:</strong><br>
+        {{ quote.message|truncatewords:50 }}
+    </p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="https://bricli.ro/quotes/{{ quote.id }}" class="email-button">
+            Vezi oferta completă
+        </a>
+    </div>
+
+{% elif notification_type == 'order_accepted' %}
+    <h2 class="email-title">Felicitări! Oferta ta a fost acceptată! 🎉</h2>
+    
+    <p class="email-text">Salut {{ craftsman.get_full_name|default:craftsman.username }},</p>
+    
+    <p class="email-text">
+        Excelente vești! Clientul {{ client.get_full_name|default:client.username }} 
+        a acceptat oferta ta pentru proiectul "{{ order.title }}".
+    </p>
+    
+    <div class="highlight-box">
+        <p class="highlight-text">
+            <strong>Detalii proiect:</strong><br>
+            <strong>Valoare:</strong> {{ quote.price }} RON<br>
+            <strong>Client:</strong> {{ client.get_full_name|default:client.username }}<br>
+            <strong>Telefon client:</strong> {{ client.phone_number|default:"Disponibil în platformă" }}<br>
+            <strong>Data începerii:</strong> {{ order.start_date|date:"d.m.Y"|default:"De stabilit" }}
+        </p>
+    </div>
+    
+    <p class="email-text">
+        <strong>Următorii pași:</strong><br>
+        1. Contactează clientul pentru a stabili detaliile finale<br>
+        2. Confirmă data începerii lucrărilor<br>
+        3. Ține clientul la curent cu progresul proiectului
+    </p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="https://bricli.ro/projects/{{ order.id }}" class="email-button">
+            Accesează proiectul
+        </a>
+    </div>
+
+{% else %}
+    <h2 class="email-title">Actualizare comandă</h2>
+    
+    <p class="email-text">Salut {{ user.get_full_name|default:user.username }},</p>
+    
+    <p class="email-text">
+        Există o actualizare pentru comanda ta "{{ order.title }}".
+    </p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="https://bricli.ro/orders/{{ order.id }}" class="email-button">
+            Vezi actualizarea
+        </a>
+    </div>
+{% endif %}
+
+<div class="divider"></div>
+
+<p class="email-text">
+    Pentru întrebări sau suport, ne poți contacta oricând la 
+    <a href="mailto:support@bricli.ro" style="color: #8B5CF6;">support@bricli.ro</a>.
+</p>
+
+<p class="email-text">
+    Cu respect,<br>
+    <strong>Echipa Bricli</strong>
+</p>
+{% endblock %}

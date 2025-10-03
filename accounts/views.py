@@ -1,6 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as BaseLogoutView
+from django.contrib.auth.views import (
+    LoginView as BaseLoginView, LogoutView as BaseLogoutView,
+    PasswordResetView as BasePasswordResetView,
+    PasswordResetDoneView as BasePasswordResetDoneView,
+    PasswordResetConfirmView as BasePasswordResetConfirmView,
+    PasswordResetCompleteView as BasePasswordResetCompleteView
+)
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, DetailView, ListView, UpdateView, TemplateView, FormView
 from django.contrib import messages
@@ -11,11 +17,15 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.core.files.storage import default_storage
+import qrcode
+import io
+import base64
 from .models import User, CraftsmanProfile, CraftsmanPortfolio, County, City
 from .forms import (
     UserRegistrationForm, CraftsmanRegistrationForm, ProfileUpdateForm,
     SimpleUserRegistrationForm, SimpleCraftsmanRegistrationForm,
-    CraftsmanProfileForm, CraftsmanPortfolioForm, BulkPortfolioUploadForm, CraftsmanSkillsForm
+    CraftsmanProfileForm, CraftsmanPortfolioForm, BulkPortfolioUploadForm, CraftsmanSkillsForm,
+    CustomPasswordResetForm, CustomSetPasswordForm, TwoFactorSetupForm, TwoFactorVerifyForm, TwoFactorDisableForm
 )
 
 
@@ -163,6 +173,26 @@ class LoginView(BaseLoginView):
     template_name = 'accounts/login.html'
     redirect_authenticated_user = True
 
+    def form_valid(self, form):
+        """Handle successful login with 2FA check"""
+        user = form.get_user()
+        
+        # Check if user has 2FA enabled
+        if user.two_factor_enabled:
+            # Store user ID in session for 2FA verification
+            self.request.session['2fa_user_id'] = user.id
+            
+            # Store redirect URL if provided
+            next_url = self.request.GET.get('next')
+            if next_url:
+                self.request.session['login_redirect_url'] = next_url
+            
+            # Redirect to 2FA verification instead of logging in
+            return redirect('accounts:two_factor_verify')
+        
+        # Normal login for users without 2FA
+        return super().form_valid(form)
+
     def get_success_url(self):
         return reverse_lazy('core:home')
 
@@ -217,28 +247,28 @@ class CraftsmenListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = CraftsmanProfile.objects.filter(user__is_active=True)
+        queryset = CraftsmanProfile.objects.filter(
+            user__is_active=True
+        ).select_related(
+            'user', 'county', 'city'
+        ).prefetch_related('services', 'services__service')
+
+        # Filter by trade
+        trade = self.request.GET.get('trade')
+        if trade:
+            queryset = queryset.filter(trade=trade)
 
         # Filter by county
         county = self.request.GET.get('county')
         if county:
             queryset = queryset.filter(county_id=county)
 
-        # Filter by service
-        service = self.request.GET.get('service')
-        if service:
-            queryset = queryset.filter(services__service_id=service)
+        # Filter by rating
+        rating = self.request.GET.get('rating')
+        if rating:
+            queryset = queryset.filter(average_rating__gte=rating)
 
-        # Search by name or company
-        search = self.request.GET.get('search')
-        if search:
-            queryset = queryset.filter(
-                models.Q(user__first_name__icontains=search) |
-                models.Q(user__last_name__icontains=search) |
-                models.Q(company_name__icontains=search)
-            )
-
-        return queryset.order_by('-average_rating', '-total_reviews')
+        return queryset.order_by('-user__is_verified', '-average_rating', '-total_reviews')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -284,37 +314,80 @@ class CraftsmenListView(ListView):
     context_object_name = 'craftsmen'
     paginate_by = 12
 
-    def get_queryset(self):
-        queryset = CraftsmanProfile.objects.filter(user__is_active=True)
+    def get_paginate_by(self, queryset):
+        """Allow dynamic page size based on user preference"""
+        page_size = self.request.GET.get('page_size')
+        if page_size and page_size.isdigit():
+            page_size = int(page_size)
+            # Limit page size to reasonable values
+            if 1 <= page_size <= 100:
+                return page_size
+        return self.paginate_by
 
-        # Filter by trade
-        trade = self.request.GET.get('trade')
-        if trade:
-            queryset = queryset.filter(trade=trade)
+    def get_queryset(self):
+        from django.core.cache import cache
+        from core.cache_utils import CacheManager
+        
+        # Create cache key based on filters and page size
+        county = self.request.GET.get('county', '')
+        service = self.request.GET.get('service', '')
+        search = self.request.GET.get('search', '')
+        page_size = self.get_paginate_by(None)
+        
+        cache_key = CacheManager.generate_key(
+            'craftsmen_list',
+            county=county,
+            service=service,
+            search=search,
+            page_size=page_size
+        )
+        
+        # Try to get from cache first
+        cached_result = cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
+        
+        # Build queryset with optimized select_related and prefetch_related
+        queryset = CraftsmanProfile.objects.filter(user__is_active=True).select_related(
+            'user', 'county', 'city'
+        ).prefetch_related('services__service')
 
         # Filter by county
-        county = self.request.GET.get('county')
         if county:
             queryset = queryset.filter(county_id=county)
 
-        # Filter by rating
-        rating = self.request.GET.get('rating')
-        if rating:
-            queryset = queryset.filter(average_rating__gte=rating)
+        # Filter by service
+        if service:
+            queryset = queryset.filter(services__service_id=service)
 
-        return queryset.order_by('-user__is_verified', '-average_rating', '-total_reviews')
+        # Search by name or company
+        if search:
+            queryset = queryset.filter(
+                models.Q(user__first_name__icontains=search) |
+                models.Q(user__last_name__icontains=search) |
+                models.Q(company_name__icontains=search)
+            )
+
+        # Order and evaluate queryset
+        queryset = queryset.order_by('-average_rating', '-total_reviews')
+        
+        # Cache the result for 15 minutes
+        cache.set(cache_key, queryset, 900)
+        
+        return queryset
 
     def get_context_data(self, **kwargs):
-        from services.models import Service
+        from django.core.cache import cache
+        
         context = super().get_context_data(**kwargs)
-        context.update({
-            'counties': County.objects.all().order_by('name'),
-            'total_craftsmen': CraftsmanProfile.objects.filter(user__is_active=True).count(),
-            'verified_craftsmen': CraftsmanProfile.objects.filter(
-                user__is_active=True, user__is_verified=True
-            ).count(),
-            'total_services': Service.objects.filter(is_active=True).count(),
-        })
+        
+        # Cache counties list for 1 hour
+        counties = cache.get('counties_list')
+        if counties is None:
+            counties = County.objects.all().order_by('name')
+            cache.set('counties_list', counties, 3600)
+        
+        context['counties'] = counties
         return context
 
 
@@ -718,3 +791,217 @@ def confirm_email(request, uidb64, token):
             'Linkul de confirmare este invalid sau a expirat. Te rugăm să încerci din nou.'
         )
         return redirect('accounts:simple_craftsman_register')
+
+
+# Password Reset Views
+class PasswordResetView(BasePasswordResetView):
+    """Custom password reset view with Romanian language support"""
+    template_name = 'accounts/password_reset_form.html'
+    email_template_name = 'accounts/password_reset_email.html'
+    subject_template_name = 'accounts/password_reset_subject.txt'
+    success_url = reverse_lazy('accounts:password_reset_done')
+    form_class = CustomPasswordResetForm
+    
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            'Am trimis instrucțiunile de resetare a parolei la adresa ta de email.'
+        )
+        return super().form_valid(form)
+
+
+class PasswordResetDoneView(BasePasswordResetDoneView):
+    """Password reset email sent confirmation"""
+    template_name = 'accounts/password_reset_done.html'
+
+
+class PasswordResetConfirmView(BasePasswordResetConfirmView):
+    """Password reset confirmation view"""
+    template_name = 'accounts/password_reset_confirm.html'
+    success_url = reverse_lazy('accounts:password_reset_complete')
+    form_class = CustomSetPasswordForm
+    
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            'Parola ta a fost schimbată cu succes! Acum te poți autentifica cu noua parolă.'
+        )
+        return super().form_valid(form)
+
+
+class PasswordResetCompleteView(BasePasswordResetCompleteView):
+    """Password reset complete view"""
+    template_name = 'accounts/password_reset_complete.html'
+
+
+# Two-Factor Authentication Views
+
+class TwoFactorSetupView(LoginRequiredMixin, FormView):
+    """View for setting up two-factor authentication"""
+    template_name = 'accounts/two_factor_setup.html'
+    form_class = TwoFactorSetupForm
+    success_url = reverse_lazy('accounts:profile')
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Redirect if 2FA is already enabled
+        if request.user.two_factor_enabled:
+            messages.info(request, 'Autentificarea cu doi factori este deja activată.')
+            return redirect('accounts:profile')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Generate QR code for TOTP setup
+        if not self.request.user.two_factor_secret:
+            self.request.user.generate_2fa_secret()
+            self.request.user.save()
+        
+        qr_code_url = self.request.user.get_2fa_qr_code_url()
+        
+        # Generate QR code image
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(qr_code_url)
+        qr.make(fit=True)
+        
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = io.BytesIO()
+        img.save(buffer, format='PNG')
+        buffer.seek(0)
+        
+        qr_code_base64 = base64.b64encode(buffer.getvalue()).decode()
+        
+        context.update({
+            'qr_code_base64': qr_code_base64,
+            'secret_key': self.request.user.two_factor_secret,
+            'qr_code_url': qr_code_url,
+        })
+        
+        return context
+    
+    def form_valid(self, form):
+        user = self.request.user
+        token = form.cleaned_data['token']
+        
+        if user.verify_2fa_token(token):
+            user.two_factor_enabled = True
+            user.generate_backup_codes()
+            user.save()
+            
+            messages.success(
+                self.request,
+                'Autentificarea cu doi factori a fost activată cu succes! '
+                'Salvează codurile de rezervă într-un loc sigur.'
+            )
+            return super().form_valid(form)
+        else:
+            form.add_error('token', 'Codul introdus nu este valid.')
+            return self.form_invalid(form)
+
+
+class TwoFactorVerifyView(FormView):
+    """View for verifying 2FA token during login"""
+    template_name = 'accounts/two_factor_verify.html'
+    form_class = TwoFactorVerifyForm
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user is in 2FA verification state
+        if not request.session.get('2fa_user_id'):
+            return redirect('accounts:login')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_id = self.request.session.get('2fa_user_id')
+        if user_id:
+            user = get_object_or_404(User, id=user_id)
+            context['user'] = user
+        return context
+    
+    def form_valid(self, form):
+        user_id = self.request.session.get('2fa_user_id')
+        user = get_object_or_404(User, id=user_id)
+        token = form.cleaned_data['token']
+        
+        # Verify TOTP token or backup code
+        if user.verify_2fa_token(token) or user.verify_backup_code(token):
+            # Complete login
+            login(self.request, user)
+            
+            # Clear 2FA session data
+            del self.request.session['2fa_user_id']
+            
+            messages.success(self.request, f'Bun venit, {user.get_full_name() or user.username}!')
+            
+            # Redirect to next URL or profile
+            next_url = self.request.session.get('login_redirect_url', reverse_lazy('accounts:profile'))
+            if 'login_redirect_url' in self.request.session:
+                del self.request.session['login_redirect_url']
+            
+            return redirect(next_url)
+        else:
+            form.add_error('token', 'Codul introdus nu este valid.')
+            return self.form_invalid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('accounts:profile')
+
+
+class TwoFactorDisableView(LoginRequiredMixin, FormView):
+    """View for disabling two-factor authentication"""
+    template_name = 'accounts/two_factor_disable.html'
+    form_class = TwoFactorDisableForm
+    success_url = reverse_lazy('accounts:profile')
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Redirect if 2FA is not enabled
+        if not request.user.two_factor_enabled:
+            messages.info(request, 'Autentificarea cu doi factori nu este activată.')
+            return redirect('accounts:profile')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        user = self.request.user
+        password = form.cleaned_data['password']
+        
+        # Verify password
+        if user.check_password(password):
+            user.disable_2fa()
+            messages.success(
+                self.request,
+                'Autentificarea cu doi factori a fost dezactivată cu succes.'
+            )
+            return super().form_valid(form)
+        else:
+            form.add_error('password', 'Parola introdusă nu este corectă.')
+            return self.form_invalid(form)
+
+
+class TwoFactorBackupCodesView(LoginRequiredMixin, TemplateView):
+    """View for displaying backup codes"""
+    template_name = 'accounts/two_factor_backup_codes.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Redirect if 2FA is not enabled
+        if not request.user.two_factor_enabled:
+            messages.error(request, 'Autentificarea cu doi factori nu este activată.')
+            return redirect('accounts:profile')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['backup_codes'] = self.request.user.backup_codes or []
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        # Regenerate backup codes
+        request.user.generate_backup_codes()
+        request.user.save()
+        
+        messages.success(
+            request,
+            'Codurile de rezervă au fost regenerate cu succes. '
+            'Salvează noile coduri într-un loc sigur.'
+        )
+        
+        return redirect('accounts:two_factor_backup_codes')

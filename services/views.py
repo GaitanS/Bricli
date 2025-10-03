@@ -27,9 +27,24 @@ class ServiceCategoryListView(ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return ServiceCategory.objects.filter(is_active=True).annotate(
+        from django.core.cache import cache
+        from core.cache_utils import CacheManager
+        
+        cache_key = CacheManager.generate_key('service_categories_with_stats')
+        
+        # Try to get from cache first
+        cached_result = cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
+        
+        queryset = ServiceCategory.objects.filter(is_active=True).annotate(
             orders_count=Count('services__order', filter=Q(services__order__status='published'))
         )
+        
+        # Cache the result for 30 minutes
+        cache.set(cache_key, queryset, 1800)
+        
+        return queryset
 
 
 class ServiceCategoryDetailView(DetailView):
@@ -185,7 +200,9 @@ class MyOrdersView(ClientRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Order.objects.filter(client=self.request.user).order_by('-created_at')
+        return Order.objects.filter(client=self.request.user).select_related(
+            'service', 'service__category', 'county', 'city'
+        ).prefetch_related('quotes', 'reviews').order_by('-created_at')
 
 
 class MyQuotesView(CraftsmanRequiredMixin, ListView):
@@ -195,7 +212,11 @@ class MyQuotesView(CraftsmanRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Quote.objects.filter(craftsman=self.request.user.craftsman_profile).order_by('-created_at')
+        return Quote.objects.filter(
+            craftsman=self.request.user.craftsman_profile
+        ).select_related(
+            'order', 'order__client', 'order__service', 'order__service__category'
+        ).order_by('-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -218,8 +239,39 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
     context_object_name = 'orders'
     paginate_by = 12
 
+    def get_paginate_by(self, queryset):
+        """Allow dynamic page size based on user preference"""
+        page_size = self.request.GET.get('page_size')
+        if page_size and page_size.isdigit():
+            page_size = int(page_size)
+            # Limit page size to reasonable values
+            if 1 <= page_size <= 100:
+                return page_size
+        return self.paginate_by
+
     def get_queryset(self):
+        from django.core.cache import cache
+        from core.cache_utils import CacheManager
+        
         craftsman = self.request.user.craftsman_profile
+        
+        # Create cache key based on craftsman, filters, and page size
+        category = self.request.GET.get('category', '')
+        county = self.request.GET.get('county', '')
+        page_size = self.get_paginate_by(None)
+        
+        cache_key = CacheManager.generate_key(
+            'available_orders',
+            craftsman_id=craftsman.id,
+            category=category,
+            county=county,
+            page_size=page_size
+        )
+        
+        # Try to get from cache first (shorter cache time for orders)
+        cached_result = cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
         
         # Limit to services registered by the craftsman
         service_ids = CraftsmanService.objects.filter(
@@ -232,19 +284,24 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
             service_id__in=service_ids
         ).exclude(
             quotes__craftsman=craftsman
-        ).select_related('client', 'service').order_by('-created_at')
+        ).select_related(
+            'client', 'service', 'service__category', 'county', 'city'
+        ).prefetch_related('quotes').order_by('-created_at')
         
         # Filter by service category if requested
-        category = self.request.GET.get('category')
         if category:
             queryset = queryset.filter(service__category__slug=category)
         
         # Filter by county if requested
-        county = self.request.GET.get('county')
         if county:
             queryset = queryset.filter(county=county)
         
-        return queryset.distinct()
+        queryset = queryset.distinct()
+        
+        # Cache the result for 5 minutes (orders change frequently)
+        cache.set(cache_key, queryset, 300)
+        
+        return queryset
 
 
 class CreateQuoteView(LoginRequiredMixin, RateLimitMixin, CreateView):

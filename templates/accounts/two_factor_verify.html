@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verificare Autentificare cu Doi Factori - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .verify-container {
+        max-width: 450px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .verify-header {
+        margin-bottom: 2rem;
+    }
+
+    .verify-header .icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .verify-header h1 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 1.8rem;
+    }
+
+    .verify-header p {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+
+    .user-info {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #3498db;
+    }
+
+    .user-info strong {
+        color: #2c3e50;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        text-align: center;
+        letter-spacing: 0.2rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 1rem 2rem;
+        background: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        border: none;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .btn:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+        background: #7f8c8d;
+        color: white;
+        text-decoration: none;
+    }
+
+    .help-text {
+        background: #e8f4fd;
+        padding: 1rem;
+        border-radius: 6px;
+        margin: 1.5rem 0;
+        font-size: 0.9rem;
+        color: #2c3e50;
+        line-height: 1.6;
+    }
+
+    .help-text strong {
+        color: #3498db;
+    }
+
+    .error-list {
+        color: #e74c3c;
+        margin: 0.5rem 0;
+        padding: 0;
+        list-style: none;
+        text-align: center;
+    }
+
+    .error-list li {
+        margin-bottom: 0.25rem;
+        background: #fdf2f2;
+        padding: 0.5rem;
+        border-radius: 4px;
+        border: 1px solid #f5c6cb;
+    }
+
+    .backup-code-info {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #eee;
+    }
+
+    .backup-code-info p {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-bottom: 0.5rem;
+    }
+
+    .backup-code-info a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .backup-code-info a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .verify-container {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+
+        .verify-header h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verify-container">
+    <div class="verify-header">
+        <div class="icon">🔐</div>
+        <h1>Verificare cu Doi Factori</h1>
+        <p>Introdu codul de autentificare pentru a continua</p>
+    </div>
+
+    {% if user %}
+    <div class="user-info">
+        <strong>Cont:</strong> {{ user.get_full_name|default:user.username }}
+    </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.token.id_for_label }}">Cod de autentificare</label>
+            {{ form.token }}
+            {% if form.token.errors %}
+                <ul class="error-list">
+                    {% for error in form.token.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="help-text">
+            <strong>Cum să obții codul:</strong><br>
+            Deschide aplicația ta de autentificare (Google Authenticator, Authy, etc.) 
+            și introdu codul de 6 cifre afișat pentru Bricli.
+        </div>
+
+        <button type="submit" class="btn">Verifică și Conectează-te</button>
+        
+        <a href="{% url 'accounts:login' %}" class="btn btn-secondary">Înapoi la Autentificare</a>
+    </form>
+
+    <div class="backup-code-info">
+        <p>Nu ai acces la aplicația de autentificare?</p>
+        <p>Poți folosi un <strong>cod de rezervă</strong> în câmpul de mai sus.</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tokenInput = document.getElementById('{{ form.token.id_for_label }}');
+    if (tokenInput) {
+        tokenInput.focus();
+        
+        // Auto-format input for 6-digit codes
+        tokenInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 6) {
+                value = value.substring(0, 6);
+            }
+            e.target.value = value;
+        });
+        
+        // Auto-submit when 6 digits are entered
+        tokenInput.addEventListener('input', function(e) {
+            if (e.target.value.length === 6) {
+                // Small delay to allow user to see the complete code
+                setTimeout(function() {
+                    e.target.form.submit();
+                }, 500);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

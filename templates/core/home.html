@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load lazy_loading %}
 
 {% block title %}Bricli - Găsește meșterul potrivit pentru tine{% endblock %}
 
@@ -36,11 +37,13 @@
                 </div>
                 
                 <!-- Search Form -->
-                <div class="card shadow-lg">
+                <div class="card shadow-xl border-0">
                     <div class="card-body p-4">
+                        <h5 class="card-title text-dark mb-3 fw-bold">Caută servicii în zona ta</h5>
                         <form method="GET" action="{% url 'core:search' %}">
-                            <div class="row g-3">
-                                <div class="col-md-6">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-5">
+                                    <label class="form-label text-dark">Ce serviciu cauți?</label>
                                     <input type="text" name="q" class="form-control form-control-lg"
                                            placeholder="ex. renovare casă" value="{{ request.GET.q }}"
                                            list="popular-services">
@@ -60,6 +63,7 @@
                                     </datalist>
                                 </div>
                                 <div class="col-md-4">
+                                    <label class="form-label text-dark">Județul</label>
                                     <select name="county" class="form-select form-select-lg">
                                         <option value="">Alege județul</option>
                                         {% for county in counties %}
@@ -67,25 +71,24 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="col-md-2">
-                                    <button type="submit" class="btn btn-success btn-lg w-100">
-                                        <i class="fas fa-search"></i>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-success btn-lg w-100 shadow-sm d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-search me-2"></i>Caută
                                     </button>
                                 </div>
                             </div>
                         </form>
 
                         <!-- Popular Services -->
-                        <div class="mt-3">
-                            <small class="text-muted">Servicii populare:</small>
+                        <div class="mt-4">
+                            <small class="text-muted fw-semibold">Servicii populare:</small>
                             <div class="mt-2">
-                                <a href="{% url 'core:search' %}?q=renovare+baie" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Renovare baie</a>
-                                <a href="{% url 'core:search' %}?q=vopsit+apartament" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Vopsit apartament</a>
-                                <a href="{% url 'core:search' %}?q=montaj+parchet" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Montaj parchet</a>
-                                <a href="{% url 'core:search' %}?q=instalatii+sanitare" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Instalații sanitare</a>
-                                <a href="{% url 'core:search' %}?q=amenajare+gradina" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Amenajare grădină</a>
-                                <a href="{% url 'core:search' %}?q=transport+mutare" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Transport și mutare</a>
-                                <a href="{% url 'core:search' %}?q=curatenie+menaj" class="badge bg-light text-dark text-decoration-none me-2 mb-1">Curățenie și menaj</a>
+                                <a href="{% url 'core:search' %}?q=renovare+baie" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none me-2 mb-2 px-3 py-2">Renovare baie</a>
+                                <a href="{% url 'core:search' %}?q=vopsit+apartament" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none me-2 mb-2 px-3 py-2">Vopsit apartament</a>
+                                <a href="{% url 'core:search' %}?q=montaj+parchet" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none me-2 mb-2 px-3 py-2">Montaj parchet</a>
+                                <a href="{% url 'core:search' %}?q=instalatii+sanitare" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none me-2 mb-2 px-3 py-2">Instalații sanitare</a>
+                                <a href="{% url 'core:search' %}?q=amenajare+gradina" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none me-2 mb-2 px-3 py-2">Amenajare grădină</a>
+                                <a href="{% url 'core:search' %}?q=transport+mutare" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none me-2 mb-2 px-3 py-2">Transport și mutare</a>
                             </div>
                         </div>
                     </div>
@@ -234,9 +237,10 @@
             <div class="col-lg-4 col-md-6">
                 <div class="card h-100 shadow-sm">
                     <div class="card-body text-center">
-                        {% if craftsman.user.profile_picture %}
-                            <img src="{{ craftsman.user.profile_picture.url }}" alt="{{ craftsman.user.get_full_name }}" 
-                                 class="rounded-circle mb-3" style="width: 80px; height: 80px; object-fit: cover;">
+                        {% if craftsman.profile_photo %}
+                            {% lazy_img craftsman.profile_photo.url alt=craftsman.user.get_full_name css_class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;" %}
+                        {% elif craftsman.user.profile_picture %}
+                            {% lazy_img craftsman.user.profile_picture.url alt=craftsman.user.get_full_name css_class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;" %}
                         {% else %}
                             <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
                                  style="width: 80px; height: 80px;">
@@ -306,8 +310,7 @@
                         
                         <div class="d-flex align-items-center mt-3">
                             {% if testimonial.image %}
-                                <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}" 
-                                     class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% lazy_img testimonial.image.url alt=testimonial.name css_class="rounded-circle me-3" width="50" height="50" style="object-fit: cover;" %}
                             {% else %}
                                 <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
                                      style="width: 50px; height: 50px;">
@@ -372,4 +375,6 @@
     font-size: 2rem;
 }
 </style>
+
+{% lazy_loading_scripts %}
 {% endblock %}

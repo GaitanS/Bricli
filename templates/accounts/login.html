@@ -244,6 +244,13 @@ hr {
                 <label for="id_password">Parola</label>
             </div>
 
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div></div>
+                <a href="{% url 'accounts:password_reset' %}" class="text-decoration-none" style="color: #8B5CF6; font-size: 0.9rem;">
+                    Ai uitat parola?
+                </a>
+            </div>
+
             <div class="d-grid">
                 <button type="submit" class="btn btn-login">
                     <i class="fas fa-sign-in-alt me-2"></i>Conectează-te

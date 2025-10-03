@@ -1,0 +1,213 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Lazy loading for images
+    const lazyImages = document.querySelectorAll('.lazy-image[data-src]');
+    
+    // Lazy loading for background images
+    const lazyBackgrounds = document.querySelectorAll('.lazy-bg[data-bg]');
+    
+    // Lazy loading for content
+    const lazyContent = document.querySelectorAll('.lazy-content[data-load-url]');
+    
+    // Check if Intersection Observer is supported
+    if ('IntersectionObserver' in window) {
+        // Image observer
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    const src = img.getAttribute('data-src');
+                    
+                    // Create a new image to preload
+                    const newImg = new Image();
+                    newImg.onload = function() {
+                        img.src = src;
+                        img.classList.add('loaded');
+                    };
+                    newImg.onerror = function() {
+                        img.classList.add('error');
+                    };
+                    newImg.src = src;
+                    
+                    img.removeAttribute('data-src');
+                    observer.unobserve(img);
+                }
+            });
+        }, {
+            rootMargin: '50px 0px',
+            threshold: 0.01
+        });
+        
+        lazyImages.forEach(img => imageObserver.observe(img));
+        
+        // Background observer
+        const backgroundObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const element = entry.target;
+                    const bgSrc = element.getAttribute('data-bg');
+                    
+                    // Preload background image
+                    const img = new Image();
+                    img.onload = function() {
+                        element.style.backgroundImage = `url('${bgSrc}')`;
+                        element.classList.add('loaded');
+                    };
+                    img.onerror = function() {
+                        element.classList.add('error');
+                    };
+                    img.src = bgSrc;
+                    
+                    element.removeAttribute('data-bg');
+                    observer.unobserve(element);
+                }
+            });
+        }, {
+            rootMargin: '50px 0px',
+            threshold: 0.01
+        });
+        
+        lazyBackgrounds.forEach(bg => backgroundObserver.observe(bg));
+        
+        // Content observer
+        const contentObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const element = entry.target;
+                    const loadUrl = element.getAttribute('data-load-url');
+                    
+                    // Load content via AJAX
+                    fetch(loadUrl)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.text();
+                        })
+                        .then(html => {
+                            element.innerHTML = html;
+                            element.classList.add('loaded');
+                        })
+                        .catch(error => {
+                            console.error('Error loading lazy content:', error);
+                            element.innerHTML = '<div class="alert alert-warning">Eroare la încărcarea conținutului.</div>';
+                            element.classList.add('error');
+                        });
+                    
+                    element.removeAttribute('data-load-url');
+                    observer.unobserve(element);
+                }
+            });
+        }, {
+            rootMargin: '100px 0px',
+            threshold: 0.01
+        });
+        
+        lazyContent.forEach(content => contentObserver.observe(content));
+        
+    } else {
+        // Fallback for browsers without Intersection Observer
+        console.warn('Intersection Observer not supported, loading all content immediately');
+        
+        // Load all images immediately
+        lazyImages.forEach(img => {
+            const src = img.getAttribute('data-src');
+            if (src) {
+                img.src = src;
+                img.removeAttribute('data-src');
+                img.classList.add('loaded');
+            }
+        });
+        
+        // Load all backgrounds immediately
+        lazyBackgrounds.forEach(bg => {
+            const bgSrc = bg.getAttribute('data-bg');
+            if (bgSrc) {
+                bg.style.backgroundImage = `url('${bgSrc}')`;
+                bg.removeAttribute('data-bg');
+                bg.classList.add('loaded');
+            }
+        });
+        
+        // Load all content immediately
+        lazyContent.forEach(content => {
+            const loadUrl = content.getAttribute('data-load-url');
+            if (loadUrl) {
+                fetch(loadUrl)
+                    .then(response => response.text())
+                    .then(html => {
+                        content.innerHTML = html;
+                        content.classList.add('loaded');
+                    })
+                    .catch(error => {
+                        console.error('Error loading content:', error);
+                        content.innerHTML = '<div class="alert alert-warning">Eroare la încărcarea conținutului.</div>';
+                        content.classList.add('error');
+                    });
+                content.removeAttribute('data-load-url');
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.lazy-image {
+    transition: opacity 0.3s ease;
+    opacity: 0.7;
+}
+
+.lazy-image.loaded {
+    opacity: 1;
+}
+
+.lazy-image.error {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+.lazy-bg {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity 0.3s ease;
+    opacity: 0.7;
+}
+
+.lazy-bg.loaded {
+    opacity: 1;
+}
+
+.lazy-bg.error {
+    opacity: 0.5;
+    background-color: #f8f9fa !important;
+}
+
+.lazy-content {
+    min-height: 50px;
+    transition: opacity 0.3s ease;
+}
+
+.lazy-content.loaded {
+    opacity: 1;
+}
+
+.lazy-content.error {
+    opacity: 0.8;
+}
+
+.lazy-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lazy-image,
+    .lazy-bg,
+    .lazy-content {
+        transition: none;
+    }
+}
+</style>

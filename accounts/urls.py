@@ -18,6 +18,18 @@ urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
 
+    # Password reset URLs
+    path('password-reset/', views.PasswordResetView.as_view(), name='password_reset'),
+    path('password-reset/done/', views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('password-reset/confirm/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('password-reset/complete/', views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
+    # Two-Factor Authentication URLs
+    path('2fa/setup/', views.TwoFactorSetupView.as_view(), name='two_factor_setup'),
+    path('2fa/verify/', views.TwoFactorVerifyView.as_view(), name='two_factor_verify'),
+    path('2fa/disable/', views.TwoFactorDisableView.as_view(), name='two_factor_disable'),
+    path('2fa/backup-codes/', views.TwoFactorBackupCodesView.as_view(), name='two_factor_backup_codes'),
+
     # Profile management
     path('profile/', views.ProfileView.as_view(), name='profile'),
     path('profile/edit/', views.EditProfileView.as_view(), name='edit_profile'),

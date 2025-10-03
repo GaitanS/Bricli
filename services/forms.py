@@ -163,6 +163,25 @@ class ReviewImageForm(forms.ModelForm):
             'class': 'form-control',
             'placeholder': 'ex. Lucrarea finalizată, înainte și după, etc.'
         })
+    
+    def clean_image(self):
+        """Validate and optimize review image"""
+        from accounts.utils import optimize_review_image
+        
+        image = self.cleaned_data.get('image')
+        if image:
+            # Check file size (max 10MB)
+            if image.size > 10 * 1024 * 1024:
+                raise forms.ValidationError('Imaginea este prea mare. Dimensiunea maximă este 10MB.')
+            
+            # Check file type
+            if not image.content_type.startswith('image/'):
+                raise forms.ValidationError('Fișierul trebuie să fie o imagine.')
+            
+            # Optimize the image
+            image = optimize_review_image(image)
+        
+        return image
 
 
 class MultipleReviewImageForm(forms.Form):
@@ -180,6 +199,28 @@ class MultipleReviewImageForm(forms.Form):
                 'class': 'form-control',
                 'accept': 'image/*'
             })
+
+    def clean(self):
+        """Validate and optimize all uploaded images"""
+        from accounts.utils import optimize_review_image
+        
+        cleaned_data = super().clean()
+        
+        for field_name in ['image1', 'image2', 'image3', 'image4', 'image5']:
+            image = cleaned_data.get(field_name)
+            if image:
+                # Check file size (max 10MB)
+                if image.size > 10 * 1024 * 1024:
+                    raise forms.ValidationError(f'{field_name}: Imaginea este prea mare. Dimensiunea maximă este 10MB.')
+                
+                # Check file type
+                if not image.content_type.startswith('image/'):
+                    raise forms.ValidationError(f'{field_name}: Fișierul trebuie să fie o imagine.')
+                
+                # Optimize the image
+                cleaned_data[field_name] = optimize_review_image(image)
+        
+        return cleaned_data
 
     def get_images(self):
         """Return list of uploaded images"""

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Conversație cu {{ other_participant.get_full_name|default:"Utilizator" }} - Bricli{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-3">
+                <a href="{% url 'messaging:conversation_list' %}" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left"></i> Înapoi la mesaje
+                </a>
+                <div class="d-flex align-items-center">
+                    {% if other_participant.profile_picture %}
+                        <img src="{{ other_participant.profile_picture.url }}" 
+                             class="rounded-circle me-3" 
+                             width="50" height="50" 
+                             alt="{{ other_participant.get_full_name }}"
+                             style="object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light text-muted rounded-circle d-inline-flex align-items-center justify-content-center me-3"
+                             style="width: 50px; height: 50px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h2 class="h4 mb-0">{{ other_participant.get_full_name|default:"Utilizator" }}</h2>
+                        <p class="text-muted mb-0">{{ conversation.subject|default:"Conversație" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="messages-container" style="max-height: 500px; overflow-y: auto;">
+                        {% for message in messages %}
+                        <div class="message-item p-4 {% if message.sender == user %}sent{% else %}received{% endif %} {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="d-flex {% if message.sender == user %}justify-content-end{% endif %}">
+                                <div class="message-content {% if message.sender == user %}bg-primary text-white{% else %}bg-light{% endif %} rounded p-3" style="max-width: 70%;">
+                                    {% if message.is_system_message %}
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            <small class="fw-bold">Mesaj de sistem</small>
+                                        </div>
+                                    {% endif %}
+                                    <p class="mb-2">{{ message.content|linebreaks }}</p>
+                                    <small class="{% if message.sender == user %}text-white-50{% else %}text-muted{% endif %}">
+                                        {{ message.created_at|date:"d.m.Y H:i" }}
+                                        {% if message.sender == user and message.is_read %}
+                                            <i class="fas fa-check-double ms-1" title="Citit"></i>
+                                        {% elif message.sender == user %}
+                                            <i class="fas fa-check ms-1" title="Trimis"></i>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-comments text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-3">Nu există mesaje încă</h5>
+                            <p class="text-muted">Începe conversația trimițând primul mesaj.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reply Form -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="post" action="{% url 'messaging:send_reply' conversation.pk %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Răspunsul tău</label>
+                            <textarea class="form-control" id="message" name="message" rows="4" 
+                                      placeholder="Scrie răspunsul tău aici..." required></textarea>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Mesajul va fi trimis către {{ other_participant.get_full_name|default:"utilizator" }}
+                            </small>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Trimite răspuns
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.message-item.sent {
+    background-color: #f8f9fa;
+}
+
+.message-item.received {
+    background-color: #ffffff;
+}
+
+.messages-container {
+    padding: 0;
+}
+
+.message-content {
+    word-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+    .message-content {
+        max-width: 90% !important;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll to bottom of messages
+    const messagesContainer = document.querySelector('.messages-container');
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Mark conversation as read
+    fetch("{% url 'messaging:mark_conversation_read' conversation.pk %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    });
+});
+</script>
+{% endblock %}

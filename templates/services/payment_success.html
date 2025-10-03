@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Plată Reușită - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .success-container {
+        max-width: 600px;
+        margin: 50px auto;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .success-icon {
+        font-size: 4rem;
+        color: #28a745;
+        margin-bottom: 20px;
+        animation: bounce 1s ease-in-out;
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 60%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-20px);
+        }
+        80% {
+            transform: translateY(-10px);
+        }
+    }
+    
+    .success-card {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .amount-display {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #28a745;
+        margin: 20px 0;
+    }
+    
+    .success-message {
+        color: #495057;
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 12px 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        border-radius: 10px;
+        padding: 12px 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(108,117,125,0.2);
+    }
+    
+    .payment-details {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+        text-align: left;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+        font-weight: bold;
+    }
+    
+    .next-steps {
+        background: #e7f3ff;
+        border-left: 4px solid #007bff;
+        border-radius: 5px;
+        padding: 20px;
+        margin-top: 30px;
+        text-align: left;
+    }
+    
+    .next-steps h5 {
+        color: #0056b3;
+        margin-bottom: 15px;
+    }
+    
+    .next-steps ul {
+        margin-bottom: 0;
+        padding-left: 20px;
+    }
+    
+    .next-steps li {
+        margin-bottom: 8px;
+        color: #495057;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-container">
+    <div class="success-card">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        
+        <h1 class="text-success mb-3">Plată Reușită!</h1>
+        
+        {% if amount %}
+        <div class="amount-display">+{{ amount }} RON</div>
+        {% endif %}
+        
+        <p class="success-message">
+            Portofelul tău a fost alimentat cu succes. Creditul este disponibil imediat 
+            și poate fi folosit pentru a contacta meșteri și a primi oferte.
+        </p>
+        
+        <div class="action-buttons">
+            <a href="{% url 'services:wallet' %}" class="btn btn-primary">
+                <i class="fas fa-wallet"></i> Vezi Portofelul
+            </a>
+            <a href="{% url 'services:available_orders' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-search"></i> Caută Proiecte
+            </a>
+        </div>
+        
+        {% if payment_intent %}
+        <div class="payment-details">
+            <h6 class="mb-3">Detalii Tranzacție</h6>
+            <div class="detail-row">
+                <span>ID Tranzacție:</span>
+                <span class="text-monospace">{{ payment_intent.id }}</span>
+            </div>
+            <div class="detail-row">
+                <span>Data:</span>
+                <span>{{ payment_intent.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+            <div class="detail-row">
+                <span>Suma:</span>
+                <span>{{ payment_intent.amount_lei }} RON</span>
+            </div>
+            <div class="detail-row">
+                <span>Status:</span>
+                <span class="text-success">Reușită</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="next-steps">
+        <h5><i class="fas fa-lightbulb"></i> Ce poți face acum:</h5>
+        <ul>
+            <li>Răsfoiește proiectele disponibile și contactează clienții</li>
+            <li>Creează oferte competitive pentru proiectele care te interesează</li>
+            <li>Verifică istoricul tranzacțiilor în portofel</li>
+            <li>Completează-ți profilul pentru a primi mai multe lead-uri</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

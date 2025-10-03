@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact - Bricli{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 bg-gradient-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-4">Contactează-ne</h1>
+                <p class="lead">
+                    Suntem aici să te ajutăm! Ia legătura cu echipa Bricli pentru orice întrebare sau sugestie.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Information -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 text-center">
+                <div class="contact-info-card h-100 p-4">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-envelope fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold">Email</h4>
+                    <p class="text-muted mb-3">Scrie-ne și îți răspundem în maxim 24 de ore</p>
+                    <a href="mailto:contact@bricli.ro" class="btn btn-outline-primary">
+                        contact@bricli.ro
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 text-center">
+                <div class="contact-info-card h-100 p-4">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-phone fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold">Telefon</h4>
+                    <p class="text-muted mb-3">Suntem disponibili Luni-Vineri, 9:00-18:00</p>
+                    <a href="tel:+40721234567" class="btn btn-outline-success">
+                        +40 721 234 567
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 text-center">
+                <div class="contact-info-card h-100 p-4">
+                    <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-map-marker-alt fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold">Adresă</h4>
+                    <p class="text-muted mb-3">Vizitează-ne la sediul nostru din București</p>
+                    <address class="mb-0">
+                        Str. Calea Victoriei nr. 120<br>
+                        Sector 1, București<br>
+                        010096, România
+                    </address>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Form -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold">Trimite-ne un mesaj</h2>
+                            <p class="text-muted">Completează formularul de mai jos și îți vom răspunde cât mai curând</p>
+                        </div>
+                        
+                        <form method="post" id="contact-form">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="name" class="form-label">Nume complet *</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Adresa de email *</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label">Număr de telefon</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="subject" class="form-label">Subiect *</label>
+                                    <select class="form-select" id="subject" name="subject" required>
+                                        <option value="">Alege subiectul</option>
+                                        <option value="general">Întrebare generală</option>
+                                        <option value="technical">Problemă tehnică</option>
+                                        <option value="billing">Întrebare despre facturare</option>
+                                        <option value="partnership">Parteneriat</option>
+                                        <option value="feedback">Feedback</option>
+                                        <option value="other">Altceva</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="message" class="form-label">Mesajul tău *</label>
+                                    <textarea class="form-control" id="message" name="message" rows="5" 
+                                              placeholder="Descrie în detaliu întrebarea sau problema ta..." required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="privacy" name="privacy" required>
+                                        <label class="form-check-label" for="privacy">
+                                            Sunt de acord cu <a href="#" class="text-primary">politica de confidențialitate</a> 
+                                            și <a href="#" class="text-primary">termenii și condițiile</a> *
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                                        <i class="fas fa-paper-plane me-2"></i>Trimite mesajul
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Întrebări frecvente</h2>
+            <p class="text-muted">Poate găsești răspunsul la întrebarea ta aici</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#faq1">
+                                Cum funcționează Bricli?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Bricli conectează clienții cu meșteri verificați. Postezi o comandă gratuită, 
+                                primești oferte de la specialiști din zona ta, alegi cea mai bună ofertă și 
+                                colaborezi direct cu meșterul ales.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#faq2">
+                                Este gratuită utilizarea platformei?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Da, pentru clienți utilizarea Bricli este complet gratuită. Poți posta comenzi, 
+                                primi oferte și comunica cu meșterii fără niciun cost. Meșterii plătesc o 
+                                comision mic doar pentru proiectele finalizate cu succes.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#faq3">
+                                Cum sunt verificați meșterii?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Fiecare meșter trece printr-un proces de verificare care include validarea 
+                                identității, verificarea experienței profesionale, analiza portofoliului 
+                                și verificarea referințelor. Doar profesioniștii calificați sunt acceptați pe platformă.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#faq4">
+                                Ce se întâmplă dacă nu sunt mulțumit de serviciu?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Avem o echipă dedicată pentru rezolvarea disputelor. Dacă nu ești mulțumit 
+                                de serviciul primit, ne poți contacta și vom media situația pentru a găsi 
+                                o soluție echitabilă pentru toate părțile implicate.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted">Nu ai găsit răspunsul la întrebarea ta?</p>
+                    <a href="{% url 'core:faq' %}" class="btn btn-outline-primary">
+                        Vezi toate întrebările frecvente
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">Locația noastră</h2>
+            <p class="text-muted">Vizitează-ne la sediul din București</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="map-container bg-secondary rounded" style="height: 400px; position: relative;">
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="text-center text-white">
+                            <i class="fas fa-map-marker-alt fs-1 mb-3"></i>
+                            <h4>Hartă interactivă</h4>
+                            <p>Str. Calea Victoriei nr. 120, Sector 1, București</p>
+                            <a href="https://maps.google.com/?q=Calea+Victoriei+120+București" 
+                               target="_blank" class="btn btn-light">
+                                <i class="fas fa-external-link-alt me-2"></i>Deschide în Google Maps
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.getElementById('contact-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Simulate form submission
+    const button = this.querySelector('button[type="submit"]');
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Se trimite...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+        alert('Mulțumim pentru mesaj! Îți vom răspunde în cel mai scurt timp.');
+        this.reset();
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }, 2000);
+});
+</script>
+{% endblock %}

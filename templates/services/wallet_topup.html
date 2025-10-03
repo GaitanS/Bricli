@@ -1,0 +1,406 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Alimentează Portofelul - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .topup-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .balance-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .balance-amount {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .amount-selection {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .amount-card {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .amount-card:hover {
+        border-color: #007bff;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,123,255,0.2);
+    }
+    
+    .amount-card.selected {
+        border-color: #007bff;
+        background: #f8f9ff;
+    }
+    
+    .amount-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 5px;
+    }
+    
+    .amount-leads {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .custom-amount {
+        margin-bottom: 30px;
+    }
+    
+    .custom-amount input {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 15px;
+        font-size: 1.1rem;
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .payment-form {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .stripe-element {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .stripe-element.focused {
+        border-color: #007bff;
+    }
+    
+    .stripe-element.invalid {
+        border-color: #dc3545;
+    }
+    
+    .pay-button {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .pay-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+    }
+    
+    .pay-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    .loading-spinner {
+        display: none;
+        margin-right: 10px;
+    }
+    
+    .security-info {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .security-info h5 {
+        color: #495057;
+        margin-bottom: 15px;
+    }
+    
+    .security-features {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .security-features li {
+        padding: 5px 0;
+        color: #6c757d;
+    }
+    
+    .security-features li:before {
+        content: "🔒";
+        margin-right: 10px;
+    }
+    
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+        padding: 10px;
+        margin-top: 10px;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="topup-container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-wallet"></i> Alimentează Portofelul
+            </h1>
+            
+            <!-- Current Balance -->
+            <div class="balance-card">
+                <div class="balance-amount">{{ wallet.balance_lei }} RON</div>
+                <p class="mb-0">Soldul curent al portofelului</p>
+            </div>
+            
+            <!-- Amount Selection -->
+            <div class="payment-form">
+                <h4 class="mb-4">Selectează suma pentru alimentare</h4>
+                
+                <div class="amount-selection">
+                    {% for amount in predefined_amounts %}
+                    <div class="amount-card" data-amount="{{ amount.cents }}">
+                        <div class="amount-value">{{ amount.lei }} RON</div>
+                        <div class="amount-leads">{{ amount.leads }} lead-uri</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Custom Amount -->
+                <div class="custom-amount">
+                    <label for="custom-amount" class="form-label">Sau introdu o sumă personalizată:</label>
+                    <div class="input-group">
+                        <input type="number" 
+                               id="custom-amount" 
+                               class="form-control" 
+                               placeholder="Suma în RON" 
+                               min="50" 
+                               max="5000">
+                        <span class="input-group-text">RON</span>
+                    </div>
+                    <small class="text-muted">Suma minimă: 50 RON, maximă: 5000 RON</small>
+                </div>
+                
+                <!-- Payment Form -->
+                <form id="payment-form">
+                    <div class="mb-3">
+                        <label class="form-label">Detalii card</label>
+                        <div id="card-element" class="stripe-element">
+                            <!-- Stripe Elements will create form elements here -->
+                        </div>
+                    </div>
+                    
+                    <div class="error-message" id="card-errors" role="alert"></div>
+                    
+                    <button type="submit" id="submit-button" class="pay-button" disabled>
+                        <span class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </span>
+                        <span id="button-text">Selectează o sumă</span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Security Information -->
+            <div class="security-info">
+                <h5><i class="fas fa-shield-alt"></i> Plăți Securizate</h5>
+                <ul class="security-features">
+                    <li>Toate plățile sunt procesate prin Stripe, lider mondial în securitatea plăților</li>
+                    <li>Datele cardului sunt criptate și nu sunt stocate pe serverele noastre</li>
+                    <li>Certificat SSL pentru protecția datelor în tranzit</li>
+                    <li>Conformitate PCI DSS pentru siguranța maximă</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Stripe
+    const stripe = Stripe('{{ stripe_publishable_key }}');
+    const elements = stripe.elements();
+    
+    // Create card element
+    const cardElement = elements.create('card', {
+        style: {
+            base: {
+                fontSize: '16px',
+                color: '#424770',
+                '::placeholder': {
+                    color: '#aab7c4',
+                },
+            },
+        },
+    });
+    
+    cardElement.mount('#card-element');
+    
+    // Handle card element events
+    cardElement.on('change', function(event) {
+        const displayError = document.getElementById('card-errors');
+        const cardElementDiv = document.getElementById('card-element');
+        
+        if (event.error) {
+            displayError.textContent = event.error.message;
+            displayError.style.display = 'block';
+            cardElementDiv.classList.add('invalid');
+        } else {
+            displayError.style.display = 'none';
+            cardElementDiv.classList.remove('invalid');
+        }
+        
+        cardElementDiv.classList.toggle('focused', event.focused);
+    });
+    
+    // Amount selection logic
+    let selectedAmount = 0;
+    const amountCards = document.querySelectorAll('.amount-card');
+    const customAmountInput = document.getElementById('custom-amount');
+    const submitButton = document.getElementById('submit-button');
+    const buttonText = document.getElementById('button-text');
+    
+    function updateSelectedAmount(amount) {
+        selectedAmount = amount;
+        if (amount > 0) {
+            submitButton.disabled = false;
+            buttonText.textContent = `Plătește ${amount / 100} RON`;
+        } else {
+            submitButton.disabled = true;
+            buttonText.textContent = 'Selectează o sumă';
+        }
+    }
+    
+    // Handle predefined amount selection
+    amountCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove selection from all cards
+            amountCards.forEach(c => c.classList.remove('selected'));
+            // Add selection to clicked card
+            this.classList.add('selected');
+            // Clear custom amount
+            customAmountInput.value = '';
+            // Update selected amount
+            const amount = parseInt(this.dataset.amount);
+            updateSelectedAmount(amount);
+        });
+    });
+    
+    // Handle custom amount input
+    customAmountInput.addEventListener('input', function() {
+        // Remove selection from predefined amounts
+        amountCards.forEach(c => c.classList.remove('selected'));
+        
+        const value = parseFloat(this.value);
+        if (value >= 50 && value <= 5000) {
+            updateSelectedAmount(Math.round(value * 100));
+        } else {
+            updateSelectedAmount(0);
+        }
+    });
+    
+    // Handle form submission
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        if (selectedAmount <= 0) {
+            return;
+        }
+        
+        // Disable submit button and show loading
+        submitButton.disabled = true;
+        document.querySelector('.loading-spinner').style.display = 'inline-block';
+        buttonText.textContent = 'Se procesează...';
+        
+        try {
+            // Create payment intent
+            const response = await fetch('{% url "services:payments:create_payment_intent" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({
+                    amount_cents: selectedAmount
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'A apărut o eroare');
+            }
+            
+            // Confirm payment with Stripe
+            const result = await stripe.confirmCardPayment(data.client_secret, {
+                payment_method: {
+                    card: cardElement,
+                }
+            });
+            
+            if (result.error) {
+                // Show error to customer
+                const errorElement = document.getElementById('card-errors');
+                errorElement.textContent = result.error.message;
+                errorElement.style.display = 'block';
+                
+                // Re-enable submit button
+                submitButton.disabled = false;
+                document.querySelector('.loading-spinner').style.display = 'none';
+                buttonText.textContent = `Plătește ${selectedAmount / 100} RON`;
+            } else {
+                // Payment succeeded
+                window.location.href = '{% url "services:payments:payment_success" %}?payment_intent=' + result.paymentIntent.id;
+            }
+            
+        } catch (error) {
+            console.error('Payment error:', error);
+            const errorElement = document.getElementById('card-errors');
+            errorElement.textContent = error.message;
+            errorElement.style.display = 'block';
+            
+            // Re-enable submit button
+            submitButton.disabled = false;
+            document.querySelector('.loading-spinner').style.display = 'none';
+            buttonText.textContent = selectedAmount > 0 ? `Plătește ${selectedAmount / 100} RON` : 'Selectează o sumă';
+        }
+    });
+});
+</script>
+{% csrf_token %}
+{% endblock %}

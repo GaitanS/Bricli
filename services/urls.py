@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = 'services'
@@ -37,4 +37,7 @@ urlpatterns = [
     
     # Notifications
     path('notifications/', views.NotificationsView.as_view(), name='notifications'),
+    
+    # Payment system
+    path('payments/', include('services.payment_urls')),
 ]

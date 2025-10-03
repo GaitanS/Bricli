@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordResetForm, SetPasswordForm
 from django.core.exceptions import ValidationError
 from .models import User, CraftsmanProfile, CraftsmanPortfolio, County, City
 from services.models import Service, ServiceCategory
@@ -8,7 +8,7 @@ from .validators import (
     validate_email_format, validate_name, validate_company_name,
     validate_description, validate_services_selection, validate_display_name,
     validate_coverage_radius, validate_bio_length, validate_hourly_rate,
-    validate_min_job_value
+    validate_min_job_value, validate_portfolio_image
 )
 
 
@@ -445,6 +445,30 @@ class ProfileUpdateForm(forms.ModelForm):
         self.fields['email'].label = 'Adresa de email'
         self.fields['phone_number'].label = 'Număr de telefon'
         self.fields['profile_picture'].label = ''
+    
+    def clean_profile_picture(self):
+        """Validate and optimize profile picture"""
+        from .utils import optimize_profile_picture
+        
+        picture = self.cleaned_data.get('profile_picture')
+        if picture:
+            # Check file size (max 10MB)
+            if picture.size > 10 * 1024 * 1024:
+                raise forms.ValidationError('Imaginea este prea mare. Dimensiunea maximă este 10MB.')
+            
+            # Check file type - handle both UploadedFile and ImageFieldFile
+            content_type = getattr(picture, 'content_type', None)
+            if not content_type and hasattr(picture, 'file'):
+                # For ImageFieldFile, get content type from the file
+                content_type = getattr(picture.file, 'content_type', None)
+            
+            if content_type and not content_type.startswith('image/'):
+                raise forms.ValidationError('Fișierul trebuie să fie o imagine.')
+            
+            # Optimize the image
+            picture = optimize_profile_picture(picture)
+        
+        return picture
 
 
 class CraftsmanProfileForm(forms.ModelForm):
@@ -661,7 +685,27 @@ class CraftsmanPortfolioForm(forms.ModelForm):
         self.fields['description'].help_text = 'Detalii despre lucrarea realizată'
 
     def clean_image(self):
+        """Validate and optimize portfolio image"""
+        from .utils import optimize_portfolio_image
+        
         image = self.cleaned_data.get('image')
+        if image:
+            # Check file size (max 15MB)
+            if image.size > 15 * 1024 * 1024:
+                raise forms.ValidationError('Imaginea este prea mare. Dimensiunea maximă este 15MB.')
+            
+            # Check file type - handle both UploadedFile and ImageFieldFile
+            content_type = getattr(image, 'content_type', None)
+            if not content_type and hasattr(image, 'file'):
+                # For ImageFieldFile, get content type from the file
+                content_type = getattr(image.file, 'content_type', None)
+            
+            if content_type and not content_type.startswith('image/'):
+                raise forms.ValidationError('Fișierul trebuie să fie o imagine.')
+            
+            # Optimize the image
+            image = optimize_portfolio_image(image)
+            
         validate_portfolio_image(image)
         return image
 
@@ -693,6 +737,28 @@ class BulkPortfolioUploadForm(forms.Form):
                 'class': 'form-control',
                 'accept': 'image/*'
             })
+
+    def clean(self):
+        """Validate and optimize all uploaded images"""
+        from .utils import optimize_portfolio_image
+        
+        cleaned_data = super().clean()
+        
+        for field_name in ['image1', 'image2', 'image3', 'image4', 'image5']:
+            image = cleaned_data.get(field_name)
+            if image:
+                # Check file size (max 15MB)
+                if image.size > 15 * 1024 * 1024:
+                    raise forms.ValidationError(f'{field_name}: Imaginea este prea mare. Dimensiunea maximă este 15MB.')
+                
+                # Check file type
+                if not image.content_type.startswith('image/'):
+                    raise forms.ValidationError(f'{field_name}: Fișierul trebuie să fie o imagine.')
+                
+                # Optimize the image
+                cleaned_data[field_name] = optimize_portfolio_image(image)
+        
+        return cleaned_data
 
     def get_images(self):
         """Return list of uploaded images"""
@@ -758,3 +824,159 @@ class CraftsmanSkillsForm(forms.Form):
         }),
         help_text='Listează certificările și autorizațiile pe care le deții'
     )
+
+
+# Password Reset Forms
+class CustomPasswordResetForm(PasswordResetForm):
+    """Custom password reset form with Romanian language support"""
+    
+    email = forms.EmailField(
+        label='Adresa de email',
+        max_length=254,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Introdu adresa de email',
+            'autocomplete': 'email'
+        })
+    )
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            # Check if user exists with this email
+            if not User.objects.filter(email=email, is_active=True).exists():
+                raise ValidationError(
+                    'Nu există niciun cont activ cu această adresă de email.'
+                )
+        return email
+
+
+class CustomSetPasswordForm(SetPasswordForm):
+    """Custom set password form with Romanian language support and validation"""
+    
+    new_password1 = forms.CharField(
+        label='Parola nouă',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Introdu parola nouă',
+            'autocomplete': 'new-password'
+        }),
+        strip=False,
+        help_text='Parola trebuie să aibă cel puțin 8 caractere și să nu fie prea comună.'
+    )
+    
+    new_password2 = forms.CharField(
+        label='Confirmă parola nouă',
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Confirmă parola nouă',
+            'autocomplete': 'new-password'
+        })
+    )
+    
+    def clean_new_password1(self):
+        password = self.cleaned_data.get('new_password1')
+        if password:
+            validate_strong_password(password)
+        return password
+    
+    def clean_new_password2(self):
+        password1 = self.cleaned_data.get('new_password1')
+        password2 = self.cleaned_data.get('new_password2')
+        if password1 and password2:
+            if password1 != password2:
+                raise ValidationError('Parolele nu se potrivesc.')
+        return password2
+
+
+class TwoFactorSetupForm(forms.Form):
+    """Form pentru configurarea 2FA"""
+    
+    token = forms.CharField(
+        label='Cod de verificare',
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control form-control-lg text-center',
+            'placeholder': '123456',
+            'autocomplete': 'one-time-code',
+            'pattern': '[0-9]{6}',
+            'maxlength': '6',
+            'style': 'letter-spacing: 0.5em; font-size: 1.5rem;'
+        }),
+        help_text='Introdu codul din aplicația de autentificare'
+    )
+    
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+    
+    def clean_token(self):
+        token = self.cleaned_data.get('token')
+        if token and not self.user.verify_2fa_token(token):
+            raise ValidationError('Codul de verificare este incorect sau a expirat.')
+        return token
+
+
+class TwoFactorVerifyForm(forms.Form):
+    """Form pentru verificarea 2FA la login"""
+    
+    token = forms.CharField(
+        label='Cod de verificare',
+        max_length=8,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control form-control-lg text-center',
+            'placeholder': '123456',
+            'autocomplete': 'one-time-code',
+            'pattern': '[0-9A-Fa-f]{6,8}',
+            'maxlength': '8',
+            'style': 'letter-spacing: 0.5em; font-size: 1.5rem;'
+        }),
+        help_text='Introdu codul din aplicația de autentificare sau un cod de rezervă'
+    )
+    
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+    
+    def clean_token(self):
+        token = self.cleaned_data.get('token')
+        if not token:
+            return token
+            
+        # Verifică dacă este un cod TOTP (6 cifre)
+        if len(token) == 6 and token.isdigit():
+            if self.user.verify_2fa_token(token):
+                return token
+        
+        # Verifică dacă este un cod de rezervă (8 caractere hex)
+        if len(token) == 8:
+            if self.user.verify_backup_code(token):
+                return token
+        
+        raise ValidationError('Codul de verificare este incorect sau a expirat.')
+
+
+class TwoFactorDisableForm(forms.Form):
+    """Form pentru dezactivarea 2FA"""
+    
+    password = forms.CharField(
+        label='Parola curentă',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Introdu parola curentă',
+            'autocomplete': 'current-password'
+        }),
+        help_text='Pentru securitate, confirmă parola pentru a dezactiva 2FA'
+    )
+    
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+    
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if password and not self.user.check_password(password):
+            raise ValidationError('Parola este incorectă.')
+        return password

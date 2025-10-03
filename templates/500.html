@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eroare de server - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+.error-hero {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 100%);
+}
+.error-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(16,24,40,.08);
+  padding: 2rem;
+}
+.error-code {
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1;
+}
+.error-actions .btn {
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+}
+.error-illustration {
+  max-width: 340px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="error-hero">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="error-card p-4 p-md-5">
+          <div class="row g-4 align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+              <div class="error-code mb-3">500</div>
+              <h1 class="h3 fw-bold mb-2">Oops! Ceva nu a mers bine pe serverul nostru.</h1>
+              <p class="text-muted mb-4">Ne pare rău pentru inconvenient. Echipa noastră a fost notificată și lucrează la rezolvarea problemei.</p>
+              <div class="error-actions d-flex flex-wrap gap-2">
+                <a href="{% url 'core:home' %}" class="btn btn-primary"><i class="fas fa-house me-2"></i>Acasă</a>
+                <a href="javascript:history.back()" class="btn btn-outline-primary"><i class="fas fa-arrow-left me-2"></i>Înapoi</a>
+                <a href="{% url 'core:contact' %}" class="btn btn-outline-dark"><i class="fas fa-envelope me-2"></i>Raportează problema</a>
+              </div>
+            </div>
+            <div class="col-md-6 text-center">
+              <!-- Inline SVG Illustration for 500 error -->
+              <svg class="error-illustration" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                  <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#EF4444"/>
+                    <stop offset="100%" stop-color="#DC2626"/>
+                  </linearGradient>
+                </defs>
+                <rect x="0" y="0" width="400" height="300" fill="none"/>
+                <g>
+                  <circle cx="90" cy="120" r="60" fill="url(#g1)" opacity="0.12"/>
+                  <circle cx="310" cy="160" r="70" fill="url(#g1)" opacity="0.12"/>
+                  <g transform="translate(110,70)">
+                    <rect x="0" y="40" rx="10" ry="10" width="180" height="110" fill="#fff" stroke="#fee2e2"/>
+                    <rect x="15" y="55" rx="6" ry="6" width="150" height="14" fill="#fef2f2"/>
+                    <rect x="15" y="80" rx="6" ry="6" width="120" height="10" fill="#fef2f2"/>
+                    <rect x="15" y="100" rx="6" ry="6" width="90" height="10" fill="#fef2f2"/>
+                    <rect x="15" y="120" rx="8" ry="8" width="60" height="14" fill="#EF4444" opacity="0.8"/>
+                  </g>
+                  <g transform="translate(70,150)">
+                    <path d="M0,40 C15,5 45,5 60,40" fill="none" stroke="#fca5a5" stroke-width="3"/>
+                    <circle cx="30" cy="40" r="8" fill="#EF4444"/>
+                    <rect x="26" y="48" width="8" height="22" rx="2" fill="#EF4444"/>
+                    <rect x="10" y="70" width="40" height="8" rx="4" fill="#EF4444" opacity="0.3"/>
+                  </g>
+                  <g transform="translate(250,160)">
+                    <rect x="-8" y="0" width="16" height="40" rx="3" fill="#DC2626"/>
+                    <rect x="-30" y="38" width="60" height="10" rx="5" fill="#DC2626" opacity="0.4"/>
+                  </g>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="text-center mt-4">
+          <small class="text-muted">Cod eroare: 500 • Eroare internă de server</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

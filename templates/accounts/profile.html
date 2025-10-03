@@ -27,9 +27,6 @@
                             <a href="{% url 'accounts:portfolio' %}" class="btn btn-success">
                                 <i class="fas fa-images me-2"></i>Portfolio
                             </a>
-                            <a href="{% url 'accounts:onboarding' %}" class="btn btn-outline-primary">
-                                <i class="fas fa-cog me-2"></i>Configurare profil
-                            </a>
                             <a href="{% url 'services:my_quotes' %}" class="btn btn-outline-success">
                                 <i class="fas fa-handshake me-2"></i>Ofertele mele
                             </a>
@@ -93,6 +90,47 @@
                     </div>
                 </div>
             {% endif %}
+            
+            <!-- Security Settings -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4><i class="fas fa-shield-alt me-2"></i>Setări de securitate</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-mobile-alt me-2"></i>Autentificare în doi pași (2FA)</h6>
+                            {% if user.two_factor_enabled %}
+                                <p class="text-success mb-2">
+                                    <i class="fas fa-check-circle me-1"></i>Activată
+                                </p>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'accounts:two_factor_backup_codes' %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-key me-1"></i>Coduri de rezervă
+                                    </a>
+                                    <a href="{% url 'accounts:two_factor_disable' %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-times me-1"></i>Dezactivează
+                                    </a>
+                                </div>
+                            {% else %}
+                                <p class="text-warning mb-2">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Dezactivată
+                                </p>
+                                <a href="{% url 'accounts:two_factor_setup' %}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-plus me-1"></i>Activează 2FA
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-key me-2"></i>Parolă</h6>
+                            <p class="text-muted mb-2">Ultima modificare: {{ user.last_login|date:"d.m.Y"|default:"Necunoscută" }}</p>
+                            <a href="{% url 'accounts:password_reset' %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit me-1"></i>Schimbă parola
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <!-- Recent Activity -->
             <div class="card mt-4">

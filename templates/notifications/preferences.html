@@ -1,0 +1,506 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Preferințe notificări - Bricli{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'core:home' %}">
+                            <i class="fas fa-home"></i> Acasă
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'notifications:list' %}">
+                            <i class="fas fa-bell"></i> Notificări
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Preferințe
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>
+                        <i class="fas fa-cog text-primary me-2"></i>
+                        Preferințe notificări
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Configurați cum și când doriți să primiți notificări
+                    </p>
+                </div>
+            </div>
+
+            <form method="post" id="preferences-form">
+                {% csrf_token %}
+                
+                <!-- Email Notifications -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-envelope me-2"></i>
+                            Notificări prin email
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="email_enabled" 
+                                           name="email_enabled" {% if preferences.email_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_enabled">
+                                        <strong>Activează notificările prin email</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            Primiți notificări importante prin email
+                                        </small>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="email_digest" 
+                                           name="email_digest" {% if preferences.email_digest %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_digest">
+                                        <strong>Rezumat zilnic prin email</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            Primiți un rezumat cu toate notificările zilei
+                                        </small>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="digest_frequency" class="form-label">
+                                        <strong>Frecvența rezumatului</strong>
+                                    </label>
+                                    <select class="form-select" id="digest_frequency" name="digest_frequency">
+                                        <option value="daily" {% if preferences.digest_frequency == 'daily' %}selected{% endif %}>
+                                            Zilnic
+                                        </option>
+                                        <option value="weekly" {% if preferences.digest_frequency == 'weekly' %}selected{% endif %}>
+                                            Săptămânal
+                                        </option>
+                                        <option value="monthly" {% if preferences.digest_frequency == 'monthly' %}selected{% endif %}>
+                                            Lunar
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="digest_time" class="form-label">
+                                        <strong>Ora trimiterii rezumatului</strong>
+                                    </label>
+                                    <input type="time" class="form-control" id="digest_time" 
+                                           name="digest_time" value="{{ preferences.digest_time|time:'H:i' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Push Notifications -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-mobile-alt me-2"></i>
+                            Notificări push
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="push_enabled" 
+                                           name="push_enabled" {% if preferences.push_enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="push_enabled">
+                                        <strong>Activează notificările push</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            Primiți notificări instant în browser
+                                        </small>
+                                    </label>
+                                </div>
+                                
+                                <div id="push-subscription-status" class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span id="subscription-text">Verificăm statusul abonamentului...</span>
+                                </div>
+                                
+                                <button type="button" id="enable-push-btn" class="btn btn-success btn-sm d-none">
+                                    <i class="fas fa-bell me-1"></i>
+                                    Activează notificările push
+                                </button>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <strong>Testează notificările push</strong>
+                                    </label>
+                                    <br>
+                                    <button type="button" id="test-push-btn" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-paper-plane me-1"></i>
+                                        Trimite notificare de test
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiet Hours -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-moon me-2"></i>
+                            Ore de liniște
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="quiet_hours_enabled" 
+                                   name="quiet_hours_enabled" {% if preferences.quiet_hours_enabled %}checked{% endif %}>
+                            <label class="form-check-label" for="quiet_hours_enabled">
+                                <strong>Activează orele de liniște</strong>
+                                <br>
+                                <small class="text-muted">
+                                    Nu veți primi notificări în intervalul specificat
+                                </small>
+                            </label>
+                        </div>
+                        
+                        <div class="row" id="quiet-hours-settings">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="quiet_hours_start" class="form-label">
+                                        <strong>Ora de început</strong>
+                                    </label>
+                                    <input type="time" class="form-control" id="quiet_hours_start" 
+                                           name="quiet_hours_start" value="{{ preferences.quiet_hours_start|time:'H:i' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="quiet_hours_end" class="form-label">
+                                        <strong>Ora de sfârșit</strong>
+                                    </label>
+                                    <input type="time" class="form-control" id="quiet_hours_end" 
+                                           name="quiet_hours_end" value="{{ preferences.quiet_hours_end|time:'H:i' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Types -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            Tipuri de notificări
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-4">
+                            Selectați tipurile de notificări pe care doriți să le primiți
+                        </p>
+                        
+                        <div class="row">
+                            {% for type_key, type_name in notification_types %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" 
+                                               id="type_{{ type_key }}" name="notification_types" 
+                                               value="{{ type_key }}"
+                                               {% if type_key in preferences.notification_types %}checked{% endif %}>
+                                        <label class="form-check-label" for="type_{{ type_key }}">
+                                            <strong>{{ type_name }}</strong>
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Priority Levels -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Niveluri de prioritate
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-4">
+                            Selectați nivelurile de prioritate pentru care doriți să primiți notificări
+                        </p>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="priority_low" 
+                                           name="priority_levels" value="low"
+                                           {% if 'low' in preferences.priority_levels %}checked{% endif %}>
+                                    <label class="form-check-label" for="priority_low">
+                                        <span class="badge bg-secondary me-2">Scăzută</span>
+                                        Notificări generale
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="priority_medium" 
+                                           name="priority_levels" value="medium"
+                                           {% if 'medium' in preferences.priority_levels %}checked{% endif %}>
+                                    <label class="form-check-label" for="priority_medium">
+                                        <span class="badge bg-warning me-2">Medie</span>
+                                        Notificări importante
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="priority_high" 
+                                           name="priority_levels" value="high"
+                                           {% if 'high' in preferences.priority_levels %}checked{% endif %}>
+                                    <label class="form-check-label" for="priority_high">
+                                        <span class="badge bg-danger me-2">Înaltă</span>
+                                        Notificări urgente
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'notifications:list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Înapoi la notificări
+                    </a>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>
+                        Salvează preferințele
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container for notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="notification-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-cog text-primary me-2"></i>
+            <strong class="me-auto">Preferințe</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/notifications.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize notification manager
+    const notificationManager = new NotificationManager();
+    
+    // Toggle quiet hours settings visibility
+    const quietHoursEnabled = document.getElementById('quiet_hours_enabled');
+    const quietHoursSettings = document.getElementById('quiet-hours-settings');
+    
+    function toggleQuietHoursSettings() {
+        if (quietHoursEnabled.checked) {
+            quietHoursSettings.style.display = 'block';
+        } else {
+            quietHoursSettings.style.display = 'none';
+        }
+    }
+    
+    quietHoursEnabled.addEventListener('change', toggleQuietHoursSettings);
+    toggleQuietHoursSettings(); // Initial state
+    
+    // Check push notification support and subscription status
+    checkPushSupport();
+    
+    // Enable push notifications
+    document.getElementById('enable-push-btn').addEventListener('click', function() {
+        enablePushNotifications();
+    });
+    
+    // Test push notification
+    document.getElementById('test-push-btn').addEventListener('click', function() {
+        testPushNotification();
+    });
+    
+    // Form submission
+    document.getElementById('preferences-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        savePreferences();
+    });
+    
+    function checkPushSupport() {
+        const statusDiv = document.getElementById('push-subscription-status');
+        const statusText = document.getElementById('subscription-text');
+        const enableBtn = document.getElementById('enable-push-btn');
+        
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+            statusDiv.className = 'alert alert-warning';
+            statusText.textContent = 'Browserul dvs. nu suportă notificările push.';
+            return;
+        }
+        
+        // Check if already subscribed
+        navigator.serviceWorker.ready.then(registration => {
+            return registration.pushManager.getSubscription();
+        }).then(subscription => {
+            if (subscription) {
+                statusDiv.className = 'alert alert-success';
+                statusText.textContent = 'Notificările push sunt activate.';
+            } else {
+                statusDiv.className = 'alert alert-info';
+                statusText.textContent = 'Notificările push nu sunt activate.';
+                enableBtn.classList.remove('d-none');
+            }
+        }).catch(error => {
+            console.error('Error checking push subscription:', error);
+            statusDiv.className = 'alert alert-danger';
+            statusText.textContent = 'Eroare la verificarea statusului notificărilor push.';
+        });
+    }
+    
+    function enablePushNotifications() {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+            showToast('Browserul dvs. nu suportă notificările push.', 'error');
+            return;
+        }
+        
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                return navigator.serviceWorker.ready;
+            } else {
+                throw new Error('Permission denied');
+            }
+        }).then(registration => {
+            // Get VAPID public key from server
+            return fetch('{% url "notifications:api_push_vapid_key" %}')
+                .then(response => response.json())
+                .then(data => {
+                    return registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(data.public_key)
+                    });
+                });
+        }).then(subscription => {
+            // Send subscription to server
+            return fetch('{% url "notifications:api_push_subscribe" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    subscription: subscription.toJSON()
+                })
+            });
+        }).then(response => {
+            if (response.ok) {
+                showToast('Notificările push au fost activate cu succes!', 'success');
+                checkPushSupport(); // Refresh status
+            } else {
+                throw new Error('Failed to save subscription');
+            }
+        }).catch(error => {
+            console.error('Error enabling push notifications:', error);
+            showToast('Eroare la activarea notificărilor push.', 'error');
+        });
+    }
+    
+    function testPushNotification() {
+        fetch('{% url "notifications:api_push_test" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        }).then(response => {
+            if (response.ok) {
+                showToast('Notificarea de test a fost trimisă!', 'success');
+            } else {
+                throw new Error('Failed to send test notification');
+            }
+        }).catch(error => {
+            console.error('Error sending test notification:', error);
+            showToast('Eroare la trimiterea notificării de test.', 'error');
+        });
+    }
+    
+    function savePreferences() {
+        const formData = new FormData(document.getElementById('preferences-form'));
+        
+        fetch('{% url "notifications:preferences" %}', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (response.ok) {
+                showToast('Preferințele au fost salvate cu succes!', 'success');
+            } else {
+                throw new Error('Failed to save preferences');
+            }
+        }).catch(error => {
+            console.error('Error saving preferences:', error);
+            showToast('Eroare la salvarea preferințelor.', 'error');
+        });
+    }
+    
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding)
+            .replace(/-/g, '+')
+            .replace(/_/g, '/');
+        
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+});
+
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('notification-toast');
+    const toastBody = toast.querySelector('.toast-body');
+    
+    // Update toast content
+    toastBody.textContent = message;
+    
+    // Update toast style based on type
+    toast.className = `toast bg-${type === 'error' ? 'danger' : type} text-white`;
+    
+    // Show toast
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+</script>
+{% endblock %}

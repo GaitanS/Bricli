@@ -13,7 +13,12 @@ urlpatterns = [
     path('services/', include('services.urls')),
     path('messages/', include('messaging.urls')),
     path('moderation/', include('moderation.urls')),
+    path('notifications/', include('notifications.urls')),
 ]
+
+# Custom error handlers
+handler404 = 'core.views.custom_404_view'
+handler500 = 'core.views.custom_500_view'
 
 # Serve media files in development
 if settings.DEBUG:

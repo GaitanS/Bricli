@@ -1,6 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator
+import secrets
+import pyotp
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -17,6 +20,12 @@ class User(AbstractUser):
     )
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     is_verified = models.BooleanField(default=False)
+    
+    # Two-Factor Authentication fields
+    two_factor_enabled = models.BooleanField(default=False)
+    two_factor_secret = models.CharField(max_length=32, blank=True, null=True)
+    backup_codes = models.JSONField(default=list, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -50,6 +59,58 @@ class User(AbstractUser):
                     return f"{clean_number[:4]} {clean_number[4:7]} {clean_number[7:]}"
             return self.phone_number
         return None
+
+    def generate_2fa_secret(self):
+        """Generate a new 2FA secret key"""
+        if not self.two_factor_secret:
+            self.two_factor_secret = pyotp.random_base32()
+            self.save()
+        return self.two_factor_secret
+
+    def get_2fa_qr_code_url(self):
+        """Get QR code URL for 2FA setup"""
+        if not self.two_factor_secret:
+            self.generate_2fa_secret()
+        
+        totp = pyotp.TOTP(self.two_factor_secret)
+        return totp.provisioning_uri(
+            name=self.email,
+            issuer_name="Bricli"
+        )
+
+    def verify_2fa_token(self, token):
+        """Verify a 2FA token"""
+        if not self.two_factor_enabled or not self.two_factor_secret:
+            return False
+        
+        totp = pyotp.TOTP(self.two_factor_secret)
+        return totp.verify(token, valid_window=1)
+
+    def generate_backup_codes(self):
+        """Generate new backup codes for 2FA"""
+        codes = []
+        for _ in range(8):
+            code = secrets.token_hex(4).upper()
+            codes.append(code)
+        
+        self.backup_codes = codes
+        self.save()
+        return codes
+
+    def verify_backup_code(self, code):
+        """Verify and consume a backup code"""
+        if code.upper() in self.backup_codes:
+            self.backup_codes.remove(code.upper())
+            self.save()
+            return True
+        return False
+
+    def disable_2fa(self):
+        """Disable 2FA for the user"""
+        self.two_factor_enabled = False
+        self.two_factor_secret = None
+        self.backup_codes = []
+        self.save()
 
 
 class County(models.Model):

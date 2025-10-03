@@ -1,0 +1,439 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Coduri de Rezervă 2FA - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .backup-codes-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .backup-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .backup-header .icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .backup-header h1 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 1.8rem;
+    }
+
+    .backup-header p {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+
+    .important-notice {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .important-notice .notice-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .important-notice h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.3rem;
+    }
+
+    .important-notice p {
+        margin: 0;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    .codes-section {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .codes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .backup-code {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 2px solid #dee2e6;
+        font-family: 'Courier New', monospace;
+        font-size: 1.1rem;
+        font-weight: bold;
+        text-align: center;
+        letter-spacing: 0.1rem;
+        color: #2c3e50;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .backup-code:hover {
+        border-color: #3498db;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .backup-code.copied {
+        background: #d4edda;
+        border-color: #28a745;
+        color: #155724;
+    }
+
+    .copy-all-btn {
+        background: #17a2b8;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    .copy-all-btn:hover {
+        background: #138496;
+        transform: translateY(-2px);
+    }
+
+    .instructions {
+        background: #e8f4fd;
+        padding: 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #3498db;
+    }
+
+    .instructions h3 {
+        color: #2c3e50;
+        margin: 0 0 1rem 0;
+        font-size: 1.2rem;
+    }
+
+    .instructions ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: #495057;
+    }
+
+    .instructions li {
+        margin-bottom: 0.75rem;
+        line-height: 1.6;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.75rem 2rem;
+        text-decoration: none;
+        border-radius: 6px;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: #3498db;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #2980b9;
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+
+    .btn-warning {
+        background: #f39c12;
+        color: white;
+        margin-right: 1rem;
+    }
+
+    .btn-warning:hover {
+        background: #e67e22;
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-secondary {
+        background: #95a5a6;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #7f8c8d;
+        color: white;
+        text-decoration: none;
+    }
+
+    .actions {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #eee;
+    }
+
+    .warning-section {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        color: #856404;
+    }
+
+    .warning-section h4 {
+        color: #b8860b;
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+    }
+
+    .warning-section p {
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 6px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    @media (max-width: 768px) {
+        .backup-codes-container {
+            margin: 1rem;
+            padding: 1rem;
+        }
+
+        .codes-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .actions .btn {
+            display: block;
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="backup-codes-container">
+    <div class="backup-header">
+        <div class="icon">🔑</div>
+        <h1>Coduri de Rezervă pentru 2FA</h1>
+        <p>Salvează aceste coduri într-un loc sigur</p>
+    </div>
+
+    <div class="important-notice">
+        <span class="notice-icon">⚠️</span>
+        <h3>Foarte Important!</h3>
+        <p>
+            Aceste coduri îți permit să accesezi contul dacă pierzi accesul la aplicația de autentificare. 
+            Fiecare cod poate fi folosit o singură dată. Salvează-le într-un loc sigur și nu le împărtăși cu nimeni.
+        </p>
+    </div>
+
+    {% if backup_codes %}
+    <div class="codes-section">
+        <button class="copy-all-btn" onclick="copyAllCodes()">📋 Copiază toate codurile</button>
+        
+        <div class="codes-grid">
+            {% for code in backup_codes %}
+            <div class="backup-code" onclick="copyCode(this, '{{ code }}')" title="Click pentru a copia">
+                {{ code }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>📝 Cum să folosești codurile de rezervă:</h3>
+        <ul>
+            <li><strong>Când să le folosești:</strong> Când nu ai acces la aplicația de autentificare</li>
+            <li><strong>Unde să le introduci:</strong> În câmpul pentru codul 2FA, în loc de codul din aplicație</li>
+            <li><strong>Utilizare unică:</strong> Fiecare cod poate fi folosit o singură dată</li>
+            <li><strong>Regenerare:</strong> Poți genera coduri noi oricând din această pagină</li>
+        </ul>
+    </div>
+
+    <div class="warning-section">
+        <h4>🔒 Sfaturi de securitate:</h4>
+        <p>
+            Salvează aceste coduri într-un manager de parole, într-un fișier criptat sau tipărește-le și păstrează-le într-un loc sigur. 
+            Nu le stoca în fișiere text simple sau în email-uri nesecurizate.
+        </p>
+    </div>
+    {% else %}
+    <div class="warning-section">
+        <h4>⚠️ Nu există coduri de rezervă</h4>
+        <p>Nu ai coduri de rezervă generate. Apasă butonul de mai jos pentru a genera coduri noi.</p>
+    </div>
+    {% endif %}
+
+    <div class="actions">
+        <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning" onclick="return confirm('Ești sigur că vrei să regenerezi codurile? Codurile actuale vor fi invalidate.')">
+                🔄 Regenerează Coduri
+            </button>
+        </form>
+        
+        <a href="{% url 'accounts:profile' %}" class="btn btn-primary">Înapoi la Profil</a>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+function copyCode(element, code) {
+    navigator.clipboard.writeText(code).then(function() {
+        element.classList.add('copied');
+        showToast('Cod copiat: ' + code);
+        
+        setTimeout(function() {
+            element.classList.remove('copied');
+        }, 2000);
+    }).catch(function(err) {
+        console.error('Eroare la copierea codului: ', err);
+        showToast('Eroare la copierea codului', 'error');
+    });
+}
+
+function copyAllCodes() {
+    const codes = [{% for code in backup_codes %}'{{ code }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
+    const allCodes = codes.join('\n');
+    
+    navigator.clipboard.writeText(allCodes).then(function() {
+        showToast('Toate codurile au fost copiate!');
+        
+        // Highlight all codes briefly
+        document.querySelectorAll('.backup-code').forEach(function(element) {
+            element.classList.add('copied');
+        });
+        
+        setTimeout(function() {
+            document.querySelectorAll('.backup-code').forEach(function(element) {
+                element.classList.remove('copied');
+            });
+        }, 2000);
+    }).catch(function(err) {
+        console.error('Eroare la copierea codurilor: ', err);
+        showToast('Eroare la copierea codurilor', 'error');
+    });
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast show';
+    
+    if (type === 'error') {
+        toast.style.background = '#e74c3c';
+    } else {
+        toast.style.background = '#28a745';
+    }
+    
+    setTimeout(function() {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+// Print functionality
+function printCodes() {
+    const codes = [{% for code in backup_codes %}'{{ code }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Coduri de Rezervă Bricli 2FA</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { color: #2c3e50; }
+                .code { 
+                    font-family: 'Courier New', monospace; 
+                    font-size: 14px; 
+                    padding: 10px; 
+                    margin: 5px 0; 
+                    border: 1px solid #ddd; 
+                    background: #f9f9f9; 
+                }
+                .warning { 
+                    background: #fff3cd; 
+                    padding: 15px; 
+                    border: 1px solid #ffeaa7; 
+                    margin: 20px 0; 
+                    border-radius: 5px; 
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Coduri de Rezervă pentru Autentificarea cu Doi Factori</h1>
+            <p><strong>Cont:</strong> {{ user.get_full_name|default:user.username }}</p>
+            <p><strong>Data generării:</strong> ${new Date().toLocaleDateString('ro-RO')}</p>
+            
+            <div class="warning">
+                <strong>IMPORTANT:</strong> Păstrează aceste coduri într-un loc sigur. 
+                Fiecare cod poate fi folosit o singură dată pentru accesarea contului 
+                când nu ai acces la aplicația de autentificare.
+            </div>
+            
+            <h2>Coduri de Rezervă:</h2>
+            ${codes.map(code => '<div class="code">' + code + '</div>').join('')}
+            
+            <p style="margin-top: 30px; font-size: 12px; color: #666;">
+                Generat de Bricli - ${window.location.origin}
+            </p>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.print();
+}
+</script>
+{% endblock %}

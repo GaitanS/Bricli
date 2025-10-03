@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'django_extensions',
+    'rest_framework',
 
     # Local apps
     'core',
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     'services',
     'messaging',
     'moderation',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -154,6 +156,7 @@ DECIMAL_SEPARATOR = ','
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
@@ -168,10 +171,21 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
 
-# Email settings (for development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@bricli.ro'
-EMAIL_HOST_USER = 'noreply@bricli.ro'
+# Email settings
+from .email_settings import (
+    get_email_backend, 
+    PRODUCTION_EMAIL_CONFIG, 
+    DEFAULT_FROM_EMAIL, 
+    SERVER_EMAIL, 
+    EMAIL_SUBJECT_PREFIX
+)
+
+EMAIL_BACKEND = get_email_backend()
+
+# Apply production email config if not in debug mode
+if not DEBUG:
+    for key, value in PRODUCTION_EMAIL_CONFIG.items():
+        globals()[key] = value
 
 # Language and localization
 LANGUAGE_CODE = 'ro-ro'
@@ -181,3 +195,25 @@ TIME_ZONE = 'Europe/Bucharest'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Stripe Configuration
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51234567890abcdef'  # Replace with your actual test key
+STRIPE_SECRET_KEY = 'sk_test_51234567890abcdef'  # Replace with your actual test key
+STRIPE_WEBHOOK_SECRET = 'whsec_1234567890abcdef'  # Replace with your actual webhook secret
+
+# Push Notification Settings
+VAPID_PRIVATE_KEY = "your-vapid-private-key-here"
+VAPID_PUBLIC_KEY = "your-vapid-public-key-here"
+VAPID_ADMIN_EMAIL = "admin@bricli.ro"
+
+# Django REST Framework Settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+}

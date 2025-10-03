@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notificări - Bricli{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar with filters and stats -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bell me-2"></i>
+                        Notificări
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Statistics -->
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">Statistici</h6>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total:</span>
+                            <span class="badge bg-secondary">{{ stats.total }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Necitite:</span>
+                            <span class="badge bg-warning">{{ stats.unread }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Astăzi:</span>
+                            <span class="badge bg-info">{{ stats.today }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <form method="get" class="mb-3">
+                        <h6 class="text-muted mb-3">Filtrare</h6>
+                        
+                        <!-- Search -->
+                        <div class="mb-3">
+                            <label for="search" class="form-label">Căutare</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search_query }}" placeholder="Căutați în notificări...">
+                        </div>
+
+                        <!-- Type filter -->
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Tip</label>
+                            <select class="form-select" id="type" name="type">
+                                <option value="">Toate tipurile</option>
+                                {% for type_key, type_name in notification_types %}
+                                    <option value="{{ type_key }}" {% if current_type == type_key %}selected{% endif %}>
+                                        {{ type_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Read status filter -->
+                        <div class="mb-3">
+                            <label for="read" class="form-label">Status</label>
+                            <select class="form-select" id="read" name="read">
+                                <option value="">Toate</option>
+                                <option value="false" {% if current_read == 'false' %}selected{% endif %}>Necitite</option>
+                                <option value="true" {% if current_read == 'true' %}selected{% endif %}>Citite</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-filter me-1"></i>
+                            Aplică filtrele
+                        </button>
+                    </form>
+
+                    <!-- Quick actions -->
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-outline-success btn-sm" id="mark-all-read">
+                            <i class="fas fa-check-double me-1"></i>
+                            Marchează toate ca citite
+                        </button>
+                        <a href="{% url 'notifications:preferences' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-cog me-1"></i>
+                            Preferințe
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-lg-9 col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Lista notificărilor</h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="select-all">
+                            Selectează toate
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" id="bulk-delete" disabled>
+                            Șterge selectate
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if notifications %}
+                        <div class="list-group list-group-flush">
+                            {% for notification in notifications %}
+                                <div class="list-group-item notification-item {% if not notification.is_read %}unread{% endif %}" 
+                                     data-notification-id="{{ notification.id }}">
+                                    <div class="d-flex align-items-start">
+                                        <div class="form-check me-3">
+                                            <input class="form-check-input notification-checkbox" type="checkbox" 
+                                                   value="{{ notification.id }}">
+                                        </div>
+                                        
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="mb-1 notification-title">
+                                                    {% if not notification.is_read %}
+                                                        <i class="fas fa-circle text-primary me-1" style="font-size: 0.5rem;"></i>
+                                                    {% endif %}
+                                                    {{ notification.title }}
+                                                </h6>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-{{ notification.priority|default:'secondary' }} me-2">
+                                                        {{ notification.get_priority_display }}
+                                                    </span>
+                                                    <small class="text-muted">{{ notification.created_at|timesince }} în urmă</small>
+                                                </div>
+                                            </div>
+                                            
+                                            <p class="mb-2 text-muted notification-message">
+                                                {{ notification.message|truncatewords:20 }}
+                                            </p>
+                                            
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="badge bg-light text-dark">
+                                                        {{ notification.get_notification_type_display }}
+                                                    </span>
+                                                    {% if notification.sender %}
+                                                        <small class="text-muted ms-2">
+                                                            de la {{ notification.sender.get_full_name|default:notification.sender.username }}
+                                                        </small>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <div class="btn-group" role="group">
+                                                    <a href="{% url 'notifications:detail' notification.pk %}" 
+                                                       class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm toggle-read-btn"
+                                                            data-notification-id="{{ notification.id }}"
+                                                            data-is-read="{{ notification.is_read|yesno:'true,false' }}">
+                                                        {% if notification.is_read %}
+                                                            <i class="fas fa-envelope"></i>
+                                                        {% else %}
+                                                            <i class="fas fa-envelope-open"></i>
+                                                        {% endif %}
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn"
+                                                            data-notification-id="{{ notification.id }}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nu aveți notificări</h5>
+                            <p class="text-muted">
+                                {% if search_query or current_type or current_read %}
+                                    Nu s-au găsit notificări care să corespundă filtrelor aplicate.
+                                    <br>
+                                    <a href="{% url 'notifications:list' %}" class="btn btn-outline-primary btn-sm mt-2">
+                                        Resetează filtrele
+                                    </a>
+                                {% else %}
+                                    Notificările vor apărea aici când veți primi mesaje noi.
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                    <div class="card-footer">
+                        <nav aria-label="Paginare notificări">
+                            <ul class="pagination justify-content-center mb-0">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_read %}&read={{ current_read }}{% endif %}">
+                                            Prima
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_read %}&read={{ current_read }}{% endif %}">
+                                            Anterioară
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_read %}&read={{ current_read }}{% endif %}">
+                                            Următoarea
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_read %}&read={{ current_read }}{% endif %}">
+                                            Ultima
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container for notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="notification-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-bell text-primary me-2"></i>
+            <strong class="me-auto">Notificare</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/notifications.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize notification functionality
+    const notificationManager = new NotificationManager();
+    
+    // Mark all as read
+    document.getElementById('mark-all-read').addEventListener('click', function() {
+        if (confirm('Sigur doriți să marcați toate notificările ca citite?')) {
+            notificationManager.markAllAsRead();
+        }
+    });
+    
+    // Select all checkboxes
+    document.getElementById('select-all').addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.notification-checkbox');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        
+        checkboxes.forEach(cb => {
+            cb.checked = !allChecked;
+        });
+        
+        this.textContent = allChecked ? 'Selectează toate' : 'Deselectează toate';
+        updateBulkDeleteButton();
+    });
+    
+    // Bulk delete
+    document.getElementById('bulk-delete').addEventListener('click', function() {
+        const selectedIds = Array.from(document.querySelectorAll('.notification-checkbox:checked'))
+            .map(cb => cb.value);
+        
+        if (selectedIds.length === 0) {
+            showToast('Selectați cel puțin o notificare pentru ștergere.', 'warning');
+            return;
+        }
+        
+        if (confirm(`Sigur doriți să ștergeți ${selectedIds.length} notificări selectate?`)) {
+            notificationManager.bulkDelete(selectedIds);
+        }
+    });
+    
+    // Update bulk delete button state
+    function updateBulkDeleteButton() {
+        const selectedCount = document.querySelectorAll('.notification-checkbox:checked').length;
+        const bulkDeleteBtn = document.getElementById('bulk-delete');
+        
+        bulkDeleteBtn.disabled = selectedCount === 0;
+        bulkDeleteBtn.textContent = selectedCount > 0 ? 
+            `Șterge selectate (${selectedCount})` : 'Șterge selectate';
+    }
+    
+    // Listen for checkbox changes
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('notification-checkbox')) {
+            updateBulkDeleteButton();
+        }
+    });
+    
+    // Toggle read status
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.toggle-read-btn')) {
+            const btn = e.target.closest('.toggle-read-btn');
+            const notificationId = btn.dataset.notificationId;
+            const isRead = btn.dataset.isRead === 'true';
+            
+            notificationManager.toggleReadStatus(notificationId, !isRead);
+        }
+    });
+    
+    // Delete notification
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-btn')) {
+            const btn = e.target.closest('.delete-btn');
+            const notificationId = btn.dataset.notificationId;
+            
+            if (confirm('Sigur doriți să ștergeți această notificare?')) {
+                notificationManager.deleteNotification(notificationId);
+            }
+        }
+    });
+    
+    // Auto-refresh unread count every 30 seconds
+    setInterval(() => {
+        notificationManager.updateUnreadCount();
+    }, 30000);
+});
+
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('notification-toast');
+    const toastBody = toast.querySelector('.toast-body');
+    const toastHeader = toast.querySelector('.toast-header');
+    
+    // Update toast content
+    toastBody.textContent = message;
+    
+    // Update toast style based on type
+    toast.className = `toast bg-${type === 'error' ? 'danger' : type} text-white`;
+    
+    // Show toast
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+</script>
+{% endblock %}
