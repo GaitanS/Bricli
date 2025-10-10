@@ -796,6 +796,42 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Te rugăm să completezi toate câmpurile obligatorii.');
             return false;
         }
+        
+        // Add uploaded photos to form data
+        const formElement = this;
+        const formDataObj = new FormData(formElement);
+        
+        // Remove existing images from FormData if any
+        formDataObj.delete('images');
+        
+        // Add uploaded photos
+        uploadedPhotos.forEach(photoData => {
+            formDataObj.append('images', photoData.file);
+        });
+        
+        // Submit form with images
+        if (uploadedPhotos.length > 0) {
+            e.preventDefault();
+            
+            fetch(formElement.action, {
+                method: 'POST',
+                body: formDataObj,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = response.url || '/services/orders/';
+                } else {
+                    alert('A apărut o eroare la trimiterea comenzii.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('A apărut o eroare la trimiterea comenzii.');
+            });
+        }
     });
 
     // Initialize

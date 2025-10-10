@@ -168,14 +168,6 @@
                         </div>
                     </div>
                     <!-- Remove the redundant "Trimite mesaj" button row -->
-                    <div class="row g-3 mt-2">
-                        <div class="col-12">
-                            <small class="text-muted d-flex align-items-center justify-content-center">
-                                <i class="fas fa-shield-alt me-2"></i>
-                                Datele de contact se dezvăluie după acceptarea ofertei
-                            </small>
-                        </div>
-                    </div>
                 </div>
             </div>
             <!-- About Section -->
@@ -232,7 +224,7 @@
                         {% for image in portfolio_images %}
                         <div class="col-lg-4 col-md-6">
                             <div class="position-relative overflow-hidden rounded">
-                                <img src="{{ image.image.url }}" alt="{{ image.title }}" class="img-fluid w-100" width="300" height="200" style="object-fit: cover; cursor: pointer; transition: transform 0.3s ease;" data-bs-toggle="modal" data-bs-target="#portfolioModal{{ image.id }}" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                <img src="{{ image.image.url }}" alt="{{ image.title }}" class="img-fluid w-100 portfolio-image" data-index="{{ forloop.counter0 }}" width="300" height="200" style="object-fit: cover; cursor: pointer; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                                 {% if image.title %}
                                     <div class="position-absolute bottom-0 start-0 end-0 bg-gradient-dark text-white p-2">
                                         <small class="fw-medium">{{ image.title }}</small>
@@ -242,6 +234,73 @@
                         </div>
                         {% endfor %}
                     </div>
+
+                    <!-- Lightbox Modal for portfolio images -->
+                    <div class="modal fade" id="portfolioLightbox" tabindex="-1" aria-labelledby="lightboxTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content bg-dark">
+                                <div class="modal-header border-0">
+                                    <h5 id="lightboxTitle" class="visually-hidden">Portofoliu</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Închide"></button>
+                                </div>
+                                <div class="modal-body p-0 position-relative">
+                                    <img id="lightboxImage" src="" alt="" class="img-fluid w-100" style="max-height: 80vh; object-fit: contain;" />
+                                    <div class="position-absolute bottom-0 start-0 end-0 p-2 d-flex justify-content-between align-items-center text-white" style="background: rgba(0,0,0,0.4);">
+                                        <div id="lightboxCaption" class="small"></div>
+                                        <div id="lightboxCounter" class="small"></div>
+                                    </div>
+                                    <button type="button" id="prevBtn" class="btn btn-dark position-absolute top-50 start-0 translate-middle-y" style="opacity: 0.7;" aria-label="Imagine precedentă">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <button type="button" id="nextBtn" class="btn btn-dark position-absolute top-50 end-0 translate-middle-y" style="opacity: 0.7;" aria-label="Imagine următoare">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        (function() {
+                            const images = Array.from(document.querySelectorAll('.portfolio-image'));
+                            const lightbox = document.getElementById('portfolioLightbox');
+                            const lightboxImage = document.getElementById('lightboxImage');
+                            const prevBtn = document.getElementById('prevBtn');
+                            const nextBtn = document.getElementById('nextBtn');
+                            const captionEl = document.getElementById('lightboxCaption');
+                            const counterEl = document.getElementById('lightboxCounter');
+                            let currentIndex = 0;
+
+                            function showImage(index) {
+                                if (index < 0) index = images.length - 1;
+                                if (index >= images.length) index = 0;
+                                currentIndex = index;
+                                const img = images[currentIndex];
+                                lightboxImage.src = img.getAttribute('src');
+                                lightboxImage.alt = img.getAttribute('alt') || '';
+                                captionEl.textContent = lightboxImage.alt || '';
+                                counterEl.textContent = `${currentIndex + 1} / ${images.length}`;
+                                const modal = bootstrap.Modal.getOrCreateInstance(lightbox);
+                                modal.show();
+                            }
+
+                            images.forEach((img, idx) => {
+                                img.addEventListener('click', () => showImage(idx));
+                            });
+
+                            prevBtn.addEventListener('click', () => showImage(currentIndex - 1));
+                            nextBtn.addEventListener('click', () => showImage(currentIndex + 1));
+
+                            // Keyboard navigation
+                            document.addEventListener('keydown', (e) => {
+                                const isOpen = lightbox.classList.contains('show');
+                                if (!isOpen) return;
+                                if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
+                                if (e.key === 'ArrowRight') showImage(currentIndex + 1);
+                                if (e.key === 'Escape') bootstrap.Modal.getInstance(lightbox)?.hide();
+                            });
+                        })();
+                    </script>
 
                     {% if craftsman.portfolio_images.count > 6 %}
                     <div class="text-center mt-4">
@@ -335,14 +394,31 @@
                 </div>
             </div>
 
-            <!-- Contact Info (Protected) -->
+            <!-- Contact Info (Always Visible) -->
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <h5 class="card-title mb-3">
-                        <i class="fas fa-lock me-2" style="color: #8B5CF6;"></i>Date de contact
+                        <i class="fas fa-phone me-2" style="color: #8B5CF6;"></i>Date de contact
                     </h5>
-                    <div class="text-muted">
-                        <p><i class="fas fa-info-circle me-2"></i>Contactele devin vizibile după acceptarea unei oferte.</p>
+                    <div class="contact-info">
+                        {% if craftsman.phone %}
+                            <p class="mb-2">
+                                <i class="fas fa-phone me-2"></i>
+                                <a href="tel:{{ craftsman.phone }}" class="text-decoration-none">{{ craftsman.phone }}</a>
+                            </p>
+                        {% endif %}
+                        {% if craftsman.user.email %}
+                            <p class="mb-2">
+                                <i class="fas fa-envelope me-2"></i>
+                                <a href="mailto:{{ craftsman.user.email }}" class="text-decoration-none">{{ craftsman.user.email }}</a>
+                            </p>
+                        {% endif %}
+                        {% if craftsman.city and craftsman.county %}
+                            <p class="mb-0">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                {{ craftsman.city.name }}, {{ craftsman.county.name }}
+                            </p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -364,11 +440,11 @@
             <div class="modal-body">
                 <!-- Data Protection Notice -->
                 <div class="alert alert-info">
-                    <i class="fas fa-shield-alt me-2"></i>
-                    <strong>Protecția datelor personale</strong><br>
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Comunicare directă</strong><br>
                     <small>
-                        Pentru siguranța ta, comunicarea se face prin platformă.
-                        Datele de contact se dezvăluie doar după acceptarea unei oferte.
+                        Poți contacta direct meșterul folosind datele de contact de mai sus
+                        sau prin formularul de mai jos pentru comunicare prin platformă.
                     </small>
                 </div>
 

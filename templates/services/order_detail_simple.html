@@ -2,6 +2,73 @@
 
 {% block title %}{{ order.title }} - Bricli{% endblock %}
 
+{% block extra_css %}
+<style>
+    .order-image-thumbnail {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .order-image-thumbnail:hover {
+        transform: scale(1.05);
+    }
+    
+    .client-details .reveal-phone {
+        opacity: 0.7;
+        transition: opacity 0.2s ease-in-out;
+    }
+    
+    .client-details .reveal-phone:hover {
+        opacity: 1;
+    }
+    
+    .blurred-phone {
+        font-family: monospace;
+        letter-spacing: 1px;
+    }
+    
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.125);
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    }
+    
+    .badge {
+        font-size: 0.75em;
+    }
+    
+    .client-details small {
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Phone number reveal functionality
+    document.querySelectorAll('.reveal-phone').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const phone = this.getAttribute('data-phone');
+            const targetId = this.getAttribute('data-target');
+            const target = document.getElementById(targetId);
+            
+            if (target) {
+                target.textContent = phone;
+                this.innerHTML = '<i class="fas fa-check"></i>';
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('btn-success');
+                this.disabled = true;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <h1>{{ order.title }}</h1>
@@ -24,7 +91,51 @@
                             {{ order.get_status_display }}
                         </span>
                     </p>
-                    <p><strong>Locație:</strong> {{ order.city.name }}, {{ order.county.name }}</p>
+                    <p><strong>Locație:</strong> 
+                        {% if order.address %}
+                            {{ order.address }}, {{ order.city.name }}, {{ order.county.name }}
+                        {% else %}
+                            {{ order.city.name }}, {{ order.county.name }}
+                        {% endif %}
+                    </p>
+                    
+                    {% if order.service %}
+                    <p><strong>Categorie serviciu:</strong> {{ order.service.name }}</p>
+                    {% endif %}
+                    
+                    {% if order.urgency %}
+                    <p><strong>Urgență:</strong> 
+                        <span class="badge 
+                            {% if order.urgency == 'low' %}bg-success
+                            {% elif order.urgency == 'medium' %}bg-warning
+                            {% elif order.urgency == 'high' %}bg-danger
+                            {% endif %}">
+                            {{ order.get_urgency_display }}
+                        </span>
+                    </p>
+                    {% endif %}
+                    
+                    {% if order.preferred_date %}
+                    <p><strong>Data preferată:</strong> {{ order.preferred_date|date:"d.m.Y" }}</p>
+                    {% endif %}
+
+                    {% if user.user_type == 'craftsman' and invitation %}
+                    <div class="mt-3">
+                        {% if invitation.status == 'pending' %}
+                            <div class="alert alert-primary">
+                                <i class="fas fa-handshake me-2"></i>Ai fost invitat de client să ofertezi pentru această lucrare.
+                            </div>
+                        {% elif invitation.status == 'accepted' %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>Invitația este acceptată. Trimite oferta ta!
+                            </div>
+                        {% elif invitation.status == 'declined' %}
+                            <div class="alert alert-secondary">
+                                <i class="fas fa-ban me-2"></i>Ai refuzat invitația pentru această lucrare.
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                     
                     {% if order.budget_min or order.budget_max %}
                     <p><strong>Buget:</strong> 
@@ -82,6 +193,50 @@
                 </div>
             </div>
 
+            <!-- Order Images Section -->
+            {% if order.images.all %}
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5><i class="fas fa-images me-2"></i>Imagini comandă ({{ order.images.count }})</h5>
+                    <div class="row g-3">
+                        {% for image in order.images.all %}
+                        <div class="col-md-4 col-sm-6">
+                            <div class="position-relative">
+                                <img src="{{ image.image.url }}" 
+                                     alt="Imagine comandă" 
+                                     class="img-fluid rounded shadow-sm order-image-thumbnail"
+                                     style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;"
+                                     data-bs-toggle="modal" 
+                                     data-bs-target="#imageModal{{ forloop.counter }}">
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-dark bg-opacity-75">{{ forloop.counter }}/{{ order.images.count }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Modal for each image -->
+                        <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Imagine {{ forloop.counter }} din {{ order.images.count }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <img src="{{ image.image.url }}" 
+                                             alt="Imagine comandă" 
+                                             class="img-fluid rounded"
+                                             style="max-height: 70vh;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="card mt-4">
                 <div class="card-body">
                     <h5>Oferte ({{ quotes.count }})</h5>
@@ -118,22 +273,18 @@
                                         <div class="mt-3 p-2 bg-success bg-opacity-10 border border-success rounded">
                                             <i class="fas fa-check-circle text-success me-2"></i>
                                             <strong>Shortlistat!</strong>
-                                            {% if shortlist.is_contact_revealed %}
-                                                - Contactul a fost deblocat
-                                                <div class="mt-2">
-                                                    <strong>Contact:</strong>
-                                                    {% if quote.craftsman.user.phone %}
-                                                        <a href="tel:{{ quote.craftsman.user.phone }}" class="btn btn-sm btn-outline-primary me-2">
-                                                            <i class="fas fa-phone"></i> {{ quote.craftsman.user.phone }}
-                                                        </a>
-                                                    {% endif %}
-                                                    <a href="mailto:{{ quote.craftsman.user.email }}" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-envelope"></i> Email
+                                            - Contactul este disponibil
+                                            <div class="mt-2">
+                                                <strong>Contact:</strong>
+                                                {% if quote.craftsman.user.phone %}
+                                                    <a href="tel:{{ quote.craftsman.user.phone }}" class="btn btn-sm btn-outline-primary me-2">
+                                                        <i class="fas fa-phone"></i> {{ quote.craftsman.user.phone }}
                                                     </a>
-                                                </div>
-                                            {% else %}
-                                                - În așteptarea plății taxei de lead
-                                            {% endif %}
+                                                {% endif %}
+                                                <a href="mailto:{{ quote.craftsman.user.email }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-envelope"></i> Email
+                                                </a>
+                                            </div>
                                         </div>
                                     {% elif quote.status == 'pending' %}
                                         <div class="mt-3">
@@ -175,19 +326,17 @@
                                             <span class="badge bg-info ms-2">
                                                 <i class="fas fa-star me-1"></i>Shortlistat
                                             </span>
-                                            {% if shortlist.is_contact_revealed %}
-                                                <div class="mt-2 p-2 bg-info bg-opacity-10 border border-info rounded">
-                                                    <strong>Contact client:</strong>
-                                                    {% if order.client.phone %}
-                                                        <a href="tel:{{ order.client.phone }}" class="btn btn-sm btn-outline-primary me-2">
-                                                            <i class="fas fa-phone"></i> {{ order.client.phone }}
-                                                        </a>
-                                                    {% endif %}
-                                                    <a href="mailto:{{ order.client.email }}" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-envelope"></i> Email
+                                            <div class="mt-2 p-2 bg-info bg-opacity-10 border border-info rounded">
+                                                <strong>Contact client:</strong>
+                                                {% if order.client.phone %}
+                                                    <a href="tel:{{ order.client.phone }}" class="btn btn-sm btn-outline-primary me-2">
+                                                        <i class="fas fa-phone"></i> {{ order.client.phone }}
                                                     </a>
-                                                </div>
-                                            {% endif %}
+                                                {% endif %}
+                                                <a href="mailto:{{ order.client.email }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-envelope"></i> Email
+                                                </a>
+                                            </div>
                                         {% endif %}
                                     {% endwith %}
                                 </div>
@@ -204,8 +353,94 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
-                    <h6>Client</h6>
-                    <p>{{ order.client.get_full_name|default:order.client.username }}</p>
+                    <h6><i class="fas fa-user me-2"></i>Informații Client</h6>
+                    
+                    <!-- Client Profile Picture -->
+                    <div class="text-center mb-3">
+                        {% if order.client.profile_picture %}
+                            <img src="{{ order.client.profile_picture.url }}" 
+                                 alt="Profil client" 
+                                 class="rounded-circle shadow-sm"
+                                 style="width: 80px; height: 80px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center text-white shadow-sm"
+                                 style="width: 80px; height: 80px; font-size: 2rem;">
+                                {{ order.client.first_name|first|default:order.client.username|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Client Name -->
+                    <div class="text-center mb-3">
+                        <h6 class="mb-1">{{ order.client.get_full_name|default:order.client.username }}</h6>
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Membru din {{ order.client.date_joined|date:"M Y" }}
+                        </small>
+                    </div>
+                    
+                    <!-- Client Details -->
+                    <div class="client-details">
+                        {% if order.client.phone_number %}
+                        <div class="mb-2">
+                            <strong><i class="fas fa-phone me-2 text-muted"></i>Telefon:</strong>
+                            <div class="d-flex align-items-center">
+                                <span class="blurred-phone me-2" id="phone-{{ order.client.id }}">
+                                    {{ order.client.phone_number|slice:":3" }}xxxx{{ order.client.phone_number|slice:"-2:" }}
+                                </span>
+                                <button class="btn btn-sm btn-outline-primary reveal-phone" 
+                                        data-phone="{{ order.client.phone_number }}" 
+                                        data-target="phone-{{ order.client.id }}"
+                                        title="Click pentru a afișa numărul complet">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-2">
+                            <strong><i class="fas fa-envelope me-2 text-muted"></i>Email:</strong>
+                            <div>
+                                <a href="mailto:{{ order.client.email }}" class="text-decoration-none">
+                                    {{ order.client.email }}
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <strong><i class="fas fa-map-marker-alt me-2 text-muted"></i>Locație:</strong>
+                            <div>{{ order.city.name }}, {{ order.county.name }}</div>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <strong><i class="fas fa-user-check me-2 text-muted"></i>Status:</strong>
+                            <div>
+                                {% if order.client.is_verified %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>Verificat
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-clock me-1"></i>În verificare
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Client Activity Stats -->
+                        <div class="mt-3 pt-3 border-top">
+                            <small class="text-muted">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span><i class="fas fa-shopping-cart me-1"></i>Comenzi active:</span>
+                                    <strong>{{ order.client.orders.count|default:0 }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span><i class="fas fa-check-circle me-1"></i>Comenzi finalizate:</span>
+                                    <strong>{{ order.client.orders.count|default:0 }}</strong>
+                                </div>
+                            </small>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -220,6 +455,36 @@
             {% elif user.user_type == 'craftsman' and quote_disabled_reason %}
             <div class="card mt-3">
                 <div class="card-body">
+                    {% if invitation %}
+                        {% if invitation.status == 'pending' %}
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-envelope-open-text me-2"></i>Invitație de la client</h6>
+                                <p class="mb-2">Clientul te-a invitat să ofertezi pentru această lucrare. Acceptă invitația pentru a trimite oferta.</p>
+                                <div class="d-flex gap-2">
+                                    <form method="post" action="{% url 'services:accept_invitation' order.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-check me-2"></i>Acceptă invitația
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{% url 'services:decline_invitation' order.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Sigur vrei să refuzi invitația?')">
+                                            <i class="fas fa-times me-2"></i>Refuză
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% elif invitation.status == 'accepted' %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>Ai acceptat invitația! Poți trimite oferta.
+                            </div>
+                        {% elif invitation.status == 'declined' %}
+                            <div class="alert alert-secondary">
+                                <i class="fas fa-ban me-2"></i>Ai refuzat invitația pentru această lucrare.
+                            </div>
+                        {% endif %}
+                    {% endif %}
                     <button class="btn btn-secondary w-100" disabled title="{{ quote_disabled_reason }}">
                         <i class="fas fa-lock me-2"></i>Nu poți licita
                     </button>
@@ -227,7 +492,7 @@
                         <i class="fas fa-info-circle me-1"></i>{{ quote_disabled_reason }}
                     </small>
                     {% if 'Profil incomplet' in quote_disabled_reason %}
-                    <a href="{% url 'accounts:edit_craftsman_profile' %}" class="btn btn-outline-primary btn-sm mt-2 w-100">
+                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-primary btn-sm mt-2 w-100">
                         <i class="fas fa-user-edit me-2"></i>Completează profilul
                     </a>
                     {% endif %}

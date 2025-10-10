@@ -238,14 +238,11 @@
                 <div class="card h-100 shadow-sm">
                     <div class="card-body text-center">
                         {% if craftsman.profile_photo %}
-                            <img src="{{ craftsman.profile_photo.url }}" alt="{{ craftsman.user.get_full_name }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;">
+                            <img src="{{ craftsman.profile_photo.url }}?v={% image_version craftsman.profile_photo fallback_dt=craftsman.updated_at %}" alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;" loading="lazy">
                         {% elif craftsman.user.profile_picture %}
-                            <img src="{{ craftsman.user.profile_picture.url }}" alt="{{ craftsman.user.get_full_name }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;">
+                            <img src="{{ craftsman.user.profile_picture.url }}?v={% profile_img_version craftsman.user %}" alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;" loading="lazy">
                         {% else %}
-                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
-                                 style="width: 80px; height: 80px;">
-                                <i class="fas fa-user fs-3"></i>
-                            </div>
+                            <img src="{% static 'images/avatar.svg' %}" alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;" loading="lazy">
                         {% endif %}
                         
                         <h5 class="card-title">{{ craftsman.user.get_full_name|default:craftsman.user.username }}</h5>

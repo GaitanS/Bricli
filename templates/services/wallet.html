@@ -232,11 +232,9 @@
                                 {{ shortlist.created_at|date:"d M Y" }} • 
                                 Taxa: {{ shortlist.lead_fee_lei|floatformat:2 }} RON
                             </small>
-                            {% if shortlist.is_contact_revealed %}
-                                <div class="mt-2">
-                                    <span class="badge bg-success">Contact deblocat</span>
-                                </div>
-                            {% endif %}
+                            <div class="mt-2">
+                                <span class="badge bg-success">Contact disponibil</span>
+                            </div>
                         </div>
                         {% endfor %}
                     {% else %}

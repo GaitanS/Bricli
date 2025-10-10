@@ -20,87 +20,100 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-7=u=ieg2ma6h2^xi^&h2jap9r!)_03wl=aexy_$36*_-h$mv#y'
+SECRET_KEY = "django-insecure-7=u=ieg2ma6h2^xi^&h2jap9r!)_03wl=aexy_$36*_-h$mv#y"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# CSRF Debug settings
-CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
-CSRF_USE_SESSIONS = False
-CSRF_COOKIE_HTTPONLY = False
+# CSRF Protection
+# NOTE: In production (DEBUG=False), add your actual domains here
+# Example: CSRF_TRUSTED_ORIGINS = ['https://bricli.ro', 'https://www.bricli.ro']
+CSRF_TRUSTED_ORIGINS = [
+    "https://bricli.ro",
+    "https://www.bricli.ro",
+]
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver']
+CSRF_FAILURE_VIEW = "django.views.csrf.csrf_failure"
+CSRF_USE_SESSIONS = False
+CSRF_COOKIE_HTTPONLY = False  # Set to True in production
+# CSRF Cookie Security (enabled in production)
+CSRF_COOKIE_SECURE = not DEBUG  # True in production (HTTPS only)
+
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
+
+# Session Security (enabled in production)
+SESSION_COOKIE_SECURE = not DEBUG  # True in production (HTTPS only)
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access
+SESSION_COOKIE_SAMESITE = "Lax"  # CSRF protection
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
     # Third party apps
-    'crispy_forms',
-    'crispy_bootstrap5',
-    'django_extensions',
-    'rest_framework',
-    'widget_tweaks',
-
+    "crispy_forms",
+    "crispy_bootstrap5",
+    "django_extensions",
+    "rest_framework",
+    "widget_tweaks",
     # Local apps
-    'core',
-    'accounts',
-    'services',
-    'messaging',
-    'moderation',
-    'notifications',
+    "core",
+    "accounts",
+    "services",
+    "messaging",
+    "moderation",
+    "notifications",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Static files serving
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Static files serving
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "csp.middleware.CSPMiddleware",  # Content Security Policy
 ]
 
-ROOT_URLCONF = 'bricli.urls'
+ROOT_URLCONF = "bricli.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'core.context_processors.romanian_context',
-                'core.context_processors.site_settings_context',
-                'core.context_processors.user_context',
-                'core.context_processors.navigation_context',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "core.context_processors.romanian_context",
+                "core.context_processors.site_settings_context",
+                "core.context_processors.user_context",
+                "core.context_processors.navigation_context",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'bricli.wsgi.application'
+WSGI_APPLICATION = "bricli.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -110,16 +123,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -127,9 +140,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'ro-ro'
+# Supported languages (P1: i18n skeleton)
+LANGUAGES = [
+    ("ro", "Romanian"),
+    ("en", "English"),
+]
 
-TIME_ZONE = 'Europe/Bucharest'
+LANGUAGE_CODE = "ro-ro"
+
+TIME_ZONE = "Europe/Bucharest"
 
 USE_I18N = True
 
@@ -139,51 +158,45 @@ USE_TZ = True
 
 # Romanian locale settings
 LOCALE_PATHS = [
-    BASE_DIR / 'locale',
+    BASE_DIR / "locale",
 ]
 
 # Date and number formatting
-DATE_FORMAT = 'd.m.Y'
-DATETIME_FORMAT = 'd.m.Y H:i'
-SHORT_DATE_FORMAT = 'd.m.Y'
-SHORT_DATETIME_FORMAT = 'd.m.Y H:i'
+DATE_FORMAT = "d.m.Y"
+DATETIME_FORMAT = "d.m.Y H:i"
+SHORT_DATE_FORMAT = "d.m.Y"
+SHORT_DATETIME_FORMAT = "d.m.Y H:i"
 
 # Currency settings for Romanian Leu
 USE_THOUSAND_SEPARATOR = True
-THOUSAND_SEPARATOR = '.'
-DECIMAL_SEPARATOR = ','
+THOUSAND_SEPARATOR = "."
+DECIMAL_SEPARATOR = ","
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Whitenoise configuration for static files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Custom User Model
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = "accounts.User"
 
 # Email settings
-from .email_settings import (
-    get_email_backend, 
-    PRODUCTION_EMAIL_CONFIG, 
-    DEFAULT_FROM_EMAIL, 
-    SERVER_EMAIL, 
-    EMAIL_SUBJECT_PREFIX
-)
+from .email_settings import PRODUCTION_EMAIL_CONFIG, get_email_backend
 
 EMAIL_BACKEND = get_email_backend()
 
@@ -193,18 +206,18 @@ if not DEBUG:
         globals()[key] = value
 
 # Language and localization
-LANGUAGE_CODE = 'ro-ro'
-TIME_ZONE = 'Europe/Bucharest'
+LANGUAGE_CODE = "ro-ro"
+TIME_ZONE = "Europe/Bucharest"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Stripe Configuration
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51234567890abcdef'  # Replace with your actual test key
-STRIPE_SECRET_KEY = 'sk_test_51234567890abcdef'  # Replace with your actual test key
-STRIPE_WEBHOOK_SECRET = 'whsec_1234567890abcdef'  # Replace with your actual webhook secret
+STRIPE_PUBLISHABLE_KEY = "pk_test_51234567890abcdef"  # Replace with your actual test key
+STRIPE_SECRET_KEY = "sk_test_51234567890abcdef"  # Replace with your actual test key
+STRIPE_WEBHOOK_SECRET = "whsec_1234567890abcdef"  # Replace with your actual webhook secret
 
 # Push Notification Settings
 VAPID_PRIVATE_KEY = "your-vapid-private-key-here"
@@ -213,12 +226,51 @@ VAPID_ADMIN_EMAIL = "admin@bricli.ro"
 
 # Django REST Framework Settings
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
 }
+
+# Content Security Policy (CSP)
+# Strict policy for production security - allows Bootstrap, FontAwesome, Google Fonts from CDN
+# When local assets are used (P1 local-first), update these to 'self' only
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = (
+    "'self'",
+    "https://cdn.jsdelivr.net",  # Bootstrap JS
+    "https://js.stripe.com",  # Stripe payments
+    "'unsafe-inline'",  # TODO: Remove after refactoring inline scripts
+)
+CSP_STYLE_SRC = (
+    "'self'",
+    "https://cdn.jsdelivr.net",  # Bootstrap CSS
+    "https://cdnjs.cloudflare.com",  # Font Awesome
+    "https://fonts.googleapis.com",  # Google Fonts
+    "'unsafe-inline'",  # Required for Bootstrap and inline styles
+)
+CSP_FONT_SRC = (
+    "'self'",
+    "https://fonts.gstatic.com",  # Google Fonts
+    "https://cdnjs.cloudflare.com",  # Font Awesome fonts
+    "data:",  # Data URIs for fonts
+)
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",  # Data URIs for images
+    "https:",  # Allow HTTPS images (user avatars, portfolios)
+)
+CSP_CONNECT_SRC = (
+    "'self'",
+    "https://api.stripe.com",  # Stripe API
+)
+CSP_FRAME_SRC = ("https://js.stripe.com",)  # Stripe payment frames
+
+# Additional security headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"

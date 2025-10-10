@@ -4,22 +4,23 @@ Lead Fee Service - Handles automatic wallet deduction for shortlist/contact reve
 This service manages the business logic for charging craftsmen when clients
 add them to shortlists or reveal their contact information.
 """
+
+import logging
+
 from django.db import transaction
 from django.utils import timezone
-from decimal import Decimal
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 class InsufficientBalanceError(Exception):
     """Raised when wallet balance is insufficient for lead fee."""
+
     def __init__(self, required_cents, available_cents):
         self.required_cents = required_cents
         self.available_cents = available_cents
         super().__init__(
-            f"Sold insuficient: necesar {required_cents/100:.2f} RON, "
-            f"disponibil {available_cents/100:.2f} RON"
+            f"Sold insuficient: necesar {required_cents/100:.2f} RON, " f"disponibil {available_cents/100:.2f} RON"
         )
 
 
@@ -64,10 +65,7 @@ class LeadFeeService:
         """
         from .models import CreditWallet
 
-        wallet, created = CreditWallet.objects.get_or_create(
-            user=user,
-            defaults={'balance_cents': 0}
-        )
+        wallet, created = CreditWallet.objects.get_or_create(user=user, defaults={"balance_cents": 0})
 
         if created:
             logger.info(f"Created new wallet for user {user.id}")
@@ -102,7 +100,7 @@ class LeadFeeService:
         from .models import Shortlist
 
         # Validation
-        if craftsman_user.user_type != 'craftsman':
+        if craftsman_user.user_type != "craftsman":
             raise ValueError(f"User {craftsman_user.id} is not a craftsman")
 
         # Get wallet
@@ -122,34 +120,31 @@ class LeadFeeService:
         # Deduct from wallet
         wallet.deduct_amount(
             amount_cents=lead_fee,
-            reason='lead_fee',
+            reason="lead_fee",
             meta={
-                'order_id': order.id,
-                'order_title': order.title,
-                'client_id': order.client.id,
-            }
+                "order_id": order.id,
+                "order_title": order.title,
+                "client_id": order.client.id,
+            },
         )
 
-        logger.info(
-            f"Deducted {lead_fee} cents from wallet {wallet.id} "
-            f"for order {order.id}"
-        )
+        logger.info(f"Deducted {lead_fee} cents from wallet {wallet.id} " f"for order {order.id}")
 
         # Create/update shortlist entry
         shortlist, created = Shortlist.objects.get_or_create(
             order=order,
             craftsman=craftsman_user,
             defaults={
-                'lead_fee_amount': lead_fee,
-                'charged_at': timezone.now(),
-            }
+                "lead_fee_amount": lead_fee,
+                "charged_at": timezone.now(),
+            },
         )
 
         if not created:
             # Update existing shortlist
             shortlist.lead_fee_amount = lead_fee
             shortlist.charged_at = timezone.now()
-            shortlist.save(update_fields=['lead_fee_amount', 'charged_at'])
+            shortlist.save(update_fields=["lead_fee_amount", "charged_at"])
             logger.info(f"Updated existing shortlist {shortlist.id}")
         else:
             logger.info(f"Created new shortlist {shortlist.id}")
@@ -209,11 +204,11 @@ class LeadFeeService:
         can_afford, balance, _ = cls.can_afford_shortlist(craftsman_user, order)
 
         return {
-            'is_shortlisted': is_shortlisted,
-            'charged_at': charged_at,
-            'fee_amount': fee_amount,
-            'fee_lei': fee_amount / 100,
-            'can_afford': can_afford,
-            'wallet_balance_cents': balance,
-            'wallet_balance_lei': balance / 100,
+            "is_shortlisted": is_shortlisted,
+            "charged_at": charged_at,
+            "fee_amount": fee_amount,
+            "fee_lei": fee_amount / 100,
+            "can_afford": can_afford,
+            "wallet_balance_cents": balance,
+            "wallet_balance_lei": balance / 100,
         }

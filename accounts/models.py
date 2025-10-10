@@ -1,31 +1,31 @@
-from django.contrib.auth.models import AbstractUser
-from django.db import models
-from django.core.validators import RegexValidator
 import secrets
+
 import pyotp
-from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
+from django.db import models
 
 
 class User(AbstractUser):
     USER_TYPE_CHOICES = [
-        ('client', 'Client'),
-        ('craftsman', 'Meseriaș'),
+        ("client", "Client"),
+        ("craftsman", "Meseriaș"),
     ]
 
-    user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='client')
+    user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default="client")
     phone_number = models.CharField(
         max_length=15,
-        validators=[RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Numărul de telefon trebuie să fie valid.")],
-        blank=True
+        validators=[RegexValidator(regex=r"^\+?1?\d{9,15}$", message="Numărul de telefon trebuie să fie valid.")],
+        blank=True,
     )
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to="profile_pics/", blank=True, null=True)
     is_verified = models.BooleanField(default=False)
-    
+
     # Two-Factor Authentication fields
     two_factor_enabled = models.BooleanField(default=False)
     two_factor_secret = models.CharField(max_length=32, blank=True, null=True)
     backup_codes = models.JSONField(default=list, blank=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -36,25 +36,25 @@ class User(AbstractUser):
         """Generate WhatsApp link from phone number"""
         if self.phone_number:
             # Remove any non-digit characters and format for WhatsApp
-            clean_number = ''.join(filter(str.isdigit, self.phone_number))
-            if clean_number.startswith('0'):
+            clean_number = "".join(filter(str.isdigit, self.phone_number))
+            if clean_number.startswith("0"):
                 # Romanian number starting with 0, replace with +40
-                clean_number = '40' + clean_number[1:]
-            elif not clean_number.startswith('40'):
+                clean_number = "40" + clean_number[1:]
+            elif not clean_number.startswith("40"):
                 # Add Romanian country code if not present
-                clean_number = '40' + clean_number
+                clean_number = "40" + clean_number
             return f"https://wa.me/{clean_number}"
         return None
 
     def get_formatted_phone(self):
         """Get formatted phone number for display"""
         if self.phone_number:
-            clean_number = ''.join(filter(str.isdigit, self.phone_number))
+            clean_number = "".join(filter(str.isdigit, self.phone_number))
             if len(clean_number) >= 10:
-                if clean_number.startswith('40'):
+                if clean_number.startswith("40"):
                     # Format as +40 XXX XXX XXX
                     return f"+40 {clean_number[2:5]} {clean_number[5:8]} {clean_number[8:]}"
-                elif clean_number.startswith('0'):
+                elif clean_number.startswith("0"):
                     # Format as 0XXX XXX XXX
                     return f"{clean_number[:4]} {clean_number[4:7]} {clean_number[7:]}"
             return self.phone_number
@@ -71,18 +71,15 @@ class User(AbstractUser):
         """Get QR code URL for 2FA setup"""
         if not self.two_factor_secret:
             self.generate_2fa_secret()
-        
+
         totp = pyotp.TOTP(self.two_factor_secret)
-        return totp.provisioning_uri(
-            name=self.email,
-            issuer_name="Bricli"
-        )
+        return totp.provisioning_uri(name=self.email, issuer_name="Bricli")
 
     def verify_2fa_token(self, token):
         """Verify a 2FA token"""
         if not self.two_factor_enabled or not self.two_factor_secret:
             return False
-        
+
         totp = pyotp.TOTP(self.two_factor_secret)
         return totp.verify(token, valid_window=1)
 
@@ -92,7 +89,7 @@ class User(AbstractUser):
         for _ in range(8):
             code = secrets.token_hex(4).upper()
             codes.append(code)
-        
+
         self.backup_codes = codes
         self.save()
         return codes
@@ -119,7 +116,7 @@ class County(models.Model):
 
     class Meta:
         verbose_name_plural = "Counties"
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -127,13 +124,13 @@ class County(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=100)
-    county = models.ForeignKey(County, on_delete=models.CASCADE, related_name='cities')
+    county = models.ForeignKey(County, on_delete=models.CASCADE, related_name="cities")
     postal_code = models.CharField(max_length=10, blank=True)
 
     class Meta:
         verbose_name_plural = "Cities"
-        ordering = ['name']
-        unique_together = ['name', 'county']
+        ordering = ["name"]
+        unique_together = ["name", "county"]
 
     def __str__(self):
         return f"{self.name}, {self.county.name}"
@@ -144,13 +141,12 @@ class CraftsmanProfile(models.Model):
     Profil meșter redesigned pentru protecția datelor și profesionalism.
     Câmpuri obligatorii: display_name, city/county, coverage_radius_km, categories, bio, profile_photo, portfolio (min 3 poze)
     """
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='craftsman_profile')
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="craftsman_profile")
 
     # CÂMPURI OBLIGATORII (temporar opționale pentru migrație)
     display_name = models.CharField(
-        max_length=100,
-        blank=True, null=True,
-        help_text="Nume afișat (nume persoană sau denumire comercială)"
+        max_length=100, blank=True, null=True, help_text="Nume afișat (nume persoană sau denumire comercială)"
     )
 
     # Locație obligatorie (temporar opțională pentru migrație)
@@ -158,52 +154,36 @@ class CraftsmanProfile(models.Model):
     city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
 
     # Raza de acoperire obligatorie (5-150 km)
-    coverage_radius_km = models.PositiveSmallIntegerField(
-        default=25,
-        help_text="Raza de acoperire în km (5-150)"
-    )
+    coverage_radius_km = models.PositiveSmallIntegerField(default=25, help_text="Raza de acoperire în km (5-150)")
 
     # Descriere obligatorie (min 200 caractere) (temporar opțională pentru migrație)
     bio = models.TextField(
-        blank=True, null=True,
-        help_text="Descriere scurtă - ce tip de lucrări faci (minim 200 caractere)"
+        blank=True, null=True, help_text="Descriere scurtă - ce tip de lucrări faci (minim 200 caractere)"
     )
 
     # Poză de profil obligatorie (temporar opțională pentru migrație)
-    profile_photo = models.ImageField(
-        upload_to='profiles/',
-        blank=True, null=True,
-        help_text="Poză de profil"
-    )
+    profile_photo = models.ImageField(upload_to="profiles/", blank=True, null=True, help_text="Poză de profil")
 
     # CÂMPURI OPȚIONALE (dar utile pentru clienți)
-    years_experience = models.PositiveSmallIntegerField(
-        null=True, blank=True,
-        help_text="Ani de experiență"
-    )
+    years_experience = models.PositiveSmallIntegerField(null=True, blank=True, help_text="Ani de experiență")
 
     # Tarife orientative
     hourly_rate = models.DecimalField(
-        max_digits=8, decimal_places=2,
-        null=True, blank=True,
-        help_text="Tarif orientativ (lei/oră)"
+        max_digits=8, decimal_places=2, null=True, blank=True, help_text="Tarif orientativ (lei/oră)"
     )
 
     min_job_value = models.DecimalField(
-        max_digits=10, decimal_places=2,
-        null=True, blank=True,
-        help_text="Valoare minimă lucrare (lei)"
+        max_digits=10, decimal_places=2, null=True, blank=True, help_text="Valoare minimă lucrare (lei)"
     )
 
     # Informații firmă (opțional)
     company_cui = models.CharField(
-        max_length=20, blank=True,
-        help_text="CUI/CIF (dacă e firmă/PFA) - pentru badge 'Firmă înregistrată'"
+        max_length=20, blank=True, help_text="CUI/CIF (dacă e firmă/PFA) - pentru badge 'Firmă înregistrată'"
     )
-    company_verified_at = models.DateTimeField(
-        null=True, blank=True,
-        help_text="Data verificării CUI (setat automat)"
-    )
+    company_verified_at = models.DateTimeField(null=True, blank=True, help_text="Data verificării CUI (setat automat)")
+
+    # Contact info
+    phone = models.CharField(max_length=15, blank=True, help_text="Telefon de contact (opțional)")
 
     # Linkuri publice (opțional)
     website_url = models.URLField(blank=True, help_text="Site web")
@@ -266,7 +246,7 @@ class CraftsmanProfile(models.Model):
 
         # Servicii/categorii (10 puncte)
         # Verifică dacă profilul are un ID înainte de a accesa serviciile
-        if self.pk and hasattr(self, 'services') and self.services.exists():
+        if self.pk and hasattr(self, "services") and self.services.exists():
             score += 10
 
         # Câmpuri opționale (10 puncte total)
@@ -296,7 +276,7 @@ class CraftsmanProfile(models.Model):
             is_company_verified=self.is_company_verified,
             is_top_rated=self.is_top_rated,
             is_active=self.is_active,
-            is_trusted=self.is_trusted
+            is_trusted=self.is_trusted,
         )
 
     def update_badges(self):
@@ -305,10 +285,7 @@ class CraftsmanProfile(models.Model):
         self.is_company_verified = bool(self.company_cui and self.company_verified_at)
 
         # Badge "Top Rated" - rating ≥4.5 cu minim 5 recenzii
-        self.is_top_rated = (
-            self.average_rating >= 4.5 and
-            self.total_reviews >= 5
-        )
+        self.is_top_rated = self.average_rating >= 4.5 and self.total_reviews >= 5
 
         # Badge "Activ" - după primele 3 joburi finalizate
         self.is_active = self.total_jobs_completed >= 3
@@ -319,11 +296,11 @@ class CraftsmanProfile(models.Model):
     def can_bid_on_jobs(self):
         """Verifică dacă meșterul poate licita (profil complet)"""
         return (
-            self.is_profile_complete and
-            self.profile_photo and
-            self.portfolio_images.count() >= 3 and
-            len(self.bio.strip()) >= 200 and
-            self.coverage_radius_km
+            self.is_profile_complete
+            and self.profile_photo
+            and self.portfolio_images.count() >= 3
+            and len(self.bio.strip()) >= 200
+            and self.coverage_radius_km
         )
 
     def get_badges(self):
@@ -331,44 +308,54 @@ class CraftsmanProfile(models.Model):
         badges = []
 
         if self.is_profile_complete:
-            badges.append({
-                'name': 'Profil complet',
-                'icon': 'fas fa-check-circle',
-                'color': 'success',
-                'description': '100% profil completat'
-            })
+            badges.append(
+                {
+                    "name": "Profil complet",
+                    "icon": "fas fa-check-circle",
+                    "color": "success",
+                    "description": "100% profil completat",
+                }
+            )
 
         if self.is_company_verified:
-            badges.append({
-                'name': 'Firmă înregistrată',
-                'icon': 'fas fa-building',
-                'color': 'primary',
-                'description': 'CUI validat automat'
-            })
+            badges.append(
+                {
+                    "name": "Firmă înregistrată",
+                    "icon": "fas fa-building",
+                    "color": "primary",
+                    "description": "CUI validat automat",
+                }
+            )
 
         if self.is_top_rated:
-            badges.append({
-                'name': 'Top Rated',
-                'icon': 'fas fa-star',
-                'color': 'warning',
-                'description': f'Rating {self.average_rating} cu {self.total_reviews} recenzii'
-            })
+            badges.append(
+                {
+                    "name": "Top Rated",
+                    "icon": "fas fa-star",
+                    "color": "warning",
+                    "description": f"Rating {self.average_rating} cu {self.total_reviews} recenzii",
+                }
+            )
 
         if self.is_active:
-            badges.append({
-                'name': 'Activ',
-                'icon': 'fas fa-bolt',
-                'color': 'info',
-                'description': f'{self.total_jobs_completed} lucrări finalizate'
-            })
+            badges.append(
+                {
+                    "name": "Activ",
+                    "icon": "fas fa-bolt",
+                    "color": "info",
+                    "description": f"{self.total_jobs_completed} lucrări finalizate",
+                }
+            )
 
         if self.is_trusted:
-            badges.append({
-                'name': 'De încredere',
-                'icon': 'fas fa-shield-alt',
-                'color': 'success',
-                'description': f'{self.total_reviews} recenzii verificate'
-            })
+            badges.append(
+                {
+                    "name": "De încredere",
+                    "icon": "fas fa-shield-alt",
+                    "color": "success",
+                    "description": f"{self.total_reviews} recenzii verificate",
+                }
+            )
 
         return badges
 
@@ -386,28 +373,16 @@ class CraftsmanPortfolio(models.Model):
     Portofoliu meșter - minim 3 poze obligatorii pentru profil complet.
     Fără fețe/PII vizibile - doar lucrări.
     """
-    craftsman = models.ForeignKey(
-        CraftsmanProfile,
-        on_delete=models.CASCADE,
-        related_name='portfolio_images'
-    )
+
+    craftsman = models.ForeignKey(CraftsmanProfile, on_delete=models.CASCADE, related_name="portfolio_images")
 
     image = models.ImageField(
-        upload_to='portfolio/%Y/%m/',
-        help_text="Poză cu lucrarea (fără fețe/date personale vizibile)"
+        upload_to="portfolio/%Y/%m/", help_text="Poză cu lucrarea (fără fețe/date personale vizibile)"
     )
 
-    title = models.CharField(
-        max_length=200,
-        blank=True,
-        help_text="Titlu lucrare (opțional)"
-    )
+    title = models.CharField(max_length=200, blank=True, help_text="Titlu lucrare (opțional)")
 
-    description = models.TextField(
-        max_length=500,
-        blank=True,
-        help_text="Descriere lucrare (opțional)"
-    )
+    description = models.TextField(max_length=500, blank=True, help_text="Descriere lucrare (opțional)")
 
     # Moderare automată
     is_approved = models.BooleanField(default=True)
@@ -418,7 +393,7 @@ class CraftsmanPortfolio(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
         verbose_name = "Imagine Portofoliu"
         verbose_name_plural = "Imagini Portofoliu"
 

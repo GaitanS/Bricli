@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load lazy_loading %}
 
 {% block title %}Profilul meu - Bricli{% endblock %}
 
@@ -9,12 +11,12 @@
             <!-- Sidebar -->
             <div class="card">
                 <div class="card-body text-center">
-                    {% if user.profile_picture %}
-                        <img src="{{ user.profile_picture.url }}" alt="Poză profil" class="rounded-circle mb-3" width="100" height="100">
+                    {% if user.user_type == 'craftsman' and user.craftsman_profile and user.craftsman_profile.profile_photo %}
+                        <img src="{{ user.craftsman_profile.profile_photo.url }}?v={% image_version user.craftsman_profile.profile_photo fallback_dt=user.craftsman_profile.updated_at %}" alt="Poză profil" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover;" loading="lazy">
+                    {% elif user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}?v={% profile_img_version user %}" alt="Poză profil" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover;" loading="lazy">
                     {% else %}
-                        <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
-                            <i class="fas fa-user fs-2"></i>
-                        </div>
+                        <img src="{% static 'images/avatar.svg' %}" alt="Poză profil" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover;" loading="lazy">
                     {% endif %}
                     <h5>{{ user.get_full_name|default:user.username }}</h5>
                     <p class="text-muted">{{ user.get_user_type_display }}</p>

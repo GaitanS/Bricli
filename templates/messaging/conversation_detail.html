@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load lazy_loading %}
 
 {% block title %}Conversație cu {{ other_participant.get_full_name|default:"Utilizator" }} - Bricli{% endblock %}
 
@@ -12,17 +14,27 @@
                     <i class="fas fa-arrow-left"></i> Înapoi la mesaje
                 </a>
                 <div class="d-flex align-items-center">
-                    {% if other_participant.profile_picture %}
-                        <img src="{{ other_participant.profile_picture.url }}" 
+                    {% if other_participant.user_type == 'craftsman' and other_participant.craftsman_profile and other_participant.craftsman_profile.profile_photo %}
+                        <img src="{{ other_participant.craftsman_profile.profile_photo.url }}?v={% image_version other_participant.craftsman_profile.profile_photo fallback_dt=other_participant.craftsman_profile.updated_at %}" 
                              class="rounded-circle me-3" 
                              width="50" height="50" 
-                             alt="{{ other_participant.get_full_name }}"
+                             alt="{{ other_participant.get_full_name|default:'Utilizator' }}"
+                             loading="lazy"
+                             style="object-fit: cover;">
+                    {% elif other_participant.profile_picture %}
+                        <img src="{{ other_participant.profile_picture.url }}?v={% profile_img_version other_participant %}" 
+                             class="rounded-circle me-3" 
+                             width="50" height="50" 
+                             alt="{{ other_participant.get_full_name|default:'Utilizator' }}"
+                             loading="lazy"
                              style="object-fit: cover;">
                     {% else %}
-                        <div class="bg-light text-muted rounded-circle d-inline-flex align-items-center justify-content-center me-3"
-                             style="width: 50px; height: 50px;">
-                            <i class="fas fa-user"></i>
-                        </div>
+                        <img src="{% static 'images/avatar.svg' %}" 
+                             class="rounded-circle me-3" 
+                             width="50" height="50" 
+                             alt="{{ other_participant.get_full_name|default:'Utilizator' }}"
+                             loading="lazy"
+                             style="object-fit: cover;">
                     {% endif %}
                     <div>
                         <h2 class="h4 mb-0">{{ other_participant.get_full_name|default:"Utilizator" }}</h2>

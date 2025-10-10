@@ -26,7 +26,8 @@ pytest==8.3.2
 pytest-django==4.8.0
 factory-boy==3.3.0
 
-# Security and monitoring (optional)
+# Security and monitoring
+django-csp==3.8  # Content Security Policy headers (P1)
 sentry-sdk==2.13.0
 django-cors-headers==4.4.0
 

@@ -1,4 +1,3 @@
-import os
 from django import template
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -14,10 +13,10 @@ def static_css(path):
     """
     # Check if we're in production and minified version exists
     if not settings.DEBUG:
-        min_path = path.replace('.css', '.min.css')
+        min_path = path.replace(".css", ".min.css")
         if staticfiles_storage.exists(min_path):
             path = min_path
-    
+
     url = staticfiles_storage.url(path)
     return mark_safe(f'<link rel="stylesheet" href="{url}">')
 
@@ -29,10 +28,10 @@ def static_js(path):
     """
     # Check if we're in production and minified version exists
     if not settings.DEBUG:
-        min_path = path.replace('.js', '.min.js')
+        min_path = path.replace(".js", ".min.js")
         if staticfiles_storage.exists(min_path):
             path = min_path
-    
+
     url = staticfiles_storage.url(path)
     return mark_safe(f'<script src="{url}"></script>')
 
@@ -43,10 +42,10 @@ def preload_css(path):
     Preload CSS file for better performance
     """
     if not settings.DEBUG:
-        min_path = path.replace('.css', '.min.css')
+        min_path = path.replace(".css", ".min.css")
         if staticfiles_storage.exists(min_path):
             path = min_path
-    
+
     url = staticfiles_storage.url(path)
     return mark_safe(f'<link rel="preload" href="{url}" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">')
 
@@ -57,10 +56,10 @@ def preload_js(path):
     Preload JavaScript file for better performance
     """
     if not settings.DEBUG:
-        min_path = path.replace('.js', '.min.js')
+        min_path = path.replace(".js", ".min.js")
         if staticfiles_storage.exists(min_path):
             path = min_path
-    
+
     url = staticfiles_storage.url(path)
     return mark_safe(f'<link rel="preload" href="{url}" as="script">')
 
@@ -70,7 +69,7 @@ def critical_css(css_content):
     """
     Inline critical CSS for above-the-fold content
     """
-    return mark_safe(f'<style>{css_content}</style>')
+    return mark_safe(f"<style>{css_content}</style>")
 
 
 @register.simple_tag
@@ -79,10 +78,10 @@ def defer_js(path):
     Load JavaScript file with defer attribute
     """
     if not settings.DEBUG:
-        min_path = path.replace('.js', '.min.js')
+        min_path = path.replace(".js", ".min.js")
         if staticfiles_storage.exists(min_path):
             path = min_path
-    
+
     url = staticfiles_storage.url(path)
     return mark_safe(f'<script src="{url}" defer></script>')
 
@@ -93,9 +92,9 @@ def async_js(path):
     Load JavaScript file with async attribute
     """
     if not settings.DEBUG:
-        min_path = path.replace('.js', '.min.js')
+        min_path = path.replace(".js", ".min.js")
         if staticfiles_storage.exists(min_path):
             path = min_path
-    
+
     url = staticfiles_storage.url(path)
     return mark_safe(f'<script src="{url}" async></script>')

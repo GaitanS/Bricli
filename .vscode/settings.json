@@ -1,0 +1,93 @@
+{
+  "files.exclude": {
+    "**/.venv": true,
+    "**/venv": true,
+    "**/env": true,
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/media": true,
+    "**/staticfiles": true,
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/*.pyo": true,
+    "**/*.pyd": true,
+    "**/*.sqlite3": true,
+    "**/*.sqlite3-journal": true,
+    "**/.pytest_cache": true,
+    "**/*.egg-info": true,
+    "**/.tox": true,
+    "**/.coverage": true,
+    "**/htmlcov": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/.hypothesis": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/*.log": true
+  },
+  "search.exclude": {
+    "**/venv": true,
+    "**/.venv": true,
+    "**/env": true,
+    "**/staticfiles": true,
+    "**/media": true,
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.pytest_cache": true,
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/*.egg-info": true,
+    "**/htmlcov": true
+  },
+  "python.analysis.exclude": [
+    "**/venv/**",
+    "**/.venv/**",
+    "**/env/**",
+    "**/staticfiles/**",
+    "**/media/**",
+    "**/__pycache__/**",
+    "**/.pytest_cache/**"
+  ],
+  "python.analysis.extraPaths": [
+    "."
+  ],
+  "python.defaultInterpreterPath": "${workspaceFolder}/venv/Scripts/python.exe",
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "-v",
+    "--tb=short",
+    "--reuse-db"
+  ],
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": [
+    "--max-line-length=120",
+    "--ignore=E501,W503"
+  ],
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "files.associations": {
+    "**/*.html": "html",
+    "**/templates/**/*.html": "django-html",
+    "**/templates/**/*": "django-txt",
+    "**/requirements{/**,*}.{txt,in}": "pip-requirements"
+  },
+  "emmet.includeLanguages": {
+    "django-html": "html"
+  },
+  "editor.rulers": [
+    80,
+    120
+  ],
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.eol": "\n"
+}

@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load lazy_loading %}
+{% load widget_tweaks %}
 
 {% block title %}Trimite Ofertă - {{ order.title }} - Bricli{% endblock %}
 
@@ -71,8 +73,9 @@
 
 .tip-item {
     display: flex;
-    align-items-start;
+    align-items: flex-start;
     margin-bottom: 1rem;
+    gap: 0.75rem;
 }
 
 .tip-item:last-child {
@@ -82,14 +85,31 @@
 .tip-icon {
     background: #8B5CF6;
     color: white;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
-    justify-content-center;
-    margin-right: 1rem;
+    justify-content: center;
+    margin-right: 0;
     flex-shrink: 0;
+    font-size: 0.85rem;
+}
+
+.tip-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.tip-content strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.tip-content small {
+    line-height: 1.4;
+    display: block;
 }
 
 .urgency-indicator {
@@ -103,6 +123,19 @@
 .urgency-medium { background-color: #fff3cd; color: #856404; }
 .urgency-high { background-color: #f8d7da; color: #721c24; }
 .urgency-urgent { background-color: #f5c6cb; color: #721c24; }
+
+.profile-stat {
+    padding: 0.5rem;
+}
+
+.profile-stat h6 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.profile-stat small {
+    font-size: 0.8rem;
+}
 </style>
 {% endblock %}
 
@@ -248,8 +281,8 @@
                     <div class="tip-icon">
                         <i class="fas fa-euro-sign"></i>
                     </div>
-                    <div>
-                        <strong>Preț Competitiv</strong><br>
+                    <div class="tip-content">
+                        <strong>Preț Competitiv</strong>
                         <small class="text-muted">Oferă un preț fair și competitiv bazat pe complexitatea lucrării.</small>
                     </div>
                 </div>
@@ -258,8 +291,8 @@
                     <div class="tip-icon">
                         <i class="fas fa-file-alt"></i>
                     </div>
-                    <div>
-                        <strong>Descriere Detaliată</strong><br>
+                    <div class="tip-content">
+                        <strong>Descriere Detaliată</strong>
                         <small class="text-muted">Explică clar cum vei realiza lucrarea și ce include prețul.</small>
                     </div>
                 </div>
@@ -268,8 +301,8 @@
                     <div class="tip-icon">
                         <i class="fas fa-clock"></i>
                     </div>
-                    <div>
-                        <strong>Timp Realist</strong><br>
+                    <div class="tip-content">
+                        <strong>Timp Realist</strong>
                         <small class="text-muted">Estimează o durată realistă pentru finalizarea lucrării.</small>
                     </div>
                 </div>
@@ -278,8 +311,8 @@
                     <div class="tip-icon">
                         <i class="fas fa-star"></i>
                     </div>
-                    <div>
-                        <strong>Profesionalism</strong><br>
+                    <div class="tip-content">
+                        <strong>Profesionalism</strong>
                         <small class="text-muted">Folosește un limbaj profesional și politicos în descriere.</small>
                     </div>
                 </div>
@@ -293,15 +326,15 @@
                     </h6>
                     <div class="d-flex align-items-center mb-3">
                         {% if user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}" 
+                            <img src="{{ user.profile_picture.url }}?v={% profile_img_version user %}" 
                                  alt="{{ user.get_full_name }}" 
                                  class="rounded-circle me-3" 
-                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                 style="width: 50px; height: 50px; object-fit: cover;" loading="lazy">
                         {% else %}
-                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
-                                 style="width: 50px; height: 50px;">
-                                <i class="fas fa-user text-white"></i>
-                            </div>
+                            <img src="{% static 'images/avatar.svg' %}" 
+                                 alt="{{ user.get_full_name|default:user.username }}" 
+                                 class="rounded-circle me-3" 
+                                 style="width: 50px; height: 50px; object-fit: cover;" loading="lazy">
                         {% endif %}
                         <div>
                             <strong>{{ user.get_full_name|default:user.username }}</strong><br>
@@ -313,22 +346,24 @@
                     
                     <div class="row text-center">
                         <div class="col-4">
-                            <div class="border-end">
-                                <h6 class="text-warning mb-0">
+                            <div class="profile-stat">
+                                <h6 class="text-warning mb-1">
                                     <i class="fas fa-star"></i> {{ user.craftsman_profile.average_rating|floatformat:1 }}
                                 </h6>
-                                <small class="text-muted">Rating</small>
+                                <small class="text-muted d-block">Rating</small>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="border-end">
-                                <h6 class="text-info mb-0">{{ user.craftsman_profile.total_reviews }}</h6>
-                                <small class="text-muted">Recenzii</small>
+                            <div class="profile-stat">
+                                <h6 class="text-info mb-1">{{ user.craftsman_profile.total_reviews }}</h6>
+                                <small class="text-muted d-block">Recenzii</small>
                             </div>
                         </div>
                         <div class="col-4">
-                            <h6 class="mb-0" style="color: #8B5CF6;">{{ user.craftsman_profile.total_jobs_completed }}</h6>
-                            <small class="text-muted">Lucrări</small>
+                            <div class="profile-stat">
+                                <h6 class="mb-1" style="color: #8B5CF6;">{{ user.craftsman_profile.total_jobs_completed }}</h6>
+                                <small class="text-muted d-block">Lucrări</small>
+                            </div>
                         </div>
                     </div>
                 </div>

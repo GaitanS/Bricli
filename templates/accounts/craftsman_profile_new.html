@@ -365,10 +365,24 @@
                 <div class="contact-section">
                     <h4><i class="fas fa-envelope"></i> Contact</h4>
                     
-                    <!-- Notificare protecția datelor -->
-                    <div class="data-protection-notice">
-                        <i class="fas fa-shield-alt"></i>
-                        <strong>Protecția datelor:</strong> Datele de contact se afișează doar după acceptarea unei oferte.
+                    <!-- Date de contact vizibile -->
+                    <div class="contact-info mb-3">
+                        {% if profile.user.phone %}
+                            <p class="mb-2">
+                                <i class="fas fa-phone me-2"></i>
+                                <a href="tel:{{ profile.user.phone }}" class="text-decoration-none">{{ profile.user.phone }}</a>
+                            </p>
+                        {% endif %}
+                        <p class="mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            <a href="mailto:{{ profile.user.email }}" class="text-decoration-none">{{ profile.user.email }}</a>
+                        </p>
+                        {% if profile.address %}
+                            <p class="mb-0">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                {{ profile.address }}
+                            </p>
+                        {% endif %}
                     </div>
                     
                     <button class="btn btn-contact">

@@ -28,12 +28,12 @@ class Testimonial(models.Model):
     location = models.CharField(max_length=100, blank=True)
     content = models.TextField(max_length=500)
     rating = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 6)], default=5)
-    image = models.ImageField(upload_to='testimonials/', blank=True, null=True)
+    image = models.ImageField(upload_to="testimonials/", blank=True, null=True)
     is_featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-is_featured', '-created_at']
+        ordering = ["-is_featured", "-created_at"]
 
     def __str__(self):
         return f"{self.name} - {self.rating} stele"
@@ -47,7 +47,7 @@ class FAQ(models.Model):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ['order', 'question']
+        ordering = ["order", "question"]
         verbose_name = "FAQ"
         verbose_name_plural = "FAQs"
 
@@ -60,7 +60,7 @@ class BlogPost(models.Model):
     slug = models.SlugField(unique=True)
     content = models.TextField()
     excerpt = models.TextField(max_length=300, blank=True)
-    featured_image = models.ImageField(upload_to='blog/', blank=True, null=True)
+    featured_image = models.ImageField(upload_to="blog/", blank=True, null=True)
 
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -68,7 +68,7 @@ class BlogPost(models.Model):
     published_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = ['-published_at', '-created_at']
+        ordering = ["-published_at", "-created_at"]
 
     def __str__(self):
         return self.title
