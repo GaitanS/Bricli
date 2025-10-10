@@ -27,6 +27,8 @@ class RomanianURLRedirectMiddleware:
     REDIRECTS = [
         # Services → Servicii (all subpaths)
         (r"^/services/(.*)$", r"/servicii/\1"),
+        # Old category detail URL (singular) → new (plural)
+        (r"^/servicii/categorie/(.*)$", r"/servicii/categorii/\1"),
         # Accounts → Conturi (craftsmen list with diacritics removed)
         (r"^/accounts/mesterii/$", "/conturi/meseriasi/"),
         # Craftsman detail (mester → meserias, no diacritics)

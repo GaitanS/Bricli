@@ -6,7 +6,7 @@ app_name = "services"
 
 urlpatterns = [
     path("categorii/", views.ServiceCategoryListView.as_view(), name="categories"),
-    path("categorie/<slug:slug>/", views.ServiceCategoryDetailView.as_view(), name="category_detail"),
+    path("categorii/<slug:slug>/", views.ServiceCategoryDetailView.as_view(), name="category_detail"),
     path("comanda/creare/", views.CreateOrderView.as_view(), name="create_order"),
     path("comanda/<int:pk>/", views.OrderDetailView.as_view(), name="order_detail"),
     path("comanda/<int:pk>/editare/", views.EditOrderView.as_view(), name="edit_order"),

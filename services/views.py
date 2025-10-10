@@ -74,6 +74,9 @@ class ServiceCategoryDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["services"] = self.object.services.filter(is_active=True)
+        context["popular_services"] = self.object.services.filter(is_active=True, is_popular=True).order_by("name")[
+            :100
+        ]
         context["recent_orders"] = Order.objects.filter(service__category=self.object, status="published")[:6]
 
         # Add statistics for the category
