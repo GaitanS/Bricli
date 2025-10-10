@@ -20,7 +20,9 @@
       "Bash(git commit:*)",
       "Bash(./venv/Scripts/python.exe -m pytest tests/test_url_redirects.py -q)",
       "Bash(./venv/Scripts/python.exe -m pytest -v --collect-only)",
-      "Bash(del accountsurls.py)"
+      "Bash(del accountsurls.py)",
+      "Bash(./venv/Scripts/python.exe -m pytest tests/test_contact_info.py::TestContactInfoDisplay::test_craftsman_email_displays_correctly -v)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

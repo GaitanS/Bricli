@@ -118,7 +118,7 @@
                     <div class="alert alert-info mb-3">
                         <i class="fas fa-info-circle me-2"></i>
                         <strong>Pentru a contacta meșterul</strong><br>
-                        <small>Trebuie să te <a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}" class="alert-link">autentifici</a> sau să îți <a href="{% url 'accounts:register' %}" class="alert-link">creezi un cont</a>.</small>
+                        <small>Trebuie să te <a href="{% url 'auth:login' %}?next={{ request.get_full_path }}" class="alert-link">autentifici</a> sau să îți <a href="{% url 'auth:register' %}" class="alert-link">creezi un cont</a>.</small>
                     </div>
                     {% elif user.is_authenticated and user.user_type == 'craftsman' and user != craftsman.user %}
                     <div class="alert alert-warning mb-3">
@@ -137,7 +137,7 @@
                                 <i class="fas fa-comments me-2"></i>Contactează meșterul
                             </button>
                             {% elif not user.is_authenticated %}
-                            <a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}" 
+                            <a href="{% url 'auth:login' %}?next={{ request.get_full_path }}" 
                                class="btn btn-lg w-100 text-white fw-bold"
                                style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
                                 <i class="fas fa-comments me-2"></i>Contactează meșterul
@@ -156,7 +156,7 @@
                                 <i class="fas fa-plus me-2"></i>Solicită ofertă
                             </a>
                             {% elif not user.is_authenticated %}
-                            <a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}" 
+                            <a href="{% url 'auth:login' %}?next={{ request.get_full_path }}" 
                                class="btn btn-outline-primary btn-lg w-100 fw-bold">
                                 <i class="fas fa-plus me-2"></i>Solicită ofertă
                             </a>
@@ -499,7 +499,7 @@
                 {% else %}
                     <div class="text-center">
                         <p class="text-muted mb-3">Pentru a contacta meșterul, trebuie să te autentifici.</p>
-                        <a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}" class="btn btn-primary">
+                        <a href="{% url 'auth:login' %}?next={{ request.get_full_path }}" class="btn btn-primary">
                             <i class="fas fa-sign-in-alt me-2"></i>Autentifică-te
                         </a>
                     </div>

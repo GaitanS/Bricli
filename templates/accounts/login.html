@@ -246,7 +246,7 @@ hr {
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div></div>
-                <a href="{% url 'accounts:password_reset' %}" class="text-decoration-none" style="color: #8B5CF6; font-size: 0.9rem;">
+                <a href="{% url 'auth:password_reset' %}" class="text-decoration-none" style="color: #8B5CF6; font-size: 0.9rem;">
                     Ai uitat parola?
                 </a>
             </div>
@@ -262,10 +262,10 @@ hr {
 
         <div class="text-center">
             <p class="mb-2">Nu ai un cont?
-                <a href="{% url 'accounts:register' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">Înregistrează-te</a>
+                <a href="{% url 'auth:register' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">Înregistrează-te</a>
             </p>
             <p class="mb-0">Ești meșter?
-                <a href="{% url 'accounts:craftsman_register' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">Înregistrează-te ca meșter</a>
+                <a href="{% url 'auth:craftsman_register' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">Înregistrează-te ca meșter</a>
             </p>
         </div>
     </div>

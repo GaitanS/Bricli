@@ -151,17 +151,17 @@
                                     </a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                                <li><a class="dropdown-item" href="{% url 'auth:logout' %}">
                                     <i class="fas fa-sign-out-alt me-2"></i>Deconectare
                                 </a></li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:login' %}">Conectare</a>
+                            <a class="nav-link" href="{% url 'auth:login' %}">Conectare</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn ms-2" href="{% url 'accounts:register' %}" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); border: none; color: white; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 500;">Înregistrare</a>
+                            <a class="btn ms-2" href="{% url 'auth:register' %}" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); border: none; color: white; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 500;">Înregistrare</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -196,7 +196,7 @@
                                 </a>
                             {% endif %}
                             
-                            <a href="{% url 'accounts:logout' %}" class="list-group-item list-group-item-action border-0 px-0 text-danger">
+                            <a href="{% url 'auth:logout' %}" class="list-group-item list-group-item-action border-0 px-0 text-danger">
                                 <i class="fas fa-sign-out-alt me-3"></i>Deconectare
                             </a>
                         </div>
@@ -205,10 +205,10 @@
                     <!-- Mobile Auth Buttons -->
                     <div class="mobile-auth-buttons d-lg-none mt-3 pt-3 border-top">
                         <div class="d-grid gap-2">
-                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary">
+                            <a href="{% url 'auth:login' %}" class="btn btn-outline-primary">
                                 <i class="fas fa-sign-in-alt me-2"></i>Conectare
                             </a>
-                            <a href="{% url 'accounts:register' %}" class="btn btn-primary">
+                            <a href="{% url 'auth:register' %}" class="btn btn-primary">
                                 <i class="fas fa-user-plus me-2"></i>Înregistrare
                             </a>
                         </div>
@@ -268,7 +268,7 @@
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Pentru meșteri</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'accounts:craftsman_register' %}" class="text-light text-decoration-none">Înregistrează-te</a></li>
+                        <li><a href="{% url 'auth:craftsman_register' %}" class="text-light text-decoration-none">Înregistrează-te</a></li>
                         <li><a href="{% url 'services:available_orders' %}" class="text-light text-decoration-none">Găsește lucrări</a></li>
                         <li><a href="#" class="text-light text-decoration-none">Avantaje</a></li>
                     </ul>

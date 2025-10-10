@@ -115,7 +115,7 @@
                         <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg me-3">
                             <i class="fas fa-plus me-2"></i>Postează o comandă
                         </a>
-                        <a href="{% url 'accounts:craftsman_register' %}" class="btn btn-outline-light btn-lg">
+                        <a href="{% url 'auth:craftsman_register' %}" class="btn btn-outline-light btn-lg">
                             <i class="fas fa-user-plus me-2"></i>Devino meșter
                         </a>
                     {% endif %}
@@ -373,7 +373,7 @@
                 <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg me-3 mb-3">
                     <i class="fas fa-plus me-2"></i>Postează o comandă gratuită
                 </a>
-                <a href="{% url 'accounts:craftsman_register' %}" class="btn btn-outline-light btn-lg mb-3">
+                <a href="{% url 'auth:craftsman_register' %}" class="btn btn-outline-light btn-lg mb-3">
                     <i class="fas fa-user-plus me-2"></i>Înregistrează-te ca meșter
                 </a>
             </div>
