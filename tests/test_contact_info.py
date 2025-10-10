@@ -39,6 +39,7 @@ def craftsman(db, craftsman_user, county, city):
     return CraftsmanProfile.objects.create(
         user=craftsman_user,
         display_name="Ion Popescu",
+        slug="ion-popescu",
         county=county,
         city=city,
         coverage_radius_km=25,
@@ -61,7 +62,7 @@ class TestContactInfoDisplay:
 
     def test_craftsman_email_displays_correctly(self, client, craftsman):
         """Email should show from craftsman.user.email, not craftsman.email"""
-        response = client.get(reverse("accounts:craftsman_detail", kwargs={"pk": craftsman.pk}))
+        response = client.get(reverse("accounts:craftsman_detail", kwargs={"slug": craftsman.slug}))
         assert response.status_code == 200
 
         # Check email is in response
@@ -72,14 +73,14 @@ class TestContactInfoDisplay:
 
     def test_craftsman_phone_displays_when_set(self, client, craftsman):
         """Phone should display when set"""
-        response = client.get(reverse("accounts:craftsman_detail", kwargs={"pk": craftsman.pk}))
+        response = client.get(reverse("accounts:craftsman_detail", kwargs={"slug": craftsman.slug}))
         assert response.status_code == 200
         assert craftsman.phone in response.content.decode()
         assert f"tel:{craftsman.phone}" in response.content.decode()
 
     def test_contact_info_shows_location(self, client, craftsman):
         """Contact card should show city and county"""
-        response = client.get(reverse("accounts:craftsman_detail", kwargs={"pk": craftsman.pk}))
+        response = client.get(reverse("accounts:craftsman_detail", kwargs={"slug": craftsman.slug}))
         assert response.status_code == 200
         assert craftsman.city.name in response.content.decode()
         assert craftsman.county.name in response.content.decode()

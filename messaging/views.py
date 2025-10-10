@@ -30,7 +30,7 @@ def send_contact_message(request, craftsman_id):
 
     if not subject or not message_content:
         messages.error(request, "Toate câmpurile sunt obligatorii.")
-        return redirect("accounts:craftsman_detail", pk=craftsman_id)
+        return redirect("accounts:craftsman_detail", slug=craftsman.slug)
 
     # Creează conversația și trimite mesajul
     try:
@@ -49,7 +49,7 @@ def send_contact_message(request, craftsman_id):
     except Exception:
         messages.error(request, "A apărut o eroare la trimiterea mesajului. Te rugăm să încerci din nou.")
 
-    return redirect("accounts:craftsman_detail", pk=craftsman_id)
+    return redirect("accounts:craftsman_detail", slug=craftsman.slug)
 
 
 class ConversationListView(LoginRequiredMixin, ListView):

@@ -374,6 +374,8 @@ class CraftsmanDetailView(DetailView):
     model = CraftsmanProfile
     template_name = "accounts/craftsman_detail.html"
     context_object_name = "craftsman"
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
