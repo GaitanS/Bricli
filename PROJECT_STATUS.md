@@ -12,6 +12,65 @@
 ✅ Django check: 0 issues
 ✅ Migrations: up to date
 
+## 🎉 Fix-Lot-RO COMPLETAT - 11 Ianuarie 2025
+
+**URL-uri românești ASCII + funcționalități corectate!**
+
+✅ **URL namespace split** - eliminated W005 warning (auth@root, accounts@/conturi/)
+✅ **301 redirects** - old English URLs → new Romanian ASCII URLs
+✅ **Servicii/Categorii** - 8 categories seeded, page displays content
+✅ **Registration choice** - /inregistrare/ shows Meșter vs Client options
+✅ **Comprehensive tests** - 39/39 tests passing
+✅ **Django check: 0 issues**
+
+### URL Mapping Final (ASCII-only for SEO)
+
+| Old URL (English/Diacritics) | New URL (Romanian ASCII) | Status |
+|------------------------------|--------------------------|--------|
+| `/services/*` | `/servicii/*` | 301 redirect |
+| `/accounts/mesterii/` | `/conturi/meseriasi/` | 301 redirect |
+| `/accounts/mester/<slug>/` | `/conturi/meserias/<slug>/` | 301 redirect |
+| `/accounts/inregistrare/*` | `/inregistrare/*` | 301 redirect |
+| `/accounts/autentificare/` | `/autentificare/` | 301 redirect |
+| `/messages/*` | `/mesaje/*` | 301 redirect |
+
+### Namespace Structure
+
+- **`auth`** (root-level) - Authentication URLs
+  - `/inregistrare/` - Registration choice
+  - `/inregistrare/client/` - Client registration
+  - `/inregistrare/meserias/` - Craftsman registration (ASCII: ș→s)
+  - `/autentificare/` - Login
+  - `/deconectare/` - Logout
+  - `/resetare-parola/*` - Password reset flow
+
+- **`accounts`** (under /conturi/) - Profile & craftsmen
+  - `/conturi/profil/` - User profile
+  - `/conturi/meseriasi/` - Craftsmen list (ASCII: ț→t)
+  - `/conturi/meserias/<slug>/` - Craftsman detail (ASCII: ș→s)
+  - `/conturi/portofoliu/*` - Portfolio management
+
+- **`services`** (under /servicii/) - Orders & categories
+  - `/servicii/categorii/` - Categories list (8 seeded)
+  - `/servicii/comanda/*` - Order management
+
+### Seed Data
+
+Run after fresh database:
+```bash
+python manage.py populate_categories
+```
+
+Creates 8 service categories with ASCII slugs:
+1. constructii (Construcții)
+2. instalatii (Instalații)
+3. finisaje (Finisaje)
+4. renovari (Renovări)
+5. electricitate (Electricitate)
+6. sanitare (Sanitare)
+7. tamplarie (Tâmplărie)
+8. amenajari (Amenajări)
+
 ## Rezumat General
 Bricli este o platformă completă de conectare între clienți și meșteri, similară cu MyBuilder, implementată în Django. Proiectul este **production-ready** cu toate funcționalitățile P0 implementate și testate.
 
