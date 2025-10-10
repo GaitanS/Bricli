@@ -631,3 +631,99 @@ All verification steps passed:
 Ready to proceed to **Fix-Lot-3: Stats Dashboard** 🚀
 
 **Note**: This fix is JavaScript-only and cannot be E2E tested with pytest. Manual browser testing recommended to confirm smooth navigation.
+
+---
+
+## ✅ Fix-Lot-3 (Stats Dashboard) - COMPLETE
+
+**Status**: ✅ COMPLETE
+**Date**: 10 Ianuarie 2025
+**Total Commits**: 1 commit
+
+### Summary
+
+Added real aggregated platform statistics to the homepage, displaying active craftsmen count, average rating, and completed projects. Stats are calculated dynamically from the database and displayed in a responsive 3-column layout.
+
+### Changes Implemented
+
+**1. HomeView Context** ([core/views.py:31-35](core/views.py#L31-L35))
+```python
+# Calculate platform statistics
+active_craftsmen = CraftsmanProfile.objects.filter(
+    user__is_active=True, user__is_verified=True
+).count()
+avg_rating_data = Review.objects.aggregate(avg=Avg("rating"))
+avg_rating = avg_rating_data["avg"] or 0.0
+completed_projects = Order.objects.filter(status="completed").count()
+```
+
+**2. Homepage Template** ([templates/core/home.html:140-173](templates/core/home.html#L140-L173))
+- New "Platform Statistics" section
+- 3 responsive cards with icons:
+  - **Meșteri activi verificați** (Users icon, primary color)
+  - **Rating mediu meșteri** (Star icon, warning color)
+  - **Proiecte finalizate** (Check-circle icon, success color)
+- Uses existing Bootstrap utility classes (bg-light, shadow-sm, rounded)
+
+**3. Unit Tests** ([tests/test_home_stats.py](tests/test_home_stats.py))
+Created 6 comprehensive tests:
+- `test_stats_context_exists` - Verifies stats dict in context
+- `test_active_craftsmen_count` - Tests correct filtering (verified + active only)
+- `test_avg_rating_calculation` - Tests rating aggregation (5,4,5,3,5 → 4.4)
+- `test_completed_projects_count` - Tests status filtering
+- `test_stats_with_no_data` - Tests graceful handling of empty DB
+- `test_stats_display_in_template` - Tests HTML rendering
+
+### Stats Calculation Logic
+
+**Active Craftsmen**:
+```python
+CraftsmanProfile.objects.filter(user__is_active=True, user__is_verified=True).count()
+```
+- Excludes inactive users
+- Excludes unverified users
+
+**Average Rating**:
+```python
+Review.objects.aggregate(avg=Avg("rating"))
+```
+- Aggregates all review ratings
+- Rounds to 1 decimal place
+- Returns 0 if no reviews exist
+
+**Completed Projects**:
+```python
+Order.objects.filter(status="completed").count()
+```
+- Only counts orders with status='completed'
+- Excludes draft, published, in_progress, cancelled
+
+### Verification Results
+
+All verification steps passed:
+- ✅ **pytest -q**: 20/20 tests passing (9 wallet + 5 contact + 6 stats)
+- ✅ **python manage.py check**: 0 issues
+- ✅ **black --check**: All files compliant
+
+### Git Commits
+
+1. `1037ee9` - feat(stats): add platform statistics to homepage
+
+### Files Modified
+
+- [core/views.py](core/views.py) (added imports, stats calculation)
+- [templates/core/home.html](templates/core/home.html) (new stats section)
+- [tests/test_home_stats.py](tests/test_home_stats.py) (new file, 137 lines, 6 tests)
+
+### Next Steps
+
+Ready to proceed to **Fix-Lot-4: SEO/URL Romanian + Slugs** 🚀
+
+This is the most complex remaining task, involving:
+- Adding slug field to CraftsmanProfile with migration
+- Converting all URLs from English to Romanian
+- Creating 301 redirect middleware
+- Updating all {% url %} template tags
+- Creating comprehensive tests
+
+**Total Progress**: 3/4 Fix-Lots complete (Fix-Lot-1, 2, 3 ✅ | Fix-Lot-4 pending)
