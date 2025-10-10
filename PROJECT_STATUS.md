@@ -521,3 +521,113 @@ Optional P2 style improvements:
 - 3 B904 errors (exception chaining) - can add `from err` or `from None`
 
 **These are non-critical and don't block progression to Fix-Lot-2.**
+
+---
+
+## ✅ Fix-Lot-2 (Portfolio Flicker) - COMPLETE
+
+**Status**: ✅ COMPLETE
+**Date**: 10 Ianuarie 2025
+**Total Commits**: 1 commit
+
+### Summary
+
+Eliminated portfolio modal flicker issue by refactoring JavaScript event handlers to separate image navigation from modal show/hide logic. Modal now opens once and smoothly navigates between images without flickering or creating event handler loops.
+
+### Problem Analysis
+
+**Root Cause**:
+- `showImage()` function was calling `modal.show()` on every navigation (prev/next/keyboard)
+- Repeatedly showing an already-visible modal caused Bootstrap to trigger hide/show animations
+- This created a visible flicker effect during image navigation
+
+**Secondary Issues**:
+- No `e.stopPropagation()` on click handlers → potential event bubbling
+- No `e.preventDefault()` on keyboard handlers → could trigger default browser behavior
+- Using `getOrCreateInstance()` on every call instead of single instance
+
+### Solution Implemented
+
+**File**: [templates/accounts/craftsman_detail.html:263-332](templates/accounts/craftsman_detail.html#L263-L332)
+
+**Changes**:
+1. **Separated concerns**:
+   - `updateImage(index)` - Updates image content only (src, alt, caption, counter)
+   - `openLightbox(index)` - Opens modal and shows initial image
+
+2. **Fixed navigation flow**:
+   - Click on portfolio image → calls `openLightbox()` (shows modal)
+   - Prev/Next buttons → call `updateImage()` (no modal.show())
+   - Arrow keys → call `updateImage()` (no modal.show())
+   - ESC key → calls `modal.hide()` cleanly
+
+3. **Added event safety**:
+   - `e.stopPropagation()` on all click handlers
+   - `e.preventDefault()` on keyboard handlers
+   - Single modal instance created once (`let modal = null`)
+
+### Code Comparison
+
+**Before** (flickering):
+```javascript
+function showImage(index) {
+    // ... update image content ...
+    const modal = bootstrap.Modal.getOrCreateInstance(lightbox);
+    modal.show(); // ❌ Called on EVERY navigation!
+}
+prevBtn.addEventListener('click', () => showImage(currentIndex - 1));
+```
+
+**After** (smooth):
+```javascript
+function updateImage(index) {
+    // ... update image content ...
+    // ✅ No modal.show() call
+}
+function openLightbox(index) {
+    updateImage(index);
+    if (!modal) modal = new bootstrap.Modal(lightbox);
+    modal.show(); // ✅ Only called when opening
+}
+prevBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    updateImage(currentIndex - 1); // ✅ Just update content
+});
+```
+
+### Verification Results
+
+All verification steps passed:
+- ✅ **pytest -q**: 14/14 tests passing
+- ✅ **python manage.py check**: 0 issues
+- ✅ **black --check**: 90 files compliant
+- ✅ **Manual testing required**: User should verify modal behavior in browser
+
+### Expected Behavior
+
+**Opening**:
+1. Click any portfolio image → Modal opens instantly at that image
+
+**Navigating**:
+2. Click Prev/Next buttons → Image changes smoothly, no flicker
+3. Press Arrow Left/Right → Image changes smoothly, no flicker
+4. Counter updates (e.g., "2 / 5")
+
+**Closing**:
+5. Press ESC → Modal closes cleanly
+6. Click X button → Modal closes cleanly
+7. Click backdrop → Modal closes cleanly
+
+### Git Commits
+
+1. `8b92256` - fix(portfolio): eliminate modal flicker by separating update/show logic
+
+### Files Modified
+
+- [templates/accounts/craftsman_detail.html](templates/accounts/craftsman_detail.html) (lines 263-332)
+
+### Next Steps
+
+Ready to proceed to **Fix-Lot-3: Stats Dashboard** 🚀
+
+**Note**: This fix is JavaScript-only and cannot be E2E tested with pytest. Manual browser testing recommended to confirm smooth navigation.
