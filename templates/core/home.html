@@ -137,7 +137,40 @@
     </div>
 </section>
 
-
+<!-- Platform Statistics -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <div class="stat-card p-4 bg-white rounded shadow-sm h-100">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-users fa-3x text-primary"></i>
+                    </div>
+                    <h3 class="fw-bold mb-2 text-gradient">{{ stats.active_craftsmen }}</h3>
+                    <p class="text-muted mb-0">Meșteri activi verificați</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <div class="stat-card p-4 bg-white rounded shadow-sm h-100">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-star fa-3x text-warning"></i>
+                    </div>
+                    <h3 class="fw-bold mb-2 text-gradient">{{ stats.avg_rating }}</h3>
+                    <p class="text-muted mb-0">Rating mediu meșteri</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card p-4 bg-white rounded shadow-sm h-100">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-check-circle fa-3x text-success"></i>
+                    </div>
+                    <h3 class="fw-bold mb-2 text-gradient">{{ stats.completed_projects }}</h3>
+                    <p class="text-muted mb-0">Proiecte finalizate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Service Categories -->
 <section class="py-5">

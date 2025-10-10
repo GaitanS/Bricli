@@ -1,11 +1,11 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Avg, Q
 from django.shortcuts import render
 from django.utils.text import slugify
 from django.views.generic import ListView, TemplateView
 
 from accounts.models import County, CraftsmanProfile
-from services.models import ServiceCategory
+from services.models import Order, Review, ServiceCategory
 
 from .models import FAQ, SiteSettings, Testimonial
 
@@ -28,6 +28,12 @@ class HomeView(TemplateView):
         except SiteSettings.DoesNotExist:
             site_settings = None
 
+        # Calculate platform statistics
+        active_craftsmen = CraftsmanProfile.objects.filter(user__is_active=True, user__is_verified=True).count()
+        avg_rating_data = Review.objects.aggregate(avg=Avg("rating"))
+        avg_rating = avg_rating_data["avg"] or 0.0
+        completed_projects = Order.objects.filter(status="completed").count()
+
         context.update(
             {
                 "site_settings": site_settings,
@@ -39,6 +45,12 @@ class HomeView(TemplateView):
                     "-average_rating", "-total_reviews"
                 )[:6],
                 "counties": County.objects.all().order_by("name"),  # All counties
+                # Platform statistics
+                "stats": {
+                    "active_craftsmen": active_craftsmen,
+                    "avg_rating": round(avg_rating, 1) if avg_rating else 0,
+                    "completed_projects": completed_projects,
+                },
             }
         )
         return context

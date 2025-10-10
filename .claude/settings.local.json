@@ -7,7 +7,11 @@
       "Bash(./venv/Scripts/python.exe -m ruff check:*)",
       "Bash(./venv/Scripts/python.exe -m black .)",
       "Bash(./venv/Scripts/python.exe -m pytest -q)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(findstr:*)",
+      "Bash(./venv/Scripts/python.exe -m black --check .)",
+      "Bash(./venv/Scripts/python.exe -m pytest tests/test_home_stats.py -v)",
+      "Bash(./venv/Scripts/python.exe -m pytest tests/test_home_stats.py -q)"
     ],
     "deny": [],
     "ask": []
