@@ -40,7 +40,9 @@ class TestHomeStats:
             is_verified=True,
             is_active=False,
         )
-        CraftsmanProfile.objects.create(user=inactive_user, display_name="Inactive Craftsman", slug="inactive-craftsman")
+        CraftsmanProfile.objects.create(
+            user=inactive_user, display_name="Inactive Craftsman", slug="inactive-craftsman"
+        )
 
         # Create unverified craftsman (should not be counted)
         unverified_user = User.objects.create_user(
@@ -51,7 +53,9 @@ class TestHomeStats:
             is_verified=False,
             is_active=True,
         )
-        CraftsmanProfile.objects.create(user=unverified_user, display_name="Unverified Craftsman", slug="unverified-craftsman")
+        CraftsmanProfile.objects.create(
+            user=unverified_user, display_name="Unverified Craftsman", slug="unverified-craftsman"
+        )
 
         # Create completed orders
         client = User.objects.create_user(

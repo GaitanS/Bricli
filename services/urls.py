@@ -22,7 +22,9 @@ urlpatterns = [
     path("comanda/<int:pk>/recenzie/", views.CreateReviewView.as_view(), name="create_review"),
     path("recenzie/<int:pk>/", views.ReviewDetailView.as_view(), name="review_detail"),
     path("mester/<int:pk>/recenzii/", views.CraftsmanReviewsView.as_view(), name="craftsman_reviews"),
-    path("recenzie/<int:review_pk>/incarcare-imagine/", views.ReviewImageUploadView.as_view(), name="upload_review_image"),
+    path(
+        "recenzie/<int:review_pk>/incarcare-imagine/", views.ReviewImageUploadView.as_view(), name="upload_review_image"
+    ),
     # URLs sistem lead (stil MyBuilder)
     path("comanda/<int:pk>/invitare/", views.InviteCraftsmenView.as_view(), name="invite_craftsmen"),
     path(
@@ -37,7 +39,11 @@ urlpatterns = [
     path("serviciile-mele/", views.CraftsmanServicesView.as_view(), name="craftsman_services"),
     path("serviciile-mele/adaugare/", views.AddCraftsmanServiceView.as_view(), name="add_craftsman_service"),
     path("serviciile-mele/<int:pk>/editare/", views.EditCraftsmanServiceView.as_view(), name="edit_craftsman_service"),
-    path("serviciile-mele/<int:pk>/stergere/", views.DeleteCraftsmanServiceView.as_view(), name="delete_craftsman_service"),
+    path(
+        "serviciile-mele/<int:pk>/stergere/",
+        views.DeleteCraftsmanServiceView.as_view(),
+        name="delete_craftsman_service",
+    ),
     # Notificări
     path("notificari/", views.NotificationsView.as_view(), name="notifications"),
     # Sistem plăți

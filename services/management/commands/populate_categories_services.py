@@ -29,7 +29,12 @@ CATEGORIES = [
     ("instalatii-sanitare", "Instalații Sanitare", "🚿", "Instalații sanitare, țevi, obiecte sanitare"),
     ("instalatii-electrice", "Instalații Electrice", "⚡", "Instalații electrice, tablouri, prize, iluminat"),
     ("curatenie-menaj", "Curățenie și Menaj", "🧹", "Curățenie profesională, menaj, igienizare"),
-    ("gradinarit-peisagistica", "Grădinărit și Peisagistică", "🌿", "Grădinărit, peisagistică, întreținere spații verzi"),
+    (
+        "gradinarit-peisagistica",
+        "Grădinărit și Peisagistică",
+        "🌿",
+        "Grădinărit, peisagistică, întreținere spații verzi",
+    ),
     ("asamblare-montaj", "Asamblare și Montaj", "🧰", "Asamblare mobilier, montaj corpuri, instalare echipamente"),
     ("acoperisuri", "Acoperișuri", "🏠", "Reparații acoperișuri, înlocuire țigle, hidroizolație"),
     ("geamuri-ferestre", "Geamuri și Ferestre", "🪟", "Montaj ferestre, termopan, jaluzele, reparații"),
