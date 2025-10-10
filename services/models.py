@@ -11,6 +11,7 @@ class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True)
     icon = models.CharField(max_length=50, blank=True, help_text="CSS class pentru icon")
+    icon_emoji = models.CharField(max_length=8, default="🔧", help_text="Emoji icon for category")
     description = models.TextField(max_length=500, blank=True)
     is_active = models.BooleanField(default=True)
     order = models.PositiveIntegerField(default=0)
@@ -26,13 +27,13 @@ class ServiceCategory(models.Model):
 class Service(models.Model):
     category = models.ForeignKey(ServiceCategory, on_delete=models.CASCADE, related_name="services")
     name = models.CharField(max_length=200)
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True)  # Changed to unique for easier lookup
     description = models.TextField(max_length=500, blank=True)
+    is_popular = models.BooleanField(default=False, help_text="Popular service shown in suggestions")
     is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["name"]
-        unique_together = ["category", "slug"]
 
     def __str__(self):
         return f"{self.category.name} - {self.name}"
