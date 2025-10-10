@@ -9,6 +9,7 @@ from .validators import (
     validate_bio_length,
     validate_company_name,
     validate_coverage_radius,
+    validate_cui_format,
     validate_display_name,
     validate_email_format,
     validate_hourly_rate,
@@ -19,6 +20,7 @@ from .validators import (
     validate_romanian_phone,
     validate_services_selection,
     validate_strong_password,
+    validate_url_format,
 )
 
 
