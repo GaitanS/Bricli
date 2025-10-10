@@ -224,66 +224,6 @@ class LogoutView(BaseLogoutView):
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):
-    template_name = "accounts/profile.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.user_type == "craftsman":
-            try:
-                context["craftsman_profile"] = self.request.user.craftsman_profile
-            except CraftsmanProfile.DoesNotExist:
-                CraftsmanProfile.objects.create(user=self.request.user)
-                context["craftsman_profile"] = self.request.user.craftsman_profile
-        return context
-
-
-class EditProfileView(LoginRequiredMixin, UpdateView):
-    model = User
-    form_class = ProfileUpdateForm
-    template_name = "accounts/edit_profile.html"
-    success_url = reverse_lazy("accounts:profile")
-
-    def get_object(self):
-        return self.request.user
-
-
-class CraftsmenListView(ListView):
-    model = CraftsmanProfile
-    template_name = "accounts/craftsmen_list.html"
-    context_object_name = "craftsmen"
-    paginate_by = 12
-
-    def get_queryset(self):
-        queryset = (
-            CraftsmanProfile.objects.filter(user__is_active=True)
-            .select_related("user", "county", "city")
-            .prefetch_related("services", "services__service")
-        )
-
-        # Filter by trade
-        trade = self.request.GET.get("trade")
-        if trade:
-            queryset = queryset.filter(trade=trade)
-
-        # Filter by county
-        county = self.request.GET.get("county")
-        if county:
-            queryset = queryset.filter(county_id=county)
-
-        # Filter by rating
-        rating = self.request.GET.get("rating")
-        if rating:
-            queryset = queryset.filter(average_rating__gte=rating)
-
-        return queryset.order_by("-user__is_verified", "-average_rating", "-total_reviews")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["counties"] = County.objects.all()
-        return context
-
-
-class ProfileView(LoginRequiredMixin, TemplateView):
     """User profile view"""
 
     template_name = "accounts/profile.html"

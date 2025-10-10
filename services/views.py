@@ -721,18 +721,6 @@ class ReviewImageUploadView(LoginRequiredMixin, CreateView):
         return reverse_lazy("services:review_detail", kwargs={"pk": self.review.pk})
 
 
-class MyOrdersView(LoginRequiredMixin, ListView):
-    """View for user's orders"""
-
-    model = Order
-    template_name = "services/my_orders.html"
-    context_object_name = "orders"
-    paginate_by = 10
-
-    def get_queryset(self):
-        return Order.objects.filter(client=self.request.user).order_by("-created_at")
-
-
 LEAD_FEE_CENTS = 2000  # 20 lei exemplu
 
 
