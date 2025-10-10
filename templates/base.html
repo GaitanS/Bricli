@@ -161,7 +161,7 @@
                             <a class="nav-link" href="{% url 'auth:login' %}">Conectare</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn ms-2" href="{% url 'auth:register' %}" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); border: none; color: white; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 500;">Înregistrare</a>
+                            <a class="btn ms-2" href="{% url 'auth:registration_choice' %}" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); border: none; color: white; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 500;">Înregistrare</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -208,7 +208,7 @@
                             <a href="{% url 'auth:login' %}" class="btn btn-outline-primary">
                                 <i class="fas fa-sign-in-alt me-2"></i>Conectare
                             </a>
-                            <a href="{% url 'auth:register' %}" class="btn btn-primary">
+                            <a href="{% url 'auth:registration_choice' %}" class="btn btn-primary">
                                 <i class="fas fa-user-plus me-2"></i>Înregistrare
                             </a>
                         </div>
