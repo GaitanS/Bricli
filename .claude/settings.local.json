@@ -1,28 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./venv/Scripts/python.exe manage.py migrate accounts)",
-      "Bash(./venv/Scripts/python.exe -m pytest tests/test_contact_info.py -q)",
-      "Bash(pip install:*)",
-      "Bash(./venv/Scripts/python.exe -m ruff check:*)",
-      "Bash(./venv/Scripts/python.exe -m black .)",
-      "Bash(./venv/Scripts/python.exe -m pytest -q)",
-      "Bash(git reset:*)",
-      "Bash(findstr:*)",
-      "Bash(./venv/Scripts/python.exe -m black --check .)",
-      "Bash(./venv/Scripts/python.exe -m pytest tests/test_home_stats.py -v)",
-      "Bash(./venv/Scripts/python.exe -m pytest tests/test_home_stats.py -q)",
-      "Bash(del accountsmigrations0006_craftsmanprofile_slug.py)",
-      "Bash(./venv/Scripts/python.exe manage.py migrate)",
-      "Bash(./venv/Scripts/python.exe -m pytest tests/test_url_redirects.py -v)",
-      "Bash(./venv/Scripts/python.exe manage.py check)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(./venv/Scripts/python.exe -m pytest tests/test_url_redirects.py -q)",
-      "Bash(./venv/Scripts/python.exe -m pytest -v --collect-only)",
-      "Bash(del accountsurls.py)",
-      "Bash(./venv/Scripts/python.exe -m pytest tests/test_contact_info.py::TestContactInfoDisplay::test_craftsman_email_displays_correctly -v)",
-      "Bash(find:*)"
+      "Bash(./venv/Scripts/python.exe -m pytest tests/test_categories_page.py -v)"
     ],
     "deny": [],
     "ask": []
