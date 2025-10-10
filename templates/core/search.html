@@ -22,22 +22,13 @@
                     <form method="GET" action="{% url 'core:search' %}">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <input type="text" name="q" class="form-control" 
+                                <input type="text" name="q" class="form-control"
                                        placeholder="Ce serviciu cauți?" value="{{ query }}"
                                        list="popular-services">
                                 <datalist id="popular-services">
-                                    <option value="Renovare baie">
-                                    <option value="Instalare aer condiționat">
-                                    <option value="Vopsit apartament">
-                                    <option value="Montaj parchet">
-                                    <option value="Reparații instalații sanitare">
-                                    <option value="Amenajare grădină">
-                                    <option value="Montaj gresie și faianță">
-                                    <option value="Instalații electrice">
-                                    <option value="Reparații acoperiș">
-                                    <option value="Curățenie după renovare">
-                                    <option value="Montaj mobilier">
-                                    <option value="Transport și mutare">
+                                    {% for service in popular_services|slice:":20" %}
+                                        <option value="{{ service.name }}">
+                                    {% endfor %}
                                 </datalist>
                             </div>
                             <div class="col-md-3">
@@ -180,20 +171,16 @@
                         <div class="card-body">
                             <h6>Servicii populare:</h6>
                             <div class="mb-3">
-                                <a href="{% url 'core:search' %}?q=renovare+baie" class="badge bg-light text-dark text-decoration-none me-1 mb-1">Renovare baie</a>
-                                <a href="{% url 'core:search' %}?q=vopsit+apartament" class="badge bg-light text-dark text-decoration-none me-1 mb-1">Vopsit apartament</a>
-                                <a href="{% url 'core:search' %}?q=montaj+parchet" class="badge bg-light text-dark text-decoration-none me-1 mb-1">Montaj parchet</a>
-                                <a href="{% url 'core:search' %}?q=instalatii+sanitare" class="badge bg-light text-dark text-decoration-none me-1 mb-1">Instalații sanitare</a>
-                                <a href="{% url 'core:search' %}?q=amenajare+gradina" class="badge bg-light text-dark text-decoration-none me-1 mb-1">Amenajare grădină</a>
+                                {% for service in popular_services|slice:":5" %}
+                                    <a href="{% url 'core:search' %}?q={{ service.name|urlencode }}" class="badge bg-light text-dark text-decoration-none me-1 mb-1">{{ service.name }}</a>
+                                {% endfor %}
                             </div>
 
                             <h6>Categorii populare:</h6>
                             <ul class="list-unstyled">
-                                <li><a href="{% url 'services:category_detail' 'renovari-constructii' %}" class="text-decoration-none">Renovări și Construcții</a></li>
-                                <li><a href="{% url 'services:category_detail' 'instalatii-sanitare' %}" class="text-decoration-none">Instalații Sanitare</a></li>
-                                <li><a href="{% url 'services:category_detail' 'instalatii-electrice' %}" class="text-decoration-none">Instalații Electrice</a></li>
-                                <li><a href="{% url 'services:category_detail' 'curatenie-menaj' %}" class="text-decoration-none">Curățenie și Menaj</a></li>
-                                <li><a href="{% url 'services:category_detail' 'gradinarit-peisagistica' %}" class="text-decoration-none">Grădinărit</a></li>
+                                {% for category in categories|slice:":5" %}
+                                    <li><a href="{% url 'services:category_detail' category.slug %}" class="text-decoration-none">{{ category.icon_emoji|default:"🔧" }} {{ category.name }}</a></li>
+                                {% endfor %}
                             </ul>
                         </div>
                     </div>

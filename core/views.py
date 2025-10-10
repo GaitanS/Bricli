@@ -5,7 +5,7 @@ from django.utils.text import slugify
 from django.views.generic import ListView, TemplateView
 
 from accounts.models import County, CraftsmanProfile
-from services.models import Order, Review, ServiceCategory
+from services.models import Order, Review, Service, ServiceCategory
 
 from .models import FAQ, SiteSettings, Testimonial
 
@@ -227,6 +227,9 @@ class SearchView(ListView):
                 "total_craftsmen": total_craftsmen,
                 "verified_craftsmen": verified_craftsmen,
                 "search_performed": bool(query or county_id or rating_min),
+                # Suggestions sidebar data
+                "categories": ServiceCategory.objects.filter(is_active=True).order_by("name")[:8],
+                "popular_services": Service.objects.filter(is_popular=True, is_active=True).order_by("name")[:30],
             }
         )
         return context
