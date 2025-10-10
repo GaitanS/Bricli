@@ -37,17 +37,26 @@ db.sqlite3-journal
 /static/CACHE/
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
 
+# VSCode (keep useful configs, exclude workspace state)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 # Environment variables
 .env
 .env.local
 .env.*.local
+
+# Local development credentials (P1: admin password, demo users)
+README_LOCAL_ONLY.md
 
 # Testing
 .coverage
@@ -74,3 +83,4 @@ logs/
 *.pyc
 *.pyo
 *.pyd
+nul
