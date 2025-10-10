@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load lazy_loading %}
+{% load service_icons %}
 
 {% block title %}Rezultate căutare - Bricli{% endblock %}
 
@@ -179,7 +180,10 @@
                             <h6>Categorii populare:</h6>
                             <ul class="list-unstyled">
                                 {% for category in categories|slice:":5" %}
-                                    <li><a href="{% url 'services:category_detail' category.slug %}" class="text-decoration-none">{{ category.icon_emoji|default:"🔧" }} {{ category.name }}</a></li>
+                                    <li class="d-flex align-items-center mb-2">
+                                        {% category_icon_sm category %}
+                                        <a href="{% url 'services:category_detail' category.slug %}" class="text-decoration-none">{{ category.name }}</a>
+                                    </li>
                                 {% endfor %}
                             </ul>
                         </div>

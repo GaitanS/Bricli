@@ -4,7 +4,8 @@
       "Bash(./venv/Scripts/python.exe -m pytest tests/test_categories_page.py -v)",
       "Bash(./venv/Scripts/python.exe -m pytest tests/test_registration_choice.py -v)",
       "Bash(./venv/Scripts/python.exe -m pytest accounts/tests/test_registration_routes.py -v)",
-      "Bash(./venv/Scripts/python.exe:*)"
+      "Bash(./venv/Scripts/python.exe:*)",
+      "Bash(del services/tests.py)"
     ],
     "deny": [],
     "ask": []

@@ -150,8 +150,8 @@ class TestSuggestionsLinks:
             for service in popular_services[:5]:
                 assert f'<option value="{service.name}">' in content
 
-    def test_suggestions_shows_emoji_icons(self, client):
-        """Category suggestions should display emoji icons"""
+    def test_suggestions_shows_fa_icons(self, client):
+        """Category suggestions should display Font Awesome icons"""
         url = reverse("core:search")
         response = client.get(url, {"q": "test"})
 
@@ -159,11 +159,14 @@ class TestSuggestionsLinks:
         categories = response.context["categories"]
 
         if categories:
-            # At least one emoji should be present
-            for category in categories[:3]:
-                if category.icon_emoji and category.icon_emoji != "🔧":
-                    # Emoji should appear in the HTML
-                    assert category.icon_emoji in content
+            # Font Awesome icons should be present
+            assert "fas fa-" in content
+
+            # At least one category icon should be present
+            from services.icon_map import ICONS
+
+            icon_count = sum(1 for icon in ICONS.values() if icon in content)
+            assert icon_count >= 1, f"Expected at least 1 FA icon in suggestions, found {icon_count}"
 
     def test_suggestions_limits_display_count(self, client):
         """Suggestions should limit the number of displayed items"""

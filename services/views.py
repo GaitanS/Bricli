@@ -56,8 +56,10 @@ class ServiceCategoryListView(ListView):
         if cached_result is not None:
             return cached_result
 
-        queryset = ServiceCategory.objects.filter(is_active=True).annotate(
-            orders_count=Count("services__order", filter=Q(services__order__status="published"))
+        queryset = (
+            ServiceCategory.objects.filter(is_active=True)
+            .annotate(orders_count=Count("services__order", filter=Q(services__order__status="published")))
+            .order_by("name")  # Alphabetical ordering
         )
 
         # Cache the result for 30 minutes

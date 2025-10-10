@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load lazy_loading %}
+{% load service_icons %}
 
 {% block title %}Bricli - Găsește meșterul potrivit pentru tine{% endblock %}
 
@@ -186,10 +187,8 @@
                 <a href="{% url 'services:category_detail' category.slug %}" class="text-decoration-none">
                     <div class="service-category-card h-100">
                         <div class="card-body text-center p-4">
-                            <div class="service-category-icon bg-gradient-primary mx-auto">
-                                <i class="{{ category.icon|default:'fas fa-tools' }}"></i>
-                            </div>
-                            <h5 class="card-title fw-bold">{{ category.name }}</h5>
+                            {% category_icon_lg category %}
+                            <h5 class="card-title fw-bold mt-3">{{ category.name }}</h5>
                             <p class="card-text text-muted">{{ category.description|truncatewords:10 }}</p>
                             <div class="mb-2">
                                 <span class="badge text-white" style="background-color: #8B5CF6;">
