@@ -149,6 +149,17 @@ class CraftsmanProfile(models.Model):
         max_length=100, blank=True, null=True, help_text="Nume afișat (nume persoană sau denumire comercială)"
     )
 
+    # SEO-friendly slug generated from display_name
+    slug = models.SlugField(
+        max_length=120,
+        unique=True,
+        blank=True,
+        null=False,
+        default="",
+        allow_unicode=True,
+        help_text="URL-friendly identifier (auto-generated)",
+    )
+
     # Locație obligatorie (temporar opțională pentru migrație)
     county = models.ForeignKey(County, on_delete=models.CASCADE, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
@@ -217,6 +228,34 @@ class CraftsmanProfile(models.Model):
         city_name = self.city.name if self.city else "Necunoscut"
         county_name = self.county.name if self.county else "Necunoscut"
         return f"{self.display_name} - {city_name}, {county_name}"
+
+    def save(self, *args, **kwargs):
+        """Auto-generate slug from display_name or username if not set"""
+        if not self.slug:
+            import uuid
+
+            from django.utils.text import slugify
+
+            # Use display_name if available, otherwise use username with UUID for uniqueness
+            if self.display_name:
+                base_slug = slugify(self.display_name, allow_unicode=True)
+            else:
+                # Use username + short UUID to ensure uniqueness when display_name is missing
+                unique_suffix = str(uuid.uuid4())[:8]
+                base_slug = slugify(self.user.username, allow_unicode=True) or "user"
+                base_slug = f"{base_slug}-{unique_suffix}"
+
+            slug = base_slug
+            counter = 1
+
+            # Ensure uniqueness
+            while CraftsmanProfile.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
+        super().save(*args, **kwargs)
 
     def calculate_profile_completion(self):
         """Calculează procentajul de completare a profilului (0-100%)"""

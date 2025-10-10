@@ -11,7 +11,8 @@
       "Bash(findstr:*)",
       "Bash(./venv/Scripts/python.exe -m black --check .)",
       "Bash(./venv/Scripts/python.exe -m pytest tests/test_home_stats.py -v)",
-      "Bash(./venv/Scripts/python.exe -m pytest tests/test_home_stats.py -q)"
+      "Bash(./venv/Scripts/python.exe -m pytest tests/test_home_stats.py -q)",
+      "Bash(del accountsmigrations0006_craftsmanprofile_slug.py)"
     ],
     "deny": [],
     "ask": []
