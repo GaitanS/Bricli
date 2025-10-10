@@ -788,7 +788,11 @@ class InviteCraftsmenView(LoginRequiredMixin, DetailView):
                 if created:
                     invited_count += 1
                     # TODO: Send notification to craftsman
-            except:
+            except (Http404, ValueError) as e:
+                logger.warning(f"Failed to invite craftsman {craftsman_id}: {e}")
+                continue
+            except Exception as e:
+                logger.exception(f"Unexpected error inviting craftsman {craftsman_id}: {e}")
                 continue
 
         if invited_count > 0:

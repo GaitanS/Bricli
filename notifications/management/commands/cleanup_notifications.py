@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.core.management.base import BaseCommand
+from django.db import models
 from django.utils import timezone
 
 from notifications.models import Notification, PushSubscription
