@@ -270,8 +270,10 @@
                             const captionEl = document.getElementById('lightboxCaption');
                             const counterEl = document.getElementById('lightboxCounter');
                             let currentIndex = 0;
+                            let modal = null;
 
-                            function showImage(index) {
+                            function updateImage(index) {
+                                // Update image content without showing/hiding modal
                                 if (index < 0) index = images.length - 1;
                                 if (index >= images.length) index = 0;
                                 currentIndex = index;
@@ -280,24 +282,51 @@
                                 lightboxImage.alt = img.getAttribute('alt') || '';
                                 captionEl.textContent = lightboxImage.alt || '';
                                 counterEl.textContent = `${currentIndex + 1} / ${images.length}`;
-                                const modal = bootstrap.Modal.getOrCreateInstance(lightbox);
+                            }
+
+                            function openLightbox(index) {
+                                // Open modal and show specific image
+                                updateImage(index);
+                                if (!modal) {
+                                    modal = new bootstrap.Modal(lightbox);
+                                }
                                 modal.show();
                             }
 
+                            // Click on portfolio image to open lightbox
                             images.forEach((img, idx) => {
-                                img.addEventListener('click', () => showImage(idx));
+                                img.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    openLightbox(idx);
+                                });
                             });
 
-                            prevBtn.addEventListener('click', () => showImage(currentIndex - 1));
-                            nextBtn.addEventListener('click', () => showImage(currentIndex + 1));
+                            // Navigation buttons (only update image, don't re-show modal)
+                            prevBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                updateImage(currentIndex - 1);
+                            });
+                            nextBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                updateImage(currentIndex + 1);
+                            });
 
                             // Keyboard navigation
                             document.addEventListener('keydown', (e) => {
                                 const isOpen = lightbox.classList.contains('show');
                                 if (!isOpen) return;
-                                if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
-                                if (e.key === 'ArrowRight') showImage(currentIndex + 1);
-                                if (e.key === 'Escape') bootstrap.Modal.getInstance(lightbox)?.hide();
+                                if (e.key === 'ArrowLeft') {
+                                    e.preventDefault();
+                                    updateImage(currentIndex - 1);
+                                }
+                                if (e.key === 'ArrowRight') {
+                                    e.preventDefault();
+                                    updateImage(currentIndex + 1);
+                                }
+                                if (e.key === 'Escape') {
+                                    e.preventDefault();
+                                    modal?.hide();
+                                }
                             });
                         })();
                     </script>
