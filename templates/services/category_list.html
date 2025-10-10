@@ -15,7 +15,9 @@
             <a href="{% url 'services:category_detail' category.slug %}" class="text-decoration-none">
                 <div class="card h-100 shadow-sm hover-card">
                     <div class="card-body text-center p-4">
-                        <i class="{{ category.icon|default:'fas fa-tools' }} fs-1 mb-3" style="color: var(--bricli-primary);"></i>
+                        <div class="service-category-icon bg-gradient-primary mx-auto mb-3" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <span style="font-size: 2.5rem;" aria-hidden="true">{{ category.icon_emoji|default:"🔧" }}</span>
+                        </div>
                         <h5 class="card-title">{{ category.name }}</h5>
                         <p class="card-text text-muted">{{ category.description }}</p>
                         

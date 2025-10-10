@@ -10,14 +10,26 @@
     <div class="row mb-4">
         <div class="col-12">
 
-            
+
             <div class="d-flex align-items-center mb-3">
-                <i class="{{ category.icon }} text-primary fs-1 me-3"></i>
+                <span class="me-3" style="font-size: 3.5rem;" aria-hidden="true">{{ category.icon_emoji|default:"🔧" }}</span>
                 <div>
                     <h1 class="mb-1">{{ category.name }}</h1>
                     <p class="text-muted mb-0">{{ category.description }}</p>
                 </div>
             </div>
+
+            <!-- Popular Services as badges -->
+            {% if popular_services %}
+            <div class="mb-4">
+                <h6 class="text-muted mb-2">Servicii populare:</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for s in popular_services %}
+                        <a href="{% url 'core:search' %}?q={{ s.name|urlencode }}" class="badge bg-light text-dark text-decoration-none me-1 mb-1 px-3 py-2">{{ s.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
             
             <div class="row g-4 text-center">
                 <div class="col-md-6">
