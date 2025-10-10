@@ -20,7 +20,8 @@
 ✅ **301 redirects** - old English URLs → new Romanian ASCII URLs
 ✅ **Servicii/Categorii** - 8 categories seeded, page displays content
 ✅ **Registration choice** - /inregistrare/ shows Meșter vs Client options
-✅ **Comprehensive tests** - 39/39 tests passing
+✅ **Route aliases** - backward compatibility for old template references
+✅ **Comprehensive tests** - 48/48 tests passing (9 new regression tests)
 ✅ **Django check: 0 issues**
 
 ### URL Mapping Final (ASCII-only for SEO)
@@ -38,11 +39,13 @@
 
 - **`auth`** (root-level) - Authentication URLs
   - `/inregistrare/` - Registration choice
-  - `/inregistrare/client/` - Client registration
-  - `/inregistrare/meserias/` - Craftsman registration (ASCII: ș→s)
+  - `/inregistrare/client/` - Client registration (**canonical**: `auth:register`, **alias**: `auth:simple_register`)
+  - `/inregistrare/meserias/` - Craftsman registration (**canonical**: `auth:craftsman_register`, **alias**: `auth:simple_craftsman_register`) (ASCII: ș→s)
   - `/autentificare/` - Login
   - `/deconectare/` - Logout
   - `/resetare-parola/*` - Password reset flow
+
+  **Note**: Aliases introduced for backward compatibility with old templates. All new code should use canonical names.
 
 - **`accounts`** (under /conturi/) - Profile & craftsmen
   - `/conturi/profil/` - User profile
