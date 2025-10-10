@@ -13,7 +13,11 @@ urlpatterns = [
     # Registration choice and forms
     path("inregistrare/", views.RegistrationChoiceView.as_view(), name="registration_choice"),
     path("inregistrare/client/", views.SimpleRegisterView.as_view(), name="register"),
+    # Alias for backward compatibility (old templates may use simple_register)
+    path("inregistrare/client/", views.SimpleRegisterView.as_view(), name="simple_register"),
     path("inregistrare/meserias/", views.SimpleCraftsmanRegisterView.as_view(), name="craftsman_register"),
+    # Alias for backward compatibility (old templates may use simple_craftsman_register)
+    path("inregistrare/meserias/", views.SimpleCraftsmanRegisterView.as_view(), name="simple_craftsman_register"),
     # Login/Logout
     path("autentificare/", views.LoginView.as_view(), name="login"),
     path("deconectare/", views.LogoutView.as_view(), name="logout"),
