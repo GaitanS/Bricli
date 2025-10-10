@@ -707,7 +707,7 @@ def confirm_email(request, uidb64, token):
         return redirect("core:home")
     else:
         messages.error(request, "Linkul de confirmare este invalid sau a expirat. Te rugăm să încerci din nou.")
-        return redirect("accounts:simple_craftsman_register")
+        return redirect("auth:craftsman_register")
 
 
 # Password Reset Views

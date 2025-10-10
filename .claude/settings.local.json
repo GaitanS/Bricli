@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./venv/Scripts/python.exe -m pytest tests/test_categories_page.py -v)"
+      "Bash(./venv/Scripts/python.exe -m pytest tests/test_categories_page.py -v)",
+      "Bash(./venv/Scripts/python.exe -m pytest tests/test_registration_choice.py -v)"
     ],
     "deny": [],
     "ask": []
