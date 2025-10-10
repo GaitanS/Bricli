@@ -922,3 +922,11 @@ class TwoFactorBackupCodesView(LoginRequiredMixin, TemplateView):
         )
 
         return redirect("accounts:two_factor_backup_codes")
+
+
+class RegistrationChoiceView(TemplateView):
+    """
+    Landing page for registration - choose between Client or Craftsman (Meserias)
+    """
+
+    template_name = "accounts/registration_choice.html"

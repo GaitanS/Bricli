@@ -34,6 +34,7 @@ class RomanianURLRedirectMiddleware:
         # Profile/dashboard → Conturi
         (r"^/accounts/profil/(.*)$", r"/conturi/profil/\1"),
         (r"^/accounts/portofoliu/(.*)$", r"/conturi/portofoliu/\1"),
+        (r"^/accounts/integrare/(.*)$", r"/conturi/integrare/\1"),
         # Auth → Root level
         (r"^/accounts/inregistrare/(.*)$", r"/inregistrare/\1"),
         (r"^/accounts/autentificare/$", "/autentificare/"),

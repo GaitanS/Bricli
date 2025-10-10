@@ -13,11 +13,15 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # API endpoints
     path("api/health/", HealthCheckAPIView.as_view(), name="api_health"),
-    # App URLs
+    # App URLs - Romanian ASCII paths with separate namespaces
     path("", include("core.urls")),
-    path("accounts/", include("accounts.urls")),
-    path("services/", include("services.urls")),
-    path("messages/", include("messaging.urls")),
+    # Auth URLs at root (namespace: 'auth')
+    path("", include("accounts.auth_urls")),  # /inregistrare/, /autentificare/
+    # Profile URLs under /conturi/ (namespace: 'accounts')
+    path("conturi/", include("accounts.profile_urls")),  # /conturi/profil/, /conturi/meseriasi/
+    # Services, messaging, etc.
+    path("servicii/", include("services.urls")),  # /servicii/categorii/
+    path("mesaje/", include("messaging.urls")),  # /mesaje/conversatie/
     path("moderation/", include("moderation.urls")),
     path("notifications/", include("notifications.urls")),
 ]

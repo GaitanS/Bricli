@@ -13,7 +13,14 @@
       "Bash(./venv/Scripts/python.exe -m pytest tests/test_home_stats.py -v)",
       "Bash(./venv/Scripts/python.exe -m pytest tests/test_home_stats.py -q)",
       "Bash(del accountsmigrations0006_craftsmanprofile_slug.py)",
-      "Bash(./venv/Scripts/python.exe manage.py migrate)"
+      "Bash(./venv/Scripts/python.exe manage.py migrate)",
+      "Bash(./venv/Scripts/python.exe -m pytest tests/test_url_redirects.py -v)",
+      "Bash(./venv/Scripts/python.exe manage.py check)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(./venv/Scripts/python.exe -m pytest tests/test_url_redirects.py -q)",
+      "Bash(./venv/Scripts/python.exe -m pytest -v --collect-only)",
+      "Bash(del accountsurls.py)"
     ],
     "deny": [],
     "ask": []
