@@ -1,0 +1,34 @@
+{# Compact search bar with mobile filter button #}
+<div class="mb-3">
+    <form method="GET" action="{% url 'core:search' %}" class="d-flex gap-2 mb-3">
+        <input type="search"
+               name="q"
+               class="form-control"
+               placeholder="Ce serviciu cauți?"
+               value="{{ query }}"
+               list="popular-services-list">
+
+        <datalist id="popular-services-list">
+            {% for service in popular_services|slice:":20" %}
+                <option value="{{ service.name }}">
+            {% endfor %}
+        </datalist>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search me-1 d-none d-sm-inline"></i>Caută
+        </button>
+
+        {# Mobile filter button - opens offcanvas #}
+        <button type="button"
+                class="btn btn-outline-secondary d-lg-none"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#filtersOffcanvas"
+                aria-controls="filtersOffcanvas"
+                id="filterBtn">
+            <i class="fas fa-sliders-h me-1"></i><span id="filterBtnText">Filtrează</span>
+        </button>
+    </form>
+
+    {# Active filter chips #}
+    {% include "core/search/_filter_chips.html" %}
+</div>

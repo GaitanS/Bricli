@@ -1,0 +1,109 @@
+{% load querystring %}
+{# Mobile filter offcanvas (Bootstrap drawer) #}
+<div class="offcanvas offcanvas-end d-lg-none"
+     tabindex="-1"
+     id="filtersOffcanvas"
+     aria-labelledby="filtersOffcanvasLabel">
+
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="filtersOffcanvasLabel">
+            <i class="fas fa-sliders-h me-2"></i>Filtre
+        </h5>
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Închide"></button>
+    </div>
+
+    <div class="offcanvas-body">
+        <form method="GET" action="{% url 'core:search' %}">
+            {# Preserve query parameter #}
+            <input type="hidden" name="q" value="{{ query }}">
+
+            {# County filter #}
+            <div class="mb-4">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-map-marker-alt me-1 text-primary"></i>Județ
+                </label>
+                <select name="county" class="form-select">
+                    <option value="">Toate județele</option>
+                    {% for c in counties %}
+                        <option value="{{ c.slug }}"
+                                {% if county and county.id == c.id %}selected{% endif %}>
+                            {{ c.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {# Category filter #}
+            <div class="mb-4">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-tag me-1 text-info"></i>Categorie
+                </label>
+
+                {# Category search #}
+                <input type="search"
+                       class="form-control form-control-sm mb-2"
+                       placeholder="Caută categorie..."
+                       oninput="filterCatOptions(this.value)">
+
+                {# Category radio buttons #}
+                <div id="categoryScroll" class="border rounded p-2" style="max-height: 240px; overflow-y: auto;">
+                    {% for cat in service_categories %}
+                        <div class="form-check category-option">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="category"
+                                   id="cat-{{ cat.slug }}"
+                                   value="{{ cat.slug }}"
+                                   {% if active_category and active_category.id == cat.id %}checked{% endif %}>
+                            <label class="form-check-label" for="cat-{{ cat.slug }}">
+                                <span class="me-1">{{ cat.icon_emoji }}</span>{{ cat.name }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                    <div class="small text-muted text-center py-2" id="noCatMatch" style="display:none;">
+                        Nicio categorie găsită.
+                    </div>
+                </div>
+
+                {# Clear category button #}
+                {% if active_category %}
+                <button type="button"
+                        class="btn btn-sm btn-outline-secondary mt-2 w-100"
+                        onclick="document.querySelectorAll('input[name=category]').forEach(r=>r.checked=false)">
+                    <i class="fas fa-times me-1"></i>Șterge categorie
+                </button>
+                {% endif %}
+            </div>
+
+            {# Rating filter #}
+            <div class="mb-4">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-star me-1 text-warning"></i>Rating minim
+                </label>
+                <select name="rating" class="form-select">
+                    <option value="">Orice rating</option>
+                    <option value="5" {% if rating_min == '5' %}selected{% endif %}>5 stele</option>
+                    <option value="4.5" {% if rating_min == '4.5' %}selected{% endif %}>4.5+ stele</option>
+                    <option value="4.0" {% if rating_min == '4.0' %}selected{% endif %}>4.0+ stele</option>
+                    <option value="3.5" {% if rating_min == '3.5' %}selected{% endif %}>3.5+ stele</option>
+                    <option value="3.0" {% if rating_min == '3.0' %}selected{% endif %}>3.0+ stele</option>
+                </select>
+            </div>
+
+            {# Action buttons #}
+            <div class="d-flex gap-2 border-top pt-3">
+                <a href="?{% querystring county=None category=None rating=None %}"
+                   class="btn btn-outline-secondary flex-fill"
+                   data-bs-dismiss="offcanvas">
+                    <i class="fas fa-redo me-1"></i>Reset
+                </a>
+                <button type="submit" class="btn btn-primary flex-fill">
+                    <i class="fas fa-check me-1"></i>Aplică filtre
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

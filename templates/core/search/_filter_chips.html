@@ -1,0 +1,45 @@
+{% load querystring %}
+{# Active filter chips with removal links #}
+{% if query or county or active_category or rating_min %}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    <small class="text-muted">Filtre active:</small>
+
+    {% if query %}
+    <a href="?{% querystring q=None %}"
+       class="badge bg-light text-dark border text-decoration-none"
+       title="Elimină căutare">
+        „{{ query }}" <i class="fas fa-times ms-1"></i>
+    </a>
+    {% endif %}
+
+    {% if county %}
+    <a href="?{% querystring county=None %}"
+       class="badge bg-primary text-white text-decoration-none"
+       title="Elimină filtru județ">
+        <i class="fas fa-map-marker-alt me-1"></i>{{ county.name }} <i class="fas fa-times ms-1"></i>
+    </a>
+    {% endif %}
+
+    {% if active_category %}
+    <a href="?{% querystring category=None %}"
+       class="badge bg-info text-white text-decoration-none"
+       title="Elimină filtru categorie">
+        <span class="me-1">{{ active_category.icon_emoji }}</span>{{ active_category.name }} <i class="fas fa-times ms-1"></i>
+    </a>
+    {% endif %}
+
+    {% if rating_min %}
+    <a href="?{% querystring rating=None %}"
+       class="badge bg-warning text-dark text-decoration-none"
+       title="Elimină filtru rating">
+        <i class="fas fa-star me-1"></i>{{ rating_min }}+ <i class="fas fa-times ms-1"></i>
+    </a>
+    {% endif %}
+
+    <a href="{% url 'core:search' %}"
+       class="badge bg-secondary text-white text-decoration-none ms-auto"
+       title="Șterge toate filtrele">
+        <i class="fas fa-redo me-1"></i>Șterge toate
+    </a>
+</div>
+{% endif %}
