@@ -59,9 +59,9 @@
     box-shadow: 0 0 0 .25rem rgba(139, 92, 246, .35);
 }
 
-/* Safari/Firefox fallback - ensure white dot on radio */
+/* Safari/Firefox fallback - ensure violet dot on radio */
 .form-check-input[type="radio"]:checked {
-    background-image: radial-gradient(#fff 42%, #fff 42%);
+    background-image: radial-gradient(#8b5cf6 42%, #8b5cf6 42%);
 }
 
 /* Perfectly centered category icon */
