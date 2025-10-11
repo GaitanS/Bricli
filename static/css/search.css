@@ -188,6 +188,56 @@
         padding-right: 1rem;
     }
 
+    /* Search bar mobile improvements */
+    .form-control-lg {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border-radius: 0.5rem;
+        border: 2px solid #e5e7eb;
+        transition: all 0.2s ease;
+    }
+
+    .form-control-lg:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.15);
+    }
+
+    /* Mobile buttons - larger touch targets */
+    .btn.flex-fill {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+    }
+
+    /* Primary button on mobile */
+    .btn-primary.flex-fill {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        border: none;
+        box-shadow: 0 4px 6px rgba(139, 92, 246, 0.25);
+    }
+
+    .btn-primary.flex-fill:hover,
+    .btn-primary.flex-fill:focus {
+        background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        box-shadow: 0 6px 8px rgba(139, 92, 246, 0.35);
+        transform: translateY(-1px);
+    }
+
+    /* Secondary button on mobile */
+    .btn-outline-secondary.flex-fill {
+        border: 2px solid #e5e7eb;
+        color: #374151;
+        background: #fff;
+    }
+
+    .btn-outline-secondary.flex-fill:hover,
+    .btn-outline-secondary.flex-fill:focus {
+        border-color: #8b5cf6;
+        color: #8b5cf6;
+        background: #f5f3ff;
+    }
+
     /* More spacing between sections */
     .py-4 {
         padding-top: 1.5rem !important;
