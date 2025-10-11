@@ -12,6 +12,46 @@
 ✅ Django check: 0 issues
 ✅ Migrations: up to date
 
+## 🎉 Search v2 COMPLETAT - 11 Ianuarie 2025
+
+**Advanced search with county slugs, category filtering, and active filter chips!**
+
+✅ **County slugs** - SEO-friendly slugs for all counties (București → bucuresti, Iași → iasi)
+✅ **County filtering** - Accepts id/slug/name, ignores invalid values (`.`, `all`)
+✅ **301 redirects** - `?county=<id>` → `?county=<slug>` (middleware)
+✅ **Category filtering** - Filter by service category slug, validates against active categories
+✅ **Active filter chips** - Visual badges showing active filters (county, category, rating)
+✅ **Filter removal** - Each chip has "X" link to remove that filter
+✅ **Query sanitization** - Strips whitespace, handles diacritics, min length validation
+✅ **Comprehensive tests** - 39/39 tests passing (county slugs, filtering, diacritics, links)
+✅ **Django check: 0 issues**
+
+### Implementation Details
+
+**County Slugs:**
+- Added `slug` field to County model (unique, indexed, blank for migration)
+- `populate_county_slugs` management command with Romanian transliteration
+- Idempotent command can be run multiple times safely
+
+**Search Filters:**
+- `core/filters.py` with utilities: `normalize_slug()`, `sanitize_query()`, `get_county_by_any()`
+- `CountySlugRedirectMiddleware` for automatic 301 redirects from IDs to slugs
+- Category filtering via `services__service__category__slug` relationship
+- Distinct results to avoid duplicates when craftsman has multiple services
+
+**UI Enhancements:**
+- Active filters displayed as colored chips (primary=county, info=category, warning=rating)
+- Category filter sidebar with emoji icons and active state highlighting
+- Filter removal links preserve other query parameters
+- Search form uses county slugs in dropdown
+
+**Example URLs:**
+- `/cautare/?q=instalatii&category=finisaje&county=bucuresti`
+- `/cautare/?category=constructii&rating=4.5&county=cluj`
+- `/cautare/?q=renovare&county=iasi` (diacritics handled automatically)
+
+---
+
 ## 🎉 Fix-Lot-RO COMPLETAT - 11 Ianuarie 2025
 
 **URL-uri românești ASCII + funcționalități corectate!**

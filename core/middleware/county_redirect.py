@@ -7,7 +7,6 @@ Only applies to GET requests.
 """
 
 from django.http import HttpResponsePermanentRedirect
-from django.utils.http import urlencode
 
 from accounts.models import County
 
@@ -40,8 +39,8 @@ class CountySlugRedirectMiddleware:
                         new_params = request.GET.copy()
                         new_params["county"] = county.slug
 
-                        # Build new URL with updated query string
-                        new_url = f"{request.path}?{urlencode(new_params)}"
+                        # Build new URL with updated query string (doseq=True handles lists properly)
+                        new_url = f"{request.path}?{new_params.urlencode()}"
 
                         # Return 301 Permanent Redirect
                         return HttpResponsePermanentRedirect(new_url)
