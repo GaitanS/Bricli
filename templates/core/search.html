@@ -8,6 +8,10 @@
     {% if query %}Rezultate pentru "{{ query }}"{% else %}Caută meșteri{% endif %} - Bricli
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
     {# Compact search bar + mobile filter button #}
