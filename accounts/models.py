@@ -113,6 +113,7 @@ class User(AbstractUser):
 class County(models.Model):
     name = models.CharField(max_length=100, unique=True)
     code = models.CharField(max_length=2, unique=True)  # RO county codes
+    slug = models.SlugField(max_length=80, unique=True, db_index=True, blank=True, help_text="URL-friendly slug")
 
     class Meta:
         verbose_name_plural = "Counties"
