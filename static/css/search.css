@@ -179,3 +179,115 @@
         font-size: 0.75rem;
     }
 }
+
+/* Mobile layout optimizations - more breathing room */
+@media (max-width: 991.98px) {
+    /* Reduce container padding on mobile */
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* More spacing between sections */
+    .py-4 {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+
+    /* Larger spacing for filter chips on mobile */
+    .gap-2 {
+        gap: 0.75rem !important;
+    }
+
+    /* More breathing room for result cards */
+    .card.mb-3 {
+        margin-bottom: 1.5rem !important;
+    }
+
+    /* Better padding for card content */
+    .card-body {
+        padding: 1.25rem !important;
+    }
+
+    /* Increase spacing between elements in cards */
+    .mb-1 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    /* Results header with more space */
+    .d-flex.justify-content-between.align-items-center.mb-3 {
+        margin-bottom: 1.5rem !important;
+    }
+
+    /* Sort bar with more spacing */
+    .row.align-items-center.mb-3.g-2 {
+        margin-bottom: 1.5rem !important;
+        row-gap: 1rem !important;
+    }
+
+    /* Empty state icon larger on mobile */
+    .text-center.py-5 i.fa-search {
+        font-size: 3rem !important;
+    }
+
+    /* CTA buttons stack better on mobile */
+    .text-center.py-5 .btn {
+        display: block;
+        width: 100%;
+        margin: 0.5rem 0 !important;
+    }
+
+    /* Profile image with more space */
+    .col-sm-3.text-center {
+        margin-bottom: 1rem !important;
+    }
+
+    /* Action buttons with better spacing */
+    .col-md-3 .d-grid.gap-2 {
+        gap: 0.75rem !important;
+        margin-top: 1rem !important;
+    }
+}
+
+/* Extra small devices - even more spacing */
+@media (max-width: 575.98px) {
+    /* Container with minimal padding */
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    /* Results header font size adjustment */
+    .h4 {
+        font-size: 1.25rem !important;
+    }
+
+    /* Badge smaller on very small screens */
+    .h4 .badge {
+        font-size: 0.7rem !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+
+    /* Card content more compact but still breathable */
+    .card-body {
+        padding: 1rem !important;
+    }
+
+    /* Profile info text smaller */
+    .card-text.small {
+        font-size: 0.8rem !important;
+    }
+
+    /* Pagination more compact */
+    .pagination {
+        font-size: 0.875rem;
+    }
+
+    .pagination .page-link {
+        padding: 0.375rem 0.75rem;
+    }
+}
