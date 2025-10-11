@@ -44,6 +44,45 @@
     background: #94a3b8;
 }
 
+/* Violet radio/checkbox styling */
+.form-check-input {
+    accent-color: #8b5cf6;
+}
+
+.form-check-input:checked {
+    background-color: #8b5cf6;
+    border-color: #8b5cf6;
+}
+
+.form-check-input:focus {
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 .25rem rgba(139, 92, 246, .35);
+}
+
+/* Safari/Firefox fallback - ensure white dot on radio */
+.form-check-input[type="radio"]:checked {
+    background-image: radial-gradient(#fff 42%, #fff 42%);
+}
+
+/* Perfectly centered category icon */
+.category-icon-sm {
+    width: 28px;
+    height: 28px;
+    display: inline-grid;
+    place-items: center;
+    vertical-align: middle;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%);
+    box-shadow: 0 6px 12px rgba(139, 92, 246, .25);
+}
+
+.category-icon-sm i {
+    display: block;
+    font-size: 13px;
+    line-height: 1;
+    color: #fff;
+}
+
 /* Smooth transitions for form controls */
 .form-select,
 .form-control {
