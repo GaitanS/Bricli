@@ -26,7 +26,20 @@
 ✅ **Comprehensive tests** - 39/39 tests passing (county slugs, filtering, diacritics, links)
 ✅ **Django check: 0 issues**
 
-### Implementation Details
+## 🎉 Search UX v2.1 COMPLETAT - 11 Ianuarie 2025
+
+**Smart filters with visual stars, intelligent sorting, and pagination controls!**
+
+✅ **Unified icons** - Font Awesome icons replace emojis in filters (consistent with /servicii/categorii/)
+✅ **Visual star rating filter** - Radio buttons with filled/half/empty stars, result counts per threshold
+✅ **Smart rating buckets** - Counts calculated BEFORE applying filter (accurate UX)
+✅ **Sort options** - Popular, newest, reviews, rating (preserves filters across navigation)
+✅ **Pagination controls** - 60/80/100 per page (default 60), overrides ListView paginate_by
+✅ **View toggle** - List/grid view modes (default grid), parameter preserved in URLs
+✅ **Comprehensive tests** - 65 total tests passing (19 search UI + 38 new UX v2.1 tests)
+✅ **Django check: 0 issues**
+
+### Implementation Details (Search v2)
 
 **County Slugs:**
 - Added `slug` field to County model (unique, indexed, blank for migration)
@@ -49,6 +62,60 @@
 - `/cautare/?q=instalatii&category=finisaje&county=bucuresti`
 - `/cautare/?category=constructii&rating=4.5&county=cluj`
 - `/cautare/?q=renovare&county=iasi` (diacritics handled automatically)
+
+### Implementation Details (Search UX v2.1)
+
+**Phase A: Unified Category Icons**
+- `core/templatetags/stars.py` - `stars_5()` template tag renders 5-star display
+- `core/templatetags/dictutils.py` - `get_item()` filter for dict access, `split()` for string splitting
+- Replaced `{{ cat.icon_emoji }}` with `{% category_icon_sm cat %}` in sidebar and offcanvas
+- Uses existing `services/templatetags/service_icons.py` from /servicii/categorii/
+
+**Phase B: Visual Star Rating Filter**
+- Rating radio buttons with visual stars (filled/half/empty icons)
+- Result counts displayed as badges next to each threshold
+- Rating buckets (3.0, 3.5, 4.0, 4.5, 5.0) calculated BEFORE applying rating filter
+- `<details>` accordion in sidebar for collapsible rating section
+- "Șterge rating" clear button when rating is selected
+
+**Phase C: Sort Bar + Pagination + View Toggle**
+- `templates/core/search/_sort_bar.html` - Sort dropdown, per-page selector, view toggle buttons
+- Sort options:
+  - **Popular** (default): verified → rating → reviews → jobs → newest
+  - **Newest**: Most recent registrations first
+  - **Reviews**: Most reviewed craftsmen first
+  - **Rating**: Highest rated craftsmen first
+- Pagination: 60 (default), 80, 100 results per page
+- View modes: Grid (default), List
+- All parameters preserved across navigation using querystring template tag
+
+**Phase D: Rating Bucket Logic**
+- `SearchView.get_context_data()` calculates rating_counts before applying rating filter
+- Reuses search query, county, and category filters
+- Ensures accurate "N results" counts at each rating threshold
+- Example: If 100 total results, shows "5.0+ (10)", "4.5+ (30)", "4.0+ (50)", etc.
+
+**Phase E: Comprehensive Tests**
+- `tests/test_search_icons.py` (7 tests) - Verify Font Awesome icons, no raw emojis
+- `tests/test_search_rating_stars.py` (12 tests) - Star rendering, rating buckets, filters
+- `tests/test_search_sort_pagination.py` (19 tests) - Sort modes, per-page, view toggle, parameter preservation
+
+**Key Files Modified:**
+- `core/views.py` - Added `get_paginate_by()`, sort logic, rating bucket calculations
+- `templates/core/search/_filter_sidebar.html` - Stars + radio buttons for rating
+- `templates/core/search/_filter_offcanvas.html` - Stars + radio buttons for rating
+- `templates/core/search/_sort_bar.html` - NEW sort, per-page, view toggle controls
+- `templates/core/search.html` - Includes sort bar above results
+
+**Template Tags:**
+- `{% stars_5 threshold %}` - Renders 5 stars with filled/half/empty icons
+- `{{ rating_counts|get_item:threshold }}` - Accesses dict value (converts string to float key)
+- `{{ "5.0,4.5,4.0,3.5,3.0"|split:"," }}` - Splits string by delimiter
+
+**Example URL with all parameters:**
+```
+/cautare/?q=instalatii&county=bucuresti&category=finisaje&rating=4.0&sort=rating&per_page=80&view=list
+```
 
 ---
 
