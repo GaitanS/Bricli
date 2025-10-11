@@ -81,7 +81,7 @@ class SimpleCraftsmanRegisterView(CreateView):
     model = User
     form_class = SimpleCraftsmanRegistrationForm
     template_name = "accounts/simple_craftsman_register.html"
-    success_url = reverse_lazy("core:home")
+    success_url = reverse_lazy("accounts:profile")
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -90,6 +90,10 @@ class SimpleCraftsmanRegisterView(CreateView):
             else:
                 return redirect("services:my_orders")
         return super().dispatch(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        """Keep user on page with error messages when form is invalid"""
+        return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
         # Save the user and profile normally first
@@ -291,82 +295,107 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
 class CraftsmenListView(ListView):
     model = CraftsmanProfile
     template_name = "accounts/craftsmen_list.html"
-    context_object_name = "craftsmen"
-    paginate_by = 12
+    context_object_name = "results"
+    paginate_by = 20
 
     def get_paginate_by(self, queryset):
-        """Allow dynamic page size based on user preference"""
-        page_size = self.request.GET.get("page_size")
-        if page_size and page_size.isdigit():
-            page_size = int(page_size)
-            # Limit page size to reasonable values
-            if 1 <= page_size <= 100:
-                return page_size
+        """Allow dynamic page size"""
+        per_page = self.request.GET.get("per_page")
+        if per_page and per_page.isdigit():
+            per_page = int(per_page)
+            # Limit to 10-60 range
+            return max(10, min(60, per_page))
         return self.paginate_by
 
     def get_queryset(self):
-        from django.core.cache import cache
+        from services.models import ServiceCategory
 
-        from core.cache_utils import CacheManager
+        # Get filter parameters
+        q = (self.request.GET.get("q") or "").strip()
+        county = self.request.GET.get("county") or ""
+        category = self.request.GET.get("category") or ""
+        verified = self.request.GET.get("verified") == "1"
+        available = self.request.GET.get("available") == "1"
+        rating = self.request.GET.get("rating")
+        sort = self.request.GET.get("sort") or "popular"
 
-        # Create cache key based on filters and page size
-        county = self.request.GET.get("county", "")
-        service = self.request.GET.get("service", "")
-        search = self.request.GET.get("search", "")
-        page_size = self.get_paginate_by(None)
+        # Base queryset
+        qs = CraftsmanProfile.objects.filter(user__is_active=True, is_active=True)
+        qs = qs.select_related("user", "county").prefetch_related("categories")
 
-        cache_key = CacheManager.generate_key(
-            "craftsmen_list", county=county, service=service, search=search, page_size=page_size
-        )
-
-        # Try to get from cache first
-        cached_result = cache.get(cache_key)
-        if cached_result is not None:
-            return cached_result
-
-        # Build queryset with optimized select_related and prefetch_related
-        queryset = (
-            CraftsmanProfile.objects.filter(user__is_active=True)
-            .select_related("user", "county", "city")
-            .prefetch_related("services__service")
-        )
-
-        # Filter by county
-        if county:
-            queryset = queryset.filter(county_id=county)
-
-        # Filter by service
-        if service:
-            queryset = queryset.filter(services__service_id=service)
-
-        # Search by name or company
-        if search:
-            queryset = queryset.filter(
-                models.Q(user__first_name__icontains=search)
-                | models.Q(user__last_name__icontains=search)
-                | models.Q(company_name__icontains=search)
+        # Text search
+        if q:
+            qs = qs.filter(
+                models.Q(user__first_name__icontains=q)
+                | models.Q(user__last_name__icontains=q)
+                | models.Q(bio__icontains=q)
+                | models.Q(company_name__icontains=q)
             )
 
-        # Order and evaluate queryset
-        queryset = queryset.order_by("-average_rating", "-total_reviews")
+        # County filter (by slug)
+        if county:
+            county_obj = County.objects.filter(slug=county).first()
+            if county_obj:
+                qs = qs.filter(county=county_obj)
 
-        # Cache the result for 15 minutes
-        cache.set(cache_key, queryset, 900)
+        # Category filter (by slug)
+        if category:
+            category_obj = ServiceCategory.objects.filter(slug=category).first()
+            if category_obj:
+                qs = qs.filter(categories=category_obj)
 
-        return queryset
+        # Verified filter
+        if verified:
+            qs = qs.filter(user__is_verified=True)
+
+        # Available filter (if field exists)
+        if available and hasattr(CraftsmanProfile, "is_available"):
+            qs = qs.filter(is_available=True)
+
+        # Hourly rate filter (if fields exist)
+        min_rate = self.request.GET.get("min_rate")
+        max_rate = self.request.GET.get("max_rate")
+        if hasattr(CraftsmanProfile, "hourly_rate"):
+            if min_rate and min_rate.isdigit():
+                qs = qs.filter(hourly_rate__gte=int(min_rate))
+            if max_rate and max_rate.isdigit():
+                qs = qs.filter(hourly_rate__lte=int(max_rate))
+
+        # Rating filter
+        if rating:
+            try:
+                rating_min = float(rating)
+                qs = qs.filter(average_rating__gte=rating_min)
+            except ValueError:
+                pass
+
+        # Sorting
+        if sort == "reviews":
+            qs = qs.order_by("-total_reviews", "-average_rating", "-id")
+        elif sort == "rating":
+            qs = qs.order_by("-average_rating", "-total_reviews", "-id")
+        elif sort == "newest" and hasattr(CraftsmanProfile, "created_at"):
+            qs = qs.order_by("-created_at")
+        else:  # popular (default)
+            qs = qs.order_by("-total_reviews", "-average_rating")
+
+        return qs.distinct()
 
     def get_context_data(self, **kwargs):
-        from django.core.cache import cache
+        from services.models import ServiceCategory
 
         context = super().get_context_data(**kwargs)
-
-        # Cache counties list for 1 hour
-        counties = cache.get("counties_list")
-        if counties is None:
-            counties = County.objects.all().order_by("name")
-            cache.set("counties_list", counties, 3600)
-
-        context["counties"] = counties
+        context["counties"] = County.objects.only("name", "slug").order_by("name")
+        context["categories"] = ServiceCategory.objects.only("name", "slug").order_by("name")
+        context["sort_options"] = {
+            "popular": "Cei mai populari",
+            "newest": "Cei mai noi",
+            "rating": "Rating",
+            "reviews": "Nr. recenzii",
+        }
+        context["per_page_choices"] = [20, 40, 60]
+        context["default_per_page"] = 20
+        context["view"] = self.request.GET.get("view") or "grid"
         return context
 
 

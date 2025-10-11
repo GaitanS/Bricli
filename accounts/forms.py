@@ -295,6 +295,65 @@ class SimpleCraftsmanRegistrationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Add HTML5 validation attributes
+        self.fields["first_name"].widget.attrs.update({
+            "required": "required",
+            "aria-required": "true",
+            "minlength": "2",
+            "maxlength": "30",
+            "pattern": r"[A-Za-zÀ-ÿ\s\-]+",
+            "title": "Doar litere, spații și cratime sunt permise"
+        })
+
+        self.fields["last_name"].widget.attrs.update({
+            "required": "required",
+            "aria-required": "true",
+            "minlength": "2",
+            "maxlength": "30",
+            "pattern": r"[A-Za-zÀ-ÿ\s\-]+",
+            "title": "Doar litere, spații și cratime sunt permise"
+        })
+
+        self.fields["email"].widget.attrs.update({
+            "required": "required",
+            "aria-required": "true",
+            "type": "email"
+        })
+
+        self.fields["phone_number"].widget.attrs.update({
+            "required": "required",
+            "aria-required": "true",
+            "minlength": "10",
+            "maxlength": "15",
+            "pattern": r"^[0-9+\-\s()]{7,}$",
+            "title": "Număr de telefon valid românesc (ex: 0721234567)"
+        })
+
+        self.fields["password"].widget.attrs.update({
+            "required": "required",
+            "aria-required": "true",
+            "minlength": "8",
+            "title": "Minim 8 caractere, include litere și cifre"
+        })
+
+        self.fields["password_confirm"].widget.attrs.update({
+            "required": "required",
+            "aria-required": "true",
+            "minlength": "8"
+        })
+
+        self.fields["county"].widget.attrs.update({
+            "required": "required",
+            "aria-required": "true"
+        })
+
+        self.fields["bio"].widget.attrs.update({
+            "required": "required",
+            "aria-required": "true",
+            "minlength": "200",
+            "maxlength": "2000"
+        })
+
         # Grupează serviciile pe categorii pentru afișare mai bună
         services_by_category = {}
         for service in Service.objects.filter(is_active=True).select_related("category"):
