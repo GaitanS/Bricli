@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load lazy_loading %}
+{% load urlutils %}
 
 {% block title %}Profilul meu - Bricli{% endblock %}
 
@@ -102,25 +103,41 @@
                     <div class="row">
                         <div class="col-md-6">
                             <h6><i class="fas fa-mobile-alt me-2"></i>Autentificare în doi pași (2FA)</h6>
-                            {% if user.two_factor_enabled %}
-                                <p class="text-success mb-2">
-                                    <i class="fas fa-check-circle me-1"></i>Activată
-                                </p>
-                                <div class="d-flex gap-2">
-                                    <a href="{% url 'accounts:two_factor_backup_codes' %}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-key me-1"></i>Coduri de rezervă
+                            {% url_if_exists 'accounts:two_factor_setup' as twofa_setup_url %}
+                            {% url_if_exists 'accounts:two_factor_backup_codes' as twofa_backup_url %}
+                            {% url_if_exists 'accounts:two_factor_disable' as twofa_disable_url %}
+
+                            {% if twofa_setup_url or twofa_backup_url or twofa_disable_url %}
+                                {% if user.two_factor_enabled %}
+                                    <p class="text-success mb-2">
+                                        <i class="fas fa-check-circle me-1"></i>Activată
+                                    </p>
+                                    <div class="d-flex gap-2">
+                                        {% if twofa_backup_url %}
+                                        <a href="{{ twofa_backup_url }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-key me-1"></i>Coduri de rezervă
+                                        </a>
+                                        {% endif %}
+                                        {% if twofa_disable_url %}
+                                        <a href="{{ twofa_disable_url }}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-times me-1"></i>Dezactivează
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-warning mb-2">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Dezactivată
+                                    </p>
+                                    {% if twofa_setup_url %}
+                                    <a href="{{ twofa_setup_url }}" class="btn btn-sm btn-success">
+                                        <i class="fas fa-plus me-1"></i>Activează 2FA
                                     </a>
-                                    <a href="{% url 'accounts:two_factor_disable' %}" class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-times me-1"></i>Dezactivează
-                                    </a>
-                                </div>
+                                    {% endif %}
+                                {% endif %}
                             {% else %}
-                                <p class="text-warning mb-2">
-                                    <i class="fas fa-exclamation-triangle me-1"></i>Dezactivată
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-info-circle me-1"></i>2FA nu este disponibil momentan
                                 </p>
-                                <a href="{% url 'accounts:two_factor_setup' %}" class="btn btn-sm btn-success">
-                                    <i class="fas fa-plus me-1"></i>Activează 2FA
-                                </a>
                             {% endif %}
                         </div>
                         <div class="col-md-6">
