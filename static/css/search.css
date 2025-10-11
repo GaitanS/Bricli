@@ -15,6 +15,16 @@
     text-decoration: none;
 }
 
+/* Violet badge for rating filter chip */
+.badge.bg-violet {
+    background-color: #8b5cf6 !important;
+    color: #fff !important;
+}
+
+.badge.bg-violet:hover {
+    background-color: #7c3aed !important;
+}
+
 /* Sticky sidebar positioning */
 .position-sticky {
     position: sticky !important;
