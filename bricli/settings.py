@@ -74,6 +74,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "core.middleware.url_redirects.RomanianURLRedirectMiddleware",  # 301 redirects for old URLs
+    "core.middleware.county_redirect.CountySlugRedirectMiddleware",  # 301 redirect county ID → slug
     "whitenoise.middleware.WhiteNoiseMiddleware",  # Static files serving
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

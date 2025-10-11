@@ -7,6 +7,7 @@ from django.views.generic import ListView, TemplateView
 from accounts.models import County, CraftsmanProfile
 from services.models import Order, Review, Service, ServiceCategory
 
+from .filters import get_county_by_any, sanitize_query
 from .models import FAQ, SiteSettings, Testimonial
 
 
@@ -103,8 +104,8 @@ class SearchView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        query = self.request.GET.get("q", "")
-        county_id = self.request.GET.get("county", "")
+        query = sanitize_query(self.request.GET.get("q", ""))
+        county_param = self.request.GET.get("county", "")
         rating_min = self.request.GET.get("rating", "")
 
         # Base queryset with active craftsmen
@@ -175,13 +176,10 @@ class SearchView(ListView):
                 | service_desc_matches
             ).distinct()
 
-        # Location filtering
-        if county_id:
-            try:
-                county_id = int(county_id)
-                queryset = queryset.filter(county_id=county_id)
-            except (ValueError, TypeError):
-                pass
+        # Location filtering - accepts id, slug, or name
+        county = get_county_by_any(county_param)
+        if county:
+            queryset = queryset.filter(county=county)
 
         # Rating filtering
         if rating_min:
@@ -202,17 +200,12 @@ class SearchView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        query = self.request.GET.get("q", "")
-        county_id = self.request.GET.get("county", "")
+        query = sanitize_query(self.request.GET.get("q", ""))
+        county_param = self.request.GET.get("county", "")
         rating_min = self.request.GET.get("rating", "")
 
-        # Get county object if specified
-        county = None
-        if county_id:
-            try:
-                county = County.objects.get(id=int(county_id))
-            except (County.DoesNotExist, ValueError, TypeError):
-                pass
+        # Get county object if specified (by id, slug, or name)
+        county = get_county_by_any(county_param)
 
         # Calculate search statistics
         total_craftsmen = CraftsmanProfile.objects.filter(user__is_active=True).count()
@@ -222,11 +215,12 @@ class SearchView(ListView):
             {
                 "query": query,
                 "county": county,
+                "county_param": county_param,  # Pass original param for form preservation
                 "rating_min": rating_min,
                 "counties": County.objects.all().order_by("name"),
                 "total_craftsmen": total_craftsmen,
                 "verified_craftsmen": verified_craftsmen,
-                "search_performed": bool(query or county_id or rating_min),
+                "search_performed": bool(query or county or rating_min),
                 # Suggestions sidebar data
                 "categories": ServiceCategory.objects.filter(is_active=True).order_by("name")[:8],
                 "popular_services": Service.objects.filter(is_popular=True, is_active=True).order_by("name")[:30],

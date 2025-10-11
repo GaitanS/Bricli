@@ -36,7 +36,7 @@
                                 <select name="county" class="form-select">
                                     <option value="">Toate județele</option>
                                     {% for c in counties %}
-                                        <option value="{{ c.id }}" {% if county and county.id == c.id %}selected{% endif %}>
+                                        <option value="{{ c.slug|default:c.id }}" {% if county and county.id == c.id %}selected{% endif %}>
                                             {{ c.name }}
                                         </option>
                                     {% endfor %}
