@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Avg, Q
+from django.db.models import Avg, Count, Q
 from django.shortcuts import render
 from django.utils.text import slugify
 from django.views.generic import ListView, TemplateView
@@ -236,6 +236,70 @@ class SearchView(ListView):
         total_craftsmen = CraftsmanProfile.objects.filter(user__is_active=True).count()
         verified_craftsmen = CraftsmanProfile.objects.filter(user__is_active=True, user__is_verified=True).count()
 
+        # Calculate rating bucket counts (BEFORE applying rating filter)
+        # This shows how many results would appear at each rating threshold
+        rating_counts = {}
+        rating_thresholds = [3.0, 3.5, 4.0, 4.5, 5.0]
+
+        # Build base queryset without rating filter for counting
+        base_queryset_for_rating = CraftsmanProfile.objects.filter(user__is_active=True)
+
+        # Apply same filters as main queryset (query, county, category) but NOT rating
+        if query:
+            # Reuse same search logic as get_queryset()
+            primary_matches = Q(bio__icontains=query)
+            secondary_matches = (
+                Q(user__first_name__icontains=query)
+                | Q(user__last_name__icontains=query)
+                | Q(display_name__icontains=query)
+            )
+            normalized_query = slugify(query)
+            service_matches = Q(services__service__name__icontains=query) | Q(
+                services__service__category__name__icontains=query
+            )
+            service_slug_matches = Q(services__service__slug__icontains=normalized_query) | Q(
+                services__service__category__slug__icontains=normalized_query
+            )
+            tokens = [t for t in normalized_query.replace("-", " ").split() if t]
+            token_matches = Q()
+            synonyms_map = {
+                "gradina": ["gradina", "grădină", "gradinarit", "grădinărit"],
+                "acoperis": ["acoperis", "acoperiș"],
+                "instalatii": ["instalatii", "instalații"],
+            }
+            for t in tokens:
+                variants = synonyms_map.get(t, [t])
+                for v in variants:
+                    token_matches |= (
+                        Q(services__service__slug__icontains=v)
+                        | Q(services__service__name__icontains=v)
+                        | Q(services__service__category__slug__icontains=v)
+                        | Q(services__service__category__name__icontains=v)
+                    )
+            service_desc_matches = Q(services__service__description__icontains=query) | Q(
+                services__service__category__description__icontains=query
+            )
+            base_queryset_for_rating = base_queryset_for_rating.filter(
+                primary_matches
+                | secondary_matches
+                | service_matches
+                | service_slug_matches
+                | token_matches
+                | service_desc_matches
+            ).distinct()
+
+        if county:
+            base_queryset_for_rating = base_queryset_for_rating.filter(county=county)
+
+        if category_param and active_category:
+            base_queryset_for_rating = base_queryset_for_rating.filter(
+                services__service__category__slug=active_category.slug
+            ).distinct()
+
+        # Count craftsmen at each rating threshold
+        for threshold in rating_thresholds:
+            rating_counts[threshold] = base_queryset_for_rating.filter(average_rating__gte=threshold).count()
+
         context.update(
             {
                 "query": query,
@@ -244,6 +308,7 @@ class SearchView(ListView):
                 "active_category": active_category,
                 "category_param": category_param,
                 "rating_min": rating_min,
+                "rating_counts": rating_counts,  # Pass rating bucket counts to template
                 "counties": County.objects.all().order_by("name"),
                 "total_craftsmen": total_craftsmen,
                 "verified_craftsmen": verified_craftsmen,

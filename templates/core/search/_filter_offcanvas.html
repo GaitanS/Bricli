@@ -1,5 +1,7 @@
 {% load querystring %}
 {% load service_icons %}
+{% load stars %}
+{% load dictutils %}
 {# Mobile filter offcanvas (Bootstrap drawer) #}
 <div class="offcanvas offcanvas-end d-lg-none"
      tabindex="-1"
@@ -79,19 +81,37 @@
                 {% endif %}
             </div>
 
-            {# Rating filter #}
+            {# Rating filter with visual stars #}
             <div class="mb-4">
                 <label class="form-label fw-bold">
                     <i class="fas fa-star me-1 text-warning"></i>Rating minim
                 </label>
-                <select name="rating" class="form-select">
-                    <option value="">Orice rating</option>
-                    <option value="5" {% if rating_min == '5' %}selected{% endif %}>5 stele</option>
-                    <option value="4.5" {% if rating_min == '4.5' %}selected{% endif %}>4.5+ stele</option>
-                    <option value="4.0" {% if rating_min == '4.0' %}selected{% endif %}>4.0+ stele</option>
-                    <option value="3.5" {% if rating_min == '3.5' %}selected{% endif %}>3.5+ stele</option>
-                    <option value="3.0" {% if rating_min == '3.0' %}selected{% endif %}>3.0+ stele</option>
-                </select>
+                <div class="mt-2">
+                    {% for threshold in "5.0,4.5,4.0,3.5,3.0"|split:"," %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="rating"
+                                   id="rating-mob-{{ threshold }}"
+                                   value="{{ threshold }}"
+                                   {% if rating_min == threshold %}checked{% endif %}>
+                            <label class="form-check-label d-flex justify-content-between align-items-center"
+                                   for="rating-mob-{{ threshold }}"
+                                   style="width: 100%;">
+                                <span>{% stars_5 threshold %}</span>
+                                <span class="badge bg-light text-dark">{{ rating_counts|get_item:threshold|default:0 }}</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                    {# Clear rating button #}
+                    {% if rating_min %}
+                    <button type="button"
+                            class="btn btn-sm btn-outline-secondary mt-2 w-100"
+                            onclick="document.querySelectorAll('input[name=rating]').forEach(r=>r.checked=false)">
+                        <i class="fas fa-times me-1"></i>Șterge rating
+                    </button>
+                    {% endif %}
+                </div>
             </div>
 
             {# Action buttons #}

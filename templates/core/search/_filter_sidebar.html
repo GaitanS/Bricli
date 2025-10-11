@@ -1,5 +1,7 @@
 {% load querystring %}
 {% load service_icons %}
+{% load stars %}
+{% load dictutils %}
 {# Desktop sticky sidebar (hidden on mobile) #}
 <div class="d-none d-lg-block">
     <div class="position-sticky" style="top: 84px;">
@@ -62,20 +64,38 @@
                         {% endif %}
                     </div>
 
-                    {# Rating filter #}
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase">
-                            Rating minim
-                        </label>
-                        <select name="rating" class="form-select form-select-sm">
-                            <option value="">Orice rating</option>
-                            <option value="5" {% if rating_min == '5' %}selected{% endif %}>5 stele</option>
-                            <option value="4.5" {% if rating_min == '4.5' %}selected{% endif %}>4.5+</option>
-                            <option value="4.0" {% if rating_min == '4.0' %}selected{% endif %}>4.0+</option>
-                            <option value="3.5" {% if rating_min == '3.5' %}selected{% endif %}>3.5+</option>
-                            <option value="3.0" {% if rating_min == '3.0' %}selected{% endif %}>3.0+</option>
-                        </select>
-                    </div>
+                    {# Rating filter with visual stars #}
+                    <details class="mb-3" open>
+                        <summary class="form-label small fw-bold text-muted text-uppercase" style="cursor: pointer;">
+                            <i class="fas fa-star me-1 text-warning"></i>Rating minim
+                        </summary>
+                        <div class="mt-2">
+                            {% for threshold in "5.0,4.5,4.0,3.5,3.0"|split:"," %}
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           name="rating"
+                                           id="rating-{{ threshold }}"
+                                           value="{{ threshold }}"
+                                           {% if rating_min == threshold %}checked{% endif %}>
+                                    <label class="form-check-label small d-flex justify-content-between align-items-center"
+                                           for="rating-{{ threshold }}"
+                                           style="width: 100%;">
+                                        <span>{% stars_5 threshold %}</span>
+                                        <span class="badge bg-light text-dark">{{ rating_counts|get_item:threshold|default:0 }}</span>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                            {# Clear rating button #}
+                            {% if rating_min %}
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-secondary mt-2 w-100"
+                                    onclick="document.querySelectorAll('input[name=rating]').forEach(r=>r.checked=false)">
+                                <i class="fas fa-times me-1"></i>Șterge rating
+                            </button>
+                            {% endif %}
+                        </div>
+                    </details>
 
                     {# Action buttons #}
                     <div class="d-grid gap-2">
