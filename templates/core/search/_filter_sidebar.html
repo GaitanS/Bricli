@@ -1,4 +1,5 @@
 {% load querystring %}
+{% load service_icons %}
 {# Desktop sticky sidebar (hidden on mobile) #}
 <div class="d-none d-lg-block">
     <div class="position-sticky" style="top: 84px;">
@@ -45,7 +46,7 @@
                                            value="{{ cat.slug }}"
                                            {% if active_category and active_category.id == cat.id %}checked{% endif %}>
                                     <label class="form-check-label small" for="side-cat-{{ cat.slug }}">
-                                        <span class="me-1">{{ cat.icon_emoji }}</span>{{ cat.name }}
+                                        {% category_icon_sm cat %} {{ cat.name }}
                                     </label>
                                 </div>
                             {% endfor %}

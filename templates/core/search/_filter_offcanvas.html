@@ -1,4 +1,5 @@
 {% load querystring %}
+{% load service_icons %}
 {# Mobile filter offcanvas (Bootstrap drawer) #}
 <div class="offcanvas offcanvas-end d-lg-none"
      tabindex="-1"
@@ -59,7 +60,7 @@
                                    value="{{ cat.slug }}"
                                    {% if active_category and active_category.id == cat.id %}checked{% endif %}>
                             <label class="form-check-label" for="cat-{{ cat.slug }}">
-                                <span class="me-1">{{ cat.icon_emoji }}</span>{{ cat.name }}
+                                {% category_icon_sm cat %} {{ cat.name }}
                             </label>
                         </div>
                     {% endfor %}
