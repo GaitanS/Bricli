@@ -61,7 +61,56 @@
                 </div>
             </div>
 
-            <!-- Search Statistics removed as requested -->
+            <!-- Active Filters Chips -->
+            {% if county or active_category or rating_min %}
+            <div class="card mb-4 border-0 bg-light">
+                <div class="card-body py-2">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <small class="text-muted me-2">Filtre active:</small>
+
+                        {% if county %}
+                        <span class="badge bg-primary d-inline-flex align-items-center">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            {{ county.name }}
+                            <a href="?{% if query %}q={{ query }}{% endif %}{% if active_category %}{% if query %}&{% endif %}category={{ active_category.slug }}{% endif %}{% if rating_min %}{% if query or active_category %}&{% endif %}rating={{ rating_min }}{% endif %}"
+                               class="text-white ms-2 text-decoration-none"
+                               title="Elimină filtru județ">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </span>
+                        {% endif %}
+
+                        {% if active_category %}
+                        <span class="badge bg-info d-inline-flex align-items-center">
+                            <i class="fas fa-tag me-1"></i>
+                            {{ active_category.name }}
+                            <a href="?{% if query %}q={{ query }}{% endif %}{% if county %}{% if query %}&{% endif %}county={{ county.slug }}{% endif %}{% if rating_min %}{% if query or county %}&{% endif %}rating={{ rating_min }}{% endif %}"
+                               class="text-white ms-2 text-decoration-none"
+                               title="Elimină filtru categorie">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </span>
+                        {% endif %}
+
+                        {% if rating_min %}
+                        <span class="badge bg-warning text-dark d-inline-flex align-items-center">
+                            <i class="fas fa-star me-1"></i>
+                            {{ rating_min }}+ stele
+                            <a href="?{% if query %}q={{ query }}{% endif %}{% if county %}{% if query %}&{% endif %}county={{ county.slug }}{% endif %}{% if active_category %}{% if query or county %}&{% endif %}category={{ active_category.slug }}{% endif %}"
+                               class="text-dark ms-2 text-decoration-none"
+                               title="Elimină filtru rating">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </span>
+                        {% endif %}
+
+                        <a href="{% url 'core:search' %}" class="btn btn-sm btn-outline-secondary ms-auto">
+                            <i class="fas fa-redo me-1"></i>Resetează filtre
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Results -->
             <div class="row">
@@ -163,6 +212,27 @@
                 </div>
 
                 <div class="col-lg-4">
+                    <!-- Category Filter Card -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-filter me-2"></i>Filtrează după categorie
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                {% for category in service_categories %}
+                                    <a href="?{% if query %}q={{ query }}&{% endif %}{% if county %}county={{ county.slug }}&{% endif %}category={{ category.slug }}{% if rating_min %}&rating={{ rating_min }}{% endif %}"
+                                       class="btn btn-sm {% if active_category and active_category.slug == category.slug %}btn-primary{% else %}btn-outline-secondary{% endif %} text-start d-flex align-items-center">
+                                        <span class="me-2">{{ category.icon_emoji }}</span>
+                                        {{ category.name }}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suggestions Card -->
                     <div class="card">
                         <div class="card-header">
                             <h5 class="mb-0">
@@ -176,16 +246,6 @@
                                     <a href="{% url 'core:search' %}?q={{ service.name|urlencode }}" class="badge bg-light text-dark text-decoration-none me-1 mb-1">{{ service.name }}</a>
                                 {% endfor %}
                             </div>
-
-                            <h6>Categorii populare:</h6>
-                            <ul class="list-unstyled">
-                                {% for category in categories|slice:":5" %}
-                                    <li class="d-flex align-items-center mb-2">
-                                        {% category_icon_sm category %}
-                                        <a href="{% url 'services:category_detail' category.slug %}" class="text-decoration-none">{{ category.name }}</a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
                         </div>
                     </div>
 

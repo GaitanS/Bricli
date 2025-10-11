@@ -106,13 +106,14 @@ class SearchView(ListView):
     def get_queryset(self):
         query = sanitize_query(self.request.GET.get("q", ""))
         county_param = self.request.GET.get("county", "")
+        category_param = self.request.GET.get("category", "")
         rating_min = self.request.GET.get("rating", "")
 
         # Base queryset with active craftsmen
         queryset = (
             CraftsmanProfile.objects.filter(user__is_active=True)
             .select_related("user", "county", "city")
-            .prefetch_related("services", "services__service")
+            .prefetch_related("services", "services__service", "services__service__category")
         )
 
         # Enhanced search with weighted scoring
@@ -181,6 +182,18 @@ class SearchView(ListView):
         if county:
             queryset = queryset.filter(county=county)
 
+        # Category filtering - filter by service category slug
+        if category_param:
+            from .filters import normalize_slug
+
+            normalized_category = normalize_slug(category_param)
+
+            # Validate against active categories
+            valid_slugs = set(ServiceCategory.objects.filter(is_active=True).values_list("slug", flat=True))
+
+            if normalized_category in valid_slugs:
+                queryset = queryset.filter(services__service__category__slug=normalized_category).distinct()
+
         # Rating filtering
         if rating_min:
             try:
@@ -202,10 +215,22 @@ class SearchView(ListView):
         context = super().get_context_data(**kwargs)
         query = sanitize_query(self.request.GET.get("q", ""))
         county_param = self.request.GET.get("county", "")
+        category_param = self.request.GET.get("category", "")
         rating_min = self.request.GET.get("rating", "")
 
         # Get county object if specified (by id, slug, or name)
         county = get_county_by_any(county_param)
+
+        # Get active category if specified
+        from .filters import normalize_slug
+
+        active_category = None
+        if category_param:
+            normalized_category = normalize_slug(category_param)
+            try:
+                active_category = ServiceCategory.objects.get(slug=normalized_category, is_active=True)
+            except ServiceCategory.DoesNotExist:
+                pass
 
         # Calculate search statistics
         total_craftsmen = CraftsmanProfile.objects.filter(user__is_active=True).count()
@@ -216,13 +241,15 @@ class SearchView(ListView):
                 "query": query,
                 "county": county,
                 "county_param": county_param,  # Pass original param for form preservation
+                "active_category": active_category,
+                "category_param": category_param,
                 "rating_min": rating_min,
                 "counties": County.objects.all().order_by("name"),
                 "total_craftsmen": total_craftsmen,
                 "verified_craftsmen": verified_craftsmen,
-                "search_performed": bool(query or county or rating_min),
+                "search_performed": bool(query or county or active_category or rating_min),
                 # Suggestions sidebar data
-                "categories": ServiceCategory.objects.filter(is_active=True).order_by("name")[:8],
+                "service_categories": ServiceCategory.objects.filter(is_active=True).order_by("name"),
                 "popular_services": Service.objects.filter(is_popular=True, is_active=True).order_by("name")[:30],
             }
         )
