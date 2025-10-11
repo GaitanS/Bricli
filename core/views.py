@@ -101,7 +101,19 @@ class SearchView(ListView):
 
     template_name = "core/search.html"
     context_object_name = "craftsmen"
-    paginate_by = 12
+    paginate_by = 60  # Default, can be overridden by per_page parameter
+
+    def get_paginate_by(self, queryset):
+        """Override pagination based on per_page query parameter"""
+        per_page = self.request.GET.get("per_page", "60")
+        try:
+            per_page_int = int(per_page)
+            # Validate per_page is one of allowed values
+            if per_page_int in [60, 80, 100]:
+                return per_page_int
+        except (ValueError, TypeError):
+            pass
+        return 60  # Default fallback
 
     def get_queryset(self):
         query = sanitize_query(self.request.GET.get("q", ""))
@@ -202,14 +214,30 @@ class SearchView(ListView):
             except (ValueError, TypeError):
                 pass
 
-        # Intelligent ordering with multiple factors
-        return queryset.order_by(
-            "-user__is_verified",  # Verified craftsmen first
-            "-average_rating",  # Higher rated craftsmen
-            "-total_reviews",  # More reviewed craftsmen
-            "-total_jobs_completed",  # More experienced craftsmen
-            "-user__date_joined",  # Newer members last
-        )
+        # Sorting based on sort parameter
+        sort_by = self.request.GET.get("sort", "popular")
+
+        # Define sort order based on sort_by parameter
+        if sort_by == "newest":
+            # Newest craftsmen first
+            queryset = queryset.order_by("-user__date_joined")
+        elif sort_by == "reviews":
+            # Most reviewed craftsmen first
+            queryset = queryset.order_by("-total_reviews", "-average_rating")
+        elif sort_by == "rating":
+            # Highest rated craftsmen first
+            queryset = queryset.order_by("-average_rating", "-total_reviews")
+        else:  # Default: "popular"
+            # Intelligent ordering with multiple factors
+            queryset = queryset.order_by(
+                "-user__is_verified",  # Verified craftsmen first
+                "-average_rating",  # Higher rated craftsmen
+                "-total_reviews",  # More reviewed craftsmen
+                "-total_jobs_completed",  # More experienced craftsmen
+                "-user__date_joined",  # Newer members last
+            )
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -217,6 +245,9 @@ class SearchView(ListView):
         county_param = self.request.GET.get("county", "")
         category_param = self.request.GET.get("category", "")
         rating_min = self.request.GET.get("rating", "")
+        sort_by = self.request.GET.get("sort", "popular")
+        view_mode = self.request.GET.get("view", "grid")
+        per_page = self.get_paginate_by(None)
 
         # Get county object if specified (by id, slug, or name)
         county = get_county_by_any(county_param)
@@ -309,6 +340,9 @@ class SearchView(ListView):
                 "category_param": category_param,
                 "rating_min": rating_min,
                 "rating_counts": rating_counts,  # Pass rating bucket counts to template
+                "sort_by": sort_by,  # Current sort option
+                "view_mode": view_mode,  # Current view mode (list/grid)
+                "per_page": per_page,  # Current per-page setting
                 "counties": County.objects.all().order_by("name"),
                 "total_craftsmen": total_craftsmen,
                 "verified_craftsmen": verified_craftsmen,

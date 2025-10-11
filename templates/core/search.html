@@ -42,6 +42,9 @@
                     </h2>
                 </div>
 
+                {# Sort bar with per-page and view toggle #}
+                {% include "core/search/_sort_bar.html" %}
+
                 {# Craftsmen cards #}
                 {% for craftsman in craftsmen %}
                 <div class="card mb-3 border-0 shadow-sm">

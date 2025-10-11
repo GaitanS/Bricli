@@ -1,0 +1,78 @@
+{% load querystring %}
+{# Sort and pagination controls bar (above results grid) #}
+<div class="row align-items-center mb-3 g-2">
+    {# Left: Sort dropdown #}
+    <div class="col-12 col-md-4">
+        <form method="GET" action="{% url 'core:search' %}" id="sortForm">
+            {# Preserve all current filters #}
+            <input type="hidden" name="q" value="{{ query }}">
+            {% if county %}<input type="hidden" name="county" value="{{ county.slug }}">{% endif %}
+            {% if active_category %}<input type="hidden" name="category" value="{{ active_category.slug }}">{% endif %}
+            {% if rating_min %}<input type="hidden" name="rating" value="{{ rating_min }}">{% endif %}
+            {% if per_page %}<input type="hidden" name="per_page" value="{{ per_page }}">{% endif %}
+            {% if view_mode %}<input type="hidden" name="view" value="{{ view_mode }}">{% endif %}
+
+            <div class="input-group input-group-sm">
+                <label class="input-group-text" for="sortSelect">
+                    <i class="fas fa-sort-amount-down me-1"></i>Sortare
+                </label>
+                <select name="sort" id="sortSelect" class="form-select" onchange="document.getElementById('sortForm').submit()">
+                    <option value="popular" {% if sort_by == 'popular' or not sort_by %}selected{% endif %}>
+                        Populare
+                    </option>
+                    <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>
+                        Cele mai noi
+                    </option>
+                    <option value="reviews" {% if sort_by == 'reviews' %}selected{% endif %}>
+                        Cele mai recenzate
+                    </option>
+                    <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>
+                        Rating cel mai mare
+                    </option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    {# Center: Per-page dropdown #}
+    <div class="col-12 col-md-4">
+        <form method="GET" action="{% url 'core:search' %}" id="perPageForm">
+            {# Preserve all current filters #}
+            <input type="hidden" name="q" value="{{ query }}">
+            {% if county %}<input type="hidden" name="county" value="{{ county.slug }}">{% endif %}
+            {% if active_category %}<input type="hidden" name="category" value="{{ active_category.slug }}">{% endif %}
+            {% if rating_min %}<input type="hidden" name="rating" value="{{ rating_min }}">{% endif %}
+            {% if sort_by %}<input type="hidden" name="sort" value="{{ sort_by }}">{% endif %}
+            {% if view_mode %}<input type="hidden" name="view" value="{{ view_mode }}">{% endif %}
+
+            <div class="input-group input-group-sm">
+                <label class="input-group-text" for="perPageSelect">
+                    <i class="fas fa-list-ol me-1"></i>Afișează
+                </label>
+                <select name="per_page" id="perPageSelect" class="form-select" onchange="document.getElementById('perPageForm').submit()">
+                    <option value="60" {% if per_page == 60 or not per_page %}selected{% endif %}>60 rezultate</option>
+                    <option value="80" {% if per_page == 80 %}selected{% endif %}>80 rezultate</option>
+                    <option value="100" {% if per_page == 100 %}selected{% endif %}>100 rezultate</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    {# Right: View toggle buttons (list/grid) #}
+    <div class="col-12 col-md-4 text-md-end">
+        <div class="btn-group btn-group-sm" role="group" aria-label="View toggle">
+            <a href="?{% querystring view='list' %}"
+               class="btn btn-outline-secondary {% if view_mode == 'list' %}active{% endif %}"
+               title="Vizualizare listă">
+                <i class="fas fa-list"></i>
+                <span class="d-none d-sm-inline ms-1">Listă</span>
+            </a>
+            <a href="?{% querystring view='grid' %}"
+               class="btn btn-outline-secondary {% if view_mode == 'grid' or not view_mode %}active{% endif %}"
+               title="Vizualizare grilă">
+                <i class="fas fa-th"></i>
+                <span class="d-none d-sm-inline ms-1">Grilă</span>
+            </a>
+        </div>
+    </div>
+</div>
