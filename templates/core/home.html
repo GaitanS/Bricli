@@ -139,34 +139,40 @@
 </section>
 
 <!-- Platform Statistics -->
-<section class="py-5 bg-light">
+<section class="stats-banner bg-light py-5">
     <div class="container">
-        <div class="row text-center">
-            <div class="col-md-4 mb-4 mb-md-0">
-                <div class="stat-card p-4 bg-white rounded shadow-sm h-100">
-                    <div class="stat-icon mb-3">
-                        <i class="fas fa-users fa-3x text-primary"></i>
+        <div class="row text-center g-3">
+            <div class="col-12 col-lg-4">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-center gap-3">
+                        <i class="fas fa-users text-primary"></i>
+                        <div>
+                            <h3 class="fw-bold mb-0">{{ stats.active_craftsmen }}</h3>
+                            <p class="mb-0">Meșteri activi verificați</p>
+                        </div>
                     </div>
-                    <h3 class="fw-bold mb-2 text-gradient">{{ stats.active_craftsmen }}</h3>
-                    <p class="text-muted mb-0">Meșteri activi verificați</p>
                 </div>
             </div>
-            <div class="col-md-4 mb-4 mb-md-0">
-                <div class="stat-card p-4 bg-white rounded shadow-sm h-100">
-                    <div class="stat-icon mb-3">
-                        <i class="fas fa-star fa-3x text-warning"></i>
+            <div class="col-12 col-lg-4">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-center gap-3">
+                        <i class="fas fa-star text-warning"></i>
+                        <div>
+                            <h3 class="fw-bold mb-0">{{ stats.avg_rating }}</h3>
+                            <p class="mb-0">Rating mediu</p>
+                        </div>
                     </div>
-                    <h3 class="fw-bold mb-2 text-gradient">{{ stats.avg_rating }}</h3>
-                    <p class="text-muted mb-0">Rating mediu meșteri</p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-card p-4 bg-white rounded shadow-sm h-100">
-                    <div class="stat-icon mb-3">
-                        <i class="fas fa-check-circle fa-3x text-success"></i>
+            <div class="col-12 col-lg-4">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-center gap-3">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <div>
+                            <h3 class="fw-bold mb-0">{{ stats.completed_projects }}</h3>
+                            <p class="mb-0">Proiecte finalizate</p>
+                        </div>
                     </div>
-                    <h3 class="fw-bold mb-2 text-gradient">{{ stats.completed_projects }}</h3>
-                    <p class="text-muted mb-0">Proiecte finalizate</p>
                 </div>
             </div>
         </div>
@@ -174,22 +180,22 @@
 </section>
 
 <!-- Service Categories -->
-<section class="py-5">
+<section class="py-5 grid-2-mobile">
     <div class="container">
         <div class="text-center mb-5 fade-in">
-            <h2 class="fw-bold text-gradient">Servicii populare</h2>
-            <p class="text-muted">Găsește specialiști pentru toate nevoile tale</p>
+            <h2 class="fw-bold text-gradient home-section-title">Servicii populare</h2>
+            <p class="text-muted clamp-1">Găsește specialiști pentru toate nevoile tale</p>
         </div>
-        
-        <div class="row g-4">
+
+        <div class="row g-4" id="catGrid">
             {% for category in service_categories %}
-            <div class="col-lg-3 col-md-6 slide-up">
+            <div class="col-lg-3 col-md-6 slide-up cat-card">
                 <a href="{% url 'services:category_detail' category.slug %}" class="text-decoration-none">
-                    <div class="service-category-card h-100">
+                    <div class="service-category-card category-card h-100">
                         <div class="card-body text-center p-4">
                             {% category_icon_lg category %}
-                            <h5 class="card-title fw-bold mt-3">{{ category.name }}</h5>
-                            <p class="card-text text-muted">{{ category.description|truncatewords:10 }}</p>
+                            <h5 class="card-title fw-bold mt-3 clamp-1">{{ category.name }}</h5>
+                            <p class="card-text text-muted clamp-2">{{ category.description|truncatewords:10 }}</p>
                             <div class="mb-2">
                                 <span class="badge text-white" style="background-color: #8B5CF6;">
                                     {{ category.orders_count|default:0 }} comenzi active
@@ -204,8 +210,12 @@
             </div>
             {% endfor %}
         </div>
-        
-        <div class="text-center mt-4">
+
+        <div class="text-center mt-4 d-lg-none">
+            <button id="showAllCats" class="btn btn-outline-secondary btn-sm">Vezi toate serviciile</button>
+        </div>
+
+        <div class="text-center mt-4 d-none d-lg-block">
             <a href="{% url 'services:categories' %}" class="btn btn-outline-primary">
                 Vezi toate serviciile <i class="fas fa-arrow-right ms-2"></i>
             </a>
@@ -214,43 +224,36 @@
 </section>
 
 <!-- How it Works -->
-<section class="py-5 bg-light">
+<section class="howitworks-banner bg-light py-5">
     <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">Cum funcționează</h2>
-            <p class="text-muted">Simplu, rapid și sigur</p>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-lg-4 text-center">
-                <div class="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <span class="fs-3 fw-bold">1</span>
+        <div class="row text-center g-3">
+            <div class="col-12 col-lg-4">
+                <div class="step">
+                    <div class="icon mx-auto mb-2">
+                        <span class="fw-bold">1</span>
+                    </div>
+                    <h3>Postează cererea</h3>
+                    <p>Descrii lucrarea o singură dată. Este gratuit.</p>
                 </div>
-                <h4>Postează cererea</h4>
-                <p class="text-muted">Descrie lucrarea de care ai nevoie și primește oferte gratuite de la meșteri din zona ta.</p>
             </div>
-
-            <div class="col-lg-4 text-center">
-                <div class="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <span class="fs-3 fw-bold">2</span>
+            <div class="col-12 col-lg-4">
+                <div class="step">
+                    <div class="icon mx-auto mb-2">
+                        <span class="fw-bold">2</span>
+                    </div>
+                    <h3>Primești oferte</h3>
+                    <p>Compari prețuri, recenzii și portofolii.</p>
                 </div>
-                <h4>Compară ofertele</h4>
-                <p class="text-muted">Analizează profilurile meșterilor, recenziile și prețurile pentru a face cea mai bună alegere.</p>
             </div>
-
-            <div class="col-lg-4 text-center">
-                <div class="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <span class="fs-3 fw-bold">3</span>
+            <div class="col-12 col-lg-4">
+                <div class="step">
+                    <div class="icon mx-auto mb-2">
+                        <span class="fw-bold">3</span>
+                    </div>
+                    <h3>Angajezi în siguranță</h3>
+                    <p>Plătești doar când ești mulțumit de rezultat.</p>
                 </div>
-                <h4>Finalizează lucrarea</h4>
-                <p class="text-muted">Colaborează cu meșterul ales și lasă o recenzie pentru a ajuta comunitatea.</p>
             </div>
-        </div>
-        
-        <div class="text-center mt-4">
-            <a href="{% url 'core:how_it_works' %}" class="btn btn-primary">
-                Află mai multe <i class="fas fa-arrow-right ms-2"></i>
-            </a>
         </div>
     </div>
 </section>
@@ -364,8 +367,8 @@
 <!-- CTA Section -->
 <section class="py-5 bg-primary text-white">
     <div class="container text-center">
-        <h2 class="fw-bold mb-4">Gata să începi?</h2>
-        <p class="lead mb-4">Alătură-te miilor de români care și-au găsit meșterul perfect pe Bricli</p>
+        <h2 class="fw-bold mb-4 text-white">Gata să începi?</h2>
+        <p class="lead mb-4 text-white">Alătură-te miilor de români care și-au găsit meșterul perfect pe Bricli</p>
         
         <div class="row justify-content-center">
             <div class="col-md-8">

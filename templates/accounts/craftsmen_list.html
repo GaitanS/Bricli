@@ -1,229 +1,184 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load pagination_optimized %}
-{% load lazy_loading %}
+{% load service_icons %}
+{% load querystring %}
 
-{% block title %}Meșteri profesioniști - {{ block.super }}{% endblock %}
+{% block title %}Meșteri verificați - {{ block.super }}{% endblock %}
 
 {% block extra_css %}
-<style>
-    .craftsman-card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        border: 1px solid #e0e0e0;
-    }
-    
-    .craftsman-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    
-    .rating-stars {
-        color: #ffc107;
-    }
-    
-    .badge-custom {
-        font-size: 0.75rem;
-    }
-    
-    .filter-section {
-        background: #8752f3;
-        color: white;
-    }
-    
-    .filter-section .form-select,
-    .filter-section .form-control {
-        border: none;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .stats-badge {
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.2);
-    }
-    
-    .stats-badge h3 {
-        color: white !important;
-    }
-    
-    .btn-light {
-        color: #8b5cf6 !important;
-    }
-    
-    .page-item.active .page-link {
-        color: #8b5cf6 !important;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/craftsmen-list-optimized.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid px-0">
-    <!-- Hero Section -->
-    <div class="filter-section py-5">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="display-5 fw-bold mb-3 text-white">Meșteri verificați</h1>
-                    <p class="lead mb-4">Găsește meșterul potrivit pentru proiectul tău. Toți meșterii noștri sunt verificați și evaluați de clienți reali.</p>
-                    
-                    {% if not user.is_authenticated %}
-                    <div class="mb-4">
-                        <a href="{% url 'auth:craftsman_register' %}" class="btn btn-light btn-lg me-3">
-                            <i class="fas fa-hammer me-2"></i>Devino meșter
-                        </a>
-                        <a href="{% url 'auth:register' %}" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-user-plus me-2"></i>Înregistrează-te
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <div class="col-lg-6">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="stats-badge rounded-3 p-3 text-center">
-                                <h3 class="mb-1">{{ craftsmen.count }}+</h3>
-                                <small>Meșteri activi</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stats-badge rounded-3 p-3 text-center">
-                                <h3 class="mb-1">4.8</h3>
-                                <small>Rating mediu</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stats-badge rounded-3 p-3 text-center">
-                                <h3 class="mb-1">1000+</h3>
-                                <small>Proiecte finalizate</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- Hero Section -->
+<section class="craftsmen-hero">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-10">
+                <h1 class="mb-3 text-white">Meșteri verificați</h1>
+                <p class="mb-0 text-white">Găsește meșterul potrivit pentru proiectul tău. Toți meșterii noștri sunt verificați și evaluați de clienți reali.</p>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Filters Section -->
-    <div class="bg-light py-4">
-        <div class="container">
-            <form method="get" class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label for="trade" class="form-label fw-semibold">
-                        <i class="fas fa-tools me-1"></i>Meserie
-                    </label>
-                    <select name="trade" id="trade" class="form-select">
-                        <option value="">Toate meseriile</option>
-                        <option value="electrician" {% if request.GET.trade == 'electrician' %}selected{% endif %}>Electrician</option>
-                        <option value="plumber" {% if request.GET.trade == 'plumber' %}selected{% endif %}>Instalator</option>
-                        <option value="painter" {% if request.GET.trade == 'painter' %}selected{% endif %}>Zugrav/Vopsitor</option>
-                        <option value="carpenter" {% if request.GET.trade == 'carpenter' %}selected{% endif %}>Tâmplar</option>
-                        <option value="mason" {% if request.GET.trade == 'mason' %}selected{% endif %}>Zidar</option>
-                        <option value="roofer" {% if request.GET.trade == 'roofer' %}selected{% endif %}>Acoperișuri</option>
-                        <option value="flooring" {% if request.GET.trade == 'flooring' %}selected{% endif %}>Pardoseli</option>
-                        <option value="hvac" {% if request.GET.trade == 'hvac' %}selected{% endif %}>Încălzire/Climatizare</option>
-                        <option value="landscaping" {% if request.GET.trade == 'landscaping' %}selected{% endif %}>Amenajări exterioare</option>
-                        <option value="cleaning" {% if request.GET.trade == 'cleaning' %}selected{% endif %}>Curățenie</option>
-                        <option value="other" {% if request.GET.trade == 'other' %}selected{% endif %}>Altele</option>
-                    </select>
-                </div>
-                
-                <div class="col-md-4">
-                    <label for="county" class="form-label fw-semibold">
-                        <i class="fas fa-map-marker-alt me-1"></i>Județ
-                    </label>
-                    <select name="county" id="county" class="form-select">
-                        <option value="">Toate județele</option>
-                        {% for county in counties %}
-                            <option value="{{ county.id }}" {% if request.GET.county == county.id|stringformat:"s" %}selected{% endif %}>
+<!-- Main Content -->
+<div class="container my-4">
+    <div class="row">
+        <!-- Filters Sidebar (Desktop) -->
+        <aside class="col-lg-3 mb-4 d-none d-lg-block">
+            <div class="filters-sidebar">
+                <h5 class="mb-3 fw-bold">
+                    <i class="fas fa-filter me-2"></i>Filtre
+                </h5>
+
+                <form method="get">
+                    <!-- Search -->
+                    <div class="mb-3">
+                        <label for="q" class="form-label">Caută meșter</label>
+                        <input type="text" class="form-control" id="q" name="q"
+                               value="{{ request.GET.q }}" placeholder="Nume, companie...">
+                    </div>
+
+                    <!-- County -->
+                    <div class="mb-3">
+                        <label for="county" class="form-label">Județ</label>
+                        <select name="county" id="county" class="form-select">
+                            <option value="">Toate județele</option>
+                            {% for county in counties %}
+                            <option value="{{ county.slug }}" {% if request.GET.county == county.slug %}selected{% endif %}>
                                 {{ county.name }}
                             </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Categorie</label>
+                        <select name="category" id="category" class="form-select">
+                            <option value="">Toate categoriile</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>
+                                {{ cat.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Rating -->
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Rating minim</label>
+                        <select name="rating" id="rating" class="form-select">
+                            <option value="">Orice rating</option>
+                            <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ stele</option>
+                            <option value="4.5" {% if request.GET.rating == '4.5' %}selected{% endif %}>4.5+ stele</option>
+                        </select>
+                    </div>
+
+                    <!-- Verified -->
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="verified" value="1"
+                               id="verified" {% if request.GET.verified == '1' %}checked{% endif %}>
+                        <label class="form-check-label" for="verified">
+                            <i class="fas fa-check-circle text-success me-1"></i>Doar verificați
+                        </label>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Caută
+                        </button>
+                        <a href="?" class="btn btn-outline-secondary">
+                            <i class="fas fa-redo me-2"></i>Resetează
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Results Column -->
+        <main class="col-lg-9">
+            <!-- Mobile Filter Button -->
+            <div class="d-lg-none mb-3">
+                <button class="filters-toggle w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas">
+                    <i class="fas fa-filter me-2"></i>Filtre și Sortare
+                </button>
+            </div>
+
+            <!-- Controls Bar -->
+            <div class="controls-bar">
+                <div class="d-flex align-items-center gap-2">
+                    <label for="sort" class="form-label mb-0 d-none d-md-block">Sortează:</label>
+                    <select name="sort" id="sort" class="form-select sort-select" onchange="updateSort(this.value)">
+                        {% for key, label in sort_options.items %}
+                        <option value="{{ key }}" {% if request.GET.sort == key %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                
-                <div class="col-md-2">
-                    <label for="rating" class="form-label fw-semibold">
-                        <i class="fas fa-star me-1"></i>Rating minim
-                    </label>
-                    <select name="rating" id="rating" class="form-select">
-                        <option value="">Orice rating</option>
-                        <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ stele</option>
-                        <option value="4.5" {% if request.GET.rating == '4.5' %}selected{% endif %}>4.5+ stele</option>
-                    </select>
-                </div>
-                
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search me-1"></i>Caută
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
-<!-- Results Section -->
-<div class="container my-5">
-    {% if craftsmen %}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">
-                <i class="fas fa-users me-2 text-primary"></i>
-                Meșteri găsiți ({{ page_obj.paginator.count }})
-            </h2>
-            
-            <!-- Page size selector -->
-            <div class="d-flex align-items-center">
-                <label for="page-size" class="form-label me-2 mb-0">Afișează:</label>
-                <select id="page-size" class="form-select form-select-sm" style="width: auto;" onchange="changePageSize(this.value)">
-                    {% for size in page_obj.paginator.per_page|get_page_size_options %}
-                        <option value="{{ size }}" {% if size == page_obj.paginator.per_page %}selected{% endif %}>{{ size }}</option>
-                    {% endfor %}
-                </select>
-                <span class="ms-2 text-muted">pe pagină</span>
+                <div class="view-toggle">
+                    <a href="?{% querystring view='grid' %}" class="btn {% if view == 'grid' %}active{% endif %}">
+                        <i class="fas fa-th"></i>
+                    </a>
+                    <a href="?{% querystring view='list' %}" class="btn {% if view == 'list' %}active{% endif %}">
+                        <i class="fas fa-list"></i>
+                    </a>
+                </div>
             </div>
-        </div>
 
-        <div class="row g-4">
-            {% for craftsman in craftsmen %}
-                <div class="col-lg-6 col-xl-4">
+            <!-- Results Count -->
+            {% if page_obj %}
+            <div class="results-count">
+                <i class="fas fa-users"></i>
+                <div>
+                    <strong>{{ page_obj.paginator.count }} meșteri găsiți</strong>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Results Grid -->
+            {% if results %}
+            <div class="row g-3 {% if view == 'list' %}row-cols-1{% else %}row-cols-1 row-cols-md-2{% endif %}">
+                {% for craftsman in results %}
+                <div class="col">
                     <div class="card craftsman-card h-100">
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-3 text-center">
+                            <div class="d-flex gap-3 mb-3">
+                                <!-- Avatar -->
+                                <div>
                                     {% if craftsman.profile_photo %}
-                                        <img src="{{ craftsman.profile_photo.url }}?v={% image_version craftsman.profile_photo fallback_dt=craftsman.updated_at %}" alt="Profil" class="rounded-circle" width="80" height="80" style="object-fit: cover;" loading="lazy">
+                                        <img src="{{ craftsman.profile_photo.url }}" alt="{{ craftsman.display_name }}"
+                                             class="craftsman-avatar" loading="lazy">
                                     {% elif craftsman.user.profile_picture %}
-                                        <img src="{{ craftsman.user.profile_picture.url }}?v={% profile_img_version craftsman.user %}" alt="Profil" class="rounded-circle" width="80" height="80" style="object-fit: cover;" loading="lazy">
+                                        <img src="{{ craftsman.user.profile_picture.url }}" alt="{{ craftsman.display_name }}"
+                                             class="craftsman-avatar" loading="lazy">
                                     {% else %}
-                                        <img src="{% static 'images/avatar.svg' %}" alt="Profil" class="rounded-circle" width="80" height="80" style="object-fit: cover;" loading="lazy">
+                                        <div class="craftsman-avatar bg-light d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-user fa-2x text-muted"></i>
+                                        </div>
                                     {% endif %}
                                 </div>
-                                <div class="col-9">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="card-title mb-0">
-                                            {{ craftsman.display_name|default:"Meșter profesionist" }}
-                                        </h5>
+
+                                <!-- Info -->
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <h3 class="craftsman-name">{{ craftsman.display_name|default:"Meșter profesionist" }}</h3>
                                         {% if craftsman.user.is_verified %}
-                                        <span class="badge bg-success">
+                                        <span class="badge-verified">
                                             <i class="fas fa-check-circle me-1"></i>Verificat
                                         </span>
                                         {% endif %}
                                     </div>
-                                    
-                                    <p class="text-muted small mb-2">
-                                        <i class="fas fa-map-marker-alt me-1"></i>
-                                        {% if craftsman.city %}{{ craftsman.city.name }}, {% endif %}{{ craftsman.county.name }}
-                                    </p>
-                                    
-                                    {% if craftsman.trade %}
-                                    <p class="text-primary small mb-2">
-                                        <i class="fas fa-tools me-1"></i>{{ craftsman.get_trade_display }}
-                                    </p>
-                                    {% endif %}
-                                    
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="rating-stars me-2">
+
+                                    <div class="craftsman-location mb-2">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>{% if craftsman.city %}{{ craftsman.city.name }}, {% endif %}{{ craftsman.county.name }}</span>
+                                    </div>
+
+                                    <div class="craftsman-rating">
+                                        <div class="stars">
                                             {% for i in "12345" %}
                                                 {% if forloop.counter <= craftsman.average_rating|floatformat:0|add:0 %}
                                                     <i class="fas fa-star"></i>
@@ -232,80 +187,155 @@
                                                 {% endif %}
                                             {% endfor %}
                                         </div>
-                                        <span class="small text-muted">
-                                            {{ craftsman.average_rating|floatformat:1 }} ({{ craftsman.total_reviews }} recenzii)
-                                        </span>
+                                        <span><strong>{{ craftsman.average_rating|floatformat:1 }}</strong> ({{ craftsman.total_reviews }} recenzii)</span>
                                     </div>
-                                    
+
                                     {% if craftsman.years_experience %}
-                                    <p class="small text-muted mb-2">
+                                    <div class="text-muted small mt-2">
                                         <i class="fas fa-calendar-alt me-1"></i>{{ craftsman.years_experience }} ani experiență
-                                    </p>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            <div class="row mt-3">
-                                <div class="col-12">
-                                    <div class="d-flex gap-2">
-                                        <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}" 
-                                           class="btn btn-primary btn-sm flex-fill">
-                                            <i class="fas fa-eye me-1"></i>Vezi profil
-                                        </a>
-                                        {% if user.is_authenticated and user != craftsman.user %}
-                                        <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#contactForm" 
-                                           class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-comment me-1"></i>Mesaj
-                                        </a>
-                                        {% endif %}
                                     </div>
+                                    {% endif %}
                                 </div>
                             </div>
-                            
-                            <!-- Badges -->
-                            <div class="mt-3">
-                                <div class="d-flex flex-wrap gap-1">
-                                    {% if craftsman.is_top_rated %}
-                                    <span class="badge bg-warning text-dark badge-custom">
-                                        <i class="fas fa-medal me-1"></i>Top rated
-                                    </span>
-                                    {% endif %}
-                                    
-                                    {% if craftsman.is_company_verified %}
-                                    <span class="badge bg-info badge-custom">
-                                        <i class="fas fa-building me-1"></i>Firmă
-                                    </span>
-                                    {% endif %}
-                                    
-                                    {% if craftsman.total_jobs_completed >= 10 %}
-                                    <span class="badge bg-secondary badge-custom">
-                                        <i class="fas fa-trophy me-1"></i>Experimentat
-                                    </span>
-                                    {% endif %}
-                                </div>
+
+                            <!-- Actions -->
+                            <div class="craftsman-actions">
+                                <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}" class="btn-view-profile">
+                                    <i class="fas fa-eye me-2"></i>Vezi profil complet
+                                </a>
+                                {% if user.is_authenticated and user != craftsman.user %}
+                                <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#contactForm" class="btn-message">
+                                    <i class="fas fa-comment me-2"></i>Mesaj
+                                </a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endfor %}
-        </div>
-
-        <!-- Pagination -->
-        {% optimized_pagination page_obj %}
-
-    {% else %}
-        <div class="text-center py-5">
-            <div class="mb-4">
-                <i class="fas fa-search fa-3x text-muted"></i>
+                {% endfor %}
             </div>
-            <h3 class="text-muted">Nu am găsit meșteri</h3>
-            <p class="text-muted">Încearcă să modifici filtrele de căutare sau să elimini unele criterii.</p>
-            <a href="{% url 'accounts:craftsmen_list' %}" class="btn btn-primary">
-                <i class="fas fa-refresh me-1"></i>Resetează filtrele
-            </a>
-        </div>
-    {% endif %}
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% querystring page=page_obj.previous_page_number %}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?{% querystring page=num %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% querystring page=page_obj.next_page_number %}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Nu am găsit meșteri</h3>
+                <p>Încearcă să modifici filtrele de căutare sau să elimini unele criterii pentru a găsi mai mulți meșteri disponibili.</p>
+                <a href="?" class="btn btn-primary btn-lg">
+                    <i class="fas fa-redo me-2"></i>Resetează toate filtrele
+                </a>
+            </div>
+            {% endif %}
+        </main>
+    </div>
 </div>
 
-{% lazy_loading_scripts %}
+<!-- Mobile Offcanvas Filters -->
+<div class="offcanvas offcanvas-start offcanvas-filters" tabindex="-1" id="filtersOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title"><i class="fas fa-filter me-2"></i>Filtre</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form method="get">
+            <!-- Same filters as sidebar -->
+            <div class="mb-3">
+                <label for="q_mobile" class="form-label">Caută meșter</label>
+                <input type="text" class="form-control" id="q_mobile" name="q"
+                       value="{{ request.GET.q }}" placeholder="Nume, companie...">
+            </div>
+
+            <div class="mb-3">
+                <label for="county_mobile" class="form-label">Județ</label>
+                <select name="county" id="county_mobile" class="form-select">
+                    <option value="">Toate județele</option>
+                    {% for county in counties %}
+                    <option value="{{ county.slug }}" {% if request.GET.county == county.slug %}selected{% endif %}>
+                        {{ county.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="category_mobile" class="form-label">Categorie</label>
+                <select name="category" id="category_mobile" class="form-select">
+                    <option value="">Toate categoriile</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="rating_mobile" class="form-label">Rating minim</label>
+                <select name="rating" id="rating_mobile" class="form-select">
+                    <option value="">Orice rating</option>
+                    <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ stele</option>
+                    <option value="4.5" {% if request.GET.rating == '4.5' %}selected{% endif %}>4.5+ stele</option>
+                </select>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="verified" value="1"
+                       id="verified_mobile" {% if request.GET.verified == '1' %}checked{% endif %}>
+                <label class="form-check-label" for="verified_mobile">
+                    <i class="fas fa-check-circle text-success me-1"></i>Doar verificați
+                </label>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search me-2"></i>Aplică filtre
+                </button>
+                <a href="?" class="btn btn-outline-secondary">
+                    <i class="fas fa-redo me-2"></i>Resetează
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function updateSort(value) {
+    const url = new URL(window.location);
+    url.searchParams.set('sort', value);
+    window.location = url;
+}
+</script>
 {% endblock %}
