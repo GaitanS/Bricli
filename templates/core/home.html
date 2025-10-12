@@ -2,6 +2,7 @@
 {% load static %}
 {% load lazy_loading %}
 {% load service_icons %}
+{% load testimonials %}
 
 {% block title %}Bricli - Găsește meșterul potrivit pentru tine{% endblock %}
 
@@ -315,54 +316,16 @@
 {% endif %}
 
 <!-- Testimonials -->
-{% if featured_testimonials %}
 <section class="py-5 bg-light">
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="fw-bold">Ce spun clienții noștri</h2>
             <p class="text-muted">Experiențe reale de la utilizatorii Bricli</p>
         </div>
-        
-        <div class="row g-4">
-            {% for testimonial in featured_testimonials %}
-            <div class="col-lg-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <div class="mb-3">
-                            {% for i in "12345" %}
-                                {% if forloop.counter <= testimonial.rating %}
-                                    <i class="fas fa-star" style="color: #8B5CF6;"></i>
-                                {% else %}
-                                    <i class="far fa-star" style="color: #8B5CF6;"></i>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        
-                        <p class="card-text">"{{ testimonial.content }}"</p>
-                        
-                        <div class="d-flex align-items-center mt-3">
-                            {% if testimonial.image %}
-                                <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}" class="rounded-circle me-3" width="50" height="50" style="object-fit: cover;">
-                            {% else %}
-                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
-                                     style="width: 50px; height: 50px;">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                            {% endif %}
-                            
-                            <div>
-                                <h6 class="mb-0">{{ testimonial.name }}</h6>
-                                <small class="text-muted">{{ testimonial.location }}</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+
+        {% render_testimonials 6 %}
     </div>
 </section>
-{% endif %}
 
 <!-- CTA Section -->
 <section class="py-5 bg-primary text-white">
