@@ -330,22 +330,22 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 {% endif %}
 
                                                 <!-- Description with truncation -->
-                                                <div class="quote-description-wrapper">
+                                                <div class="quote-description-wrapper" style="overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">
                                                     {% if quote.description|length > 150 %}
-                                                        <p class="mb-2 quote-description-short" style="color: #4b5563; line-height: 1.6;">
+                                                        <p class="mb-2 quote-description-short" style="color: #4b5563; line-height: 1.6; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">
                                                             {{ quote.description|truncatechars:150 }}
                                                             <a href="#" class="show-more-link" style="color: #8B5CF6; text-decoration: none; font-weight: 500;" onclick="event.preventDefault(); this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';">
                                                                 Vezi mai mult
                                                             </a>
                                                         </p>
-                                                        <p class="mb-2 quote-description-full" style="color: #4b5563; line-height: 1.6; display: none;">
+                                                        <p class="mb-2 quote-description-full" style="color: #4b5563; line-height: 1.6; display: none; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">
                                                             {{ quote.description }}
                                                             <a href="#" class="show-less-link" style="color: #8B5CF6; text-decoration: none; font-weight: 500;" onclick="event.preventDefault(); this.parentElement.style.display='none'; this.parentElement.previousElementSibling.style.display='block';">
                                                                 Vezi mai puțin
                                                             </a>
                                                         </p>
                                                     {% else %}
-                                                        <p class="mb-2" style="color: #4b5563; line-height: 1.6;">{{ quote.description }}</p>
+                                                        <p class="mb-2" style="color: #4b5563; line-height: 1.6; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">{{ quote.description }}</p>
                                                     {% endif %}
                                                 </div>
 
