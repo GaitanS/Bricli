@@ -961,6 +961,15 @@ class RegistrationChoiceView(TemplateView):
     template_name = "accounts/registration_choice.html"
 
 
+def ensure_craftsman_slug(craftsman):
+    """
+    Helper: if craftsman.slug is missing/empty, trigger save() to auto-generate.
+    Called by CraftsmanIdRedirectView.get() to handle old profiles without slugs.
+    """
+    if not craftsman.slug:
+        craftsman.save()  # Auto-generates slug via model's save() method
+
+
 class CraftsmanIdRedirectView(DetailView):
     """
     Redirect view for old craftsman URLs with numeric IDs.
@@ -971,5 +980,6 @@ class CraftsmanIdRedirectView(DetailView):
 
     def get(self, request, *args, **kwargs):
         craftsman = self.get_object()
+        ensure_craftsman_slug(craftsman)
         from django.shortcuts import redirect
         return redirect("accounts:craftsman_detail", slug=craftsman.slug, permanent=True)
