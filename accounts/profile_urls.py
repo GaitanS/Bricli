@@ -15,6 +15,7 @@ urlpatterns = [
     path("profil/editare/", views.EditProfileView.as_view(), name="edit_profile"),
     # Craftsmen directory - ASCII URLs (meșter→meserias, meșteri→meseriasi)
     path("meseriasi/", views.CraftsmenListView.as_view(), name="craftsmen_list"),
+    path("meserias/<int:pk>/", views.CraftsmanIdRedirectView.as_view(), name="craftsman_by_id"),  # 301 redirect to slug
     path("meserias/<slug:slug>/", views.CraftsmanDetailView.as_view(), name="craftsman_detail"),
     # Portfolio management
     path("portofoliu/", views.CraftsmanPortfolioView.as_view(), name="portfolio"),
