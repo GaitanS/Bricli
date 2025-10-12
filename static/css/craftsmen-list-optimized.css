@@ -1,0 +1,361 @@
+/* Craftsmen List Page - Optimized & User-Friendly */
+
+/* Hero Section */
+.craftsmen-hero {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    color: white;
+    padding: 3rem 0;
+}
+
+.craftsmen-hero h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.craftsmen-hero p {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    opacity: 0.95;
+}
+
+/* Filter Button (Mobile) */
+.filters-toggle {
+    background: white;
+    color: #8B5CF6;
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.filters-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Filters Sidebar */
+.filters-sidebar {
+    position: sticky;
+    top: 90px;
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.filters-sidebar .form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.filters-sidebar .form-control,
+.filters-sidebar .form-select {
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    padding: 0.625rem 0.875rem;
+}
+
+.filters-sidebar .form-control:focus,
+.filters-sidebar .form-select:focus {
+    border-color: #8B5CF6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.filters-sidebar .btn-primary {
+    background: #8B5CF6;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-weight: 600;
+}
+
+.filters-sidebar .btn-outline-secondary {
+    border-radius: 8px;
+    padding: 0.75rem;
+}
+
+/* Sort & View Controls */
+.controls-bar {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.view-toggle .btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.view-toggle .btn.active {
+    background: #8B5CF6;
+    border-color: #8B5CF6;
+    color: white;
+}
+
+.sort-select {
+    min-width: 200px;
+}
+
+/* Results Count Badge */
+.results-count {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.results-count i {
+    color: #8B5CF6;
+    font-size: 1.25rem;
+}
+
+.results-count strong {
+    color: #111827;
+    font-size: 1.1rem;
+}
+
+/* Craftsman Cards */
+.craftsman-card {
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    background: white;
+}
+
+.craftsman-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    border-color: #8B5CF6;
+}
+
+.craftsman-card .card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.craftsman-card .card-body > *:last-child {
+    margin-top: auto;
+}
+
+.craftsman-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    object-fit: cover;
+    border: 3px solid #f3f4f6;
+}
+
+.craftsman-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.craftsman-location {
+    color: #6b7280;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.craftsman-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.craftsman-rating .stars {
+    color: #8B5CF6;
+}
+
+.badge-verified {
+    background: #10b981;
+    color: white;
+    padding: 0.375rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.craftsman-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.btn-view-profile {
+    flex: 1;
+    background: #8B5CF6;
+    border: none;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-view-profile:hover {
+    background: #7C3AED;
+    transform: translateY(-1px);
+}
+
+.btn-message {
+    background: white;
+    border: 2px solid #8B5CF6;
+    color: #8B5CF6;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-message:hover {
+    background: #f5f3ff;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-state-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 2rem;
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-state-icon i {
+    font-size: 3rem;
+    color: #9ca3af;
+}
+
+.empty-state h3 {
+    color: #374151;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: #6b7280;
+    max-width: 500px;
+    margin: 0 auto 2rem;
+}
+
+/* Pagination */
+.pagination {
+    gap: 0.5rem;
+}
+
+.page-item .page-link {
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    padding: 0.5rem 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.page-item.active .page-link {
+    background: #8B5CF6;
+    border-color: #8B5CF6;
+    color: white;
+}
+
+.page-item .page-link:hover {
+    background: #f5f3ff;
+    border-color: #8B5CF6;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 991.98px) {
+    .craftsmen-hero {
+        padding: 2rem 0;
+    }
+
+    .controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sort-select {
+        width: 100%;
+    }
+
+    .view-toggle {
+        justify-content: center;
+    }
+
+    .craftsman-card .card-body {
+        padding: 1rem;
+    }
+
+    .craftsman-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .craftsman-name {
+        font-size: 1.1rem;
+    }
+
+    .craftsman-actions {
+        flex-direction: column;
+    }
+
+    .btn-message {
+        padding: 0.75rem;
+        text-align: center;
+    }
+}
+
+/* Offcanvas Filters */
+.offcanvas-filters .offcanvas-header {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    color: white;
+}
+
+.offcanvas-filters .offcanvas-title {
+    font-weight: 700;
+}
+
+.offcanvas-filters .btn-close {
+    filter: invert(1);
+}
