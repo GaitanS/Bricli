@@ -152,7 +152,12 @@
                 <div class="mobile-user-section border-bottom pb-3 mb-3">
                     <div class="d-flex align-items-center mb-3">
                         <div class="user-avatar me-3">
-                            <i class="fas fa-user-circle text-primary" style="font-size: 2.5rem;"></i>
+                            {% if avatar_url %}
+                                <img src="{{ avatar_url }}" alt="{{ user.get_full_name|default:user.username }}"
+                                     class="rounded-circle" width="50" height="50" style="object-fit: cover;">
+                            {% else %}
+                                <i class="fas fa-user-circle text-primary" style="font-size: 2.5rem;"></i>
+                            {% endif %}
                         </div>
                         <div>
                             <h6 class="mb-1 fw-semibold">{{ user.get_full_name|default:user.username }}</h6>

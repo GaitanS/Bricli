@@ -72,11 +72,29 @@ def user_context(request):
         context["is_craftsman"] = request.user.user_type == "craftsman"
         context["is_client"] = request.user.user_type == "client"
 
-        # Add craftsman-specific context
+        # Get avatar URL (craftsman profile_photo or user profile_picture)
+        avatar_url = ""
         if hasattr(request.user, "craftsman_profile"):
-            context["craftsman_profile"] = request.user.craftsman_profile
-            context["has_portfolio"] = request.user.craftsman_profile.portfolio_images.exists()
-            context["portfolio_count"] = request.user.craftsman_profile.portfolio_images.count()
+            craftsman = request.user.craftsman_profile
+            context["craftsman_profile"] = craftsman
+            context["has_portfolio"] = craftsman.portfolio_images.exists()
+            context["portfolio_count"] = craftsman.portfolio_images.count()
+
+            # Try to get profile photo from craftsman profile
+            if craftsman.profile_photo:
+                try:
+                    avatar_url = craftsman.profile_photo.url
+                except Exception:
+                    pass
+
+        # Fallback to user profile_picture if no craftsman photo
+        if not avatar_url and hasattr(request.user, "profile_picture") and request.user.profile_picture:
+            try:
+                avatar_url = request.user.profile_picture.url
+            except Exception:
+                pass
+
+        context["avatar_url"] = avatar_url
 
     return context
 
