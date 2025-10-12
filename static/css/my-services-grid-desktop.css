@@ -1,0 +1,193 @@
+/**
+ * My Services - Dense Desktop Grid (3-5 columns)
+ * Compact cards with responsive grid layout
+ */
+
+/* GRID pentru desktop, păstrăm mobilul cum e acum */
+.my-services-row {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 576px) {
+  .my-services-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 992px) {
+  .my-services-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .my-services-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1400px) {
+  .my-services-row {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* Card mai scurt / dens pe desktop */
+@media (min-width: 992px) {
+  .svc-card.card {
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+  }
+
+  .svc-card.card:hover {
+    border-color: #8B5CF6;
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .svc-card .card-body {
+    padding: 12px;
+  }
+
+  .svc-card .svc-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .svc-card .svc-title {
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #111827;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .svc-card .svc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .svc-card .chip {
+    background: #f3f4f6;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: .85rem;
+    line-height: 1.4;
+    color: #4b5563;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .svc-card .chip i {
+    font-size: .75rem;
+    color: #8B5CF6;
+  }
+
+  .svc-card .price-row {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #e5e7eb;
+    font-size: .95rem;
+  }
+
+  .svc-card .price-value {
+    font-weight: 700;
+    color: #10b981;
+  }
+
+  .svc-card .price-request {
+    color: #6b7280;
+    font-style: italic;
+    font-size: .9rem;
+  }
+
+  .svc-card .actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .svc-card .actions .btn {
+    padding: .4rem .6rem;
+    font-size: .85rem;
+    border-radius: 8px;
+    font-weight: 600;
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .svc-card .actions .btn-outline-primary {
+    border: 2px solid #e9d5ff;
+    color: #8B5CF6;
+  }
+
+  .svc-card .actions .btn-outline-primary:hover {
+    background: #f5f3ff;
+    border-color: #8B5CF6;
+    transform: translateY(-1px);
+  }
+
+  .svc-card .actions .btn-outline-danger {
+    border: 2px solid #fee2e2;
+    color: #ef4444;
+  }
+
+  .svc-card .actions .btn-outline-danger:hover {
+    background: #fef2f2;
+    border-color: #ef4444;
+    transform: translateY(-1px);
+  }
+
+  .svc-card .actions form {
+    flex: 1;
+  }
+
+  .svc-card .actions form .btn {
+    width: 100%;
+  }
+}
+
+/* Micșorăm bannerul violet din headerul paginii pe desktop */
+@media (min-width: 992px) {
+  .services-hero {
+    padding: 14px 16px !important;
+    border-radius: 16px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .services-hero h1 {
+    font-size: 1.25rem !important;
+    margin: 0 !important;
+  }
+
+  .services-hero p {
+    font-size: .9rem !important;
+    margin: 0 !important;
+  }
+
+  .services-hero .btn {
+    padding: 8px 16px !important;
+    font-size: .9rem !important;
+  }
+}

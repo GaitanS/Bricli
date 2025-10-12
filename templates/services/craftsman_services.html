@@ -10,8 +10,8 @@
 
 {% block content %}
 <div class="container mt-4">
-    <!-- DESKTOP: Modern Header -->
-    <div class="services-desktop-header d-none d-lg-flex justify-content-between align-items-center">
+    <!-- DESKTOP: Compact Header -->
+    <div class="services-desktop-header services-hero d-none d-lg-flex justify-content-between align-items-center">
         <div>
             <h1 class="page-title-white"><i class="fas fa-tools me-2"></i>Serviciile Mele</h1>
             <p>Gestionează serviciile pe care le oferi clienților</p>
@@ -38,74 +38,77 @@
     <div class="row">
         <div class="col-md-8">
             {% if services %}
-                <!-- DESKTOP: Modern Card Grid -->
-                <div class="services-desktop-grid d-none d-lg-grid">
+                <!-- DESKTOP: Dense Grid (3-5 columns) -->
+                <div class="my-services-row d-none d-lg-grid">
                     {% for service in services %}
-                    <div class="service-card-desktop">
-                        <!-- Header: Icon + Title -->
-                        <div class="card-head">
-                            <div class="card-icon">
-                                <i class="fas fa-briefcase"></i>
+                    <div class="svc-card card h-100">
+                        <div class="card-body">
+                            <!-- Header: Icon + Title -->
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="svc-icon" aria-hidden="true">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <h3 class="svc-title">{{ service.service.name }}</h3>
                             </div>
-                            <h3 class="card-title">{{ service.service.name }}</h3>
-                        </div>
 
-                        <!-- Meta: Category + Location -->
-                        <div class="card-meta">
-                            <span class="meta-badge">
-                                <i class="fas fa-layer-group"></i>
-                                {{ service.service.category.name }}
-                            </span>
-                            {% if craftsman.county %}
-                            <span class="meta-badge">
-                                <i class="fas fa-map-marker-alt"></i>
-                                {{ craftsman.county.name }}
-                            </span>
-                            {% endif %}
-                        </div>
+                            <!-- Meta: Category + Location -->
+                            <div class="svc-meta">
+                                {% if service.service.category %}
+                                <span class="chip">
+                                    <i class="fas fa-layer-group"></i>
+                                    {{ service.service.category.name }}
+                                </span>
+                                {% endif %}
+                                {% if craftsman.county %}
+                                <span class="chip">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ craftsman.county.name }}
+                                </span>
+                                {% endif %}
+                            </div>
 
-                        <!-- Price -->
-                        <div class="card-price">
-                            <div class="price-label">Preț</div>
-                            {% if service.price_from and service.price_to %}
-                                <div class="price-value">
-                                    {{ service.price_from }} - {{ service.price_to }} RON
-                                    {% if service.price_unit %}
-                                        <span class="price-unit">/ {{ service.price_unit }}</span>
-                                    {% endif %}
-                                </div>
-                            {% elif service.price_from %}
-                                <div class="price-value">
-                                    De la {{ service.price_from }} RON
-                                    {% if service.price_unit %}
-                                        <span class="price-unit">/ {{ service.price_unit }}</span>
-                                    {% endif %}
-                                </div>
-                            {% elif service.price_to %}
-                                <div class="price-value">
-                                    Până la {{ service.price_to }} RON
-                                    {% if service.price_unit %}
-                                        <span class="price-unit">/ {{ service.price_unit }}</span>
-                                    {% endif %}
-                                </div>
-                            {% else %}
-                                <div class="price-request">Preț la cerere</div>
-                            {% endif %}
-                        </div>
+                            <!-- Price -->
+                            <div class="price-row">
+                                {% if service.price_from and service.price_to %}
+                                    <span class="price-value">
+                                        {{ service.price_from }} - {{ service.price_to }} RON
+                                        {% if service.price_unit %}
+                                            <span class="text-muted">/ {{ service.price_unit }}</span>
+                                        {% endif %}
+                                    </span>
+                                {% elif service.price_from %}
+                                    <span class="price-value">
+                                        De la {{ service.price_from }} RON
+                                        {% if service.price_unit %}
+                                            <span class="text-muted">/ {{ service.price_unit }}</span>
+                                        {% endif %}
+                                    </span>
+                                {% elif service.price_to %}
+                                    <span class="price-value">
+                                        Până la {{ service.price_to }} RON
+                                        {% if service.price_unit %}
+                                            <span class="text-muted">/ {{ service.price_unit }}</span>
+                                        {% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="price-request">Preț la cerere</span>
+                                {% endif %}
+                            </div>
 
-                        <!-- Actions -->
-                        <div class="card-actions">
-                            <a href="{% url 'services:edit_craftsman_service' service.pk %}"
-                               class="btn btn-edit">
-                                <i class="fas fa-edit"></i> Editează
-                            </a>
-                            <form method="post" action="{% url 'services:delete_craftsman_service' service.pk %}"
-                                  class="flex-fill" onsubmit="return confirm('Ești sigur că vrei să ștergi acest serviciu?')">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-delete w-100">
-                                    <i class="fas fa-trash"></i> Șterge
-                                </button>
-                            </form>
+                            <!-- Actions -->
+                            <div class="actions">
+                                <a href="{% url 'services:edit_craftsman_service' service.pk %}"
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-edit"></i> Editează
+                                </a>
+                                <form method="post" action="{% url 'services:delete_craftsman_service' service.pk %}"
+                                      onsubmit="return confirm('Ești sigur că vrei să ștergi acest serviciu?')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-trash"></i> Șterge
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
