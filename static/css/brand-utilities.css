@@ -1,0 +1,28 @@
+/**
+ * Brand Utilities - Purple Theme Color Helpers
+ * Utility classes for consistent brand colors across the site
+ */
+
+/* Brand color utilities */
+.text-brand {
+  color: #8B5CF6 !important;
+}
+
+.bg-brand {
+  background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%) !important;
+}
+
+/* White text on purple headers */
+.service-form-header h1,
+.service-form-header .back-btn,
+.page-title-white,
+.page-title-white i {
+  color: #fff !important;
+}
+
+/* Purple profile card in sidebar */
+.profile-side h6,
+.profile-side .stats-row-desktop .stat-value,
+.profile-side .stats-row-desktop .stat-label {
+  color: #8B5CF6 !important;
+}
