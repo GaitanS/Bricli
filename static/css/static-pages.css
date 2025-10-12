@@ -1,0 +1,75 @@
+/**
+ * Static Pages Styling
+ * For Help Center, Terms, Privacy pages
+ */
+
+.static-page .lead {
+  color: #6b7280;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.static-hero {
+  background: linear-gradient(135deg, #F8F7FF 0%, #F3F0FF 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.static-hero h1 {
+  color: #1f2937;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.static-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  transition: box-shadow 0.2s ease;
+}
+
+.static-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.static-card h2 {
+  color: #374151;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.static-card ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.static-card ul li {
+  padding-left: 1.5rem;
+  position: relative;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.static-card ul li:before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #8B5CF6;
+  font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+  .static-hero {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .static-page h1 {
+    font-size: 1.5rem;
+  }
+
+  .static-page .lead {
+    font-size: 1rem;
+  }
+}
