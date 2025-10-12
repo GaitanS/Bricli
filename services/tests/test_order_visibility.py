@@ -21,7 +21,7 @@ User = get_user_model()
 @pytest.fixture
 def county():
     """Create a test county"""
-    county, _ = County.objects.get_or_create(name="Brasov", defaults={"slug": "brasov"})
+    county, _ = County.objects.get_or_create(name="Brasov")
     return county
 
 
@@ -30,8 +30,7 @@ def city(county):
     """Create a test city"""
     city, _ = City.objects.get_or_create(
         name="Brasov",
-        county=county,
-        defaults={"slug": "brasov"}
+        county=county
     )
     return city
 
@@ -43,13 +42,13 @@ def service():
 
     category, _ = ServiceCategory.objects.get_or_create(
         name="Test Category",
-        defaults={"slug": "test-category"}
+        slug="test-category"
     )
 
     service, _ = Service.objects.get_or_create(
         name="Test Service",
         category=category,
-        defaults={"slug": "test-service"}
+        slug="test-service"
     )
     return service
 
@@ -329,13 +328,13 @@ class TestOrderVisibility:
 
         category, _ = ServiceCategory.objects.get_or_create(
             name="Other Category",
-            defaults={"slug": "other-category"}
+            slug="other-category"
         )
 
         other_service, _ = Service.objects.get_or_create(
             name="Other Service",
             category=category,
-            defaults={"slug": "other-service"}
+            slug="other-service"
         )
 
         # DON'T register this service for craftsman
