@@ -262,47 +262,14 @@ class CraftsmanProfile(models.Model):
         super().save(*args, **kwargs)
 
     def calculate_profile_completion(self):
-        """Calculează procentajul de completare a profilului (0-100%)"""
-        score = 0
-        total_points = 100
+        """
+        Calculează procentajul de completare folosind logica nouă.
+        Importă funcția din accounts.services.profile_completion pentru consistență.
+        """
+        from accounts.services.profile_completion import calculate_profile_completion as calc_completion
 
-        # Câmpuri obligatorii (60 puncte total)
-        if self.display_name:
-            score += 10
-        if self.county and self.city:
-            score += 10
-        if self.coverage_radius_km and 5 <= self.coverage_radius_km <= 150:
-            score += 10
-        if self.bio and len(self.bio.strip()) >= 200:
-            score += 15
-        if self.profile_photo:
-            score += 15
-
-        # Portfolio (min 3 poze) - 20 puncte
-        # Verifică dacă profilul are un ID (a fost salvat) înainte de a accesa portfolio_images
-        if self.pk:
-            portfolio_count = self.portfolio_images.count()
-            if portfolio_count >= 3:
-                score += 20
-            elif portfolio_count > 0:
-                score += (portfolio_count * 20) // 3
-
-        # Servicii/categorii (10 puncte)
-        # Verifică dacă profilul are un ID înainte de a accesa serviciile
-        if self.pk and hasattr(self, "services") and self.services.exists():
-            score += 10
-
-        # Câmpuri opționale (10 puncte total)
-        if self.years_experience:
-            score += 3
-        if self.hourly_rate or self.min_job_value:
-            score += 3
-        if self.website_url or self.facebook_url or self.instagram_url:
-            score += 2
-        if self.company_cui:
-            score += 2
-
-        return min(score, total_points)
+        result = calc_completion(self)
+        return result["score"]
 
     def update_profile_completion(self):
         """Actualizează procentajul de completare și badge-urile"""

@@ -488,13 +488,59 @@ document.addEventListener('DOMContentLoaded', function() {
                     <button class="btn btn-secondary w-100" disabled title="{{ quote_disabled_reason }}">
                         <i class="fas fa-lock me-2"></i>Nu poți licita
                     </button>
+
+                    {% if 'Profil incomplet' in quote_disabled_reason %}
+                    <!-- Profile Completion Progress -->
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="fw-bold">Completare profil:</small>
+                            <small class="fw-bold text-primary">{{ user.craftsman_profile.profile_completion }}%</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" role="progressbar"
+                                 style="width: {{ user.craftsman_profile.profile_completion }}%; background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);"
+                                 aria-valuenow="{{ user.craftsman_profile.profile_completion }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
+
+                        {% if user.craftsman_profile.profile_completion < 100 %}
+                        <div class="mt-3">
+                            <small class="text-muted d-block mb-2"><strong>Ce mai lipsește:</strong></small>
+                            <ul class="list-unstyled small">
+                                {% if not user.craftsman_profile.display_name %}
+                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Nume afișat (10p)</li>
+                                {% endif %}
+                                {% if not user.craftsman_profile.county or not user.craftsman_profile.city %}
+                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Județ și oraș (10p)</li>
+                                {% endif %}
+                                {% if not user.craftsman_profile.coverage_radius_km or user.craftsman_profile.coverage_radius_km < 5 or user.craftsman_profile.coverage_radius_km > 150 %}
+                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Rază acoperire (10p)</li>
+                                {% endif %}
+                                {% if not user.craftsman_profile.bio or user.craftsman_profile.bio|length < 200 %}
+                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Bio minim 200 caractere (15p)</li>
+                                {% endif %}
+                                {% if not user.craftsman_profile.profile_photo %}
+                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Poză de profil (15p)</li>
+                                {% endif %}
+                                {% if user.craftsman_profile.portfolio_images.count < 3 %}
+                                <li class="mb-1"><i class="fas fa-circle text-warning" style="font-size: 0.5rem;"></i> Portfolio: {{ user.craftsman_profile.portfolio_images.count }}/3 poze (40p)</li>
+                                {% endif %}
+                                {% if not user.craftsman_profile.services.exists %}
+                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Minim 1 serviciu (20p)</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary btn-sm mt-3 w-100">
+                        <i class="fas fa-user-edit me-2"></i>Completează profilul
+                    </a>
+                    {% else %}
                     <small class="text-muted d-block mt-2">
                         <i class="fas fa-info-circle me-1"></i>{{ quote_disabled_reason }}
                     </small>
-                    {% if 'Profil incomplet' in quote_disabled_reason %}
-                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-primary btn-sm mt-2 w-100">
-                        <i class="fas fa-user-edit me-2"></i>Completează profilul
-                    </a>
                     {% endif %}
                 </div>
             </div>
