@@ -1,0 +1,370 @@
+/**
+ * My Quotes Page - Professional Mobile & Desktop Optimization
+ * Optimized for iPhone SE (375px) and up
+ * Desktop enhancements with hover effects and better spacing
+ */
+
+/* ========== MOBILE FIRST (iPhone SE 375px+) ========== */
+@media (max-width: 991.98px) {
+  /* Header: Compact mobile layout */
+  .quotes-header {
+    padding: 16px 0 !important;
+    margin-bottom: 20px !important;
+  }
+
+  .quotes-header h1 {
+    font-size: 1.5rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  .quotes-header p {
+    font-size: 0.85rem !important;
+    display: none; /* Hide subtitle on mobile */
+  }
+
+  .quotes-header .btn {
+    font-size: 0.85rem !important;
+    padding: 8px 16px !important;
+    white-space: nowrap;
+  }
+
+  /* Filter Tabs: Horizontal scroll for narrow screens */
+  .quotes-tabs-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 16px;
+  }
+
+  .quotes-tabs-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .quotes-tabs .nav-pills {
+    flex-wrap: nowrap !important;
+    padding: 0 !important;
+  }
+
+  .quotes-tabs .nav-link {
+    font-size: 0.85rem !important;
+    padding: 10px 14px !important;
+    white-space: nowrap;
+    min-width: max-content;
+  }
+
+  .quotes-tabs .badge {
+    font-size: 0.7rem !important;
+    padding: 2px 6px !important;
+  }
+
+  /* Quote Cards: Ultra-compact mobile layout */
+  .quote-card-mobile {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 14px !important;
+    padding: 12px !important;
+    margin-bottom: 12px !important;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+    transition: box-shadow 0.15s ease;
+  }
+
+  .quote-card-mobile:active {
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.15) !important;
+  }
+
+  /* Quote Title: 1-line with ellipsis */
+  .quote-title-mobile {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #8B5CF6;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Quote Meta: Location + Date */
+  .quote-meta-mobile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .quote-meta-mobile .meta-item {
+    font-size: 0.8rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .quote-meta-mobile .meta-item i {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+
+  /* Quote Description: 2 lines max */
+  .quote-desc-mobile {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Quote Footer: Price + Status + Action */
+  .quote-footer-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .quote-price-mobile {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #10b981;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .quote-price-mobile .duration {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 400;
+  }
+
+  .quote-status-mobile {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+
+  .quote-action-mobile {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+
+  /* Empty State: Compact */
+  .quotes-empty-mobile {
+    padding: 40px 20px !important;
+    text-align: center;
+  }
+
+  .quotes-empty-mobile i {
+    font-size: 3rem !important;
+  }
+
+  .quotes-empty-mobile h3 {
+    font-size: 1.1rem !important;
+    margin-top: 16px !important;
+  }
+
+  .quotes-empty-mobile p {
+    font-size: 0.9rem !important;
+  }
+
+  /* Pagination: Compact */
+  .quotes-pagination-mobile .pagination {
+    gap: 4px;
+  }
+
+  .quotes-pagination-mobile .page-link {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+}
+
+/* ========== DESKTOP IMPROVEMENTS (992px+) ========== */
+@media (min-width: 992px) {
+  /* Header: Professional spacing */
+  .quotes-header {
+    padding: 32px 0 !important;
+    margin-bottom: 32px !important;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .quotes-header h1 {
+    font-size: 2rem !important;
+    font-weight: 700;
+  }
+
+  .quotes-header p {
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+
+  /* Filter Tabs: Better hover and active states */
+  .quotes-tabs .nav-link {
+    padding: 16px 24px !important;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .quotes-tabs .nav-link:hover:not(.active) {
+    background-color: rgba(139, 92, 246, 0.08) !important;
+    transform: translateY(-1px);
+  }
+
+  .quotes-tabs .nav-link.active {
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+  }
+
+  .quotes-tabs .badge {
+    font-size: 0.8rem;
+    padding: 3px 8px;
+  }
+
+  /* Quote Cards: Enhanced desktop layout */
+  .quote-card-desktop {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    margin-bottom: 20px !important;
+    transition: all 0.25s ease;
+    background: #fff;
+  }
+
+  .quote-card-desktop:hover {
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.12) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    transform: translateY(-2px);
+  }
+
+  .quote-title-desktop {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #8B5CF6;
+    margin-bottom: 12px;
+    transition: color 0.2s ease;
+  }
+
+  .quote-card-desktop:hover .quote-title-desktop {
+    color: #7C3AED;
+  }
+
+  .quote-meta-desktop {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .quote-meta-desktop .meta-item {
+    font-size: 0.9rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .quote-desc-desktop {
+    font-size: 0.95rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .quote-price-desktop {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #10b981;
+    margin-bottom: 8px;
+  }
+
+  .quote-price-desktop .duration {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 400;
+    display: block;
+    margin-top: 4px;
+  }
+
+  .quote-status-desktop {
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .quote-action-desktop {
+    transition: all 0.2s ease;
+  }
+
+  .quote-action-desktop:hover {
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
+  }
+
+  /* Empty State: Professional */
+  .quotes-empty-desktop {
+    padding: 80px 20px !important;
+    text-align: center;
+  }
+
+  .quotes-empty-desktop i {
+    font-size: 4rem !important;
+    opacity: 0.3;
+  }
+
+  .quotes-empty-desktop h3 {
+    font-size: 1.5rem !important;
+    margin-top: 24px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .quotes-empty-desktop p {
+    font-size: 1rem !important;
+    max-width: 500px;
+    margin: 0 auto 32px;
+  }
+}
+
+/* ========== STATUS BADGES (all viewports) ========== */
+.badge-pending {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.badge-accepted {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+.badge-rejected {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+.badge-declined {
+  background-color: #e5e7eb !important;
+  color: #374151 !important;
+}
+
+/* ========== UTILITY CLASSES ========== */
+.text-ellipsis-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-ellipsis-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

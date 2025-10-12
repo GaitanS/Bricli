@@ -1,64 +1,74 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Ofertele mele - Bricli{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/my-quotes-pro.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
+<div class="container py-3 py-lg-5">
     <!-- Header Section -->
-    <div class="row mb-5">
+    <div class="row quotes-header">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 class="h2 fw-bold mb-2" style="color: #8B5CF6;">
-                        <i class="fas fa-handshake me-3"></i>Ofertele mele
+                    <h1 class="fw-bold mb-2" style="color: #8B5CF6;">
+                        <i class="fas fa-handshake me-2"></i>Ofertele mele
                     </h1>
                     <p class="text-muted mb-0">Gestionează și urmărește toate ofertele tale trimise</p>
                 </div>
                 <a href="{% url 'services:available_orders' %}"
-                   class="btn btn-lg text-white fw-medium px-4"
+                   class="btn text-white fw-medium d-none d-lg-inline-block"
                    style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
                     <i class="fas fa-search me-2"></i>Caută comenzi
+                </a>
+                <a href="{% url 'services:available_orders' %}"
+                   class="btn btn-sm text-white fw-medium d-lg-none"
+                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                    <i class="fas fa-search"></i>
                 </a>
             </div>
         </div>
     </div>
-            
+
     <!-- Filter Tabs -->
-    <div class="row mb-4">
+    <div class="row mb-3 mb-lg-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-0">
+            <div class="card border-0 shadow-sm quotes-tabs">
+                <div class="card-body p-0 quotes-tabs-wrapper">
                     <ul class="nav nav-pills nav-fill" id="quoteTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active rounded-0 border-0 py-3"
+                            <button class="nav-link active rounded-0 border-0"
                                     id="all-tab" data-bs-toggle="tab" data-bs-target="#all"
-                                    type="button" role="tab" style="color: #8B5CF6;">
-                                <i class="fas fa-list me-2"></i>Toate
-                                <span class="badge bg-light text-dark ms-2">{{ total_quotes|default:0 }}</span>
+                                    type="button" role="tab">
+                                <i class="fas fa-list me-1 me-lg-2"></i>Toate
+                                <span class="badge bg-light text-dark ms-1 ms-lg-2">{{ total_quotes|default:0 }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link rounded-0 border-0 py-3" 
+                            <button class="nav-link rounded-0 border-0"
                                     id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
-                                    type="button" role="tab" style="color: #8B5CF6;">
-                                <i class="fas fa-clock me-2"></i>În așteptare
-                                <span class="badge bg-light text-dark ms-2">{{ pending_quotes|default:0 }}</span>
+                                    type="button" role="tab">
+                                <i class="fas fa-clock me-1 me-lg-2"></i>Așteptare
+                                <span class="badge bg-light text-dark ms-1 ms-lg-2">{{ pending_quotes|default:0 }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link rounded-0 border-0 py-3"
+                            <button class="nav-link rounded-0 border-0"
                                     id="accepted-tab" data-bs-toggle="tab" data-bs-target="#accepted"
-                                    type="button" role="tab" style="color: #8B5CF6;">
-                                <i class="fas fa-check-circle me-2"></i>Acceptate
-                                <span class="badge bg-light text-dark ms-2">{{ accepted_quotes|default:0 }}</span>
+                                    type="button" role="tab">
+                                <i class="fas fa-check-circle me-1 me-lg-2"></i>Acceptate
+                                <span class="badge bg-light text-dark ms-1 ms-lg-2">{{ accepted_quotes|default:0 }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link rounded-0 border-0 py-3"
+                            <button class="nav-link rounded-0 border-0"
                                     id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected"
-                                    type="button" role="tab" style="color: #8B5CF6;">
-                                <i class="fas fa-times-circle me-2"></i>Respinse
-                                <span class="badge bg-light text-dark ms-2">{{ rejected_quotes|default:0 }}</span>
+                                    type="button" role="tab">
+                                <i class="fas fa-times-circle me-1 me-lg-2"></i>Respinse
+                                <span class="badge bg-light text-dark ms-1 ms-lg-2">{{ rejected_quotes|default:0 }}</span>
                             </button>
                         </li>
                     </ul>
@@ -72,78 +82,139 @@
         <!-- All Quotes Tab -->
         <div class="tab-pane fade show active" id="all" role="tabpanel">
             {% if quotes %}
-                <div class="row">
+                <!-- Mobile: Compact Cards -->
+                <div class="d-lg-none">
                     {% for quote in quotes %}
-                        <div class="col-12 mb-4">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-8">
-                                            <div class="d-flex align-items-start mb-3">
-                                                <div class="flex-grow-1">
-                                                    <h5 class="card-title mb-2">
-                                                        <a href="{% url 'services:order_detail' quote.order.pk %}" 
-                                                           class="text-decoration-none" style="color: #8B5CF6;">
-                                                            {{ quote.order.title }}
-                                                        </a>
-                                                    </h5>
-                                                    <p class="text-muted mb-2">
-                                                        <i class="fas fa-map-marker-alt me-1"></i>
-                                                        {{ quote.order.county.name }}, {{ quote.order.city.name }}
-                                                    </p>
-                                                    <p class="card-text text-muted mb-2">
-                                                        {{ quote.description|truncatewords:20 }}
-                                                    </p>
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-calendar me-1"></i>
-                                                        Trimisă pe {{ quote.created_at|date:"d M Y" }}
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 text-md-end">
-                                            <div class="mb-3">
-                                                <h4 class="text-success mb-1">{{ quote.price }} RON</h4>
-                                                {% if quote.estimated_duration %}
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-clock me-1"></i>
-                                                        {{ quote.estimated_duration }}
-                                                    </small>
-                                                {% endif %}
-                                            </div>
-                                            <div class="mb-3">
-                                                {% if quote.status == 'pending' %}
-                                                    <span class="badge bg-warning text-dark px-3 py-2">
-                                                        <i class="fas fa-clock me-1"></i>În așteptare
-                                                    </span>
-                                                {% elif quote.status == 'accepted' %}
-                                                    <span class="badge bg-success px-3 py-2">
-                                                        <i class="fas fa-check-circle me-1"></i>Acceptată
-                                                    </span>
-                                                {% elif quote.status == 'rejected' %}
-                                                    <span class="badge bg-danger px-3 py-2">
-                                                        <i class="fas fa-times-circle me-1"></i>Respinsă
-                                                    </span>
-                                                {% elif quote.status == 'declined' %}
-                                                    <span class="badge bg-secondary px-3 py-2">
-                                                        <i class="fas fa-ban me-1"></i>Refuzată
-                                                    </span>
-                                                {% endif %}
-                                            </div>
-                                            <a href="{% url 'services:order_detail' quote.order.pk %}" 
-                                               class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-eye me-1"></i>Vezi comanda
-                                            </a>
-                                        </div>
+                    <div class="quote-card-mobile">
+                        <a href="{% url 'services:order_detail' quote.order.pk %}"
+                           class="quote-title-mobile text-decoration-none">
+                            {{ quote.order.title }}
+                        </a>
+
+                        <div class="quote-meta-mobile">
+                            <span class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ quote.order.county.name }}
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                {{ quote.created_at|date:"d M Y" }}
+                            </span>
+                        </div>
+
+                        <div class="quote-desc-mobile">
+                            {{ quote.description }}
+                        </div>
+
+                        <div class="quote-footer-mobile">
+                            <div class="quote-price-mobile">
+                                {{ quote.price }} RON
+                                {% if quote.estimated_duration %}
+                                <span class="duration">
+                                    <i class="fas fa-clock"></i> {{ quote.estimated_duration }}
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            {% if quote.status == 'pending' %}
+                                <span class="badge badge-pending quote-status-mobile">
+                                    <i class="fas fa-clock"></i> Așteptare
+                                </span>
+                            {% elif quote.status == 'accepted' %}
+                                <span class="badge badge-accepted quote-status-mobile">
+                                    <i class="fas fa-check-circle"></i> Acceptată
+                                </span>
+                            {% elif quote.status == 'rejected' %}
+                                <span class="badge badge-rejected quote-status-mobile">
+                                    <i class="fas fa-times-circle"></i> Respinsă
+                                </span>
+                            {% elif quote.status == 'declined' %}
+                                <span class="badge badge-declined quote-status-mobile">
+                                    <i class="fas fa-ban"></i> Refuzată
+                                </span>
+                            {% endif %}
+
+                            <a href="{% url 'services:order_detail' quote.order.pk %}"
+                               class="btn btn-outline-primary btn-sm quote-action-mobile">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Desktop: Enhanced Cards -->
+                <div class="d-none d-lg-block">
+                    {% for quote in quotes %}
+                    <div class="card quote-card-desktop">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-lg-8">
+                                    <a href="{% url 'services:order_detail' quote.order.pk %}"
+                                       class="quote-title-desktop text-decoration-none">
+                                        {{ quote.order.title }}
+                                    </a>
+
+                                    <div class="quote-meta-desktop">
+                                        <span class="meta-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            {{ quote.order.county.name }}, {{ quote.order.city.name }}
+                                        </span>
+                                        <span class="meta-item">
+                                            <i class="fas fa-calendar"></i>
+                                            Trimisă pe {{ quote.created_at|date:"d M Y" }}
+                                        </span>
                                     </div>
+
+                                    <div class="quote-desc-desktop">
+                                        {{ quote.description|truncatewords:30 }}
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 text-lg-end">
+                                    <div class="quote-price-desktop" style="{% if quote.status == 'rejected' %}color: #ef4444;{% endif %}">
+                                        {{ quote.price }} RON
+                                        {% if quote.estimated_duration %}
+                                        <span class="duration">
+                                            <i class="fas fa-clock"></i> {{ quote.estimated_duration }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        {% if quote.status == 'pending' %}
+                                            <span class="badge badge-pending quote-status-desktop">
+                                                <i class="fas fa-clock me-1"></i>În așteptare
+                                            </span>
+                                        {% elif quote.status == 'accepted' %}
+                                            <span class="badge badge-accepted quote-status-desktop">
+                                                <i class="fas fa-check-circle me-1"></i>Acceptată
+                                            </span>
+                                        {% elif quote.status == 'rejected' %}
+                                            <span class="badge badge-rejected quote-status-desktop">
+                                                <i class="fas fa-times-circle me-1"></i>Respinsă
+                                            </span>
+                                        {% elif quote.status == 'declined' %}
+                                            <span class="badge badge-declined quote-status-desktop">
+                                                <i class="fas fa-ban me-1"></i>Refuzată
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <a href="{% url 'services:order_detail' quote.order.pk %}"
+                                       class="btn btn-outline-primary btn-sm quote-action-desktop">
+                                        <i class="fas fa-eye me-2"></i>Vezi comanda
+                                    </a>
                                 </div>
                             </div>
                         </div>
+                    </div>
                     {% endfor %}
                 </div>
 
                 <!-- Pagination -->
                 {% if is_paginated %}
+                <div class="quotes-pagination-mobile mt-4">
                     <nav aria-label="Paginare oferte">
                         <ul class="pagination justify-content-center">
                             {% if page_obj.has_previous %}
@@ -157,7 +228,7 @@
 
                             <li class="page-item active">
                                 <span class="page-link">
-                                    Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}
+                                    {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
                                 </span>
                             </li>
 
@@ -171,14 +242,23 @@
                             {% endif %}
                         </ul>
                     </nav>
+                </div>
                 {% endif %}
             {% else %}
-                <div class="text-center py-5">
-                    <div class="mb-4">
-                        <i class="fas fa-handshake fa-4x text-muted"></i>
-                    </div>
-                    <h3 class="text-muted mb-3">Nu ai încă nicio ofertă</h3>
-                    <p class="text-muted mb-4">Caută comenzi disponibile și trimite prima ta ofertă!</p>
+                <div class="quotes-empty-mobile d-lg-none">
+                    <i class="fas fa-handshake text-muted"></i>
+                    <h3 class="text-muted">Nu ai oferte</h3>
+                    <p class="text-muted mb-4">Caută comenzi și trimite prima ta ofertă!</p>
+                    <a href="{% url 'services:available_orders' %}" class="btn text-white fw-medium"
+                       style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                        <i class="fas fa-search me-2"></i>Caută comenzi
+                    </a>
+                </div>
+
+                <div class="quotes-empty-desktop d-none d-lg-block">
+                    <i class="fas fa-handshake text-muted"></i>
+                    <h3 class="text-muted">Nu ai încă nicio ofertă</h3>
+                    <p class="text-muted">Caută comenzi disponibile și trimite prima ta ofertă pentru a începe să lucrezi cu clienții!</p>
                     <a href="{% url 'services:available_orders' %}" class="btn btn-lg text-white fw-medium px-4"
                        style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
                         <i class="fas fa-search me-2"></i>Caută comenzi
@@ -189,236 +269,413 @@
 
         <!-- Pending Quotes Tab -->
         <div class="tab-pane fade" id="pending" role="tabpanel">
-            {% for quote in quotes %}
-                {% if quote.status == 'pending' %}
-                    <div class="col-12 mb-4">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-md-8">
-                                        <div class="d-flex align-items-start mb-3">
-                                            <div class="flex-grow-1">
-                                                <h5 class="card-title mb-2">
-                                                    <a href="{% url 'services:order_detail' quote.order.pk %}" 
-                                                       class="text-decoration-none" style="color: #8B5CF6;">
-                                                        {{ quote.order.title }}
-                                                    </a>
-                                                </h5>
-                                                <p class="text-muted mb-2">
-                                                    <i class="fas fa-map-marker-alt me-1"></i>
-                                                    {{ quote.order.county.name }}, {{ quote.order.city.name }}
-                                                </p>
-                                                <p class="card-text text-muted mb-2">
-                                                    {{ quote.description|truncatewords:20 }}
-                                                </p>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-calendar me-1"></i>
-                                                    Trimisă pe {{ quote.created_at|date:"d M Y" }}
-                                                </small>
-                                            </div>
-                                        </div>
+            {% if quotes %}
+                <!-- Mobile -->
+                <div class="d-lg-none">
+                    {% for quote in quotes %}
+                    {% if quote.status == 'pending' %}
+                    <div class="quote-card-mobile">
+                        <a href="{% url 'services:order_detail' quote.order.pk %}"
+                           class="quote-title-mobile text-decoration-none">
+                            {{ quote.order.title }}
+                        </a>
+
+                        <div class="quote-meta-mobile">
+                            <span class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ quote.order.county.name }}
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                {{ quote.created_at|date:"d M Y" }}
+                            </span>
+                        </div>
+
+                        <div class="quote-desc-mobile">
+                            {{ quote.description }}
+                        </div>
+
+                        <div class="quote-footer-mobile">
+                            <div class="quote-price-mobile">
+                                {{ quote.price }} RON
+                                {% if quote.estimated_duration %}
+                                <span class="duration">
+                                    <i class="fas fa-clock"></i> {{ quote.estimated_duration }}
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <span class="badge badge-pending quote-status-mobile">
+                                <i class="fas fa-clock"></i> Așteptare
+                            </span>
+
+                            <a href="{% url 'services:order_detail' quote.order.pk %}"
+                               class="btn btn-outline-primary btn-sm quote-action-mobile">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Desktop -->
+                <div class="d-none d-lg-block">
+                    {% for quote in quotes %}
+                    {% if quote.status == 'pending' %}
+                    <div class="card quote-card-desktop">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-lg-8">
+                                    <a href="{% url 'services:order_detail' quote.order.pk %}"
+                                       class="quote-title-desktop text-decoration-none">
+                                        {{ quote.order.title }}
+                                    </a>
+
+                                    <div class="quote-meta-desktop">
+                                        <span class="meta-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            {{ quote.order.county.name }}, {{ quote.order.city.name }}
+                                        </span>
+                                        <span class="meta-item">
+                                            <i class="fas fa-calendar"></i>
+                                            Trimisă pe {{ quote.created_at|date:"d M Y" }}
+                                        </span>
                                     </div>
-                                    <div class="col-md-4 text-md-end">
-                                        <div class="mb-3">
-                                            <h4 class="text-success mb-1">{{ quote.price }} RON</h4>
-                                            {% if quote.estimated_duration %}
-                                                <small class="text-muted">
-                                                    <i class="fas fa-clock me-1"></i>
-                                                    {{ quote.estimated_duration }}
-                                                </small>
-                                            {% endif %}
-                                        </div>
-                                        <div class="mb-3">
-                                            <span class="badge bg-warning text-dark px-3 py-2">
-                                                <i class="fas fa-clock me-1"></i>În așteptare
-                                            </span>
-                                        </div>
-                                        <a href="{% url 'services:order_detail' quote.order.pk %}" 
-                                           class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>Vezi comanda
-                                        </a>
+
+                                    <div class="quote-desc-desktop">
+                                        {{ quote.description|truncatewords:30 }}
                                     </div>
+                                </div>
+
+                                <div class="col-lg-4 text-lg-end">
+                                    <div class="quote-price-desktop">
+                                        {{ quote.price }} RON
+                                        {% if quote.estimated_duration %}
+                                        <span class="duration">
+                                            <i class="fas fa-clock"></i> {{ quote.estimated_duration }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <span class="badge badge-pending quote-status-desktop">
+                                            <i class="fas fa-clock me-1"></i>În așteptare
+                                        </span>
+                                    </div>
+
+                                    <a href="{% url 'services:order_detail' quote.order.pk %}"
+                                       class="btn btn-outline-primary btn-sm quote-action-desktop">
+                                        <i class="fas fa-eye me-2"></i>Vezi comanda
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                {% endif %}
-            {% empty %}
-                <div class="text-center py-5">
-                    <div class="mb-4">
-                        <i class="fas fa-clock fa-4x text-muted"></i>
-                    </div>
-                    <h3 class="text-muted mb-3">Nicio ofertă în așteptare</h3>
-                    <p class="text-muted mb-4">Caută comenzi noi și trimite oferte pentru a începe</p>
-                    <a href="{% url 'services:available_orders' %}"
-                       class="btn btn-lg text-white fw-medium px-4"
-                       style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                        <i class="fas fa-search me-2"></i>Caută comenzi
-                    </a>
+                    {% endif %}
+                    {% endfor %}
                 </div>
-            {% endfor %}
+            {% endif %}
+
+            <!-- Empty state for pending -->
+            {% if not quotes or not quotes|selectattr:"status","equalto","pending"|list %}
+            <div class="quotes-empty-mobile d-lg-none">
+                <i class="fas fa-clock text-muted"></i>
+                <h3 class="text-muted">Nicio ofertă în așteptare</h3>
+                <p class="text-muted mb-4">Caută comenzi noi și trimite oferte</p>
+                <a href="{% url 'services:available_orders' %}" class="btn text-white fw-medium"
+                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                    <i class="fas fa-search me-2"></i>Caută comenzi
+                </a>
+            </div>
+
+            <div class="quotes-empty-desktop d-none d-lg-block">
+                <i class="fas fa-clock text-muted"></i>
+                <h3 class="text-muted">Nicio ofertă în așteptare</h3>
+                <p class="text-muted">Caută comenzi noi și trimite oferte pentru a începe</p>
+                <a href="{% url 'services:available_orders' %}"
+                   class="btn btn-lg text-white fw-medium px-4"
+                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                    <i class="fas fa-search me-2"></i>Caută comenzi
+                </a>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Accepted Quotes Tab -->
         <div class="tab-pane fade" id="accepted" role="tabpanel">
-            {% for quote in quotes %}
-                {% if quote.status == 'accepted' %}
-                    <div class="col-12 mb-4">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-md-8">
-                                        <div class="d-flex align-items-start mb-3">
-                                            <div class="flex-grow-1">
-                                                <h5 class="card-title mb-2">
-                                                    <a href="{% url 'services:order_detail' quote.order.pk %}" 
-                                                       class="text-decoration-none" style="color: #8B5CF6;">
-                                                        {{ quote.order.title }}
-                                                    </a>
-                                                </h5>
-                                                <p class="text-muted mb-2">
-                                                    <i class="fas fa-map-marker-alt me-1"></i>
-                                                    {{ quote.order.county.name }}, {{ quote.order.city.name }}
-                                                </p>
-                                                <p class="card-text text-muted mb-2">
-                                                    {{ quote.description|truncatewords:20 }}
-                                                </p>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-calendar me-1"></i>
-                                                    Trimisă pe {{ quote.created_at|date:"d M Y" }}
-                                                </small>
-                                            </div>
-                                        </div>
+            {% if quotes %}
+                <!-- Mobile -->
+                <div class="d-lg-none">
+                    {% for quote in quotes %}
+                    {% if quote.status == 'accepted' %}
+                    <div class="quote-card-mobile">
+                        <a href="{% url 'services:order_detail' quote.order.pk %}"
+                           class="quote-title-mobile text-decoration-none">
+                            {{ quote.order.title }}
+                        </a>
+
+                        <div class="quote-meta-mobile">
+                            <span class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ quote.order.county.name }}
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                {{ quote.created_at|date:"d M Y" }}
+                            </span>
+                        </div>
+
+                        <div class="quote-desc-mobile">
+                            {{ quote.description }}
+                        </div>
+
+                        <div class="quote-footer-mobile">
+                            <div class="quote-price-mobile">
+                                {{ quote.price }} RON
+                                {% if quote.estimated_duration %}
+                                <span class="duration">
+                                    <i class="fas fa-clock"></i> {{ quote.estimated_duration }}
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <span class="badge badge-accepted quote-status-mobile">
+                                <i class="fas fa-check-circle"></i> Acceptată
+                            </span>
+
+                            <a href="{% url 'services:order_detail' quote.order.pk %}"
+                               class="btn btn-outline-primary btn-sm quote-action-mobile">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Desktop -->
+                <div class="d-none d-lg-block">
+                    {% for quote in quotes %}
+                    {% if quote.status == 'accepted' %}
+                    <div class="card quote-card-desktop">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-lg-8">
+                                    <a href="{% url 'services:order_detail' quote.order.pk %}"
+                                       class="quote-title-desktop text-decoration-none">
+                                        {{ quote.order.title }}
+                                    </a>
+
+                                    <div class="quote-meta-desktop">
+                                        <span class="meta-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            {{ quote.order.county.name }}, {{ quote.order.city.name }}
+                                        </span>
+                                        <span class="meta-item">
+                                            <i class="fas fa-calendar"></i>
+                                            Trimisă pe {{ quote.created_at|date:"d M Y" }}
+                                        </span>
                                     </div>
-                                    <div class="col-md-4 text-md-end">
-                                        <div class="mb-3">
-                                            <h4 class="text-success mb-1">{{ quote.price }} RON</h4>
-                                            {% if quote.estimated_duration %}
-                                                <small class="text-muted">
-                                                    <i class="fas fa-clock me-1"></i>
-                                                    {{ quote.estimated_duration }}
-                                                </small>
-                                            {% endif %}
-                                        </div>
-                                        <div class="mb-3">
-                                            <span class="badge bg-success px-3 py-2">
-                                                <i class="fas fa-check-circle me-1"></i>Acceptată
-                                            </span>
-                                        </div>
-                                        <a href="{% url 'services:order_detail' quote.order.pk %}" 
-                                           class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>Vezi comanda
-                                        </a>
+
+                                    <div class="quote-desc-desktop">
+                                        {{ quote.description|truncatewords:30 }}
                                     </div>
+                                </div>
+
+                                <div class="col-lg-4 text-lg-end">
+                                    <div class="quote-price-desktop">
+                                        {{ quote.price }} RON
+                                        {% if quote.estimated_duration %}
+                                        <span class="duration">
+                                            <i class="fas fa-clock"></i> {{ quote.estimated_duration }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <span class="badge badge-accepted quote-status-desktop">
+                                            <i class="fas fa-check-circle me-1"></i>Acceptată
+                                        </span>
+                                    </div>
+
+                                    <a href="{% url 'services:order_detail' quote.order.pk %}"
+                                       class="btn btn-outline-primary btn-sm quote-action-desktop">
+                                        <i class="fas fa-eye me-2"></i>Vezi comanda
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                {% endif %}
-            {% empty %}
-                <div class="text-center py-5">
-                    <div class="mb-4">
-                        <i class="fas fa-check-circle fa-4x text-muted"></i>
-                    </div>
-                    <h3 class="text-muted mb-3">Nicio ofertă acceptată încă</h3>
-                    <p class="text-muted mb-4">Caută comenzi noi pentru a-ți crește șansele de a fi selectat</p>
-                    <a href="{% url 'services:available_orders' %}"
-                       class="btn btn-lg text-white fw-medium px-4"
-                       style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                        <i class="fas fa-search me-2"></i>Caută comenzi
-                    </a>
+                    {% endif %}
+                    {% endfor %}
                 </div>
-            {% endfor %}
+            {% endif %}
+
+            <!-- Empty state for accepted -->
+            {% if not quotes or not quotes|selectattr:"status","equalto","accepted"|list %}
+            <div class="quotes-empty-mobile d-lg-none">
+                <i class="fas fa-check-circle text-muted"></i>
+                <h3 class="text-muted">Nicio ofertă acceptată</h3>
+                <p class="text-muted mb-4">Continuă să aplici la comenzi</p>
+                <a href="{% url 'services:available_orders' %}" class="btn text-white fw-medium"
+                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                    <i class="fas fa-search me-2"></i>Caută comenzi
+                </a>
+            </div>
+
+            <div class="quotes-empty-desktop d-none d-lg-block">
+                <i class="fas fa-check-circle text-muted"></i>
+                <h3 class="text-muted">Nicio ofertă acceptată încă</h3>
+                <p class="text-muted">Caută comenzi noi pentru a-ți crește șansele de a fi selectat</p>
+                <a href="{% url 'services:available_orders' %}"
+                   class="btn btn-lg text-white fw-medium px-4"
+                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                    <i class="fas fa-search me-2"></i>Caută comenzi
+                </a>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Rejected Quotes Tab -->
         <div class="tab-pane fade" id="rejected" role="tabpanel">
-            {% for quote in quotes %}
-                {% if quote.status == 'rejected' %}
-                    <div class="col-12 mb-4">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-md-8">
-                                        <div class="d-flex align-items-start mb-3">
-                                            <div class="flex-grow-1">
-                                                <h5 class="card-title mb-2">
-                                                    <a href="{% url 'services:order_detail' quote.order.pk %}" 
-                                                       class="text-decoration-none" style="color: #8B5CF6;">
-                                                        {{ quote.order.title }}
-                                                    </a>
-                                                </h5>
-                                                <p class="text-muted mb-2">
-                                                    <i class="fas fa-map-marker-alt me-1"></i>
-                                                    {{ quote.order.county.name }}, {{ quote.order.city.name }}
-                                                </p>
-                                                <p class="card-text text-muted mb-2">
-                                                    {{ quote.description|truncatewords:20 }}
-                                                </p>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-calendar me-1"></i>
-                                                    Trimisă pe {{ quote.created_at|date:"d M Y" }}
-                                                </small>
-                                            </div>
-                                        </div>
+            {% if quotes %}
+                <!-- Mobile -->
+                <div class="d-lg-none">
+                    {% for quote in quotes %}
+                    {% if quote.status == 'rejected' %}
+                    <div class="quote-card-mobile">
+                        <a href="{% url 'services:order_detail' quote.order.pk %}"
+                           class="quote-title-mobile text-decoration-none">
+                            {{ quote.order.title }}
+                        </a>
+
+                        <div class="quote-meta-mobile">
+                            <span class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ quote.order.county.name }}
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                {{ quote.created_at|date:"d M Y" }}
+                            </span>
+                        </div>
+
+                        <div class="quote-desc-mobile">
+                            {{ quote.description }}
+                        </div>
+
+                        <div class="quote-footer-mobile">
+                            <div class="quote-price-mobile" style="color: #ef4444;">
+                                {{ quote.price }} RON
+                                {% if quote.estimated_duration %}
+                                <span class="duration">
+                                    <i class="fas fa-clock"></i> {{ quote.estimated_duration }}
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <span class="badge badge-rejected quote-status-mobile">
+                                <i class="fas fa-times-circle"></i> Respinsă
+                            </span>
+
+                            <a href="{% url 'services:order_detail' quote.order.pk %}"
+                               class="btn btn-outline-primary btn-sm quote-action-mobile">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Desktop -->
+                <div class="d-none d-lg-block">
+                    {% for quote in quotes %}
+                    {% if quote.status == 'rejected' %}
+                    <div class="card quote-card-desktop">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-lg-8">
+                                    <a href="{% url 'services:order_detail' quote.order.pk %}"
+                                       class="quote-title-desktop text-decoration-none">
+                                        {{ quote.order.title }}
+                                    </a>
+
+                                    <div class="quote-meta-desktop">
+                                        <span class="meta-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            {{ quote.order.county.name }}, {{ quote.order.city.name }}
+                                        </span>
+                                        <span class="meta-item">
+                                            <i class="fas fa-calendar"></i>
+                                            Trimisă pe {{ quote.created_at|date:"d M Y" }}
+                                        </span>
                                     </div>
-                                    <div class="col-md-4 text-md-end">
-                                        <div class="mb-3">
-                                            <h4 class="text-danger mb-1">{{ quote.price }} RON</h4>
-                                            {% if quote.estimated_duration %}
-                                                <small class="text-muted">
-                                                    <i class="fas fa-clock me-1"></i>
-                                                    {{ quote.estimated_duration }}
-                                                </small>
-                                            {% endif %}
-                                        </div>
-                                        <div class="mb-3">
-                                            <span class="badge bg-danger px-3 py-2">
-                                                <i class="fas fa-times-circle me-1"></i>Respinsă
-                                            </span>
-                                        </div>
-                                        <a href="{% url 'services:order_detail' quote.order.pk %}" 
-                                           class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>Vezi comanda
-                                        </a>
+
+                                    <div class="quote-desc-desktop">
+                                        {{ quote.description|truncatewords:30 }}
                                     </div>
+                                </div>
+
+                                <div class="col-lg-4 text-lg-end">
+                                    <div class="quote-price-desktop" style="color: #ef4444;">
+                                        {{ quote.price }} RON
+                                        {% if quote.estimated_duration %}
+                                        <span class="duration">
+                                            <i class="fas fa-clock"></i> {{ quote.estimated_duration }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <span class="badge badge-rejected quote-status-desktop">
+                                            <i class="fas fa-times-circle me-1"></i>Respinsă
+                                        </span>
+                                    </div>
+
+                                    <a href="{% url 'services:order_detail' quote.order.pk %}"
+                                       class="btn btn-outline-primary btn-sm quote-action-desktop">
+                                        <i class="fas fa-eye me-2"></i>Vezi comanda
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                {% endif %}
-            {% empty %}
-                <div class="text-center py-5">
-                    <div class="mb-4">
-                        <i class="fas fa-times-circle fa-4x text-muted"></i>
-                    </div>
-                    <h3 class="text-muted mb-3">Nicio ofertă respinsă</h3>
-                    <p class="text-muted mb-4">Continua să aplici la comenzi noi</p>
-                    <a href="{% url 'services:available_orders' %}"
-                       class="btn btn-lg text-white fw-medium px-4"
-                       style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                        <i class="fas fa-search me-2"></i>Caută comenzi
-                    </a>
+                    {% endif %}
+                    {% endfor %}
                 </div>
-            {% endfor %}
+            {% endif %}
+
+            <!-- Empty state for rejected -->
+            {% if not quotes or not quotes|selectattr:"status","equalto","rejected"|list %}
+            <div class="quotes-empty-mobile d-lg-none">
+                <i class="fas fa-times-circle text-muted"></i>
+                <h3 class="text-muted">Nicio ofertă respinsă</h3>
+                <p class="text-muted mb-4">Continuă să aplici la comenzi noi</p>
+                <a href="{% url 'services:available_orders' %}" class="btn text-white fw-medium"
+                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                    <i class="fas fa-search me-2"></i>Caută comenzi
+                </a>
+            </div>
+
+            <div class="quotes-empty-desktop d-none d-lg-block">
+                <i class="fas fa-times-circle text-muted"></i>
+                <h3 class="text-muted">Nicio ofertă respinsă</h3>
+                <p class="text-muted">Continuă să aplici la comenzi noi</p>
+                <a href="{% url 'services:available_orders' %}"
+                   class="btn btn-lg text-white fw-medium px-4"
+                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                    <i class="fas fa-search me-2"></i>Caută comenzi
+                </a>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
 {% endblock %}
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle tab switching with filtering
-    const tabs = document.querySelectorAll('#quoteTabs button[data-bs-toggle="tab"]');
-    tabs.forEach(tab => {
-        tab.addEventListener('shown.bs.tab', function(event) {
-            // You can add any additional JavaScript functionality here
-            // For example, updating URL parameters or analytics tracking
-        });
-    });
-});
-</script>
-
+{% block extra_js %}
 <style>
 /* Purple theme for nav pills */
 .nav-pills .nav-link.active {
@@ -436,3 +693,16 @@ document.addEventListener('DOMContentLoaded', function() {
     transition: all 0.3s ease;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle tab switching
+    const tabs = document.querySelectorAll('#quoteTabs button[data-bs-toggle="tab"]');
+    tabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function(event) {
+            // Optional: analytics tracking or URL updates
+        });
+    });
+});
+</script>
+{% endblock %}
