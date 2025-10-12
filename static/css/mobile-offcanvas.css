@@ -1,0 +1,28 @@
+/**
+ * Mobile Offcanvas Menu - 85vw width + compact styling
+ * Replaces full-width collapse with iOS-like side panel
+ */
+
+@media (max-width: 991.98px) {
+  /* Offcanvas Width: 85% instead of 100% */
+  .offcanvas-end {
+    width: 85vw;
+    max-width: 400px;
+  }
+
+  /* Quick Action Buttons: Compact */
+  .offcanvas .mobile-user-section .btn {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  /* Mobile Nav Links: Better spacing */
+  .offcanvas .mobile-nav-link {
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .offcanvas .mobile-nav-link:last-child {
+    border-bottom: none;
+  }
+}
