@@ -67,6 +67,14 @@ class ServiceCategoryListView(ListView):
 
         return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories_count"] = self.get_queryset().count()
+        context["craftsmen_count"] = CraftsmanProfile.objects.filter(
+            user__is_active=True, is_active=True
+        ).count()
+        return context
+
 
 class ServiceCategoryDetailView(DetailView):
     model = ServiceCategory
@@ -943,14 +951,10 @@ class WalletView(LoginRequiredMixin, DetailView):
     model = CreditWallet
     template_name = "services/wallet.html"
 
-    def dispatch(self, request, *args, **kwargs):
-        # Ensure the user has a wallet
-        if not hasattr(request.user, "creditwallet"):
-            CreditWallet.objects.create(user=request.user, balance=0)
-        return super().dispatch(request, *args, **kwargs)
-
     def get_object(self):
-        return self.request.user.creditwallet
+        from .wallet_service import get_or_create_wallet
+        # Use service layer for safe wallet retrieval
+        return get_or_create_wallet(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
