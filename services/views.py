@@ -31,7 +31,7 @@ from .models import (
     Shortlist,
     WalletTransaction,
 )
-from .querydefs import q_active, q_completed
+from .querydefs import q_active, q_completed, q_public_orders, q_active_craftsmen
 
 
 class ServiceCategoryListView(ListView):
@@ -84,25 +84,48 @@ class ServiceCategoryDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["services"] = self.object.services.filter(is_active=True)
-        context["popular_services"] = self.object.services.filter(is_active=True, is_popular=True).order_by("name")[
-            :100
-        ]
-        context["recent_orders"] = Order.objects.filter(service__category=self.object, status="published")[:6]
+        category = self.object
 
-        # Add statistics for the category
-        context["craftsmen_count"] = (
-            CraftsmanProfile.objects.filter(services__service__category=self.object).distinct().count()
+        # Services in this category
+        context["services"] = category.services.filter(is_active=True)
+        context["popular_services"] = category.services.filter(is_active=True, is_popular=True).order_by("name")[:100]
+
+        # Public orders in this category (show more orders - 12 instead of 6)
+        context["recent_orders"] = (
+            Order.objects
+            .filter(q_public_orders())  # Use helper: public orders only
+            .filter(service__category=category)
+            .select_related('client', 'service', 'county', 'city')
+            .order_by('-created_at')[:12]
         )
 
+        # Craftsmen statistics (use correct relationship path)
+        context["craftsmen_count"] = (
+            CraftsmanProfile.objects
+            .filter(services__service__category=category)
+            .distinct()
+            .count()
+        )
+
+        # Completed orders count
         context["completed_orders_count"] = Order.objects.filter(
-            service__category=self.object, status="completed"
+            service__category=category,
+            status="completed"
         ).count()
 
-        context["featured_craftsmen"] = CraftsmanProfile.objects.filter(
-            services__service__category=self.object, user__is_verified=True
-        ).distinct()[:3]
-        context["completed_orders"] = 150  # Placeholder
+        # Featured craftsmen - use permissive filter (removed is_verified requirement)
+        context["featured_craftsmen"] = (
+            CraftsmanProfile.objects
+            .filter(q_active_craftsmen())  # Use helper: active craftsmen
+            .filter(services__service__category=category)
+            .distinct()
+            .select_related('user', 'county', 'city')
+            .annotate(
+                rating_avg=Avg('received_reviews__rating'),
+                reviews_count=Count('received_reviews')
+            )[:12]  # Show more craftsmen - 12 instead of 3
+        )
+
         return context
 
 
