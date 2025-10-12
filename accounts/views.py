@@ -416,7 +416,7 @@ class CraftsmenListView(ListView):
 
         # Base queryset - use permissive filter (only requires active user account)
         qs = CraftsmanProfile.objects.filter(q_active_craftsmen())
-        qs = qs.select_related("user", "county").prefetch_related("categories")
+        qs = qs.select_related("user", "county").prefetch_related("services__service__category")
 
         # Text search
         if q:
@@ -437,7 +437,7 @@ class CraftsmenListView(ListView):
         if category:
             category_obj = ServiceCategory.objects.filter(slug=category).first()
             if category_obj:
-                qs = qs.filter(categories=category_obj)
+                qs = qs.filter(services__service__category=category_obj)
 
         # Verified filter
         if verified:
