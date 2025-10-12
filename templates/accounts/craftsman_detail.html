@@ -403,7 +403,7 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
                     <h5 class="card-title mb-3">
-                        <i class="fas fa-map-marker-alt me-2" style="color: #8B5CF6;"></i>Locație și Disponibilitate
+                        <i class="fas fa-map-marker-alt me-2" style="color: #8B5CF6;"></i>Locație
                     </h5>
                     <div class="mb-3">
                         <div class="d-flex align-items-center text-muted">
@@ -415,13 +415,6 @@
                             Rază acoperire: {{ craftsman.coverage_radius_km }} km
                         </div>
                     </div>
-
-                    <h6 class="mb-3">Disponibilitate</h6>
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-light text-dark">Lu - Vi</span>
-                        <span class="badge bg-light text-dark">8:00 - 18:00</span>
-                        <span class="badge bg-light text-dark">Sâmbătă (la cerere)</span>
-                    </div>
                 </div>
             </div>
 
@@ -432,16 +425,44 @@
                         <i class="fas fa-phone me-2" style="color: #8B5CF6;"></i>Date de contact
                     </h5>
                     <div class="contact-info">
-                        {% if craftsman.phone %}
+                        {% if craftsman.phone or craftsman.user.phone_number %}
                             <p class="mb-2">
                                 <i class="fas fa-phone me-2"></i>
-                                <a href="tel:{{ craftsman.phone }}" class="text-decoration-none">{{ craftsman.phone }}</a>
+                                <a href="tel:{{ craftsman.phone|default:craftsman.user.phone_number }}" class="text-decoration-none">
+                                    {{ craftsman.phone|default:craftsman.user.phone_number }}
+                                </a>
                             </p>
                         {% endif %}
                         {% if craftsman.user.email %}
                             <p class="mb-2">
                                 <i class="fas fa-envelope me-2"></i>
                                 <a href="mailto:{{ craftsman.user.email }}" class="text-decoration-none">{{ craftsman.user.email }}</a>
+                            </p>
+                        {% endif %}
+                        {% if craftsman.user.phone_number %}
+                            <p class="mb-2">
+                                <i class="fab fa-whatsapp me-2"></i>
+                                <a href="{{ craftsman.user.get_whatsapp_link }}" target="_blank" class="text-decoration-none">
+                                    WhatsApp
+                                </a>
+                            </p>
+                        {% endif %}
+                        {% if craftsman.website_url %}
+                            <p class="mb-2">
+                                <i class="fas fa-globe me-2"></i>
+                                <a href="{{ craftsman.website_url }}" target="_blank" class="text-decoration-none">Website</a>
+                            </p>
+                        {% endif %}
+                        {% if craftsman.facebook_url %}
+                            <p class="mb-2">
+                                <i class="fab fa-facebook me-2"></i>
+                                <a href="{{ craftsman.facebook_url }}" target="_blank" class="text-decoration-none">Facebook</a>
+                            </p>
+                        {% endif %}
+                        {% if craftsman.instagram_url %}
+                            <p class="mb-2">
+                                <i class="fab fa-instagram me-2"></i>
+                                <a href="{{ craftsman.instagram_url }}" target="_blank" class="text-decoration-none">Instagram</a>
                             </p>
                         {% endif %}
                         {% if craftsman.city and craftsman.county %}
@@ -456,7 +477,6 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
 <!-- Contact Modal -->
 <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
@@ -510,3 +530,4 @@
         </div>
     </div>
 </div>
+{% endblock %}
