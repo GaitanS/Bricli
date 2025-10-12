@@ -87,57 +87,115 @@
                     </div>
                 </div>
 
-                <!-- Mobile: Card View -->
-                <div class="d-lg-none my-services-mobile">
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h5 class="mb-0">Servicii Oferite ({{ total_services }})</h5>
-                        </div>
+                <!-- Mobile: Ultra-Compact List View -->
+                <div class="d-lg-none">
+                    <!-- Optional: Sticky Toolbar -->
+                    <div class="services-toolbar-mobile d-flex gap-2 mb-3">
+                        <a href="{% url 'services:add_craftsman_service' %}" class="btn btn-primary flex-fill btn-sm">
+                            <i class="fas fa-plus me-1"></i> Adaugă serviciu
+                        </a>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-light btn-sm">
+                            <i class="fas fa-user-cog"></i>
+                        </a>
                     </div>
 
-                    {% for service in services %}
-                    <div class="svc-card">
-                        <h3>{{ service.service.name }}</h3>
+                    <!-- Compact Services List -->
+                    <div id="myServicesGrid" class="svc-list">
+                        {% for service in services %}
+                        <div class="svc-item">
+                            <!-- Header: Icon + Title + Dropdown -->
+                            <div class="svc-head">
+                                <div class="svc-icon" aria-hidden="true">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
 
-                        <div class="svc-meta">
-                            <span class="svc-meta-item">
-                                <i class="fas fa-tag"></i>
-                                {{ service.service.category.name }}
-                            </span>
+                                <h3 class="svc-title clamp-1">{{ service.service.name }}</h3>
 
-                            <span class="svc-meta-item">
-                                <i class="fas fa-coins"></i>
-                                {% if service.price_from and service.price_to %}
-                                    {{ service.price_from }} - {{ service.price_to }} RON
-                                {% elif service.price_from %}
-                                    De la {{ service.price_from }} RON
-                                {% elif service.price_to %}
-                                    Până la {{ service.price_to }} RON
-                                {% else %}
-                                    Preț la cerere
+                                <div class="dropdown">
+                                    <button class="btn btn-light btn-sm" type="button"
+                                            data-bs-toggle="dropdown" aria-label="Mai multe opțiuni">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <a class="dropdown-item" href="{% url 'services:edit_craftsman_service' service.pk %}">
+                                            <i class="fas fa-edit me-2"></i>Editează
+                                        </a>
+                                        <a class="dropdown-item text-danger"
+                                           href="{% url 'services:delete_craftsman_service' service.pk %}"
+                                           onclick="return confirm('Sigur vrei să ștergi acest serviciu?');">
+                                            <i class="fas fa-trash me-2"></i>Șterge
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Meta: Category + County + Price (Chips) -->
+                            <div class="svc-meta">
+                                {% if service.service.category %}
+                                <span class="svc-chip">
+                                    <i class="fas fa-layer-group"></i>
+                                    {{ service.service.category.name }}
+                                </span>
                                 {% endif %}
-                                {% if service.price_unit %}
-                                    / {{ service.price_unit }}
-                                {% endif %}
-                            </span>
-                        </div>
 
-                        <div class="svc-actions">
-                            <a href="{% url 'services:edit_craftsman_service' service.pk %}" class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-edit"></i>
-                                Editează
-                            </a>
-                            <form method="post" action="{% url 'services:delete_craftsman_service' service.pk %}"
-                                  onsubmit="return confirm('Ești sigur că vrei să ștergi acest serviciu?')">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                    <i class="fas fa-trash"></i>
-                                    Șterge
-                                </button>
-                            </form>
+                                {% if craftsman.county %}
+                                <span class="svc-chip">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ craftsman.county.name }}
+                                </span>
+                                {% endif %}
+
+                                <span class="svc-chip">
+                                    <i class="fas fa-tag"></i>
+                                    {% if service.price_from and service.price_to %}
+                                        {{ service.price_from }}-{{ service.price_to }} RON
+                                    {% elif service.price_from %}
+                                        De la {{ service.price_from }} RON
+                                    {% elif service.price_to %}
+                                        Până la {{ service.price_to }} RON
+                                    {% else %}
+                                        Preț la cerere
+                                    {% endif %}
+                                    {% if service.price_unit %}/{{ service.price_unit }}{% endif %}
+                                </span>
+                            </div>
+
+                            <!-- Actions: Edit + Delete (Side by Side) -->
+                            <div class="svc-actions">
+                                <a href="{% url 'services:edit_craftsman_service' service.pk %}"
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-edit"></i> Editează
+                                </a>
+                                <a href="{% url 'services:delete_craftsman_service' service.pk %}"
+                                   class="btn btn-outline-danger btn-sm"
+                                   onclick="return confirm('Sigur vrei să ștergi acest serviciu?');">
+                                    <i class="fas fa-trash"></i> Șterge
+                                </a>
+                            </div>
                         </div>
+                        {% empty %}
+                        <div class="svc-empty">
+                            <i class="fas fa-tools"></i>
+                            <p>Nu ai adăugat încă servicii.</p>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
+
+                    <!-- Show More Button (if > 6 services) -->
+                    {% if services|length > 6 %}
+                    <div class="text-center mt-3">
+                        <button id="showAllMyServices" class="btn btn-outline-secondary btn-sm">
+                            Vezi toate ({{ services|length }})
+                        </button>
+                    </div>
+                    {% endif %}
+
+                    <!-- FAB: Floating Action Button -->
+                    <button type="button" class="btn fab-add"
+                            onclick="window.location.href='{% url 'services:add_craftsman_service' %}'"
+                            aria-label="Adaugă serviciu">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
 
                 <!-- Pagination -->

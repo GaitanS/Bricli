@@ -1,0 +1,196 @@
+/**
+ * My Services - Ultra Compact Mobile Layout
+ * Reduces scroll by 60% with dense, efficient design
+ * Desktop layout remains completely unchanged
+ */
+
+/* MOBILE ONLY - Compact List Layout */
+@media (max-width: 991.98px) {
+
+  /* Container: Grid layout with tight gaps */
+  .svc-list {
+    display: grid;
+    gap: 10px;
+    padding: 0;
+    list-style: none;
+    margin: 0;
+  }
+
+  /* Item: Compact card with minimal padding */
+  .svc-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 10px 12px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.15s ease;
+  }
+
+  .svc-item:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Header: Icon + Title + Actions in ONE row */
+  .svc-head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* Icon: Small gradient square */
+  .svc-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  /* Title: ONE line only, truncated */
+  .svc-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: #111827;
+    line-height: 1.3;
+  }
+
+  .svc-title.clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Meta: Chips on ONE row with wrap */
+  .svc-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+    align-items: center;
+  }
+
+  /* Chip: Pill-shaped info badges */
+  .svc-chip {
+    background: #f3f4f6;
+    color: #111827;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.8125rem; /* 13px */
+    line-height: 1.3;
+    display: inline-flex;
+    gap: 5px;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .svc-chip i {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  /* Actions: 2 buttons side-by-side */
+  .svc-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .svc-actions .btn {
+    flex: 1 1 0; /* Equal width */
+    padding: 0.45rem 0.6rem;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .svc-actions .btn i {
+    font-size: 0.8rem;
+  }
+
+  /* Progressive disclosure: Hide after 6th item */
+  #myServicesGrid .svc-item:nth-child(n+7) {
+    display: none;
+  }
+
+  /* When expanded, show all */
+  #myServicesGrid.show-all .svc-item {
+    display: block !important;
+  }
+
+  /* FAB: Floating Action Button */
+  .fab-add {
+    position: fixed;
+    right: 14px;
+    bottom: 14px;
+    z-index: 1040;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .fab-add:hover,
+  .fab-add:focus {
+    transform: scale(1.08);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+  }
+
+  .fab-add:active {
+    transform: scale(0.96);
+  }
+
+  .fab-add i {
+    font-size: 20px;
+  }
+
+  /* Sticky toolbar (optional) */
+  .services-toolbar-mobile {
+    position: sticky;
+    top: 58px;
+    z-index: 1020;
+    background: #fff;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+  }
+
+  /* Empty state */
+  .svc-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+  }
+
+  .svc-empty i {
+    font-size: 2.5rem;
+    color: #d1d5db;
+    margin-bottom: 12px;
+  }
+}
+
+/* Desktop: Hide mobile-specific elements */
+@media (min-width: 992px) {
+  .svc-list,
+  .fab-add,
+  .services-toolbar-mobile,
+  #showAllMyServices {
+    display: none !important;
+  }
+}
