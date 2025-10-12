@@ -1,0 +1,153 @@
+/**
+ * My Services - Mobile Responsive Layout
+ * Converts table to card layout on mobile devices
+ */
+
+@media (max-width: 991.98px) {
+    /* Hide table on mobile */
+    .my-services-table {
+        display: none;
+    }
+
+    /* Card layout for mobile */
+    .svc-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 16px;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.2s ease;
+    }
+
+    .svc-card:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .svc-card h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0 0 8px;
+        color: #1f2937;
+    }
+
+    .svc-meta {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin-bottom: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .svc-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .svc-meta-item i {
+        color: #8B5CF6;
+        font-size: 0.85rem;
+    }
+
+    .svc-status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .svc-status.active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .svc-status.inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .svc-status.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .svc-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .svc-actions .btn {
+        width: 100%;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 16px;
+        font-size: 0.95rem;
+    }
+
+    .svc-actions .btn i {
+        font-size: 0.9rem;
+    }
+
+    /* Empty state */
+    .svc-empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6b7280;
+    }
+
+    .svc-empty i {
+        font-size: 3rem;
+        color: #d1d5db;
+        margin-bottom: 16px;
+    }
+
+    .svc-empty h3 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+        color: #374151;
+    }
+
+    .svc-empty p {
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+}
+
+/* Desktop table improvements */
+@media (min-width: 992px) {
+    .my-services-mobile {
+        display: none;
+    }
+
+    .my-services-table {
+        display: table;
+    }
+
+    .my-services-table th {
+        background: #f9fafb;
+        font-weight: 600;
+        color: #374151;
+        padding: 12px 16px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .my-services-table td {
+        padding: 14px 16px;
+        vertical-align: middle;
+    }
+
+    .my-services-table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+    .my-services-table tbody tr:hover {
+        background-color: #f9fafb;
+    }
+}
