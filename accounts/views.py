@@ -959,3 +959,17 @@ class RegistrationChoiceView(TemplateView):
     """
 
     template_name = "accounts/registration_choice.html"
+
+
+class CraftsmanIdRedirectView(DetailView):
+    """
+    Redirect view for old craftsman URLs with numeric IDs.
+    Redirects /conturi/meserias/1/ to /conturi/meserias/slug/ with 301.
+    """
+    model = CraftsmanProfile
+    pk_url_kwarg = "pk"
+
+    def get(self, request, *args, **kwargs):
+        craftsman = self.get_object()
+        from django.shortcuts import redirect
+        return redirect("accounts:craftsman_detail", slug=craftsman.slug, permanent=True)
