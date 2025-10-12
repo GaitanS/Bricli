@@ -1062,6 +1062,7 @@ def ensure_craftsman_slug(craftsman):
     """
     if not craftsman.slug:
         craftsman.save()  # Auto-generates slug via model's save() method
+        craftsman.refresh_from_db()  # Ensure we have the latest slug
 
 
 class CraftsmanIdRedirectView(DetailView):
@@ -1073,7 +1074,17 @@ class CraftsmanIdRedirectView(DetailView):
     pk_url_kwarg = "pk"
 
     def get(self, request, *args, **kwargs):
+        from django.shortcuts import redirect
+
         craftsman = self.get_object()
         ensure_craftsman_slug(craftsman)
-        from django.shortcuts import redirect
+
+        # Verify slug exists after generation
+        if not craftsman.slug:
+            messages.error(
+                request,
+                f"Nu s-a putut genera URL-ul pentru profilul meșterului. Te rugăm să contactezi suportul."
+            )
+            return redirect("accounts:craftsmen_list")
+
         return redirect("accounts:craftsman_detail", slug=craftsman.slug, permanent=True)
