@@ -389,4 +389,22 @@
   .helper-tooltip-kid {
     display: none !important;
   }
+
+  /* Desktop header with purple background */
+  .quotes-header {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+  }
+
+  .quotes-header h1,
+  .quotes-header h1 i {
+    color: #fff !important;
+  }
+
+  .quotes-header p {
+    color: rgba(255, 255, 255, 0.9);
+  }
 }
