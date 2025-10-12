@@ -482,6 +482,8 @@ class CreateQuoteView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.craftsman = self.request.user.craftsman_profile
         form.instance.order = self.order
+        # Set quote expiration to 30 days from now
+        form.instance.expires_at = timezone.now() + timezone.timedelta(days=30)
 
         # Additional validation: Prevent duplicate quotes
         if Quote.objects.filter(order=self.order, craftsman=self.request.user.craftsman_profile).exists():
