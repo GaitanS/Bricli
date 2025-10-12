@@ -1,74 +1,103 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
-{% load lazy_loading %}
 {% load widget_tweaks %}
 
 {% block title %}Trimite Ofertă - {{ order.title }} - Bricli{% endblock %}
 
 {% block extra_css %}
-<link href="{% static 'css/custom.css' %}" rel="stylesheet">
 <style>
+/* Violet Gradient Header */
 .quote-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
     color: white;
-    padding: 2rem 0;
+    padding: 2.5rem 0;
     margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
 }
 
-.order-summary {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
+.quote-header h1 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 
-.form-container {
+.quote-header p {
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+/* Order Summary Card */
+.order-summary-card {
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    padding: 2rem;
-}
-
-.price-input-group {
-    position: relative;
-}
-
-.price-input-group .form-control {
-    padding-right: 50px;
-}
-
-.price-currency {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6c757d;
-    font-weight: 600;
-}
-
-.btn-submit-quote {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
     border: none;
-    color: white;
-    padding: 1rem 3rem;
-    border-radius: 25px;
+}
+
+.order-summary-card h6 {
+    color: #1f2937;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.order-summary-card .order-title {
+    color: #8B5CF6;
     font-weight: 600;
     font-size: 1.1rem;
-    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
 }
 
-.btn-submit-quote:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
-    color: white;
+.order-info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    color: #4b5563;
 }
 
-.quote-tips {
-    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-    border-radius: 10px;
+.order-info-item i {
+    color: #8B5CF6;
+    width: 20px;
+    margin-right: 0.75rem;
+}
+
+.budget-display {
+    color: #8B5CF6;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.urgency-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.urgency-low { background-color: #d1fae5; color: #065f46; }
+.urgency-medium { background-color: #fef3c7; color: #92400e; }
+.urgency-high { background-color: #fee2e2; color: #991b1b; }
+
+/* Tips Section */
+.tips-card {
+    background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%);
+    border-left: 4px solid #8B5CF6;
+    border-radius: 12px;
     padding: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.tips-card h6 {
+    color: #5B21B6;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.tips-card h6 i {
+    margin-right: 0.5rem;
 }
 
 .tip-item {
@@ -91,109 +120,273 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 0;
     flex-shrink: 0;
     font-size: 0.85rem;
 }
 
 .tip-content {
     flex: 1;
-    min-width: 0;
 }
 
 .tip-content strong {
     display: block;
+    color: #5B21B6;
     margin-bottom: 0.25rem;
     font-size: 0.95rem;
 }
 
 .tip-content small {
-    line-height: 1.4;
-    display: block;
+    color: #6b7280;
+    line-height: 1.5;
 }
 
-.urgency-indicator {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
+/* Form Container */
+.form-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    border: none;
+}
+
+.form-container h5 {
+    color: #1f2937;
     font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
 }
 
-.urgency-low { background-color: #d4edda; color: #155724; }
-.urgency-medium { background-color: #fff3cd; color: #856404; }
-.urgency-high { background-color: #f8d7da; color: #721c24; }
-.urgency-urgent { background-color: #f5c6cb; color: #721c24; }
-
-.profile-stat {
-    padding: 0.5rem;
+.form-container h5 i {
+    color: #8B5CF6;
+    margin-right: 0.75rem;
 }
 
-.profile-stat h6 {
+.form-label {
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-label i {
+    color: #8B5CF6;
+    margin-right: 0.5rem;
+}
+
+.form-control,
+.form-select {
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
     font-size: 1rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #8B5CF6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.form-control-lg {
+    padding: 1rem 1.25rem;
+    font-size: 1.25rem;
     font-weight: 600;
 }
 
-.profile-stat small {
-    font-size: 0.8rem;
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.price-input-wrapper {
+    position: relative;
+}
+
+.price-currency {
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8B5CF6;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.form-text {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.char-counter {
+    text-align: right;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Submit Button */
+.btn-submit-quote {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    border: none;
+    color: white;
+    padding: 1rem 3rem;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    width: 100%;
+    max-width: 400px;
+}
+
+.btn-submit-quote:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+    color: white;
+}
+
+.btn-submit-quote:active {
+    transform: translateY(0);
+}
+
+.btn-back {
+    background: white;
+    border: 2px solid #8B5CF6;
+    color: #8B5CF6;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: #8B5CF6;
+    color: white;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .quote-header {
+        padding: 2rem 0;
+    }
+
+    .quote-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .form-container {
+        padding: 1.5rem;
+    }
+
+    .btn-submit-quote {
+        width: 100%;
+        max-width: none;
+    }
+
+    .order-summary-card,
+    .tips-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Error Styling */
+.text-danger {
+    color: #dc2626 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.is-invalid {
+    border-color: #dc2626 !important;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-container,
+.tips-card,
+.order-summary-card {
+    animation: fadeInUp 0.5s ease-out;
 }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Violet Gradient Header -->
 <div class="quote-header">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h1 class="mb-2">
+                <h1>
                     <i class="fas fa-paper-plane me-3"></i>Trimite Ofertă
                 </h1>
-                <p class="mb-0 opacity-75">Creează o ofertă personalizată pentru această comandă</p>
+                <p class="mb-0">Creează o ofertă personalizată și profesională pentru această comandă</p>
             </div>
             <div class="col-md-4 text-md-end">
-                <a href="{% url 'services:order_detail' order.pk %}" class="btn btn-outline-light">
-                    <i class="fas fa-arrow-left me-2"></i>Înapoi la Comandă
+                <a href="{% url 'services:order_detail' order.pk %}" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i>Înapoi
                 </a>
             </div>
         </div>
     </div>
 </div>
 
-<div class="container">
+<div class="container pb-5">
     <div class="row">
-        <div class="col-lg-8">
-            <!-- Order Summary -->
-            <div class="order-summary">
-                <h5 class="mb-3">
-                    <i class="fas fa-info-circle text-primary me-2"></i>Rezumat Comandă
-                </h5>
-                
-                <div class="row">
-                    <div class="col-md-8">
-                        <h6 class="text-primary">{{ order.title }}</h6>
-                        <p class="text-muted mb-2">{{ order.description|truncatewords:30 }}</p>
-                        <p class="mb-1">
-                            <i class="fas fa-map-marker-alt text-muted me-2"></i>
-                            {{ order.city.name }}, {{ order.county.name }}
-                        </p>
-                        <p class="mb-0">
-                            <i class="fas fa-tag text-muted me-2"></i>
-                            {{ order.service.category.name }} - {{ order.service.name }}
-                        </p>
+        <!-- Main Content Column -->
+        <div class="col-lg-8 order-lg-2">
+            <!-- Order Summary Card -->
+            <div class="order-summary-card">
+                <h6>
+                    <i class="fas fa-info-circle" style="color: #8B5CF6;"></i>
+                    Detalii Comandă
+                </h6>
+
+                <div class="order-title">{{ order.title }}</div>
+
+                <div class="order-info-item">
+                    <i class="fas fa-align-left"></i>
+                    <div>{{ order.description|truncatewords:30 }}</div>
+                </div>
+
+                <div class="order-info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>{{ order.city.name }}, {{ order.county.name }}</div>
+                </div>
+
+                <div class="order-info-item">
+                    <i class="fas fa-tag"></i>
+                    <div>{{ order.service.category.name }} - {{ order.service.name }}</div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-3" style="border-top: 1px solid #e5e7eb;">
+                    <div>
+                        <small style="color: #6b7280; display: block; margin-bottom: 0.25rem;">Buget Client:</small>
+                        {% if order.budget_min and order.budget_max %}
+                            <div class="budget-display">{{ order.budget_min }} - {{ order.budget_max }} RON</div>
+                        {% elif order.budget_min %}
+                            <div class="budget-display">De la {{ order.budget_min }} RON</div>
+                        {% elif order.budget_max %}
+                            <div class="budget-display">Până la {{ order.budget_max }} RON</div>
+                        {% else %}
+                            <div style="color: #6b7280;">De discutat</div>
+                        {% endif %}
                     </div>
-                    <div class="col-md-4 text-md-end">
-                        <div class="mb-2">
-                            <strong>Buget Client:</strong><br>
-                            {% if order.budget_min and order.budget_max %}
-                                <span style="color: #8B5CF6;">{{ order.budget_min }} - {{ order.budget_max }} RON</span>
-                            {% elif order.budget_min %}
-                                <span style="color: #8B5CF6;">De la {{ order.budget_min }} RON</span>
-                            {% elif order.budget_max %}
-                                <span style="color: #8B5CF6;">Până la {{ order.budget_max }} RON</span>
-                            {% else %}
-                                <span class="text-muted">De discutat</span>
-                            {% endif %}
-                        </div>
-                        <span class="urgency-indicator urgency-{{ order.urgency }}">
+                    <div>
+                        <span class="urgency-badge urgency-{{ order.urgency }}">
                             <i class="fas fa-clock me-1"></i>{{ order.get_urgency_display }}
                         </span>
                     </div>
@@ -202,64 +395,73 @@
 
             <!-- Quote Form -->
             <div class="form-container">
-                <h5 class="mb-4">
-                    <i class="fas fa-edit me-2" style="color: #8B5CF6;"></i>Detalii Ofertă
+                <h5>
+                    <i class="fas fa-edit"></i>
+                    Detalii Ofertă
                 </h5>
 
                 <form method="post">
                     {% csrf_token %}
-                    
+
                     <div class="row">
+                        <!-- Price Field -->
                         <div class="col-md-6">
                             <div class="mb-4">
                                 <label for="id_price" class="form-label">
-                                    <i class="fas fa-euro-sign text-primary me-2"></i>
-                                    <strong>Preț Ofertă *</strong>
+                                    <i class="fas fa-euro-sign"></i>
+                                    Preț Ofertă *
                                 </label>
-                                <div class="price-input-group">
-                                    {{ form.price|add_class:"form-control form-control-lg" }}
+                                <div class="price-input-wrapper">
+                                    {{ form.price|add_class:"form-control form-control-lg"|attr:"placeholder:Ex: 1500" }}
                                     <span class="price-currency">RON</span>
                                 </div>
                                 {% if form.price.help_text %}
-                                    <small class="form-text text-muted">{{ form.price.help_text }}</small>
+                                    <small class="form-text">{{ form.price.help_text }}</small>
                                 {% endif %}
                                 {% if form.price.errors %}
-                                    <div class="text-danger mt-1">{{ form.price.errors }}</div>
+                                    <div class="text-danger">{{ form.price.errors }}</div>
                                 {% endif %}
                             </div>
                         </div>
-                        
+
+                        <!-- Estimated Duration Field -->
                         <div class="col-md-6">
                             <div class="mb-4">
                                 <label for="id_estimated_duration" class="form-label">
-                                    <i class="fas fa-clock text-primary me-2"></i>
-                                    <strong>Durată Estimată</strong>
+                                    <i class="fas fa-clock"></i>
+                                    Durată Estimată
                                 </label>
-                                {{ form.estimated_duration|add_class:"form-control" }}
-                                <small class="form-text text-muted">Ex: 2-3 zile, 1 săptămână, 2 ore</small>
+                                {{ form.estimated_duration|add_class:"form-control"|attr:"placeholder:Ex: 2-3 zile, 1 săptămână" }}
+                                <small class="form-text">Ex: 2-3 zile, 1 săptămână, 5 ore</small>
                                 {% if form.estimated_duration.errors %}
-                                    <div class="text-danger mt-1">{{ form.estimated_duration.errors }}</div>
+                                    <div class="text-danger">{{ form.estimated_duration.errors }}</div>
                                 {% endif %}
                             </div>
                         </div>
                     </div>
 
+                    <!-- Description Field -->
                     <div class="mb-4">
                         <label for="id_description" class="form-label">
-                            <i class="fas fa-file-alt text-primary me-2"></i>
-                            <strong>Descrierea Ofertei *</strong>
+                            <i class="fas fa-file-alt"></i>
+                            Descrierea Ofertei *
                         </label>
-                        {{ form.description|add_class:"form-control" }}
-                        <small class="form-text text-muted">
-                            Descrie în detaliu cum vei realiza lucrarea, ce materiale vei folosi, 
-                            și orice alte informații relevante pentru client.
+                        {{ form.description|add_class:"form-control"|attr:"placeholder:Descrie în detaliu cum vei realiza lucrarea..."|attr:"rows:6" }}
+                        <div class="char-counter">
+                            <span id="char-count">0</span> caractere
+                        </div>
+                        <small class="form-text">
+                            Explică în detaliu cum vei realiza lucrarea, ce materiale vei folosi,
+                            experiența ta relevantă, și orice alte informații care îl vor convinge pe client
+                            că ești alegerea potrivită.
                         </small>
                         {% if form.description.errors %}
-                            <div class="text-danger mt-1">{{ form.description.errors }}</div>
+                            <div class="text-danger">{{ form.description.errors }}</div>
                         {% endif %}
                     </div>
 
-                    <div class="text-center">
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4">
                         <button type="submit" class="btn btn-submit-quote">
                             <i class="fas fa-paper-plane me-2"></i>
                             Trimite Oferta
@@ -269,102 +471,77 @@
             </div>
         </div>
 
-        <!-- Sidebar with Tips -->
-        <div class="col-lg-4">
-            <div class="quote-tips">
-                <h6 class="mb-3">
-                    <i class="fas fa-lightbulb text-warning me-2"></i>
+        <!-- Sidebar Column (shows first on mobile) -->
+        <div class="col-lg-4 order-lg-1">
+            <!-- Tips Card -->
+            <div class="tips-card">
+                <h6>
+                    <i class="fas fa-lightbulb"></i>
                     Sfaturi pentru o Ofertă de Succes
                 </h6>
-                
+
                 <div class="tip-item">
                     <div class="tip-icon">
                         <i class="fas fa-euro-sign"></i>
                     </div>
                     <div class="tip-content">
                         <strong>Preț Competitiv</strong>
-                        <small class="text-muted">Oferă un preț fair și competitiv bazat pe complexitatea lucrării.</small>
+                        <small>
+                            Oferă un preț fair și realist bazat pe complexitatea lucrării.
+                            Consultă bugetul clientului pentru a fi competitiv.
+                        </small>
                     </div>
                 </div>
-                
+
                 <div class="tip-item">
                     <div class="tip-icon">
                         <i class="fas fa-file-alt"></i>
                     </div>
                     <div class="tip-content">
                         <strong>Descriere Detaliată</strong>
-                        <small class="text-muted">Explică clar cum vei realiza lucrarea și ce include prețul.</small>
+                        <small>
+                            Explică clar ce include prețul, ce materiale vei folosi,
+                            și metodele de lucru. Cât mai mult detaliu, cu atât mai bine!
+                        </small>
                     </div>
                 </div>
-                
+
                 <div class="tip-item">
                     <div class="tip-icon">
                         <i class="fas fa-clock"></i>
                     </div>
                     <div class="tip-content">
                         <strong>Timp Realist</strong>
-                        <small class="text-muted">Estimează o durată realistă pentru finalizarea lucrării.</small>
+                        <small>
+                            Estimează o durată realistă. E mai bine să depășești
+                            așteptările decât să întârzii cu finalizarea.
+                        </small>
                     </div>
                 </div>
-                
+
                 <div class="tip-item">
                     <div class="tip-icon">
                         <i class="fas fa-star"></i>
                     </div>
                     <div class="tip-content">
                         <strong>Profesionalism</strong>
-                        <small class="text-muted">Folosește un limbaj profesional și politicos în descriere.</small>
+                        <small>
+                            Folosește un limbaj profesional, politicos și corect gramatical.
+                            Prima impresie contează!
+                        </small>
                     </div>
                 </div>
-            </div>
 
-            <!-- Your Profile Summary -->
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title">
-                        <i class="fas fa-user text-primary me-2"></i>Profilul Tău
-                    </h6>
-                    <div class="d-flex align-items-center mb-3">
-                        {% if user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}?v={% profile_img_version user %}" 
-                                 alt="{{ user.get_full_name }}" 
-                                 class="rounded-circle me-3" 
-                                 style="width: 50px; height: 50px; object-fit: cover;" loading="lazy">
-                        {% else %}
-                            <img src="{% static 'images/avatar.svg' %}" 
-                                 alt="{{ user.get_full_name|default:user.username }}" 
-                                 class="rounded-circle me-3" 
-                                 style="width: 50px; height: 50px; object-fit: cover;" loading="lazy">
-                        {% endif %}
-                        <div>
-                            <strong>{{ user.get_full_name|default:user.username }}</strong><br>
-                            {% if user.craftsman_profile.company_name %}
-                                <small class="text-muted">{{ user.craftsman_profile.company_name }}</small>
-                            {% endif %}
-                        </div>
+                <div class="tip-item">
+                    <div class="tip-icon">
+                        <i class="fas fa-images"></i>
                     </div>
-                    
-                    <div class="row text-center">
-                        <div class="col-4">
-                            <div class="profile-stat">
-                                <h6 class="text-warning mb-1">
-                                    <i class="fas fa-star"></i> {{ user.craftsman_profile.average_rating|floatformat:1 }}
-                                </h6>
-                                <small class="text-muted d-block">Rating</small>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="profile-stat">
-                                <h6 class="text-info mb-1">{{ user.craftsman_profile.total_reviews }}</h6>
-                                <small class="text-muted d-block">Recenzii</small>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="profile-stat">
-                                <h6 class="mb-1" style="color: #8B5CF6;">{{ user.craftsman_profile.total_jobs_completed }}</h6>
-                                <small class="text-muted d-block">Lucrări</small>
-                            </div>
-                        </div>
+                    <div class="tip-content">
+                        <strong>Arată-ți Experiența</strong>
+                        <small>
+                            Menționează lucrări similare pe care le-ai realizat.
+                            Un portofoliu complet îți crește șansele de succes!
+                        </small>
                     </div>
                 </div>
             </div>
@@ -376,35 +553,84 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Character counter for description
+    const descriptionTextarea = document.getElementById('id_description');
+    const charCount = document.getElementById('char-count');
+
+    if (descriptionTextarea && charCount) {
+        // Initial count
+        charCount.textContent = descriptionTextarea.value.length;
+
+        // Update on input
+        descriptionTextarea.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+
+            // Change color based on length
+            if (count < 100) {
+                charCount.style.color = '#ef4444'; // Red
+            } else if (count < 200) {
+                charCount.style.color = '#f59e0b'; // Orange
+            } else {
+                charCount.style.color = '#10b981'; // Green
+            }
+        });
+
+        // Auto-resize textarea
+        descriptionTextarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+
     // Format price input
     const priceInput = document.getElementById('id_price');
     if (priceInput) {
         priceInput.addEventListener('input', function(e) {
             // Remove non-numeric characters except decimal point
             let value = e.target.value.replace(/[^\d.]/g, '');
-            
+
             // Ensure only one decimal point
             const parts = value.split('.');
             if (parts.length > 2) {
                 value = parts[0] + '.' + parts.slice(1).join('');
             }
-            
+
             // Limit decimal places to 2
             if (parts[1] && parts[1].length > 2) {
                 value = parts[0] + '.' + parts[1].substring(0, 2);
             }
-            
+
             e.target.value = value;
         });
-    }
-    
-    // Auto-resize description textarea
-    const descriptionTextarea = document.getElementById('id_description');
-    if (descriptionTextarea) {
-        descriptionTextarea.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
+
+        // Highlight on focus
+        priceInput.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+            this.parentElement.style.transition = 'transform 0.2s ease';
         });
+
+        priceInput.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    }
+
+    // Form validation feedback
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const submitBtn = form.querySelector('.btn-submit-quote');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Se trimite...';
+                submitBtn.disabled = true;
+            }
+        });
+    }
+
+    // Smooth scroll to form errors
+    const firstError = document.querySelector('.text-danger');
+    if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 });
 </script>

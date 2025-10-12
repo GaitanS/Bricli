@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const phone = this.getAttribute('data-phone');
             const targetId = this.getAttribute('data-target');
             const target = document.getElementById(targetId);
-            
+
             if (target) {
                 target.textContent = phone;
                 this.innerHTML = '<i class="fas fa-check"></i>';
@@ -65,6 +65,47 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Load More Quotes functionality
+    const loadMoreBtn = document.getElementById('load-more-quotes');
+    if (loadMoreBtn) {
+        let currentVisible = 5;
+        const quoteCards = document.querySelectorAll('.quote-card');
+        const totalQuotes = quoteCards.length;
+
+        loadMoreBtn.addEventListener('click', function() {
+            const loadCount = 10; // Load 10 more at a time
+            const endIndex = Math.min(currentVisible + loadCount, totalQuotes);
+
+            // Show next batch of quotes with animation
+            for (let i = currentVisible; i < endIndex; i++) {
+                quoteCards[i].style.display = 'block';
+                quoteCards[i].style.opacity = '0';
+                quoteCards[i].style.transform = 'translateY(20px)';
+
+                // Trigger animation
+                setTimeout(() => {
+                    quoteCards[i].style.transition = 'all 0.3s ease';
+                    quoteCards[i].style.opacity = '1';
+                    quoteCards[i].style.transform = 'translateY(0)';
+                }, i * 50);
+            }
+
+            currentVisible = endIndex;
+
+            // Update remaining count
+            const remaining = totalQuotes - currentVisible;
+            const remainingBadge = document.getElementById('remaining-quotes');
+            if (remainingBadge) {
+                remainingBadge.textContent = `(${remaining} rămase)`;
+            }
+
+            // Hide button if all quotes are shown
+            if (currentVisible >= totalQuotes) {
+                loadMoreBtn.style.display = 'none';
+            }
+        });
+    }
 });
 </script>
 {% endblock %}
@@ -237,114 +278,200 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             {% endif %}
 
-            <div class="card mt-4">
+            <!-- Quotes Section -->
+            <div class="card mt-4" style="border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
                 <div class="card-body">
-                    <h5>Oferte ({{ quotes.count }})</h5>
-                    
-                    {% if quotes %}
-                        {% for quote in quotes %}
-                        <div class="border p-3 mb-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <h6 class="mb-0 me-3">{{ quote.craftsman.user.get_full_name|default:quote.craftsman.user.username }}</h6>
-                                        {% if quote.craftsman.average_rating > 0 %}
-                                            <small class="text-muted">
-                                                <i class="fas fa-star text-warning"></i> {{ quote.craftsman.average_rating|floatformat:1 }}
-                                                ({{ quote.craftsman.total_reviews }} recenzii)
-                                            </small>
-                                        {% endif %}
-                                    </div>
-                                    <p class="mb-2">{{ quote.description }}</p>
-                                    {% if quote.estimated_duration %}
-                                        <small class="text-muted">Durată estimată: {{ quote.estimated_duration }}</small>
-                                    {% endif %}
-                                </div>
-                                <div class="text-end">
-                                    <div class="h5 text-primary mb-2">{{ quote.price }} RON</div>
-                                    <small class="text-muted">{{ quote.created_at|date:"d M Y" }}</small>
-                                </div>
-                            </div>
+                    <h5 class="mb-4" style="color: #1f2937;">
+                        <i class="fas fa-file-invoice" style="color: #8B5CF6;"></i>
+                        Oferte ({{ quotes.count }})
+                    </h5>
 
-                            {% if user == order.client %}
-                                <!-- Check if craftsman is shortlisted -->
-                                {% with shortlist=quote.craftsman.user.shortlisted_for.all|first %}
-                                    {% if shortlist and shortlist.order == order %}
-                                        <div class="mt-3 p-2 bg-success bg-opacity-10 border border-success rounded">
-                                            <i class="fas fa-check-circle text-success me-2"></i>
-                                            <strong>Shortlistat!</strong>
-                                            - Contactul este disponibil
-                                            <div class="mt-2">
-                                                <strong>Contact:</strong>
-                                                {% if quote.craftsman.user.phone %}
-                                                    <a href="tel:{{ quote.craftsman.user.phone }}" class="btn btn-sm btn-outline-primary me-2">
-                                                        <i class="fas fa-phone"></i> {{ quote.craftsman.user.phone }}
-                                                    </a>
+                    {% if quotes %}
+                        <div id="quotes-container">
+                            {% for quote in quotes %}
+                            <div class="quote-card mb-3" data-quote-index="{{ forloop.counter0 }}" style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; transition: all 0.3s ease; {% if forloop.counter0 >= 5 %}display: none;{% endif %}">
+                                <div class="row">
+                                    <!-- Craftsman Info Column -->
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <!-- Avatar -->
+                                            <div class="me-3">
+                                                {% if quote.craftsman.profile_photo %}
+                                                    <img src="{{ quote.craftsman.profile_photo.url }}"
+                                                         alt="{{ quote.craftsman.user.get_full_name }}"
+                                                         class="rounded-circle"
+                                                         style="width: 50px; height: 50px; object-fit: cover; border: 2px solid #8B5CF6;">
+                                                {% else %}
+                                                    <div class="rounded-circle bg-gradient d-flex align-items-center justify-content-center text-white"
+                                                         style="width: 50px; height: 50px; background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); font-size: 1.25rem; font-weight: 600;">
+                                                        {{ quote.craftsman.user.get_full_name|first|default:quote.craftsman.user.username|first|upper }}
+                                                    </div>
                                                 {% endif %}
-                                                <a href="mailto:{{ quote.craftsman.user.email }}" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-envelope"></i> Email
-                                                </a>
+                                            </div>
+
+                                            <!-- Name and Rating -->
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1" style="color: #1f2937; font-weight: 600;">
+                                                    {{ quote.craftsman.user.get_full_name|default:quote.craftsman.user.username }}
+                                                </h6>
+                                                {% if quote.craftsman.average_rating > 0 %}
+                                                    <div class="mb-2">
+                                                        {% for i in "12345" %}
+                                                            {% if forloop.counter <= quote.craftsman.average_rating %}
+                                                                <i class="fas fa-star" style="color: #8B5CF6; font-size: 0.85rem;"></i>
+                                                            {% else %}
+                                                                <i class="far fa-star" style="color: #d1d5db; font-size: 0.85rem;"></i>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        <span style="color: #6b7280; font-size: 0.875rem; margin-left: 0.5rem;">
+                                                            {{ quote.craftsman.average_rating|floatformat:1 }} ({{ quote.craftsman.total_reviews }} recenzii)
+                                                        </span>
+                                                    </div>
+                                                {% endif %}
+
+                                                <!-- Description with truncation -->
+                                                <div class="quote-description-wrapper">
+                                                    {% if quote.description|length > 150 %}
+                                                        <p class="mb-2 quote-description-short" style="color: #4b5563; line-height: 1.6;">
+                                                            {{ quote.description|truncatechars:150 }}
+                                                            <a href="#" class="show-more-link" style="color: #8B5CF6; text-decoration: none; font-weight: 500;" onclick="event.preventDefault(); this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';">
+                                                                Vezi mai mult
+                                                            </a>
+                                                        </p>
+                                                        <p class="mb-2 quote-description-full" style="color: #4b5563; line-height: 1.6; display: none;">
+                                                            {{ quote.description }}
+                                                            <a href="#" class="show-less-link" style="color: #8B5CF6; text-decoration: none; font-weight: 500;" onclick="event.preventDefault(); this.parentElement.style.display='none'; this.parentElement.previousElementSibling.style.display='block';">
+                                                                Vezi mai puțin
+                                                            </a>
+                                                        </p>
+                                                    {% else %}
+                                                        <p class="mb-2" style="color: #4b5563; line-height: 1.6;">{{ quote.description }}</p>
+                                                    {% endif %}
+                                                </div>
+
+                                                {% if quote.estimated_duration %}
+                                                    <div class="d-flex align-items-center" style="color: #6b7280; font-size: 0.875rem;">
+                                                        <i class="far fa-calendar-alt me-2" style="color: #8B5CF6;"></i>
+                                                        Durată estimată: <strong class="ms-1">{{ quote.estimated_duration }}</strong>
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                         </div>
-                                    {% elif quote.status == 'pending' %}
-                                        <div class="mt-3">
-                                            <form method="post" action="{% url 'services:shortlist_craftsman' order.pk quote.craftsman.user.pk %}" class="d-inline me-2">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-star me-1"></i>Shortlistează (20 lei)
-                                                </button>
-                                            </form>
-                                            <form method="post" action="{% url 'services:accept_quote' quote.pk %}" class="d-inline me-2">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-success btn-sm">
-                                                    <i class="fas fa-check me-1"></i>Acceptă Direct
-                                                </button>
-                                            </form>
-                                            <form method="post" action="{% url 'services:reject_quote' quote.pk %}" class="d-inline">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                                    <i class="fas fa-times me-1"></i>Respinge
-                                                </button>
-                                            </form>
-                                        </div>
-                                    {% endif %}
-                                {% endwith %}
-                            {% elif user.user_type == 'craftsman' and user == quote.craftsman.user %}
-                                <!-- Show status for craftsman's own quote -->
-                                <div class="mt-3">
-                                    {% if quote.status == 'accepted' %}
-                                        <span class="badge bg-success">{{ quote.get_status_display }}</span>
-                                    {% elif quote.status == 'rejected' %}
-                                        <span class="badge bg-danger">{{ quote.get_status_display }}</span>
-                                    {% else %}
-                                        <span class="badge bg-warning">{{ quote.get_status_display }}</span>
-                                    {% endif %}
+                                    </div>
 
-                                    <!-- Show if shortlisted -->
-                                    {% with shortlist=user.shortlisted_for.all|first %}
+                                    <!-- Price and Status Column -->
+                                    <div class="col-md-4 text-md-end">
+                                        <div class="h3 mb-2" style="color: #8B5CF6; font-weight: 700;">
+                                            {{ quote.price }} <span style="font-size: 1rem; color: #6b7280;">RON</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            {% if quote.status == 'accepted' %}
+                                                <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem; border-radius: 20px;">
+                                                    <i class="fas fa-check-circle me-1"></i>{{ quote.get_status_display }}
+                                                </span>
+                                            {% elif quote.status == 'rejected' %}
+                                                <span class="badge" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 0.5rem 1rem; border-radius: 20px;">
+                                                    <i class="fas fa-times-circle me-1"></i>{{ quote.get_status_display }}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); padding: 0.5rem 1rem; border-radius: 20px;">
+                                                    <i class="fas fa-clock me-1"></i>{{ quote.get_status_display }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        <small style="color: #9ca3af; font-size: 0.875rem;">
+                                            <i class="far fa-clock me-1"></i>{{ quote.created_at|date:"d.m.Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+
+                                {% if user == order.client %}
+                                    <!-- Check if craftsman is shortlisted -->
+                                    {% with shortlist=quote.craftsman.user.shortlisted_for.all|first %}
                                         {% if shortlist and shortlist.order == order %}
-                                            <span class="badge bg-info ms-2">
-                                                <i class="fas fa-star me-1"></i>Shortlistat
-                                            </span>
-                                            <div class="mt-2 p-2 bg-info bg-opacity-10 border border-info rounded">
-                                                <strong>Contact client:</strong>
-                                                {% if order.client.phone %}
-                                                    <a href="tel:{{ order.client.phone }}" class="btn btn-sm btn-outline-primary me-2">
-                                                        <i class="fas fa-phone"></i> {{ order.client.phone }}
+                                            <div class="mt-3 p-3" style="background: linear-gradient(135deg, #10b98120 0%, #05966920 100%); border-left: 4px solid #10b981; border-radius: 8px;">
+                                                <i class="fas fa-check-circle me-2" style="color: #10b981;"></i>
+                                                <strong style="color: #065f46;">Shortlistat!</strong>
+                                                <span style="color: #047857;"> - Contactul este disponibil</span>
+                                                <div class="mt-2">
+                                                    <strong style="color: #065f46;">Contact:</strong>
+                                                    {% if quote.craftsman.user.phone %}
+                                                        <a href="tel:{{ quote.craftsman.user.phone }}" class="btn btn-sm me-2" style="background: white; border: 1px solid #8B5CF6; color: #8B5CF6;">
+                                                            <i class="fas fa-phone"></i> {{ quote.craftsman.user.phone }}
+                                                        </a>
+                                                    {% endif %}
+                                                    <a href="mailto:{{ quote.craftsman.user.email }}" class="btn btn-sm" style="background: white; border: 1px solid #8B5CF6; color: #8B5CF6;">
+                                                        <i class="fas fa-envelope"></i> Email
                                                     </a>
-                                                {% endif %}
-                                                <a href="mailto:{{ order.client.email }}" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-envelope"></i> Email
-                                                </a>
+                                                </div>
+                                            </div>
+                                        {% elif quote.status == 'pending' %}
+                                            <div class="mt-3 d-flex gap-2 flex-wrap">
+                                                <form method="post" action="{% url 'services:shortlist_craftsman' order.pk quote.craftsman.user.pk %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500;">
+                                                        <i class="fas fa-star me-1"></i>Shortlistează (20 lei)
+                                                    </button>
+                                                </form>
+                                                <form method="post" action="{% url 'services:accept_quote' quote.pk %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500;">
+                                                        <i class="fas fa-check me-1"></i>Acceptă Direct
+                                                    </button>
+                                                </form>
+                                                <form method="post" action="{% url 'services:reject_quote' quote.pk %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm" style="background: white; border: 1px solid #ef4444; color: #ef4444; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500;">
+                                                        <i class="fas fa-times me-1"></i>Respinge
+                                                    </button>
+                                                </form>
                                             </div>
                                         {% endif %}
                                     {% endwith %}
-                                </div>
-                            {% endif %}
+                                {% elif user.user_type == 'craftsman' and user == quote.craftsman.user %}
+                                    <!-- Show status for craftsman's own quote -->
+                                    <div class="mt-3">
+                                        <!-- Show if shortlisted -->
+                                        {% with shortlist=user.shortlisted_for.all|first %}
+                                            {% if shortlist and shortlist.order == order %}
+                                                <div class="p-3" style="background: linear-gradient(135deg, #8B5CF620 0%, #7C3AED20 100%); border-left: 4px solid #8B5CF6; border-radius: 8px;">
+                                                    <span style="color: #7C3AED; font-weight: 600;">
+                                                        <i class="fas fa-star me-1"></i>Shortlistat
+                                                    </span>
+                                                    <div class="mt-2">
+                                                        <strong style="color: #5B21B6;">Contact client:</strong>
+                                                        {% if order.client.phone %}
+                                                            <a href="tel:{{ order.client.phone }}" class="btn btn-sm me-2" style="background: white; border: 1px solid #8B5CF6; color: #8B5CF6;">
+                                                                <i class="fas fa-phone"></i> {{ order.client.phone }}
+                                                            </a>
+                                                        {% endif %}
+                                                        <a href="mailto:{{ order.client.email }}" class="btn btn-sm" style="background: white; border: 1px solid #8B5CF6; color: #8B5CF6;">
+                                                            <i class="fas fa-envelope"></i> Email
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+
+                        <!-- Load More Button -->
+                        {% if quotes.count > 5 %}
+                        <div class="text-center mt-4">
+                            <button id="load-more-quotes" class="btn" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 25px; font-weight: 600; transition: all 0.3s ease;">
+                                <i class="fas fa-chevron-down me-2"></i>Încarcă mai multe
+                                <span id="remaining-quotes" class="ms-2 badge bg-white" style="color: #8B5CF6;">({{ quotes.count|add:"-5" }} rămase)</span>
+                            </button>
+                        </div>
+                        {% endif %}
                     {% else %}
-                        <p>Nu au fost primite oferte încă.</p>
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                            <p style="color: #6b7280; font-size: 1.1rem;">Nu au fost primite oferte încă.</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>
