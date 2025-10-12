@@ -17,18 +17,15 @@ def calculate_profile_completion(craftsman):
        - Bio (minim 200 caractere): 15p
        - Poză de profil: 15p
 
-    2. PORTFOLIO (20 puncte) - minim 3 poze cu lucrări:
-       - 3+ poze: 20p
-       - 1-2 poze: proporțional (10p per poză)
+    2. PORTFOLIO (40 puncte) - minim 3 poze cu lucrări:
+       - 3+ poze: 40p
+       - 1-2 poze: proporțional
 
-    3. SERVICII (10 puncte) - categori în care lucrezi:
-       - Minim 1 categorie: 10p
+    3. SERVICII (20 puncte) - categori în care lucrezi:
+       - Minim 1 categorie: 20p
 
-    4. OPȚIONAL (10 puncte) - detalii suplimentare:
-       - Ani experiență: 3p
-       - Tarife (tarif orar SAU valoare minimă): 3p
-       - Rețele sociale (website/facebook/instagram): 2p
-       - CUI firmă: 2p
+    NOTA: Câmpurile opționale (ani experiență, tarife, CUI, rețele sociale) NU mai contează
+    pentru procentul de completare. Profilul este 100% complet cu: obligatoriu + portfolio + servicii.
 
     Args:
         craftsman: CraftsmanProfile instance
@@ -42,9 +39,8 @@ def calculate_profile_completion(craftsman):
     score = 0
     breakdown = {
         "obligatoriu": {"score": 0, "max": 60, "items": {}},
-        "portfolio": {"score": 0, "max": 20, "items": {}},
-        "servicii": {"score": 0, "max": 10, "items": {}},
-        "optional": {"score": 0, "max": 10, "items": {}},
+        "portfolio": {"score": 0, "max": 40, "items": {}},
+        "servicii": {"score": 0, "max": 20, "items": {}},
     }
 
     # 1. OBLIGATORIU (60 puncte)
@@ -88,19 +84,19 @@ def calculate_profile_completion(craftsman):
     else:
         breakdown["obligatoriu"]["items"]["photo"] = {"score": 0, "status": "✗", "needed": "Încarcă poză de profil"}
 
-    # 2. PORTFOLIO (20 puncte) - requires craftsman to be saved
+    # 2. PORTFOLIO (40 puncte) - requires craftsman to be saved
     if craftsman.pk:
         portfolio_count = craftsman.portfolio_images.count()
         if portfolio_count >= 3:
-            portfolio_score = 20
-            breakdown["portfolio"]["items"]["images"] = {"score": 20, "status": "✓", "count": portfolio_count}
+            portfolio_score = 40
+            breakdown["portfolio"]["items"]["images"] = {"score": 40, "status": "✓", "count": portfolio_count}
         elif portfolio_count > 0:
-            portfolio_score = (portfolio_count * 20) // 3
+            portfolio_score = (portfolio_count * 40) // 3
             breakdown["portfolio"]["items"]["images"] = {
                 "score": portfolio_score,
                 "status": "⚠",
                 "count": portfolio_count,
-                "needed": f"Adaugă {3 - portfolio_count} poze pentru 20p"
+                "needed": f"Adaugă {3 - portfolio_count} poze pentru 40p"
             }
         else:
             portfolio_score = 0
@@ -111,42 +107,13 @@ def calculate_profile_completion(craftsman):
     else:
         breakdown["portfolio"]["items"]["images"] = {"score": 0, "status": "✗", "needed": "Salvează profilul pentru a adăuga poze"}
 
-    # 3. SERVICII (10 puncte)
+    # 3. SERVICII (20 puncte)
     if craftsman.pk and hasattr(craftsman, "services") and craftsman.services.exists():
-        score += 10
-        breakdown["servicii"]["score"] = 10
-        breakdown["servicii"]["items"]["categories"] = {"score": 10, "status": "✓"}
+        score += 20
+        breakdown["servicii"]["score"] = 20
+        breakdown["servicii"]["items"]["categories"] = {"score": 20, "status": "✓"}
     else:
         breakdown["servicii"]["items"]["categories"] = {"score": 0, "status": "✗", "needed": "Adaugă minim 1 categorie de servicii"}
-
-    # 4. OPȚIONAL (10 puncte)
-    if craftsman.years_experience:
-        score += 3
-        breakdown["optional"]["score"] += 3
-        breakdown["optional"]["items"]["experience"] = {"score": 3, "status": "✓"}
-    else:
-        breakdown["optional"]["items"]["experience"] = {"score": 0, "status": "○", "optional": True}
-
-    if craftsman.hourly_rate or craftsman.min_job_value:
-        score += 3
-        breakdown["optional"]["score"] += 3
-        breakdown["optional"]["items"]["pricing"] = {"score": 3, "status": "✓"}
-    else:
-        breakdown["optional"]["items"]["pricing"] = {"score": 0, "status": "○", "optional": True}
-
-    if craftsman.website_url or craftsman.facebook_url or craftsman.instagram_url:
-        score += 2
-        breakdown["optional"]["score"] += 2
-        breakdown["optional"]["items"]["social"] = {"score": 2, "status": "✓"}
-    else:
-        breakdown["optional"]["items"]["social"] = {"score": 0, "status": "○", "optional": True}
-
-    if craftsman.company_cui:
-        score += 2
-        breakdown["optional"]["score"] += 2
-        breakdown["optional"]["items"]["company"] = {"score": 2, "status": "✓"}
-    else:
-        breakdown["optional"]["items"]["company"] = {"score": 0, "status": "○", "optional": True}
 
     return {
         "score": min(score, 100),
