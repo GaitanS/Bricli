@@ -1,0 +1,97 @@
+/**
+ * Portfolio Mobile UX Optimizations
+ * - Sticky toolbar with action buttons
+ * - 2-column grid for portfolio cards
+ * - Collapsible accordion for stats & tips
+ * - Desktop layout unchanged
+ */
+
+@media (max-width: 991.98px) {
+  /* Sticky Toolbar: Buttons fixed below header */
+  .pf-toolbar {
+    position: sticky;
+    top: 64px; /* Below fixed navbar */
+    z-index: 1020;
+    background: #fff;
+    padding: 8px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 16px;
+  }
+
+  .pf-toolbar .btn {
+    width: 50%;
+    font-size: 0.9rem;
+  }
+
+  /* 2-Column Grid for Portfolio Cards */
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .portfolio-grid .card {
+    border-radius: 12px;
+    margin-bottom: 0; /* Remove default margin */
+  }
+
+  .portfolio-grid .card-img-top {
+    height: 150px !important; /* Smaller on mobile */
+    border-radius: 12px 12px 0 0;
+  }
+
+  .portfolio-grid .card-title {
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .portfolio-grid .card-text {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.3;
+  }
+
+  .portfolio-grid .card-body {
+    padding: 10px;
+  }
+
+  /* Compact spacing for secondary sections */
+  .pf-compact .card-body {
+    padding: 12px;
+  }
+
+  .pf-compact .accordion-button {
+    padding: 12px 14px;
+    font-size: 0.95rem;
+  }
+
+  .pf-compact .accordion-body {
+    padding: 12px 14px;
+  }
+
+  /* Accordion styling */
+  .pf-compact .accordion-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+
+  .pf-compact .accordion-button:not(.collapsed) {
+    background-color: #f9fafb;
+    color: #7C3AED;
+  }
+
+  .pf-compact .accordion-button::after {
+    width: 1rem;
+    height: 1rem;
+    background-size: 1rem;
+  }
+
+  /* Hide desktop sidebar on mobile */
+  .pf-sidebar-desktop {
+    display: none;
+  }
+}

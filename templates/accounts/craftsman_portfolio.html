@@ -12,12 +12,13 @@
 
     <div class="row">
         <div class="col-lg-8">
+            <!-- Header: Title + Desktop Buttons -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="h3 mb-1">Portfolio</h1>
-                    <p class="text-muted">Gestionează imaginile cu lucrările tale</p>
+                    <p class="text-muted d-none d-lg-block">Gestionează imaginile cu lucrările tale</p>
                 </div>
-                <div>
+                <div class="d-none d-lg-block">
                     <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
                         <i class="fas fa-plus me-2"></i>Adaugă imagine
                     </button>
@@ -27,9 +28,22 @@
                 </div>
             </div>
 
+            <!-- Mobile: Sticky Toolbar -->
+            <div class="pf-toolbar d-lg-none">
+                <div class="d-flex gap-2 px-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                        <i class="fas fa-plus me-1"></i> Adaugă imagine
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bulkUploadModal">
+                        <i class="fas fa-cloud-upload-alt me-1"></i> Încărcare multiplă
+                    </button>
+                </div>
+            </div>
+
             <!-- Portfolio Grid -->
             {% if portfolio_images %}
-                <div class="row g-4">
+                <!-- Desktop: 3-column row -->
+                <div class="row g-4 d-none d-lg-grid">
                     {% for image in portfolio_images %}
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 shadow-sm">
@@ -59,6 +73,40 @@
                                 {% endif %}
                                 <small class="text-muted">{{ image.created_at|date:"d M Y" }}</small>
                             </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Mobile: 2-column grid -->
+                <div class="portfolio-grid d-lg-none">
+                    {% for image in portfolio_images %}
+                    <div class="card shadow-sm">
+                        <div class="position-relative">
+                            <img src="{{ image.image.url }}" class="card-img-top" alt="{{ image.title }}" style="height: 150px; object-fit: cover;">
+                            <div class="position-absolute top-0 end-0 p-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown" aria-label="Opțiuni">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ image.id }}">
+                                            <i class="fas fa-edit me-2"></i>Editează
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deletePortfolioItem({{ image.id }})">
+                                            <i class="fas fa-trash me-2"></i>Șterge
+                                        </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">{{ image.title|default:"Fără titlu" }}</h6>
+                            {% if image.description %}
+                                <p class="card-text small text-muted">{{ image.description|truncatewords:8 }}</p>
+                            {% endif %}
+                            <small class="text-muted">{{ image.created_at|date:"d M Y" }}</small>
                         </div>
                     </div>
                     {% endfor %}
@@ -107,7 +155,8 @@
             {% endif %}
         </div>
 
-        <div class="col-lg-4">
+        <!-- Desktop: Sidebar -->
+        <div class="col-lg-4 pf-sidebar-desktop">
             <!-- Portfolio Stats -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -159,6 +208,69 @@
                             <small>Folosește imagini înainte/după</small>
                         </li>
                     </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile: Accordion for Stats & Tips -->
+        <div class="col-12 d-lg-none pf-compact mt-3">
+            <div class="accordion" id="pfAcc">
+                <!-- Stats Accordion -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pfStats" aria-expanded="false" aria-controls="pfStats">
+                            <i class="fas fa-chart-bar me-2"></i>Statistici Portfolio
+                        </button>
+                    </h2>
+                    <div id="pfStats" class="accordion-collapse collapse" data-bs-parent="#pfAcc">
+                        <div class="accordion-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <h4 class="text-primary mb-0">{{ portfolio_images.count }}</h4>
+                                    <small class="text-muted">Imagini</small>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-success mb-0">{{ craftsman.total_reviews }}</h4>
+                                    <small class="text-muted">Recenzii</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips Accordion -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pfTips" aria-expanded="false" aria-controls="pfTips">
+                            <i class="fas fa-lightbulb me-2"></i>Sfaturi pentru Portfolio
+                        </button>
+                    </h2>
+                    <div id="pfTips" class="accordion-collapse collapse" data-bs-parent="#pfAcc">
+                        <div class="accordion-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <small>Încarcă imagini de calitate înaltă</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <small>Adaugă descrieri detaliate</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <small>Arată diverse tipuri de lucrări</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <small>Actualizează regulat portfolio-ul</small>
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <small>Folosește imagini înainte/după</small>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
