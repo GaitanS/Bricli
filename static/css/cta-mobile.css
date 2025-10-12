@@ -1,0 +1,21 @@
+/**
+ * CTA Section - Mobile Optimization
+ * Full-width buttons on narrow screens (<576px)
+ */
+
+@media (max-width: 575.98px) {
+  .cta-responsive .btn {
+    display: block;
+    width: 100%;
+    padding: 0.9rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .cta-responsive .btn + .btn {
+    margin-left: 0 !important;
+    margin-top: 0.75rem;
+  }
+}
