@@ -1,30 +1,41 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Adaugă Serviciu - Bricli{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/service-form-enhanced.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="d-flex align-items-center mb-4">
-                <a href="{% url 'services:craftsman_services' %}" class="btn btn-outline-secondary me-3">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-                <h1><i class="fas fa-plus me-2"></i>Adaugă Serviciu Nou</h1>
+    <!-- Header -->
+    <div class="service-form-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{% url 'services:craftsman_services' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span class="d-none d-md-inline">Înapoi</span>
+            </a>
+            <h1><i class="fas fa-plus me-2"></i>Adaugă Serviciu Nou</h1>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
+        {% endfor %}
+    {% endif %}
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <div class="card svc-form">
+    <!-- Two Column Layout (Desktop) / Stack (Mobile) -->
+    <div class="service-form-layout">
+        <!-- LEFT: Form -->
+        <div class="service-form-main">
+            <div class="card service-form-card">
                 <div class="card-header">
-                    <h5 class="mb-0">Detalii Serviciu</h5>
+                    <h5>Detalii Serviciu</h5>
                 </div>
                 <div class="card-body">
                     <form id="serviceForm" method="post">
@@ -85,18 +96,8 @@
                             <div class="form-text">Ex: per oră, per mp, per bucată, per proiect</div>
                         </div>
 
-                        <div class="alert alert-info">
-                            <h6><i class="fas fa-info-circle me-2"></i>Sfaturi pentru prețuri</h6>
-                            <ul class="mb-0">
-                                <li>Poți specifica doar prețul minim, doar prețul maxim, sau ambele</li>
-                                <li>Dacă nu specifici niciun preț, va apărea "Preț la cerere"</li>
-                                <li>Unitatea de măsură ajută clienții să înțeleagă cum calculezi prețul</li>
-                                <li>Prețurile competitive atrag mai mulți clienți</li>
-                            </ul>
-                        </div>
-
-                        <!-- Desktop: Action Buttons -->
-                        <div class="d-none d-lg-flex justify-content-between">
+                        <!-- Action Buttons -->
+                        <div class="service-form-actions d-none d-lg-flex">
                             <a href="{% url 'services:craftsman_services' %}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times me-2"></i>Anulează
                             </a>
@@ -111,43 +112,67 @@
             <!-- Mobile: Sticky Action Buttons -->
             <div class="svc-sticky-actions d-lg-none">
                 <div class="d-flex gap-2">
-                    <a href="{% url 'services:craftsman_services' %}" class="btn btn-light">
+                    <a href="{% url 'services:craftsman_services' %}" class="btn btn-light flex-fill">
                         <i class="fas fa-times me-1"></i> Anulează
                     </a>
-                    <button type="submit" form="serviceForm" class="btn btn-primary">
+                    <button type="submit" form="serviceForm" class="btn btn-primary flex-fill">
                         <i class="fas fa-save me-1"></i> Salvează
                     </button>
                 </div>
             </div>
+        </div>
 
-            <!-- Preview Card -->
-            <div class="card mt-4 svc-form-preview">
+        <!-- RIGHT: Sticky Sidebar (Desktop) / Top (Mobile) -->
+        <div class="service-form-sidebar">
+            <!-- Tips Card - Always Visible -->
+            <div class="card service-tips-card">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-eye me-2"></i>Previzualizare</h6>
+                    <h6><i class="fas fa-lightbulb me-2"></i>Sfaturi pentru prețuri</h6>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">Așa va apărea serviciul tău în listele de servicii:</p>
-                    <div class="border rounded p-3 bg-light">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="mb-1" id="preview-service">Selectează un serviciu</h6>
+                    <ul>
+                        <li>Poți specifica doar prețul minim, doar prețul maxim, sau ambele</li>
+                        <li>Dacă nu specifici niciun preț, va apărea "Preț la cerere"</li>
+                        <li>Unitatea de măsură ajută clienții să înțeleagă cum calculezi prețul</li>
+                        <li>Prețurile competitive atrag mai mulți clienți</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Preview Card -->
+            <div class="card service-preview-card d-none d-lg-block">
+                <div class="card-header">
+                    <h6><i class="fas fa-eye me-2"></i>Previzualizare</h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Așa va apărea serviciul tău:</p>
+                    <div class="preview-box">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="flex-grow-1">
+                                <div class="preview-service-name" id="preview-service">Selectează un serviciu</div>
                                 <span class="badge bg-secondary" id="preview-category">Categorie</span>
                             </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>{{ user.get_full_name|default:user.username }}
+                            </small>
                             <div class="text-end">
-                                <div class="fw-bold text-primary" id="preview-price">Preț la cerere</div>
+                                <div class="preview-price" id="preview-price">Preț la cerere</div>
                                 <small class="text-muted" id="preview-unit"></small>
                             </div>
                         </div>
-                        <div class="mt-2">
-                            <small class="text-muted">
-                                <i class="fas fa-user me-1"></i>{{ user.get_full_name|default:user.username }}
-                                {% if user.craftsman_profile.company_name %}
-                                    - {{ user.craftsman_profile.company_name }}
-                                {% endif %}
-                            </small>
-                        </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="service-help-card d-none d-lg-block">
+                <h6><i class="fas fa-question-circle me-2"></i>Ai nevoie de ajutor?</h6>
+                <p>Contactează-ne dacă ai întrebări despre configurarea serviciilor tale.</p>
+                <a href="#" class="btn btn-sm">
+                    <i class="fas fa-envelope me-1"></i>Contact Suport
+                </a>
             </div>
         </div>
     </div>

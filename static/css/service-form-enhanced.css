@@ -1,0 +1,408 @@
+/**
+ * Service Form - Enhanced Design for Add/Edit Service
+ * Professional layout with sticky tips, better spacing, and modern styling
+ */
+
+/* ========== DESKTOP (≥992px) ========== */
+@media (min-width: 992px) {
+
+  /* Page Layout: Two Column (Form + Tips Sidebar) */
+  .service-form-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* Header Enhancement */
+  .service-form-header {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    border-radius: 20px;
+    padding: 32px 40px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+    color: white;
+  }
+
+  .service-form-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .service-form-header .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 10px 16px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+
+  .service-form-header .back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateX(-4px);
+  }
+
+  /* Main Card Enhancement */
+  .service-form-card {
+    border: 2px solid #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  .service-form-card .card-header {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-bottom: 2px solid #e5e7eb;
+    padding: 20px 28px;
+  }
+
+  .service-form-card .card-header h5 {
+    font-weight: 700;
+    color: #1f2937;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .service-form-card .card-body {
+    padding: 32px 28px;
+  }
+
+  /* Form Fields Enhancement */
+  .service-form-card .form-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+
+  .service-form-card .form-label i {
+    color: #8B5CF6;
+  }
+
+  .service-form-card .form-control,
+  .service-form-card .form-select {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .service-form-card .form-control:focus,
+  .service-form-card .form-select:focus {
+    border-color: #8B5CF6;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+    outline: none;
+  }
+
+  .service-form-card .form-text {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 6px;
+  }
+
+  /* Action Buttons Enhancement */
+  .service-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 2px dashed #e5e7eb;
+  }
+
+  .service-form-actions .btn {
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .service-form-actions .btn-primary {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    border: none;
+  }
+
+  .service-form-actions .btn-primary:hover {
+    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+  }
+
+  .service-form-actions .btn-outline-secondary:hover {
+    background: #f3f4f6;
+    border-color: #6b7280;
+    color: #374151;
+  }
+
+  /* Sidebar: Sticky Tips */
+  .service-form-sidebar {
+    position: sticky;
+    top: 90px;
+  }
+
+  /* Tips Card - Always Visible */
+  .service-tips-card {
+    border: 2px solid #dbeafe;
+    border-radius: 18px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
+    margin-bottom: 24px;
+  }
+
+  .service-tips-card .card-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    padding: 16px 20px;
+    border: none;
+  }
+
+  .service-tips-card .card-header h6 {
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .service-tips-card .card-body {
+    padding: 20px;
+  }
+
+  .service-tips-card ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style: none;
+  }
+
+  .service-tips-card li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 12px;
+    color: #1e40af;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .service-tips-card li:last-child {
+    margin-bottom: 0;
+  }
+
+  .service-tips-card li::before {
+    content: '\f058';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+    color: #3b82f6;
+    font-size: 1rem;
+  }
+
+  /* Preview Card Enhancement */
+  .service-preview-card {
+    border: 2px solid #e5e7eb;
+    border-radius: 18px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  .service-preview-card .card-header {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-bottom: 2px solid #e5e7eb;
+    padding: 16px 20px;
+  }
+
+  .service-preview-card .card-header h6 {
+    font-weight: 700;
+    color: #1f2937;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .service-preview-card .card-body {
+    padding: 20px;
+  }
+
+  .service-preview-card .preview-box {
+    background: #f9fafb;
+    border: 2px dashed #d1d5db;
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .service-preview-card .preview-service-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+  }
+
+  .service-preview-card .preview-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #10b981;
+  }
+
+  /* Help Card */
+  .service-help-card {
+    border: 2px solid #fde68a;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%);
+    padding: 20px;
+    margin-top: 24px;
+  }
+
+  .service-help-card h6 {
+    font-weight: 700;
+    color: #92400e;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .service-help-card p {
+    color: #92400e;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .service-help-card .btn {
+    margin-top: 12px;
+    background: white;
+    color: #92400e;
+    border: 2px solid #fbbf24;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 8px 16px;
+    border-radius: 10px;
+  }
+
+  .service-help-card .btn:hover {
+    background: #fbbf24;
+    color: white;
+  }
+}
+
+/* ========== MOBILE (<992px) ========== */
+@media (max-width: 991.98px) {
+
+  /* Stack layout on mobile */
+  .service-form-layout {
+    display: block;
+  }
+
+  /* Header: Compact */
+  .service-form-header {
+    padding: 20px 16px;
+    margin-bottom: 20px;
+  }
+
+  .service-form-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  /* Tips: Always visible but compact */
+  .service-tips-card {
+    border: 2px solid #dbeafe;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    margin-bottom: 20px;
+  }
+
+  .service-tips-card .card-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    padding: 14px 16px;
+  }
+
+  .service-tips-card .card-header h6 {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .service-tips-card .card-body {
+    padding: 16px;
+  }
+
+  .service-tips-card ul {
+    margin: 0;
+    padding-left: 18px;
+    list-style: none;
+  }
+
+  .service-tips-card li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 10px;
+    color: #1e40af;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .service-tips-card li::before {
+    content: '\f058';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+    color: #3b82f6;
+    font-size: 0.9rem;
+  }
+
+  /* Mobile form styling */
+  .service-form-card .card-body {
+    padding: 20px 16px;
+  }
+
+  .service-form-card .form-control,
+  .service-form-card .form-select {
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+}
+
+/* ========== COMMON (All Screens) ========== */
+
+/* Error states */
+.is-invalid {
+  border-color: #ef4444 !important;
+}
+
+.is-invalid:focus {
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+}
+
+.text-danger {
+  color: #ef4444;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Success states */
+.is-valid {
+  border-color: #10b981 !important;
+}
+
+.is-valid:focus {
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1) !important;
+}
