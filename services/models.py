@@ -63,6 +63,11 @@ class Order(models.Model):
         ("cancelled", "Anulată"),
     ]
 
+    # Status groups for robust filtering
+    COMPLETED_STATUSES = ["completed"]
+    CANCELLED_STATUSES = ["cancelled"]
+    ACTIVE_STATUSES = ["published", "awaiting_confirmation", "in_progress"]
+
     URGENCY_CHOICES = [
         ("low", "Nu este urgent"),
         ("medium", "În următoarele săptămâni"),

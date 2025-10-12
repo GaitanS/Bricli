@@ -260,12 +260,24 @@ class MyOrdersView(ClientRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return (
+        from django.db.models import Prefetch
+
+        qs = (
             Order.objects.filter(client=self.request.user)
             .select_related("service", "service__category", "county", "city")
-            .prefetch_related("quotes", "reviews")
-            .order_by("-created_at")
+            .prefetch_related("quotes")
         )
+
+        # Safely prefetch reviews - Order has OneToOne with Review (related_name="review")
+        try:
+            from services.models import Review
+
+            # For OneToOne, just select_related is enough (no prefetch needed)
+            qs = qs.select_related("review")
+        except Exception:
+            pass
+
+        return qs.order_by("-created_at")
 
 
 class MyQuotesView(CraftsmanRequiredMixin, ListView):
@@ -338,9 +350,11 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
         service_ids = CraftsmanService.objects.filter(craftsman=craftsman).values_list("service_id", flat=True)
 
         # Get published orders that the craftsman hasn't quoted on yet and match their services
+        # EXCLUDE direct requests (orders with assigned_craftsman) from available orders listing
         queryset = (
             Order.objects.filter(status="published", service_id__in=service_ids)
             .exclude(quotes__craftsman=craftsman)
+            .exclude(assigned_craftsman__isnull=False)  # Hide direct requests
             .select_related("client", "service", "service__category", "county", "city")
             .prefetch_related("quotes", "invitations")
             .order_by("-created_at")

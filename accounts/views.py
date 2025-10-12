@@ -266,6 +266,20 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         # Format rating with comma (Romanian style)
         rating_avg_str = f"{rating_avg:.1f}".replace(".", ",")
 
+        # Calculate orders count for clients
+        orders_active_count = 0
+        orders_completed_count = 0
+        if user.user_type == "client":
+            try:
+                from services.models import Order
+                from services.querydefs import q_active, q_completed
+
+                base_qs = Order.objects.filter(client=user)
+                orders_active_count = base_qs.filter(q_active()).count()
+                orders_completed_count = base_qs.filter(q_completed()).count()
+            except Exception:
+                pass
+
         # Get public profile URL with slug
         public_url = ""
         if craftsman:
@@ -286,12 +300,32 @@ class ProfileView(LoginRequiredMixin, TemplateView):
             except Exception:
                 pass
 
+        # Calculate profile completion for craftsmen
+        profile_completion = 0
+        profile_is_complete = False
+        completion_missing = []
+        if craftsman:
+            try:
+                from accounts.services.profile_completion import calculate_profile_completion, get_completion_summary
+
+                result = calculate_profile_completion(craftsman)
+                profile_completion = result["score"]
+                profile_is_complete = result["is_complete"]
+                completion_missing = get_completion_summary(craftsman)
+            except Exception:
+                pass
+
         context.update({
             "services_count": services_count,
             "reviews_count": reviews_count,
             "rating_avg": rating_avg_str,
+            "orders_active_count": orders_active_count,
+            "orders_completed_count": orders_completed_count,
             "public_url": public_url,
             "avatar_url": avatar_url,
+            "profile_completion": profile_completion,
+            "profile_is_complete": profile_is_complete,
+            "completion_missing": completion_missing,
         })
 
         return context

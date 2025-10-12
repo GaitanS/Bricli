@@ -4,6 +4,7 @@
 {% block title %}Comenzi Disponibile - Bricli{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders-grid.css' %}">
 <style>
     .orders-header {
         background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
@@ -173,8 +174,8 @@
                             <!-- Header -->
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div class="flex-grow-1">
-                                    <h5 class="card-title mb-2 fw-bold">{{ order.title }}</h5>
-                                    <div class="d-flex align-items-center text-muted mb-2">
+                                    <h5 class="card-title mb-2 fw-bold order-title">{{ order.title }}</h5>
+                                    <div class="d-flex align-items-center text-muted mb-2 order-location">
                                         <i class="fas fa-map-marker-alt me-2"></i>
                                         <small>{{ order.city }}, {{ order.county }}</small>
                                     </div>
@@ -198,8 +199,8 @@
                             </div>
 
                             <!-- Description -->
-                            <p class="card-text text-muted mb-3">
-                                {{ order.description|truncatewords:20 }}
+                            <p class="card-text text-muted mb-3 order-description">
+                                {{ order.description }}
                             </p>
 
                             <!-- Budget -->

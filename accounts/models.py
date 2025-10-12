@@ -193,6 +193,9 @@ class CraftsmanProfile(models.Model):
         max_length=20, blank=True, help_text="CUI/CIF (dacă e firmă/PFA) - pentru badge 'Firmă înregistrată'"
     )
     company_verified_at = models.DateTimeField(null=True, blank=True, help_text="Data verificării CUI (setat automat)")
+    business_address = models.CharField(
+        max_length=255, blank=True, default="", verbose_name="Adresa sediu (opțional)", help_text="Adresa sediului firmei/PFA (opțional)"
+    )
 
     # Contact info
     phone = models.CharField(max_length=15, blank=True, help_text="Telefon de contact (opțional)")
