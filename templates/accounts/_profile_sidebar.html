@@ -1,0 +1,80 @@
+{% load static %}
+{# Card statistici profil + acțiuni rapide #}
+<div class="card sidebar-card-enhanced">
+  <div class="card-header">
+    <h6 class="mb-0"><i class="fas fa-user me-2"></i>Profilul tău</h6>
+  </div>
+  <div class="card-body profile-side">
+    <div class="text-center mb-3">
+      {% if avatar_url %}
+        <img src="{{ avatar_url }}" alt="{{ user.get_full_name|default:user.username }}"
+             class="rounded-circle mb-2" width="80" height="80" loading="lazy" style="object-fit:cover;">
+      {% else %}
+        <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-2"
+             style="width:80px;height:80px;">
+          <i class="fas fa-user-circle text-primary" style="font-size:60px;"></i>
+        </div>
+      {% endif %}
+      <h6 class="mt-2 mb-0 text-brand fw-bold">{{ user.get_full_name|default:user.username }}</h6>
+      {% if user.email %}
+        <small class="text-muted">{{ user.email }}</small>
+      {% endif %}
+    </div>
+
+    <div class="row text-center stats-row-desktop mb-3">
+      <div class="col-4 stat-item">
+        <span class="stat-value stat-primary">{{ reviews_count|default:0 }}</span>
+        <span class="stat-label">recenzii</span>
+      </div>
+      <div class="col-4 stat-item">
+        <span class="stat-value stat-warning">{{ rating_avg|default:"0,0" }}</span>
+        <span class="stat-label">rating</span>
+      </div>
+      <div class="col-4 stat-item">
+        <span class="stat-value stat-success">{{ services_count|default:0 }}</span>
+        <span class="stat-label">servicii</span>
+      </div>
+    </div>
+
+    {% if public_url %}
+      <div class="mt-3">
+        <a href="{{ public_url }}?preview=true" class="btn btn-outline-primary w-100">
+          <i class="fas fa-eye me-2"></i>Vezi profilul public
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card sidebar-card-enhanced mt-4">
+  <div class="card-header">
+    <h6 class="mb-0"><i class="fas fa-bolt me-2"></i>Acțiuni rapide</h6>
+  </div>
+  <div class="card-body">
+    <div class="d-grid gap-2 quick-actions-desktop">
+      {% if user.user_type == 'craftsman' %}
+        <a href="{% url 'services:available_orders' %}" class="btn text-white fw-medium"
+           style="background:linear-gradient(135deg,#8B5CF6 0%,#7C3AED 100%);">
+          <i class="fas fa-search me-2"></i>Caută comenzi noi
+        </a>
+        <a href="{% url 'services:my_quotes' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-handshake me-2"></i>Gestionează ofertele
+        </a>
+        <a href="{% url 'services:craftsman_services' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-tools me-2"></i>Serviciile mele
+        </a>
+      {% else %}
+        <a href="{% url 'services:my_orders' %}" class="btn text-white fw-medium"
+           style="background:linear-gradient(135deg,#8B5CF6 0%,#7C3AED 100%);">
+          <i class="fas fa-clipboard-list me-2"></i>Comenzile mele
+        </a>
+        <a href="{% url 'accounts:craftsmen_list' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-search me-2"></i>Caută meșteri
+        </a>
+      {% endif %}
+      <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-cog me-2"></i>Setări profil
+      </a>
+    </div>
+  </div>
+</div>

@@ -233,8 +233,67 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/profile.html"
 
     def get_context_data(self, **kwargs):
+        from django.db.models import Avg
+        from django.urls import reverse
+
         context = super().get_context_data(**kwargs)
-        context["user"] = self.request.user
+        user = self.request.user
+        context["user"] = user
+
+        # Get craftsman profile if exists
+        craftsman = getattr(user, "craftsman_profile", None)
+
+        # Calculate services count
+        try:
+            from services.models import CraftsmanService
+            services_count = CraftsmanService.objects.filter(craftsman=craftsman).count() if craftsman else 0
+        except Exception:
+            services_count = 0
+
+        # Calculate reviews stats
+        reviews_count = 0
+        rating_avg = 0.0
+        try:
+            from services.models import Review
+            if craftsman:
+                reviews_qs = Review.objects.filter(craftsman=craftsman)
+                reviews_count = reviews_qs.count()
+                avg_rating = reviews_qs.aggregate(avg=Avg("rating"))["avg"]
+                rating_avg = avg_rating if avg_rating is not None else 0.0
+        except Exception:
+            pass
+
+        # Format rating with comma (Romanian style)
+        rating_avg_str = f"{rating_avg:.1f}".replace(".", ",")
+
+        # Get public profile URL with slug
+        public_url = ""
+        if craftsman:
+            ensure_craftsman_slug(craftsman)  # Ensure slug exists
+            if craftsman.slug:
+                public_url = reverse("accounts:craftsman_detail", kwargs={"slug": craftsman.slug})
+
+        # Get avatar URL
+        avatar_url = ""
+        if craftsman and getattr(craftsman, "profile_photo", None):
+            try:
+                avatar_url = craftsman.profile_photo.url
+            except Exception:
+                pass
+        if not avatar_url and getattr(user, "profile_picture", None):
+            try:
+                avatar_url = user.profile_picture.url
+            except Exception:
+                pass
+
+        context.update({
+            "services_count": services_count,
+            "reviews_count": reviews_count,
+            "rating_avg": rating_avg_str,
+            "public_url": public_url,
+            "avatar_url": avatar_url,
+        })
+
         return context
 
 

@@ -8,42 +8,12 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row">
-        <div class="col-md-3">
-            <!-- Sidebar -->
-            <div class="card">
-                <div class="card-body text-center">
-                    {% if user.user_type == 'craftsman' and user.craftsman_profile and user.craftsman_profile.profile_photo %}
-                        <img src="{{ user.craftsman_profile.profile_photo.url }}?v={% image_version user.craftsman_profile.profile_photo fallback_dt=user.craftsman_profile.updated_at %}" alt="Poză profil" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover;" loading="lazy">
-                    {% elif user.profile_picture %}
-                        <img src="{{ user.profile_picture.url }}?v={% profile_img_version user %}" alt="Poză profil" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover;" loading="lazy">
-                    {% else %}
-                        <img src="{% static 'images/avatar.svg' %}" alt="Poză profil" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover;" loading="lazy">
-                    {% endif %}
-                    <h5>{{ user.get_full_name|default:user.username }}</h5>
-                    <p class="text-muted">{{ user.get_user_type_display }}</p>
-                    
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">
-                            <i class="fas fa-edit me-2"></i>Editează profilul
-                        </a>
-                        {% if user.user_type == 'craftsman' %}
-                            <a href="{% url 'accounts:portfolio' %}" class="btn btn-success">
-                                <i class="fas fa-images me-2"></i>Portfolio
-                            </a>
-                            <a href="{% url 'services:my_quotes' %}" class="btn btn-outline-success">
-                                <i class="fas fa-handshake me-2"></i>Ofertele mele
-                            </a>
-                        {% else %}
-                            <a href="{% url 'services:my_orders' %}" class="btn btn-success">
-                                <i class="fas fa-list me-2"></i>Comenzile mele
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+        <div class="col-md-4 col-lg-3">
+            <!-- Profile Sidebar with Stats & Quick Actions -->
+            {% include "accounts/_profile_sidebar.html" %}
         </div>
-        
-        <div class="col-md-9">
+
+        <div class="col-md-8 col-lg-9">
             <!-- Main Content -->
             <div class="card">
                 <div class="card-header">
