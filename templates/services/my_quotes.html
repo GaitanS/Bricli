@@ -5,12 +5,20 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/my-quotes-pro.css' %}">
+<link rel="stylesheet" href="{% static 'css/my-quotes-kid-friendly.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="container py-3 py-lg-5">
-    <!-- Header Section -->
-    <div class="row quotes-header">
+    <!-- MOBILE: Kid-Friendly Header -->
+    <div class="quotes-header-kid d-lg-none">
+        <span class="emoji">🤝</span>
+        <h1>Ofertele mele</h1>
+        <p>Vezi toate ofertele trimise</p>
+    </div>
+
+    <!-- DESKTOP: Professional Header -->
+    <div class="row quotes-header d-none d-lg-flex">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -20,21 +28,46 @@
                     <p class="text-muted mb-0">Gestionează și urmărește toate ofertele tale trimise</p>
                 </div>
                 <a href="{% url 'services:available_orders' %}"
-                   class="btn text-white fw-medium d-none d-lg-inline-block"
+                   class="btn text-white fw-medium"
                    style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
                     <i class="fas fa-search me-2"></i>Caută comenzi
-                </a>
-                <a href="{% url 'services:available_orders' %}"
-                   class="btn btn-sm text-white fw-medium d-lg-none"
-                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                    <i class="fas fa-search"></i>
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Filter Tabs -->
-    <div class="row mb-3 mb-lg-4">
+    <!-- MOBILE: Kid-Friendly Tabs with Emoji -->
+    <div class="quotes-tabs-kid d-lg-none">
+        <ul class="nav nav-pills" id="quoteTabsKid" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="all-tab-kid" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                    <span class="emoji">📋</span>
+                    <span class="label">Toate</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pending-tab-kid" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                    <span class="emoji">⏳</span>
+                    <span class="label">Așteaptă</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="accepted-tab-kid" data-bs-toggle="tab" data-bs-target="#accepted" type="button" role="tab">
+                    <span class="emoji">✅</span>
+                    <span class="label">Acceptate</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="rejected-tab-kid" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab">
+                    <span class="emoji">❌</span>
+                    <span class="label">Respinse</span>
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <!-- DESKTOP: Professional Filter Tabs -->
+    <div class="row mb-3 mb-lg-4 d-none d-lg-flex">
         <div class="col-12">
             <div class="card border-0 shadow-sm quotes-tabs">
                 <div class="card-body p-0 quotes-tabs-wrapper">
@@ -82,63 +115,61 @@
         <!-- All Quotes Tab -->
         <div class="tab-pane fade show active" id="all" role="tabpanel">
             {% if quotes %}
-                <!-- Mobile: Compact Cards -->
-                <div class="d-lg-none">
+                <!-- MOBILE: Kid-Friendly Cards -->
+                <div class="d-lg-none px-3">
                     {% for quote in quotes %}
-                    <div class="quote-card-mobile">
-                        <a href="{% url 'services:order_detail' quote.order.pk %}"
-                           class="quote-title-mobile text-decoration-none">
-                            {{ quote.order.title }}
-                        </a>
-
-                        <div class="quote-meta-mobile">
-                            <span class="meta-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                {{ quote.order.county.name }}
+                    <div class="quote-card-kid">
+                        <!-- Status Badge at top -->
+                        {% if quote.status == 'pending' %}
+                            <span class="quote-status-kid status-waiting">
+                                <span class="emoji">⏳</span> Așteaptă răspuns
                             </span>
-                            <span class="meta-item">
-                                <i class="fas fa-calendar"></i>
-                                {{ quote.created_at|date:"d M Y" }}
+                        {% elif quote.status == 'accepted' %}
+                            <span class="quote-status-kid status-success">
+                                <span class="emoji">✅</span> Acceptată!
+                            </span>
+                        {% elif quote.status == 'rejected' %}
+                            <span class="quote-status-kid status-failed">
+                                <span class="emoji">❌</span> Respinsă
+                            </span>
+                        {% elif quote.status == 'declined' %}
+                            <span class="quote-status-kid status-failed">
+                                <span class="emoji">🚫</span> Refuzată
+                            </span>
+                        {% endif %}
+
+                        <!-- Title -->
+                        <div class="quote-title-kid">{{ quote.order.title }}</div>
+
+                        <!-- Location and Date -->
+                        <div class="quote-info-kid">
+                            <span class="info-item">
+                                <span class="emoji">📍</span> {{ quote.order.county.name }}
+                            </span>
+                            <span class="info-item">
+                                <span class="emoji">📅</span> {{ quote.created_at|date:"d M Y" }}
                             </span>
                         </div>
 
-                        <div class="quote-desc-mobile">
-                            {{ quote.description }}
-                        </div>
+                        <!-- Description -->
+                        <div class="quote-desc-kid">{{ quote.description }}</div>
 
-                        <div class="quote-footer-mobile">
-                            <div class="quote-price-mobile">
-                                {{ quote.price }} RON
-                                {% if quote.estimated_duration %}
-                                <span class="duration">
-                                    <i class="fas fa-clock"></i> {{ quote.estimated_duration }}
-                                </span>
-                                {% endif %}
+                        <!-- Price Section -->
+                        <div class="quote-price-kid">
+                            <div class="price">
+                                <span class="emoji">💰</span> {{ quote.price }} RON
                             </div>
-
-                            {% if quote.status == 'pending' %}
-                                <span class="badge badge-pending quote-status-mobile">
-                                    <i class="fas fa-clock"></i> Așteptare
-                                </span>
-                            {% elif quote.status == 'accepted' %}
-                                <span class="badge badge-accepted quote-status-mobile">
-                                    <i class="fas fa-check-circle"></i> Acceptată
-                                </span>
-                            {% elif quote.status == 'rejected' %}
-                                <span class="badge badge-rejected quote-status-mobile">
-                                    <i class="fas fa-times-circle"></i> Respinsă
-                                </span>
-                            {% elif quote.status == 'declined' %}
-                                <span class="badge badge-declined quote-status-mobile">
-                                    <i class="fas fa-ban"></i> Refuzată
-                                </span>
+                            {% if quote.estimated_duration %}
+                            <div class="duration">
+                                <span class="emoji">⏱️</span> {{ quote.estimated_duration }}
+                            </div>
                             {% endif %}
-
-                            <a href="{% url 'services:order_detail' quote.order.pk %}"
-                               class="btn btn-outline-primary btn-sm quote-action-mobile">
-                                <i class="fas fa-eye"></i>
-                            </a>
                         </div>
+
+                        <!-- Action Button -->
+                        <a href="{% url 'services:order_detail' quote.order.pk %}" class="quote-action-kid">
+                            <span class="emoji">👀</span> Vezi detalii comanda
+                        </a>
                     </div>
                     {% endfor %}
                 </div>
@@ -245,13 +276,13 @@
                 </div>
                 {% endif %}
             {% else %}
-                <div class="quotes-empty-mobile d-lg-none">
-                    <i class="fas fa-handshake text-muted"></i>
-                    <h3 class="text-muted">Nu ai oferte</h3>
-                    <p class="text-muted mb-4">Caută comenzi și trimite prima ta ofertă!</p>
-                    <a href="{% url 'services:available_orders' %}" class="btn text-white fw-medium"
-                       style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                        <i class="fas fa-search me-2"></i>Caută comenzi
+                <!-- MOBILE: Kid-Friendly Empty State -->
+                <div class="quotes-empty-kid d-lg-none">
+                    <span class="emoji">🤝</span>
+                    <h3>Nu ai trimis nicio ofertă încă</h3>
+                    <p>Caută comenzi și trimite prima ta ofertă pentru a câștiga clienți!</p>
+                    <a href="{% url 'services:available_orders' %}" class="btn">
+                        <span class="emoji">🔍</span> Caută comenzi
                     </a>
                 </div>
 
@@ -603,6 +634,11 @@
 
         </div>
     </div>
+
+    <!-- MOBILE: Floating Action Button (Quick Search) -->
+    <a href="{% url 'services:available_orders' %}" class="quotes-fab-kid d-lg-none" aria-label="Caută comenzi noi">
+        <span class="emoji">🔍</span>
+    </a>
 </div>
 {% endblock %}
 
