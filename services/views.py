@@ -31,6 +31,7 @@ from .models import (
     Shortlist,
     WalletTransaction,
 )
+from .querydefs import q_active, q_completed
 
 
 class ServiceCategoryListView(ListView):
@@ -192,6 +193,10 @@ class OrderDetailView(DetailView):
 
         # Get all quotes for this order
         context["quotes"] = order.quotes.select_related("craftsman__user").order_by("-created_at")
+
+        # Add filtered order counters for client dashboard
+        context["active_orders_count"] = order.client.orders.filter(q_active()).count()
+        context["completed_orders_count"] = order.client.orders.filter(q_completed()).count()
 
         # Invitație existentă pentru meșterul curent (calculată înainte de verificări)
         invitation = None

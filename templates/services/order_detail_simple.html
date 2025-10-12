@@ -432,11 +432,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <small class="text-muted">
                                 <div class="d-flex justify-content-between mb-1">
                                     <span><i class="fas fa-shopping-cart me-1"></i>Comenzi active:</span>
-                                    <strong>{{ order.client.orders.count|default:0 }}</strong>
+                                    <strong>{{ active_orders_count|default:0 }}</strong>
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <span><i class="fas fa-check-circle me-1"></i>Comenzi finalizate:</span>
-                                    <strong>{{ order.client.orders.count|default:0 }}</strong>
+                                    <strong>{{ completed_orders_count|default:0 }}</strong>
                                 </div>
                             </small>
                         </div>
