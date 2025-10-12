@@ -1,0 +1,53 @@
+/**
+ * Service Create/Edit Form - Mobile UX Optimizations
+ * - Compact spacing for form fields
+ * - Sticky action buttons at bottom
+ * - Desktop layout unchanged
+ */
+
+@media (max-width: 991.98px) {
+  /* Compact Form Spacing */
+  .svc-form .card-body {
+    padding: 14px;
+  }
+
+  .svc-form .form-text {
+    font-size: 0.86rem;
+    line-height: 1.3;
+  }
+
+  .svc-form .alert {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+
+  .svc-form .alert ul {
+    padding-left: 20px;
+    margin-bottom: 0;
+  }
+
+  .svc-form .alert li {
+    font-size: 0.85rem;
+  }
+
+  /* Sticky Action Buttons at Bottom */
+  .svc-sticky-actions {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    border-top: 1px solid #eee;
+    padding: 10px 14px;
+    z-index: 1010;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .svc-sticky-actions .btn {
+    width: 50%;
+    font-size: 0.9rem;
+  }
+
+  /* Hide preview card on mobile (optional) */
+  .svc-form-preview {
+    display: none;
+  }
+}
