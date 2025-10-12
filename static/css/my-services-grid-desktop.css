@@ -1,12 +1,13 @@
 /**
- * My Services - Dense Desktop Grid (3-5 columns)
- * Compact cards with responsive grid layout
+ * My Services - Professional Desktop Grid
+ * Clean, spacious cards with balanced responsive layout
  */
 
-/* GRID pentru desktop, păstrăm mobilul cum e acum */
+/* GRID pentru desktop - profesional și echilibrat */
 .my-services-row {
   display: grid;
-  gap: 16px;
+  gap: 24px;
+  margin-bottom: 32px;
 }
 
 @media (min-width: 576px) {
@@ -18,145 +19,186 @@
 @media (min-width: 992px) {
   .my-services-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1200px) {
-  .my-services-row {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px;
   }
 }
 
 @media (min-width: 1400px) {
   .my-services-row {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px;
   }
 }
 
-/* Card mai scurt / dens pe desktop */
+/* Carduri profesionale cu spațiu generos */
 @media (min-width: 992px) {
   .svc-card.card {
-    border-radius: 12px;
+    border-radius: 16px;
     border: 2px solid #e5e7eb;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .svc-card.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
   }
 
   .svc-card.card:hover {
-    border-color: #8B5CF6;
-    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.15);
-    transform: translateY(-2px);
+    border-color: #c4b5fd;
+    box-shadow: 0 12px 32px rgba(139, 92, 246, 0.12);
+    transform: translateY(-4px);
+  }
+
+  .svc-card.card:hover::before {
+    transform: scaleX(1);
   }
 
   .svc-card .card-body {
-    padding: 12px;
+    padding: 20px;
   }
 
+  /* Icon și Title - mai mari și mai clare */
   .svc-card .svc-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
     display: grid;
     place-items: center;
     color: #fff;
     background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%);
-    font-size: 16px;
+    font-size: 20px;
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
   }
 
   .svc-card .svc-title {
-    font-size: 1rem;
+    font-size: 1.15rem;
     margin: 0;
-    line-height: 1.2;
+    line-height: 1.3;
     font-weight: 700;
     color: #111827;
     display: -webkit-box;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    min-height: 2.6rem;
   }
 
+  /* Meta badges - mai clare și mai mari */
   .svc-card .svc-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 8px;
+    gap: 8px;
+    margin-top: 12px;
   }
 
   .svc-card .chip {
-    background: #f3f4f6;
+    background: #f5f3ff;
+    border: 1px solid #e9d5ff;
     border-radius: 999px;
-    padding: 2px 8px;
-    font-size: .85rem;
-    line-height: 1.4;
-    color: #4b5563;
-    font-weight: 500;
+    padding: 4px 12px;
+    font-size: .9rem;
+    line-height: 1.5;
+    color: #6b21a8;
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
   }
 
   .svc-card .chip i {
-    font-size: .75rem;
+    font-size: .8rem;
     color: #8B5CF6;
   }
 
+  /* Preț - mai vizibil */
   .svc-card .price-row {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px dashed #e5e7eb;
-    font-size: .95rem;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 1rem;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
   }
 
   .svc-card .price-value {
     font-weight: 700;
     color: #10b981;
+    font-size: 1.05rem;
+  }
+
+  .svc-card .price-value .text-muted {
+    font-weight: 500;
+    font-size: .9rem;
   }
 
   .svc-card .price-request {
     color: #6b7280;
     font-style: italic;
-    font-size: .9rem;
+    font-size: .95rem;
+    font-weight: 500;
   }
 
+  /* Butoane - mai mari și mai clare */
   .svc-card .actions {
-    margin-top: 12px;
+    margin-top: 16px;
     display: flex;
-    gap: 8px;
+    gap: 10px;
   }
 
   .svc-card .actions .btn {
-    padding: .4rem .6rem;
-    font-size: .85rem;
-    border-radius: 8px;
+    padding: .6rem .8rem;
+    font-size: .9rem;
+    border-radius: 10px;
     font-weight: 600;
     flex: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 6px;
     transition: all 0.2s ease;
+  }
+
+  .svc-card .actions .btn i {
+    font-size: .85rem;
   }
 
   .svc-card .actions .btn-outline-primary {
     border: 2px solid #e9d5ff;
     color: #8B5CF6;
+    background: #faf5ff;
   }
 
   .svc-card .actions .btn-outline-primary:hover {
     background: #f5f3ff;
     border-color: #8B5CF6;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
   }
 
   .svc-card .actions .btn-outline-danger {
     border: 2px solid #fee2e2;
     color: #ef4444;
+    background: #fef2f2;
   }
 
   .svc-card .actions .btn-outline-danger:hover {
-    background: #fef2f2;
+    background: #fee2e2;
     border-color: #ef4444;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
   }
 
   .svc-card .actions form {
@@ -168,26 +210,80 @@
   }
 }
 
-/* Micșorăm bannerul violet din headerul paginii pe desktop */
+/* Header banner - mai elegant */
 @media (min-width: 992px) {
   .services-hero {
-    padding: 14px 16px !important;
-    border-radius: 16px !important;
-    margin-bottom: 24px !important;
+    padding: 24px 32px !important;
+    border-radius: 20px !important;
+    margin-bottom: 32px !important;
   }
 
   .services-hero h1 {
-    font-size: 1.25rem !important;
+    font-size: 1.75rem !important;
     margin: 0 !important;
+    font-weight: 700 !important;
   }
 
   .services-hero p {
-    font-size: .9rem !important;
+    font-size: 1rem !important;
     margin: 0 !important;
+    opacity: 0.95;
   }
 
   .services-hero .btn {
-    padding: 8px 16px !important;
-    font-size: .9rem !important;
+    padding: 12px 24px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+  }
+}
+
+/* Empty state */
+@media (min-width: 992px) {
+  .services-empty-desktop {
+    text-align: center;
+    padding: 80px 40px;
+    background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%);
+    border-radius: 24px;
+    border: 2px dashed #e9d5ff;
+  }
+
+  .services-empty-desktop i {
+    font-size: 4rem;
+    color: #8B5CF6;
+    margin-bottom: 24px;
+    display: block;
+  }
+
+  .services-empty-desktop h3 {
+    color: #1f2937;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .services-empty-desktop p {
+    color: #6b7280;
+    font-size: 1rem;
+    margin-bottom: 32px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .services-empty-desktop .btn {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    color: white;
+    padding: 14px 32px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .services-empty-desktop .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(139, 92, 246, 0.4);
   }
 }
