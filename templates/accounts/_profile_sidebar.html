@@ -69,6 +69,9 @@
         <a href="{% url 'services:craftsman_services' %}" class="btn btn-outline-secondary">
           <i class="fas fa-tools me-2"></i>Serviciile mele
         </a>
+        <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-images me-2"></i>Portfolio
+        </a>
       {% else %}
         <a href="{% url 'services:my_orders' %}" class="btn text-white fw-medium"
            style="background:linear-gradient(135deg,#8B5CF6 0%,#7C3AED 100%);">
