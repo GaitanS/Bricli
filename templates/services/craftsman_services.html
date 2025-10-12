@@ -4,13 +4,26 @@
 
 {% block title %}Serviciile Mele - Bricli{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/my-services-desktop.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-        <h1 class="mb-0"><i class="fas fa-tools me-2"></i>Serviciile Mele</h1>
-        <a href="{% url 'services:add_craftsman_service' %}" class="btn btn-primary d-none d-lg-block">
+    <!-- DESKTOP: Modern Header -->
+    <div class="services-desktop-header d-none d-lg-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-tools me-2"></i>Serviciile Mele</h1>
+            <p>Gestionează serviciile pe care le oferi clienților</p>
+        </div>
+        <a href="{% url 'services:add_craftsman_service' %}" class="btn">
             <i class="fas fa-plus me-2"></i>Adaugă Serviciu
         </a>
+    </div>
+
+    <!-- MOBILE: Simple Header -->
+    <div class="d-lg-none d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0"><i class="fas fa-tools me-2"></i>Serviciile Mele</h1>
     </div>
 
     {% if messages %}
@@ -25,66 +38,77 @@
     <div class="row">
         <div class="col-md-8">
             {% if services %}
-                <!-- Desktop: Table View -->
-                <div class="card d-none d-lg-block">
-                    <div class="card-header">
-                        <h5 class="mb-0">Servicii Oferite ({{ total_services }})</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0 my-services-table">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Serviciu</th>
-                                        <th>Categorie</th>
-                                        <th>Preț</th>
-                                        <th>Acțiuni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for service in services %}
-                                    <tr>
-                                        <td>
-                                            <strong>{{ service.service.name }}</strong>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-secondary">{{ service.service.category.name }}</span>
-                                        </td>
-                                        <td>
-                                            {% if service.price_from and service.price_to %}
-                                                {{ service.price_from }} - {{ service.price_to }} RON
-                                            {% elif service.price_from %}
-                                                De la {{ service.price_from }} RON
-                                            {% elif service.price_to %}
-                                                Până la {{ service.price_to }} RON
-                                            {% else %}
-                                                <span class="text-muted">Preț la cerere</span>
-                                            {% endif %}
-                                            {% if service.price_unit %}
-                                                <small class="text-muted">/ {{ service.price_unit }}</small>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm">
-                                                <a href="{% url 'services:edit_craftsman_service' service.pk %}"
-                                                   class="btn btn-outline-primary" title="Editează">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form method="post" action="{% url 'services:delete_craftsman_service' service.pk %}"
-                                                      class="d-inline" onsubmit="return confirm('Ești sigur că vrei să ștergi acest serviciu?')">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-outline-danger" title="Șterge">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                <!-- DESKTOP: Modern Card Grid -->
+                <div class="services-desktop-grid d-none d-lg-grid">
+                    {% for service in services %}
+                    <div class="service-card-desktop">
+                        <!-- Header: Icon + Title -->
+                        <div class="card-head">
+                            <div class="card-icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <h3 class="card-title">{{ service.service.name }}</h3>
+                        </div>
+
+                        <!-- Meta: Category + Location -->
+                        <div class="card-meta">
+                            <span class="meta-badge">
+                                <i class="fas fa-layer-group"></i>
+                                {{ service.service.category.name }}
+                            </span>
+                            {% if craftsman.county %}
+                            <span class="meta-badge">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ craftsman.county.name }}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Price -->
+                        <div class="card-price">
+                            <div class="price-label">Preț</div>
+                            {% if service.price_from and service.price_to %}
+                                <div class="price-value">
+                                    {{ service.price_from }} - {{ service.price_to }} RON
+                                    {% if service.price_unit %}
+                                        <span class="price-unit">/ {{ service.price_unit }}</span>
+                                    {% endif %}
+                                </div>
+                            {% elif service.price_from %}
+                                <div class="price-value">
+                                    De la {{ service.price_from }} RON
+                                    {% if service.price_unit %}
+                                        <span class="price-unit">/ {{ service.price_unit }}</span>
+                                    {% endif %}
+                                </div>
+                            {% elif service.price_to %}
+                                <div class="price-value">
+                                    Până la {{ service.price_to }} RON
+                                    {% if service.price_unit %}
+                                        <span class="price-unit">/ {{ service.price_unit }}</span>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="price-request">Preț la cerere</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="card-actions">
+                            <a href="{% url 'services:edit_craftsman_service' service.pk %}"
+                               class="btn btn-edit">
+                                <i class="fas fa-edit"></i> Editează
+                            </a>
+                            <form method="post" action="{% url 'services:delete_craftsman_service' service.pk %}"
+                                  class="flex-fill" onsubmit="return confirm('Ești sigur că vrei să ștergi acest serviciu?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-delete w-100">
+                                    <i class="fas fa-trash"></i> Șterge
+                                </button>
+                            </form>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
 
                 <!-- Mobile: Ultra-Compact List View -->
@@ -201,7 +225,7 @@
                 <!-- Pagination -->
                 {% if is_paginated %}
                 <nav aria-label="Paginare servicii" class="mt-4">
-                    <ul class="pagination justify-content-center">
+                    <ul class="pagination justify-content-center pagination-desktop">
                         {% if page_obj.has_previous %}
                             <li class="page-item">
                                 <a class="page-link" href="?page=1">Prima</a>
@@ -227,7 +251,18 @@
                 </nav>
                 {% endif %}
             {% else %}
-                <div class="card">
+                <!-- DESKTOP: Empty State -->
+                <div class="services-empty-desktop d-none d-lg-block">
+                    <i class="fas fa-tools"></i>
+                    <h3>Nu ai adăugat încă servicii</h3>
+                    <p>Adaugă serviciile pe care le oferi pentru a primi comenzi de la clienți și a începe să câștigi bani.</p>
+                    <a href="{% url 'services:add_craftsman_service' %}" class="btn">
+                        <i class="fas fa-plus me-2"></i>Adaugă primul serviciu
+                    </a>
+                </div>
+
+                <!-- MOBILE: Empty State -->
+                <div class="card d-lg-none">
                     <div class="card-body text-center py-5">
                         <i class="fas fa-tools fa-3x text-muted mb-3"></i>
                         <h4>Nu ai adăugat încă servicii</h4>
@@ -242,7 +277,7 @@
 
         <div class="col-md-4 mt-4 mt-md-0">
             <!-- Profile Summary -->
-            <div class="card">
+            <div class="card sidebar-card-enhanced">
                 <div class="card-header">
                     <h6 class="mb-0"><i class="fas fa-user me-2"></i>Profilul Tău</h6>
                 </div>
@@ -264,18 +299,18 @@
                         {% endif %}
                     </div>
                     
-                    <div class="row text-center">
-                        <div class="col-4">
-                            <h6 class="text-primary mb-0">{{ craftsman.total_reviews }}</h6>
-                            <small class="text-muted">recenzii</small>
+                    <div class="row text-center stats-row-desktop">
+                        <div class="col-4 stat-item">
+                            <span class="stat-value stat-primary">{{ craftsman.total_reviews }}</span>
+                            <span class="stat-label">recenzii</span>
                         </div>
-                        <div class="col-4">
-                            <h6 class="text-warning mb-0">{{ craftsman.average_rating|floatformat:1 }}</h6>
-                            <small class="text-muted">rating</small>
+                        <div class="col-4 stat-item">
+                            <span class="stat-value stat-warning">{{ craftsman.average_rating|floatformat:1 }}</span>
+                            <span class="stat-label">rating</span>
                         </div>
-                        <div class="col-4">
-                            <h6 class="text-success mb-0">{{ total_services }}</h6>
-                            <small class="text-muted">servicii</small>
+                        <div class="col-4 stat-item">
+                            <span class="stat-value stat-success">{{ total_services }}</span>
+                            <span class="stat-label">servicii</span>
                         </div>
                     </div>
                     
@@ -288,12 +323,12 @@
             </div>
 
             <!-- Quick Actions -->
-            <div class="card mt-4">
+            <div class="card sidebar-card-enhanced mt-4">
                 <div class="card-header">
                     <h6 class="mb-0"><i class="fas fa-bolt me-2"></i>Acțiuni Rapide</h6>
                 </div>
                 <div class="card-body">
-                    <div class="d-grid gap-2">
+                    <div class="d-grid gap-2 quick-actions-desktop">
                         <a href="{% url 'services:available_orders' %}" class="btn text-white fw-medium"
                            style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
                             <i class="fas fa-search me-2"></i>Caută comenzi noi
