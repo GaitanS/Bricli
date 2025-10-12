@@ -534,6 +534,12 @@ class ProfileUpdateForm(forms.ModelForm):
         widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "ex. RO12345678"}),
         label="CUI/CIF",
     )
+    business_address = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "ex. Str. Mihai Eminescu nr. 10, București"}),
+        label="Adresa sediu (opțional)",
+    )
     website_url = forms.URLField(
         required=False,
         widget=forms.URLInput(attrs={"class": "form-control", "placeholder": "https://www.site-ul-tau.ro"}),
@@ -583,6 +589,7 @@ class ProfileUpdateForm(forms.ModelForm):
             self.fields["hourly_rate"].initial = craftsman.hourly_rate
             self.fields["min_job_value"].initial = craftsman.min_job_value
             self.fields["company_cui"].initial = craftsman.company_cui
+            self.fields["business_address"].initial = craftsman.business_address
             self.fields["website_url"].initial = craftsman.website_url
             self.fields["facebook_url"].initial = craftsman.facebook_url
             self.fields["instagram_url"].initial = craftsman.instagram_url
@@ -628,6 +635,7 @@ class CraftsmanProfileForm(forms.ModelForm):
             "hourly_rate",
             "min_job_value",
             "company_cui",
+            "business_address",
             "website_url",
             "facebook_url",
             "instagram_url",
@@ -654,6 +662,7 @@ class CraftsmanProfileForm(forms.ModelForm):
         self.fields["hourly_rate"].label = "Tarif orientativ pe oră (RON) - opțional"
         self.fields["min_job_value"].label = "Valoarea minimă lucrare (RON) - opțional"
         self.fields["company_cui"].label = "CUI/CIF (opțional)"
+        self.fields["business_address"].label = "Adresa sediu (opțional)"
         self.fields["website_url"].label = "Site web (opțional)"
         self.fields["facebook_url"].label = "Facebook (opțional)"
         self.fields["instagram_url"].label = "Instagram (opțional)"

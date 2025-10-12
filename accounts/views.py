@@ -368,6 +368,7 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
                 "hourly_rate",
                 "min_job_value",
                 "company_cui",
+                "business_address",
                 "website_url",
                 "facebook_url",
                 "instagram_url",
