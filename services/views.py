@@ -139,14 +139,12 @@ class CreateOrderView(ClientRequiredMixin, CreateView):
 
         # Handle craftsman parameter for direct quote requests
         craftsman_id = self.request.GET.get("craftsman")
+        craftsman = None
         if craftsman_id:
             try:
                 craftsman = CraftsmanProfile.objects.get(pk=craftsman_id)
-                # Add a note to the order description that this is a direct request
-                if form.instance.description:
-                    form.instance.description += f"\n\n[Solicitare directă către meșterul {craftsman.user.get_full_name() or craftsman.user.username}]"
-                else:
-                    form.instance.description = f"[Solicitare directă către meșterul {craftsman.user.get_full_name() or craftsman.user.username}]"
+                # Set assigned_craftsman to mark this as a direct request
+                form.instance.assigned_craftsman = craftsman
             except CraftsmanProfile.DoesNotExist:
                 pass
 
