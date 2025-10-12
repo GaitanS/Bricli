@@ -343,8 +343,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                                 {% else %}
                                     {% for service in services %}
                                     <div class="category-card" data-service="{{ service.id }}" data-name="{{ service.name }}">
-                                        <i class="{{ service.icon|default:'fas fa-tools' }}"></i>
+                                        <i class="{{ service.category.icon|default:'fas fa-tools' }}"></i>
                                         <p class="category-name">{{ service.name }}</p>
+                                        <small class="text-muted">{{ service.category.name }}</small>
                                     </div>
                                     {% endfor %}
                                 {% endif %}
