@@ -305,6 +305,18 @@ class MyOrdersView(ClientRequiredMixin, ListView):
 
         return qs.order_by("-created_at")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Add filtered counters for order status tabs
+        user_orders = Order.objects.filter(client=self.request.user)
+        context["total_orders_count"] = user_orders.count()
+        context["active_orders_count"] = user_orders.filter(q_active()).count()
+        context["completed_orders_count"] = user_orders.filter(q_completed()).count()
+        context["pending_orders_count"] = user_orders.filter(status="published").count()
+
+        return context
+
 
 class MyQuotesView(CraftsmanRequiredMixin, ListView):
     model = Quote

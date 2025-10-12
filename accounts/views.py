@@ -403,6 +403,7 @@ class CraftsmenListView(ListView):
 
     def get_queryset(self):
         from services.models import ServiceCategory
+        from services.querydefs import q_active_craftsmen
 
         # Get filter parameters
         q = (self.request.GET.get("q") or "").strip()
@@ -413,8 +414,8 @@ class CraftsmenListView(ListView):
         rating = self.request.GET.get("rating")
         sort = self.request.GET.get("sort") or "popular"
 
-        # Base queryset
-        qs = CraftsmanProfile.objects.filter(user__is_active=True, is_active=True)
+        # Base queryset - use permissive filter (only requires active user account)
+        qs = CraftsmanProfile.objects.filter(q_active_craftsmen())
         qs = qs.select_related("user", "county").prefetch_related("categories")
 
         # Text search
