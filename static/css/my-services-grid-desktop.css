@@ -210,7 +210,26 @@
   }
 }
 
-/* Header banner - mai elegant */
+/* Mobile Header - cu fundal mov */
+.services-mobile-header {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  padding: 20px 16px;
+  margin: -16px -16px 24px -16px;
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.services-mobile-header h1 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.services-mobile-header h1 i {
+  color: #fff;
+}
+
+/* Desktop Header banner - mai elegant */
 @media (min-width: 992px) {
   .services-hero {
     padding: 24px 32px !important;
