@@ -90,8 +90,12 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% if avatar_url %}
-                                    <img src="{{ avatar_url }}" alt="{{ user.get_full_name|default:user.username }}"
-                                         class="rounded-circle me-2" width="32" height="32" style="object-fit: cover;">
+                                    <div class="position-relative d-inline-block me-2">
+                                        <img src="{{ avatar_url }}" alt="{{ user.get_full_name|default:user.username }}"
+                                             class="rounded-circle" width="32" height="32" style="object-fit: cover;">
+                                        <i class="fas fa-user-circle text-primary position-absolute"
+                                           style="bottom: -3px; right: -3px; font-size: 14px; background: white; border-radius: 50%;"></i>
+                                    </div>
                                 {% else %}
                                     <i class="fas fa-user-circle me-2"></i>
                                 {% endif %}
@@ -156,10 +160,12 @@
             {% if user.is_authenticated %}
                 <div class="mobile-user-section border-bottom pb-3 mb-3">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="user-avatar me-3">
+                        <div class="user-avatar me-3 position-relative">
                             {% if avatar_url %}
                                 <img src="{{ avatar_url }}" alt="{{ user.get_full_name|default:user.username }}"
                                      class="rounded-circle" width="50" height="50" style="object-fit: cover;">
+                                <i class="fas fa-user-circle text-primary position-absolute"
+                                   style="bottom: -3px; right: -3px; font-size: 18px; background: white; border-radius: 50%;"></i>
                             {% else %}
                                 <i class="fas fa-user-circle text-primary" style="font-size: 2.5rem;"></i>
                             {% endif %}
