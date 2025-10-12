@@ -377,29 +377,6 @@
                 </div>
             {% endif %}
 
-            <!-- Empty state for pending -->
-            {% if not quotes or not quotes|selectattr:"status","equalto","pending"|list %}
-            <div class="quotes-empty-mobile d-lg-none">
-                <i class="fas fa-clock text-muted"></i>
-                <h3 class="text-muted">Nicio ofertă în așteptare</h3>
-                <p class="text-muted mb-4">Caută comenzi noi și trimite oferte</p>
-                <a href="{% url 'services:available_orders' %}" class="btn text-white fw-medium"
-                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                    <i class="fas fa-search me-2"></i>Caută comenzi
-                </a>
-            </div>
-
-            <div class="quotes-empty-desktop d-none d-lg-block">
-                <i class="fas fa-clock text-muted"></i>
-                <h3 class="text-muted">Nicio ofertă în așteptare</h3>
-                <p class="text-muted">Caută comenzi noi și trimite oferte pentru a începe</p>
-                <a href="{% url 'services:available_orders' %}"
-                   class="btn btn-lg text-white fw-medium px-4"
-                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                    <i class="fas fa-search me-2"></i>Caută comenzi
-                </a>
-            </div>
-            {% endif %}
         </div>
 
         <!-- Accepted Quotes Tab -->
@@ -512,29 +489,6 @@
                 </div>
             {% endif %}
 
-            <!-- Empty state for accepted -->
-            {% if not quotes or not quotes|selectattr:"status","equalto","accepted"|list %}
-            <div class="quotes-empty-mobile d-lg-none">
-                <i class="fas fa-check-circle text-muted"></i>
-                <h3 class="text-muted">Nicio ofertă acceptată</h3>
-                <p class="text-muted mb-4">Continuă să aplici la comenzi</p>
-                <a href="{% url 'services:available_orders' %}" class="btn text-white fw-medium"
-                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                    <i class="fas fa-search me-2"></i>Caută comenzi
-                </a>
-            </div>
-
-            <div class="quotes-empty-desktop d-none d-lg-block">
-                <i class="fas fa-check-circle text-muted"></i>
-                <h3 class="text-muted">Nicio ofertă acceptată încă</h3>
-                <p class="text-muted">Caută comenzi noi pentru a-ți crește șansele de a fi selectat</p>
-                <a href="{% url 'services:available_orders' %}"
-                   class="btn btn-lg text-white fw-medium px-4"
-                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                    <i class="fas fa-search me-2"></i>Caută comenzi
-                </a>
-            </div>
-            {% endif %}
         </div>
 
         <!-- Rejected Quotes Tab -->
@@ -647,29 +601,6 @@
                 </div>
             {% endif %}
 
-            <!-- Empty state for rejected -->
-            {% if not quotes or not quotes|selectattr:"status","equalto","rejected"|list %}
-            <div class="quotes-empty-mobile d-lg-none">
-                <i class="fas fa-times-circle text-muted"></i>
-                <h3 class="text-muted">Nicio ofertă respinsă</h3>
-                <p class="text-muted mb-4">Continuă să aplici la comenzi noi</p>
-                <a href="{% url 'services:available_orders' %}" class="btn text-white fw-medium"
-                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                    <i class="fas fa-search me-2"></i>Caută comenzi
-                </a>
-            </div>
-
-            <div class="quotes-empty-desktop d-none d-lg-block">
-                <i class="fas fa-times-circle text-muted"></i>
-                <h3 class="text-muted">Nicio ofertă respinsă</h3>
-                <p class="text-muted">Continuă să aplici la comenzi noi</p>
-                <a href="{% url 'services:available_orders' %}"
-                   class="btn btn-lg text-white fw-medium px-4"
-                   style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                    <i class="fas fa-search me-2"></i>Caută comenzi
-                </a>
-            </div>
-            {% endif %}
         </div>
     </div>
 </div>
