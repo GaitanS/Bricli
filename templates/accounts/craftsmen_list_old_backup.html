@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load lazy_loading %}
+{% load service_icons %}
+{% load querystring %}
+
+{% block title %}Meșteri profesioniști - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .craftsman-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border: 1px solid #e0e0e0;
+    }
+
+    .craftsman-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .rating-stars {
+        color: #ffc107;
+    }
+
+    .filter-section {
+        background: #8752f3;
+        color: white;
+    }
+
+    .btn-light {
+        color: #8b5cf6 !important;
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 991.98px) {
+        .filter-section {
+            padding: 2rem 0 !important;
+        }
+        .filter-section h1 {
+            font-size: 1.75rem !important;
+        }
+        .filter-section .lead {
+            font-size: 1rem !important;
+        }
+        .hero-cta-buttons .btn {
+            display: block;
+            width: 100%;
+            margin: 0 0 12px 0 !important;
+        }
+    }
+
+    .page-item.active .page-link {
+        color: #8b5cf6 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Hero Section -->
+    <div class="filter-section py-5">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <h1 class="display-5 fw-bold mb-3 text-white">Meșteri verificați</h1>
+                    <p class="lead mb-4">Găsește meșterul potrivit pentru proiectul tău. Toți meșterii noștri sunt verificați și evaluați de clienți reali.</p>
+
+                    {% if not user.is_authenticated %}
+                    <div class="hero-cta-buttons">
+                        <a href="{% url 'auth:craftsman_register' %}" class="btn btn-light btn-lg me-3">
+                            <i class="fas fa-hammer me-2"></i>Devino meșter
+                        </a>
+                        <a href="{% url 'auth:register' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Înregistrează-te
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Results Section -->
+<div class="container my-4">
+    <form method="get" class="row">
+        <!-- Sidebar Filters (Desktop) -->
+        <aside class="col-lg-3 mb-4">
+            {% include "accounts/_filters_sidebar.html" %}
+        </aside>
+
+        <!-- Main Content -->
+        <main class="col-lg-9">
+            <!-- Sort Bar -->
+            {% include "accounts/_sort_bar.html" %}
+
+            <!-- Results Count -->
+            <div class="mb-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-users me-2 text-primary"></i>
+                    {% if page_obj %}
+                        {{ page_obj.paginator.count }} meșteri găsiți
+                    {% else %}
+                        0 meșteri găsiți
+                    {% endif %}
+                </h5>
+            </div>
+
+            <!-- Results Grid/List -->
+            {% if results %}
+            <div class="row g-3 {% if view == 'list' %}row-cols-1{% else %}row-cols-1 row-cols-md-2{% endif %}">
+                {% for craftsman in results %}
+                <div class="col">
+                    <div class="card craftsman-card h-100">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-auto text-center">
+                                    {% if craftsman.profile_photo %}
+                                        <img src="{{ craftsman.profile_photo.url }}?v={% image_version craftsman.profile_photo fallback_dt=craftsman.updated_at %}"
+                                             alt="Profil" class="rounded-circle" width="80" height="80" style="object-fit: cover;" loading="lazy">
+                                    {% elif craftsman.user.profile_picture %}
+                                        <img src="{{ craftsman.user.profile_picture.url %}?v={% profile_img_version craftsman.user %}"
+                                             alt="Profil" class="rounded-circle" width="80" height="80" style="object-fit: cover;" loading="lazy">
+                                    {% else %}
+                                        <img src="{% static 'images/avatar.svg' %}" alt="Profil"
+                                             class="rounded-circle" width="80" height="80" style="object-fit: cover;" loading="lazy">
+                                    {% endif %}
+                                </div>
+                                <div class="col">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title mb-0">
+                                            {{ craftsman.display_name|default:"Meșter profesionist" }}
+                                        </h5>
+                                        {% if craftsman.user.is_verified %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>Verificat
+                                        </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <p class="text-muted small mb-2">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        {% if craftsman.city %}{{ craftsman.city.name }}, {% endif %}{{ craftsman.county.name }}
+                                    </p>
+
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="rating-stars me-2">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= craftsman.average_rating|floatformat:0|add:0 %}
+                                                    <i class="fas fa-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <span class="small text-muted">
+                                            {{ craftsman.average_rating|floatformat:1 }} ({{ craftsman.total_reviews }} recenzii)
+                                        </span>
+                                    </div>
+
+                                    {% if craftsman.years_experience %}
+                                    <p class="small text-muted mb-2">
+                                        <i class="fas fa-calendar-alt me-1"></i>{{ craftsman.years_experience }} ani experiență
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="d-flex gap-2">
+                                        <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}"
+                                           class="btn btn-primary btn-sm flex-fill">
+                                            <i class="fas fa-eye me-1"></i>Vezi profil
+                                        </a>
+                                        {% if user.is_authenticated and user != craftsman.user %}
+                                        <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#contactForm"
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-comment me-1"></i>Mesaj
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% querystring page=page_obj.previous_page_number %}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="{% querystring page=num %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% querystring page=page_obj.next_page_number %}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-search fa-3x text-muted"></i>
+                </div>
+                <h3 class="text-muted">Nu am găsit meșteri</h3>
+                <p class="text-muted">Încearcă să modifici filtrele de căutare sau să elimini unele criterii.</p>
+                <a href="{% url 'accounts:craftsmen_list' %}" class="btn btn-primary">
+                    <i class="fas fa-refresh me-1"></i>Resetează filtrele
+                </a>
+            </div>
+            {% endif %}
+        </main>
+    </form>
+</div>
+
+<!-- Mobile Offcanvas Filters -->
+{% include "accounts/_filters_offcanvas.html" %}
+
+{% lazy_loading_scripts %}
+{% endblock %}

@@ -1,0 +1,38 @@
+/* Categories Grid - Responsive 5-column layout */
+
+.categories-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* Mobile: 2 columns */
+}
+
+/* Tablet: 3 columns */
+@media (min-width: 768px) {
+  .categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Large: 4 columns */
+@media (min-width: 992px) {
+  .categories-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Desktop: 5 columns */
+@media (min-width: 1200px) {
+  .categories-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Category card styling */
+.categories-grid .category-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.categories-grid .category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+}

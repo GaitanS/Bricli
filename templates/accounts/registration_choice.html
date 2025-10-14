@@ -4,241 +4,79 @@
 {% block title %}Înregistrare - Alege tipul de cont{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-11 col-xl-10">
-            <!-- Main Question -->
-            <div class="text-center mb-5 fade-in">
-                <h1 class="display-5 fw-bold mb-3">Ce tip de cont dorești să creezi?</h1>
-                <p class="text-muted lead">Alege opțiunea care se potrivește nevoilor tale</p>
-            </div>
+<section class="py-4">
+    <div class="container">
+        <div class="mb-4 text-center">
+            <h1 class="h-hero fw-bold mb-1">Alege tipul de cont</h1>
+            <p class="lead-hero text-muted mb-0">Selectează varianta potrivită. Poți vedea detaliile fiecărei opțiuni.</p>
+        </div>
 
-            <div class="row g-4">
-                <!-- Client Card (Left) -->
-                <div class="col-lg-6">
-                    <div class="card account-type-card h-100 border-0 shadow-lg hover-lift">
-                        <div class="card-body p-5">
-                            <!-- Icon & Title -->
-                            <div class="text-center mb-4">
-                                <div class="account-icon mb-3" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                                    <i class="fas fa-handshake"></i>
+        <div class="row g-3">
+            <!-- CLIENT -->
+            <div class="col-12 col-lg-6">
+                <div class="card choice-card">
+                    <div class="card-body">
+                        <div class="choice-header mb-2">
+                            <div class="choice-icon choice-icon--green"><i class="fas fa-handshake"></i></div>
+                            <div>
+                                <h2 class="h5 mb-1">Sunt Client</h2>
+                                <div class="cost-badge">
+                                    <span class="badge-pill badge-pill--green"><i class="fas fa-gift"></i> 100% GRATUIT</span>
                                 </div>
-                                <h2 class="fw-bold mb-2">Sunt Client</h2>
-                                <p class="text-muted">Caut meșteri pentru lucrări</p>
-                            </div>
-
-                            <!-- Benefits List -->
-                            <div class="benefits-list mb-4">
-                                <h5 class="fw-semibold mb-3 text-center">Beneficii:</h5>
-                                <ul class="list-unstyled">
-                                    <li class="mb-3">
-                                        <i class="fas fa-check-circle text-success me-2"></i>
-                                        <span>Postezi comenzi <strong>gratuit</strong></span>
-                                    </li>
-                                    <li class="mb-3">
-                                        <i class="fas fa-check-circle text-success me-2"></i>
-                                        <span>Primești oferte de la meșteri <strong>verificați</strong></span>
-                                    </li>
-                                    <li class="mb-3">
-                                        <i class="fas fa-check-circle text-success me-2"></i>
-                                        <span>Compari prețuri și <strong>recenzii reale</strong></span>
-                                    </li>
-                                    <li class="mb-3">
-                                        <i class="fas fa-check-circle text-success me-2"></i>
-                                        <span>Comunicare directă prin <strong>platformă</strong></span>
-                                    </li>
-                                    <li class="mb-3">
-                                        <i class="fas fa-check-circle text-success me-2"></i>
-                                        <span>Plătești doar când ești <strong>mulțumit</strong></span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <!-- Cost Badge -->
-                            <div class="cost-badge text-center mb-4">
-                                <span class="badge bg-success bg-opacity-10 text-success fs-5 px-4 py-3">
-                                    <i class="fas fa-gift me-2"></i>100% GRATUIT
-                                </span>
-                            </div>
-
-                            <!-- CTA Button -->
-                            <div class="text-center">
-                                <a href="{% url 'auth:register' %}" class="btn btn-lg btn-success px-5 py-3 fw-semibold w-100">
-                                    <i class="fas fa-user-plus me-2"></i>Creează cont Client
-                                </a>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Meșter Card (Right) -->
-                <div class="col-lg-6">
-                    <div class="card account-type-card h-100 border-0 shadow-lg hover-lift">
-                        <div class="card-body p-5">
-                            <!-- Icon & Title -->
-                            <div class="text-center mb-4">
-                                <div class="account-icon mb-3" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                                    <i class="fas fa-hammer"></i>
-                                </div>
-                                <h2 class="fw-bold mb-2">Sunt Meșter</h2>
-                                <p class="text-muted">Ofer servicii profesionale</p>
-                            </div>
+                        <ul class="benefits">
+                            <li><i class="fas fa-check me-2"></i>Postezi comanda gratuit</li>
+                            <li><i class="fas fa-check me-2"></i>Primești oferte de la meșteri verificați</li>
+                            <li><i class="fas fa-check me-2"></i>Compari prețuri și recenzii reale</li>
+                            <li><i class="fas fa-check me-2"></i>Plătești doar când ești mulțumit</li>
+                        </ul>
 
-                            <!-- Benefits List -->
-                            <div class="benefits-list mb-4">
-                                <h5 class="fw-semibold mb-3 text-center">Beneficii:</h5>
-                                <ul class="list-unstyled">
-                                    <li class="mb-3">
-                                        <i class="fas fa-check-circle text-primary me-2"></i>
-                                        <span>Primești comenzi din <strong>zona ta</strong></span>
-                                    </li>
-                                    <li class="mb-3">
-                                        <i class="fas fa-check-circle text-primary me-2"></i>
-                                        <span>Profil verificat cu <strong>badge-uri</strong></span>
-                                    </li>
-                                    <li class="mb-3">
-                                        <i class="fas fa-check-circle text-primary me-2"></i>
-                                        <span>Portofoliu cu <strong>lucrările tale</strong></span>
-                                    </li>
-                                    <li class="mb-3">
-                                        <i class="fas fa-check-circle text-primary me-2"></i>
-                                        <span>Recenzii de la <strong>clienți reali</strong></span>
-                                    </li>
-                                    <li class="mb-3">
-                                        <i class="fas fa-check-circle text-primary me-2"></i>
-                                        <span>Wallet integrat pentru <strong>plăți</strong></span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <!-- Cost Badge -->
-                            <div class="cost-badge text-center mb-4">
-                                <span class="badge bg-primary bg-opacity-10 text-primary fs-6 px-4 py-3">
-                                    <i class="fas fa-tag me-2"></i>20 RON / lead (contact client)
-                                </span>
-                            </div>
-
-                            <!-- CTA Button -->
-                            <div class="text-center">
-                                <a href="{% url 'auth:craftsman_register' %}" class="btn btn-lg px-5 py-3 fw-semibold w-100 text-white" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); border: none;">
-                                    <i class="fas fa-tools me-2"></i>Creează cont Meșter
-                                </a>
-                            </div>
+                        <div class="choice-cta mt-3">
+                            <a class="btn btn-success" href="{% url 'auth:register' %}"><i class="fas fa-user-plus me-2"></i>Creează cont Client</a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Login Link -->
-            <div class="text-center mt-5">
-                <p class="text-muted fs-5">
-                    Ai deja cont?
-                    <a href="{% url 'auth:login' %}" class="fw-semibold text-decoration-none">Autentifică-te aici</a>
-                </p>
+            <!-- MEȘTER -->
+            <div class="col-12 col-lg-6">
+                <div class="card choice-card">
+                    <div class="card-body">
+                        <div class="choice-header mb-2">
+                            <div class="choice-icon"><i class="fas fa-hammer"></i></div>
+                            <div>
+                                <h2 class="h5 mb-1">Sunt Meșter</h2>
+                                <div class="cost-badge">
+                                    <span class="badge-pill badge-pill--violet"><i class="fas fa-tag"></i> 20 RON / lead</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <ul class="benefits">
+                            <li><i class="fas fa-check me-2"></i>Primești comenzi din zona ta</li>
+                            <li><i class="fas fa-check me-2"></i>Profil verificat + portofoliu</li>
+                            <li><i class="fas fa-check me-2"></i>Recenzii de la clienți reali</li>
+                            <li><i class="fas fa-check me-2"></i>Wallet integrat pentru plăți</li>
+                        </ul>
+
+                        <div class="choice-cta mt-3">
+                            <a class="btn btn-primary" href="{% url 'auth:craftsman_register' %}"><i class="fas fa-user-cog me-2"></i>Creează cont Meșter</a>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+        </div>
+
+        <!-- Login Link -->
+        <div class="text-center mt-4">
+            <p class="text-muted">
+                Ai deja cont?
+                <a href="{% url 'auth:login' %}" class="fw-semibold text-decoration-none">Autentifică-te aici</a>
+            </p>
         </div>
     </div>
-</div>
-
-<style>
-/* Account Type Card Styles */
-.account-type-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border-radius: 16px;
-    overflow: hidden;
-    position: relative;
-}
-
-.account-type-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #8B5CF6, #10b981);
-}
-
-.hover-lift:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Account Icon */
-.account-icon {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-
-.account-icon i {
-    font-size: 3rem;
-    color: white;
-}
-
-/* Benefits List */
-.benefits-list ul {
-    padding-left: 0;
-}
-
-.benefits-list li {
-    font-size: 1.05rem;
-    line-height: 1.6;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    transition: background-color 0.2s ease;
-}
-
-.benefits-list li:hover {
-    background-color: rgba(0, 0, 0, 0.02);
-}
-
-.benefits-list i {
-    font-size: 1.2rem;
-}
-
-/* Cost Badge */
-.cost-badge .badge {
-    border-radius: 12px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-/* Fade In Animation */
-.fade-in {
-    animation: fadeInUp 0.6s ease-out;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive Adjustments */
-@media (max-width: 991px) {
-    .account-icon {
-        width: 80px;
-        height: 80px;
-    }
-
-    .account-icon i {
-        font-size: 2.5rem;
-    }
-
-    .benefits-list li {
-        font-size: 1rem;
-    }
-}
-</style>
+</section>
 {% endblock %}

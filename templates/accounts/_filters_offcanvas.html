@@ -1,0 +1,103 @@
+{% load service_icons %}
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="filtersOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">
+            <i class="fas fa-filter me-2"></i>Filtre
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form method="get" id="filtersFormMobile">
+            <!-- Preserve sort, view, per_page -->
+            {% if request.GET.sort %}<input type="hidden" name="sort" value="{{ request.GET.sort }}">{% endif %}
+            {% if request.GET.view %}<input type="hidden" name="view" value="{{ request.GET.view }}">{% endif %}
+            {% if request.GET.per_page %}<input type="hidden" name="per_page" value="{{ request.GET.per_page }}">{% endif %}
+
+            <!-- Search -->
+            <div class="mb-3">
+                <label for="q_mobile" class="form-label">Caută meșter</label>
+                <input type="text" class="form-control" id="q_mobile" name="q" value="{{ request.GET.q }}" placeholder="Nume, companie...">
+            </div>
+
+            <!-- County -->
+            <div class="mb-3">
+                <label for="county_mobile" class="form-label">Județ</label>
+                <select name="county" id="county_mobile" class="form-select">
+                    <option value="">Toate județele</option>
+                    {% for county in counties %}
+                    <option value="{{ county.slug }}" {% if request.GET.county == county.slug %}selected{% endif %}>
+                        {{ county.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Category -->
+            <div class="mb-3">
+                <label for="category_mobile" class="form-label">Categorie</label>
+                <select name="category" id="category_mobile" class="form-select">
+                    <option value="">Toate categoriile</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Rating -->
+            <div class="mb-3">
+                <label for="rating_mobile" class="form-label">Rating minim</label>
+                <select name="rating" id="rating_mobile" class="form-select">
+                    <option value="">Orice rating</option>
+                    <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ stele</option>
+                    <option value="4.5" {% if request.GET.rating == '4.5' %}selected{% endif %}>4.5+ stele</option>
+                </select>
+            </div>
+
+            <!-- Verified Checkbox -->
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="verified" value="1" id="verified_mobile" {% if request.GET.verified == '1' %}checked{% endif %}>
+                <label class="form-check-label" for="verified_mobile">
+                    <i class="fas fa-check-circle text-success me-1"></i>Doar verificați
+                </label>
+            </div>
+
+            <!-- Available Checkbox (if field exists) -->
+            {% if results and results.0.is_available is not None %}
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="available" value="1" id="available_mobile" {% if request.GET.available == '1' %}checked{% endif %}>
+                <label class="form-check-label" for="available_mobile">
+                    <i class="fas fa-clock text-primary me-1"></i>Disponibili acum
+                </label>
+            </div>
+            {% endif %}
+
+            <!-- Hourly Rate (if field exists) -->
+            {% if results and results.0.hourly_rate is not None %}
+            <div class="mb-3">
+                <label class="form-label">Tarif (RON/oră)</label>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <input type="number" class="form-control" name="min_rate" value="{{ request.GET.min_rate }}" placeholder="Min">
+                    </div>
+                    <div class="col-6">
+                        <input type="number" class="form-control" name="max_rate" value="{{ request.GET.max_rate }}" placeholder="Max">
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Buttons -->
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search me-1"></i>Aplică filtre
+                </button>
+                <a href="?" class="btn btn-outline-secondary">
+                    <i class="fas fa-redo me-1"></i>Resetează
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

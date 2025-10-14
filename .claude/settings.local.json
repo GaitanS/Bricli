@@ -1,11 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./venv/Scripts/python.exe -m pytest tests/test_categories_page.py -v)",
-      "Bash(./venv/Scripts/python.exe -m pytest tests/test_registration_choice.py -v)",
-      "Bash(./venv/Scripts/python.exe -m pytest accounts/tests/test_registration_routes.py -v)",
-      "Bash(./venv/Scripts/python.exe:*)",
-      "Bash(del services/tests.py)"
+      "Bash(git commit:*)",
+      "Bash(python manage.py:*)",
+      "Bash(pytest:*)",
+      "Bash(pip install:*)",
+      "Bash(git add:*)",
+      "Bash(ruff check:*)",
+      "Bash(black:*)",
+      "Bash(curl:*)",
+      "Bash(python:*)",
+      "Bash(/bashes)"
     ],
     "deny": [],
     "ask": []

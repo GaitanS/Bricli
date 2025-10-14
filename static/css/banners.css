@@ -1,0 +1,68 @@
+/* Desktop: slim banners for stats and how-it-works */
+
+/* Platform Statistics Banner - Desktop Slim */
+@media (min-width: 992px) {
+  .stats-banner {
+    padding: 12px 0;
+  }
+
+  .stats-banner .card {
+    box-shadow: none;
+    border: 0;
+    background: transparent;
+  }
+
+  .stats-banner .stat-card {
+    background: linear-gradient(135deg, #F8F7FF 0%, #F3F0FF 100%);
+    padding: 14px 18px;
+    border-radius: 14px;
+  }
+
+  .stats-banner .stat-icon i {
+    font-size: 1.5rem;
+  }
+
+  .stats-banner h3 {
+    font-size: 1.25rem;
+    margin: 0;
+  }
+
+  .stats-banner p {
+    font-size: .95rem;
+    margin: 0;
+    color: #6b7280;
+  }
+}
+
+/* How It Works Banner - Desktop Slim */
+@media (min-width: 992px) {
+  .howitworks-banner {
+    padding: 16px 0;
+  }
+
+  .howitworks-banner .step {
+    background: transparent;
+    border: 0;
+  }
+
+  .howitworks-banner .icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%);
+    color: #fff;
+  }
+
+  .howitworks-banner h3 {
+    font-size: 1.05rem;
+    margin: .25rem 0;
+  }
+
+  .howitworks-banner p {
+    font-size: .95rem;
+    margin: 0;
+    color: #6b7280;
+  }
+}

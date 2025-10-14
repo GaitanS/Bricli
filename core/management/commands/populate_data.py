@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils.text import slugify
 
 from accounts.models import City, County
 from core.models import FAQ, SiteSettings, Testimonial
@@ -76,10 +77,21 @@ class Command(BaseCommand):
             ("Vrancea", "VN"),
         ]
 
+        created_count = 0
         for name, code in counties_data:
-            county, created = County.objects.get_or_create(name=name, code=code)
+            slug = slugify(name, allow_unicode=True)
+            county, created = County.objects.get_or_create(
+                name=name,
+                defaults={"code": code, "slug": slug}
+            )
             if created:
-                self.stdout.write(f"Created county: {name}")
+                created_count += 1
+            elif not county.slug:
+                # Update existing counties without slug
+                county.slug = slug
+                county.save()
+
+        self.stdout.write(f"Created {created_count} counties")
 
         # Create some major cities
         cities_data = [
@@ -105,14 +117,17 @@ class Command(BaseCommand):
             ("Satu Mare", "Satu Mare"),
         ]
 
+        cities_created = 0
         for city_name, county_name in cities_data:
             try:
                 county = County.objects.get(name=county_name)
                 city, created = City.objects.get_or_create(name=city_name, county=county)
                 if created:
-                    self.stdout.write(f"Created city: {city_name}")
+                    cities_created += 1
             except County.DoesNotExist:
-                self.stdout.write(f"County {county_name} not found for city {city_name}")
+                pass
+
+        self.stdout.write(f"Created {cities_created} cities")
 
     def create_service_categories(self):
         categories_data = [
@@ -188,12 +203,15 @@ class Command(BaseCommand):
             ("Șeminee și Coșuri", "seminee-cosuri", "fas fa-fire-alt", "Construcție șeminee, curățare coșuri"),
         ]
 
+        categories_created = 0
         for name, slug, icon, description in categories_data:
             category, created = ServiceCategory.objects.get_or_create(
                 name=name, defaults={"slug": slug, "icon": icon, "description": description, "is_active": True}
             )
             if created:
-                self.stdout.write(f"Created service category: {name}")
+                categories_created += 1
+
+        self.stdout.write(f"Created {categories_created} service categories")
 
     def create_site_settings(self):
         settings, created = SiteSettings.objects.get_or_create(
@@ -240,12 +258,15 @@ class Command(BaseCommand):
             ),
         ]
 
+        faqs_created = 0
         for question, answer, category in faqs_data:
             faq, created = FAQ.objects.get_or_create(
                 question=question, defaults={"answer": answer, "category": category, "is_active": True}
             )
             if created:
-                self.stdout.write(f"Created FAQ: {question[:50]}...")
+                faqs_created += 1
+
+        self.stdout.write(f"Created {faqs_created} FAQs")
 
     def create_testimonials(self):
         testimonials_data = [
@@ -272,10 +293,13 @@ class Command(BaseCommand):
             ),
         ]
 
+        testimonials_created = 0
         for name, location, content, rating, is_featured in testimonials_data:
             testimonial, created = Testimonial.objects.get_or_create(
                 name=name,
                 defaults={"location": location, "content": content, "rating": rating, "is_featured": is_featured},
             )
             if created:
-                self.stdout.write(f"Created testimonial from: {name}")
+                testimonials_created += 1
+
+        self.stdout.write(f"Created {testimonials_created} testimonials")

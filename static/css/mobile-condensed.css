@@ -1,0 +1,102 @@
+/* Doar mobile (Bootstrap lg breakpoint) */
+@media (max-width: 991.98px){
+
+  /* 1) Secțiuni mai "strânse" (padding/margins) */
+  .section, .py-5, .my-5 { padding-top: 16px !important; padding-bottom: 16px !important; }
+  .mb-5, .mt-5, .my-5 { margin-top: 16px !important; margin-bottom: 16px !important; }
+  .mb-4, .mt-4, .my-4 { margin-top: 12px !important; margin-bottom: 12px !important; }
+
+  /* 2) Carduri compacte */
+  .card { border-radius: 14px; }
+  .card .card-body { padding: 12px; }
+  .card .card-header { padding: 10px 12px; }
+
+  /* 3) Grile pe 2 coloane (unde avem carduri de categorii/servicii) */
+  .grid-2-mobile > .row > [class*="col-"]:not(.col-12) { width: 50% !important; }
+  .grid-2-mobile > .row { display: flex; flex-wrap: wrap; }
+  .grid-2-mobile > .row > [class*="col-"] { flex: 0 0 50%; max-width: 50%; }
+
+  /* Pagina de categorii (/servicii/categorii/) - forțează 2 coloane pe mobil */
+  .row.g-4 > .col-lg-4.col-md-6 { flex: 0 0 50%; max-width: 50%; }
+
+  /* Carduri simetrice - înălțime egală indiferent de conținut */
+  .row.g-4 > .col-lg-4.col-md-6 .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .row.g-4 > .col-lg-4.col-md-6 .card .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .row.g-4 > .col-lg-4.col-md-6 .card .card-text {
+    min-height: 3em;
+    flex-grow: 1;
+  }
+
+  /* 4) Icon mare de categorie mai mic pe mobil - override pentru inline-style de 80px */
+  .service-category-icon { width: 64px !important; height: 64px !important; border-radius: 50% !important; }
+  .service-category-icon i { font-size: 1.8rem !important; }
+
+  /* 5) Titluri/descriptori mai mici + clamp */
+  .home-section-title, .display-5, .display-6, h2.h5, h3.h6 { font-size: 1.05rem; }
+  .category-card h3, .category-card .h6 { font-size: 1rem; margin-bottom: 4px; }
+  .category-card p, .text-muted { font-size: .9rem; }
+  .clamp-1 { display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+  .clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+  /* 6) "Servicii populare" / card link mai discret */
+  .category-card .btn-link, .card a.btn-link { padding: 0; font-size: .9rem; }
+
+  /* 7) Ascunde extra carduri în lista de categorii/servicii (după primele 3 pe homepage) */
+  #catGrid .cat-card:nth-child(n+4) { display: none; }
+  #popularGrid .popular-card:nth-child(n+7) { display: none; }
+
+  /* 8) Metrici compacte (statistici) */
+  .stats-grid .card-body { padding: 12px; }
+  .stats-grid .display-5, .stats-grid .h2 { font-size: 1.2rem; }
+
+  /* 9) Service category cards mai compacte */
+  .service-category-card .card-body { padding: 16px !important; }
+  .service-category-card h5 { font-size: 1rem; margin-bottom: 8px; }
+  .service-category-card .card-text { font-size: 0.85rem; }
+
+  /* 10) Platform statistics mult mai compacte */
+  .stats-grid .stat-card { padding: 12px !important; border-radius: 14px; }
+  .stats-grid .stat-icon { margin-bottom: 6px !important; }
+  .stats-grid .stat-icon i { font-size: 1.75rem !important; }
+  .stats-grid h3 { font-size: 1.25rem; margin-bottom: 2px !important; }
+  .stats-grid p { font-size: .9rem; margin: 0 !important; }
+  /* secțiunea în sine mai scurtă */
+  .stats-grid.section, .stats-grid .py-5, .stats-grid + .py-5 { padding-top: 16px !important; padding-bottom: 16px !important; }
+
+  /* 11) How it Works section mai compactă */
+  .step-icon { width: 60px !important; height: 60px !important; }
+  .step-icon span { font-size: 1.5rem !important; }
+
+  /* 12) Featured craftsmen cards mai compacte */
+  .card img.rounded-circle { width: 60px !important; height: 60px !important; }
+
+  /* 13) Trust indicators compacte - un singur rând pe mobil */
+  .trust-indicator { font-size: 0.8rem; padding: 4px 10px; white-space: nowrap; }
+  .trust-indicator i { font-size: 0.85rem; margin-right: 4px; }
+  .d-flex.gap-3.mb-4.flex-wrap { gap: 8px !important; margin-bottom: 16px !important; justify-content: center; }
+
+  /* 14) Hero CTA buttons full-width stacked pe mobil */
+  .hero-content .mt-4 .btn { display: block; width: 100%; margin: 0 0 12px 0 !important; }
+  .hero-content .mt-4 { margin-top: 16px !important; }
+
+  /* 15) Footer compact și lizibil pe telefon */
+  footer .container { padding-top: 16px !important; padding-bottom: 16px !important; }
+  footer .row > [class*="col-"] { margin-bottom: 12px; }
+  footer .footer-about, footer p.text-light { font-size: .92rem; line-height: 1.45; }
+  footer h5 + p.text-light { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  footer .nav.flex-column .nav-link, footer ul.list-unstyled li a { padding: .25rem 0; font-size: .95rem; }
+  footer .social-links a { width: 36px; height: 36px; display: inline-grid; place-items: center; border-radius: 50%; }
+}
+
+/* Comportament când utilizatorul apasă "Vezi toate" (JS adaugă .show-all pe container) */
+#catGrid.show-all .cat-card,
+#popularGrid.show-all .popular-card { display: block !important; }

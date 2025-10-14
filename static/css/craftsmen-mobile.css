@@ -1,0 +1,50 @@
+/* Craftsmen List - Mobile Compact Cards */
+
+@media (max-width: 991.98px) {
+  .craft-card {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .craft-card .avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #7C3AED, #8B5CF6);
+    color: #fff;
+    font-size: 20px;
+    flex: 0 0 54px;
+  }
+
+  .craft-card h3 {
+    font-size: 1rem;
+    margin: 0 0 4px;
+  }
+
+  .craft-card .meta {
+    font-size: .9rem;
+  }
+
+  .craft-card .chips {
+    gap: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+
+  .craft-card .chips .badge {
+    background: #f3f4f6;
+    color: #111827;
+    font-size: .85rem;
+  }
+
+  .craft-card .cta {
+    margin-top: 8px;
+  }
+
+  .craft-card .btn {
+    width: 100%;
+  }
+}

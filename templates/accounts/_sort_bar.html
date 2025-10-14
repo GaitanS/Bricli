@@ -1,0 +1,39 @@
+{% load querystring %}
+
+<div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
+    <!-- Mobile Filter Button -->
+    <button class="btn btn-outline-primary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas">
+        <i class="fas fa-filter me-1"></i>Filtre
+    </button>
+
+    <!-- Sort Dropdown -->
+    <div class="d-flex align-items-center gap-2">
+        <label for="sort" class="form-label mb-0 d-none d-md-inline">Sortează:</label>
+        <select name="sort" id="sort" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+            {% for key, label in sort_options.items %}
+            <option value="{{ key }}" {% if request.GET.sort == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="btn-group btn-group-sm" role="group">
+        <a href="{% querystring view='grid' %}" class="btn {% if view == 'grid' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            <i class="fas fa-th"></i>
+        </a>
+        <a href="{% querystring view='list' %}" class="btn {% if view == 'list' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            <i class="fas fa-list"></i>
+        </a>
+    </div>
+
+    <!-- Per Page -->
+    <div class="d-flex align-items-center gap-2">
+        <label for="per_page" class="form-label mb-0 d-none d-md-inline">Afișează:</label>
+        <select name="per_page" id="per_page" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+            {% for size in per_page_choices %}
+            <option value="{{ size }}" {% if request.GET.per_page == size|stringformat:"s" or size == default_per_page and not request.GET.per_page %}selected{% endif %}>{{ size }}</option>
+            {% endfor %}
+        </select>
+        <span class="text-muted small d-none d-md-inline">pe pagină</span>
+    </div>
+</div>

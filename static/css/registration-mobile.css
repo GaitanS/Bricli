@@ -1,0 +1,107 @@
+/* Registration Page - Mobile-First Responsive Styles */
+
+/* Fluid Typography with clamp() */
+.h-hero {
+  font-size: clamp(1.4rem, 1.1rem + 2vw, 2.1rem);
+}
+
+.lead-hero {
+  font-size: clamp(.95rem, .85rem + .4vw, 1.2rem);
+}
+
+/* Choice Cards */
+.choice-card {
+  border: 1px solid #eee;
+  border-radius: 16px;
+  transition: .2s transform, .2s box-shadow;
+}
+
+.choice-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .06);
+}
+
+/* Card Header with Icon */
+.choice-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.choice-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  color: #fff;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.choice-icon--green {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+/* Badge Pills - 100% Visible (No Opacity) */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: .5rem .9rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+.badge-pill--green {
+  background: #10B981;
+  color: #fff;
+}
+
+.badge-pill--violet {
+  background: #8B5CF6;
+  color: #fff;
+}
+
+/* Benefits List - Compact */
+.benefits {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.benefits li {
+  list-style: none;
+  font-size: .95rem;
+}
+
+.benefits li i {
+  color: #10B981;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 991.98px) {
+  .choice-cta .btn {
+    width: 100%;
+  }
+
+  .choice-card .card-body {
+    padding: 14px;
+  }
+
+  .choice-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .choice-icon {
+    margin: 0 auto;
+  }
+
+  .benefits {
+    text-align: left;
+  }
+}
