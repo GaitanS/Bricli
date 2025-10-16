@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Avg, Count, Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
@@ -221,11 +221,13 @@ class OrderDetailView(DetailView):
         context["active_orders_count"] = order.client.orders.filter(q_active()).count()
         context["completed_orders_count"] = order.client.orders.filter(q_completed()).count()
 
-        # Invitație existentă pentru meșterul curent (calculată înainte de verificări)
+        # Invitație existentă pentru meșterul curent (doar dacă există)
         invitation = None
         if self.request.user.is_authenticated and getattr(self.request.user, "user_type", None) == "craftsman":
             invitation = Invitation.objects.filter(order=order, craftsman=self.request.user).first()
-        context["invitation"] = invitation
+        # Only add invitation to context if it actually exists
+        if invitation:
+            context["invitation"] = invitation
 
         # Check if current user can quote (is craftsman and order is published OR invitație acceptată)
         can_quote = False
@@ -642,6 +644,51 @@ class DeclineOrderView(LoginRequiredMixin, DetailView):
 
         messages.success(request, "Ai refuzat comanda. Clientul va fi notificat și comanda va fi republicată.")
         return redirect("services:available_orders")
+
+
+class CompleteOrderView(LoginRequiredMixin, DetailView):
+    """View for craftsmen to mark order as complete"""
+
+    model = Order
+
+    def post(self, request, *args, **kwargs):
+        order = self.get_object()
+
+        # Check if user is the assigned craftsman
+        if not hasattr(request.user, "craftsman_profile") or order.assigned_craftsman != request.user.craftsman_profile:
+            messages.error(request, "Nu poți completa această comandă.")
+            return redirect("services:order_detail", pk=order.pk)
+
+        # Check if order is in progress
+        if order.status != "in_progress":
+            messages.error(request, "Această comandă nu este în progres.")
+            return redirect("services:order_detail", pk=order.pk)
+
+        # Mark as completed
+        order.status = "completed"
+        order.save()
+
+        # Update craftsman stats
+        craftsman = order.assigned_craftsman
+        craftsman.total_jobs_completed += 1
+        craftsman.save()
+
+        # Notify client
+        NotificationService.create_notification(
+            recipient=order.client,
+            title="Comanda a fost finalizată!",
+            message=f'Meșterul {request.user.get_full_name() or request.user.username} a marcat comanda "{order.title}" ca finalizată. Te rugăm să lași o recenzie!',
+            notification_type="order_update",
+            priority="high",
+            sender=request.user,
+            action_url=reverse('services:create_review', kwargs={'pk': order.pk}),
+            related_object_type="order",
+            related_object_id=order.pk,
+            data={"order_id": order.pk, "status": "completed"},
+        )
+
+        messages.success(request, "Comanda a fost marcată ca finalizată! Clientul va fi notificat.")
+        return redirect("services:order_detail", pk=order.pk)
 
 
 class CreateReviewView(LoginRequiredMixin, CreateView):
