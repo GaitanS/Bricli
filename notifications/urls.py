@@ -27,6 +27,7 @@ urlpatterns = [
                 path("notifications/<int:pk>/", views.NotificationDetailAPIView.as_view(), name="api_detail"),
                 path("notifications/create/", views.NotificationCreateAPIView.as_view(), name="api_create"),
                 # Notification management
+                path("notifications/<int:notification_id>/mark-read/", views.mark_notification_read, name="api_mark_read"),
                 path("notifications/mark-all-read/", views.mark_all_read, name="api_mark_all_read"),
                 path("notifications/unread-count/", views.unread_count, name="api_unread_count"),
                 path("notifications/bulk/", views.BulkNotificationAPIView.as_view(), name="api_bulk"),

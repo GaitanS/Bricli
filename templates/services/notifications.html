@@ -25,7 +25,10 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-0">
                         {% for notification in notifications %}
-                        <div class="notification-item border-bottom p-4 {% if not notification.is_read %}bg-light{% endif %}">
+                        <a href="{% if notification.action_url %}{{ notification.action_url }}{% else %}#{% endif %}"
+                           class="notification-item-link text-decoration-none d-block border-bottom p-4 {% if not notification.is_read %}bg-light{% endif %}"
+                           data-notification-id="{{ notification.pk }}"
+                           style="color: inherit; transition: all 0.2s ease;">
                             <div class="row align-items-center">
                                 <div class="col-md-1 text-center mb-3 mb-md-0">
                                     {% if notification.notification_type == 'new_quote' %}
@@ -58,10 +61,10 @@
                                              style="width: 50px; height: 50px;">
                                             <i class="fas fa-exclamation-triangle"></i>
                                         </div>
-                                    {% elif notification.notification_type == 'order_completed' %}
-                                        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                    {% elif notification.notification_type == 'order_update' %}
+                                        <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center"
                                              style="width: 50px; height: 50px;">
-                                            <i class="fas fa-check-double"></i>
+                                            <i class="fas fa-edit"></i>
                                         </div>
                                     {% elif notification.notification_type == 'review_received' %}
                                         <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center"
@@ -75,41 +78,28 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                                <div class="col-md-8">
-                                    <h6 class="mb-2 fw-bold">{{ notification.title }}</h6>
-                                    <p class="text-muted mb-2">{{ notification.message }}</p>
-                                    <div class="d-flex align-items-center text-muted small">
-                                        <i class="fas fa-clock me-1"></i>
-                                        {{ notification.created_at|timesince }} în urmă
-                                        {% if not notification.is_read %}
-                                            <span class="badge bg-primary ms-2">Nou</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="col-md-3 text-md-end text-center">
-                                    <div class="d-flex flex-column gap-2">
-                                        {% if notification.order %}
-                                        <a href="{% url 'services:order_detail' notification.order.pk %}" 
-                                           class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>Vezi comanda
-                                        </a>
-                                        {% endif %}
-                                        {% if notification.quote %}
-                                        <a href="{% url 'services:order_detail' notification.quote.order.pk %}" 
-                                           class="btn btn-outline-secondary btn-sm">
-                                            <i class="fas fa-handshake me-1"></i>Vezi oferta
-                                        </a>
-                                        {% endif %}
-                                        {% if notification.review %}
-                                        <a href="{% url 'services:review_detail' notification.review.pk %}" 
-                                           class="btn btn-outline-warning btn-sm">
-                                            <i class="fas fa-star me-1"></i>Vezi recenzia
-                                        </a>
+                                <div class="col-md-11">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-2 fw-bold">{{ notification.title }}</h6>
+                                            <p class="text-muted mb-2">{{ notification.message }}</p>
+                                            <div class="d-flex align-items-center text-muted small">
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ notification.created_at|timesince }} în urmă
+                                                {% if not notification.is_read %}
+                                                    <span class="badge bg-primary ms-2">Nou</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% if notification.action_url %}
+                                        <div class="ms-3">
+                                            <i class="fas fa-chevron-right text-muted"></i>
+                                        </div>
                                         {% endif %}
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                         {% endfor %}
                     </div>
                 </div>
@@ -175,12 +165,70 @@
 </div>
 
 <style>
-.notification-item:hover {
-    background-color: #f8f9fa !important;
+.notification-item-link {
+    cursor: pointer;
 }
 
-.notification-item.bg-light {
+.notification-item-link:hover {
+    background-color: #f8f9fa !important;
+    transform: translateX(4px);
+}
+
+.notification-item-link.bg-light {
     border-left: 4px solid #8B5CF6;
 }
+
+.notification-item-link:hover .fa-chevron-right {
+    color: #8B5CF6 !important;
+    transform: translateX(3px);
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mark notification as read when clicked
+    const notificationLinks = document.querySelectorAll('.notification-item-link');
+
+    notificationLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const notificationId = this.dataset.notificationId;
+            const actionUrl = this.getAttribute('href');
+
+            // Only mark as read if there's an actual action URL
+            if (actionUrl && actionUrl !== '#') {
+                // Send mark-as-read request
+                fetch(`/notifications/api/notifications/${notificationId}/mark-read/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken(),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }).catch(error => {
+                    console.error('Error marking notification as read:', error);
+                });
+            } else {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Get CSRF token from cookie
+    function getCsrfToken() {
+        const name = 'csrftoken';
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
 {% endblock %}

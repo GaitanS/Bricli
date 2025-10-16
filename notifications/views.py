@@ -360,6 +360,26 @@ def toggle_notification_read(request, notification_id):
         return JsonResponse({"success": False, "message": f"Eroare: {str(e)}"}, status=500)
 
 
+@require_http_methods(["POST"])
+@login_required
+@csrf_exempt
+def mark_notification_read(request, notification_id):
+    """Mark notification as read via AJAX"""
+    try:
+        notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+
+        if not notification.is_read:
+            notification.mark_as_read()
+            message = "Notificarea a fost marcată ca citită."
+        else:
+            message = "Notificarea este deja citită."
+
+        return JsonResponse({"success": True, "message": message, "is_read": notification.is_read})
+
+    except Exception as e:
+        return JsonResponse({"success": False, "message": f"Eroare: {str(e)}"}, status=500)
+
+
 @require_http_methods(["DELETE"])
 @login_required
 @csrf_exempt
