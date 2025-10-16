@@ -96,6 +96,15 @@ def user_context(request):
 
         context["avatar_url"] = avatar_url
 
+        # Get unread notifications count
+        try:
+            from notifications.models import Notification
+            context["unread_notifications_count"] = Notification.objects.filter(
+                recipient=request.user, is_read=False
+            ).count()
+        except Exception:
+            context["unread_notifications_count"] = 0
+
     return context
 
 

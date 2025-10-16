@@ -259,7 +259,11 @@
                     </div>
                     
                     {% if item.image %}
-                        <img src="{{ item.image.url }}" alt="{{ item.title }}" class="portfolio-image">
+                        <img src="{{ item.image.url }}"
+                             alt="{{ item.title }}"
+                             class="portfolio-image portfolio-preview-image"
+                             data-title="{{ item.title }}"
+                             style="cursor: pointer;">
                     {% else %}
                         <div class="portfolio-image">
                             <i class="fas fa-image fa-3x"></i>
@@ -308,6 +312,11 @@
         </div>
     </div>
 </div>
+
+<!-- Include Universal Lightbox for Portfolio Preview -->
+{% if portfolio_items %}
+{% include "partials/image_lightbox.html" %}
+{% endif %}
 
 <!-- Modal pentru adăugare/editare portofoliu -->
 <div class="modal fade" id="addPortfolioModal" tabindex="-1">
@@ -385,4 +394,18 @@ function deletePortfolioItem(itemId) {
     }
 }
 </script>
+
+<!-- Initialize Portfolio Preview Lightbox -->
+{% if portfolio_items %}
+<script src="{% static 'js/lightbox.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    BricliLightbox.init('.portfolio-preview-image', {
+        title: 'Preview Portfolio',
+        showCaption: true,
+        initGuardKey: 'portfolioManageLightboxInit'
+    });
+});
+</script>
+{% endif %}
 {% endblock %}

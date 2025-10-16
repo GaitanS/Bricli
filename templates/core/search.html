@@ -42,90 +42,100 @@
                     </h2>
                 </div>
 
+                {# Results count badge #}
+                <div class="results-count">
+                    <i class="fas fa-users"></i>
+                    <div>
+                        <strong>{{ page_obj.paginator.count }} meșteri găsiți</strong>
+                    </div>
+                </div>
+
                 {# Sort bar with per-page and view toggle #}
                 {% include "core/search/_sort_bar.html" %}
 
-                {# Craftsmen cards #}
-                {% for craftsman in craftsmen %}
-                <div class="card mb-3 border-0 shadow-sm">
-                    <div class="card-body p-3">
-                        <div class="row align-items-center">
-                            {# Profile photo #}
-                            <div class="col-md-2 col-sm-3 text-center mb-2 mb-md-0">
-                                {% if craftsman.profile_photo %}
-                                    <img src="{{ craftsman.profile_photo.url }}?v={% image_version craftsman.profile_photo fallback_dt=craftsman.updated_at %}"
-                                         class="rounded-circle" width="60" height="60"
-                                         alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}"
-                                         loading="lazy" style="object-fit: cover;">
-                                {% elif craftsman.user.profile_picture %}
-                                    <img src="{{ craftsman.user.profile_picture.url }}?v={% profile_img_version craftsman.user %}"
-                                         class="rounded-circle" width="60" height="60"
-                                         alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}"
-                                         loading="lazy" style="object-fit: cover;">
-                                {% else %}
-                                    <img src="{% static 'images/avatar.svg' %}"
-                                         class="rounded-circle" width="60" height="60"
-                                         alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}"
-                                         loading="lazy" style="object-fit: cover;">
-                                {% endif %}
-                            </div>
+                {# Craftsmen cards - Modern layout #}
+                <div class="row g-3 row-cols-1 row-cols-md-2">
+                    {% for craftsman in craftsmen %}
+                    <div class="col">
+                        <div class="card craftsman-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex gap-3 mb-3">
+                                    {# Avatar #}
+                                    <div>
+                                        {% if craftsman.profile_photo %}
+                                            <img src="{{ craftsman.profile_photo.url }}?v={% image_version craftsman.profile_photo fallback_dt=craftsman.updated_at %}"
+                                                 alt="{{ craftsman.display_name|default:craftsman.user.get_full_name }}"
+                                                 class="craftsman-avatar" loading="lazy">
+                                        {% elif craftsman.user.profile_picture %}
+                                            <img src="{{ craftsman.user.profile_picture.url }}?v={% profile_img_version craftsman.user %}"
+                                                 alt="{{ craftsman.display_name|default:craftsman.user.get_full_name }}"
+                                                 class="craftsman-avatar" loading="lazy">
+                                        {% else %}
+                                            <div class="craftsman-avatar bg-light d-flex align-items-center justify-content-center">
+                                                <i class="fas fa-user fa-2x text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
 
-                            {# Craftsman info #}
-                            <div class="col-md-7 col-sm-9">
-                                <div class="d-flex align-items-center mb-1">
-                                    <h6 class="card-title mb-0 me-2">
-                                        {{ craftsman.display_name|default:craftsman.user.get_full_name|default:"Meșter profesionist" }}
-                                    </h6>
-                                    {% if craftsman.user.is_verified %}
-                                    <span class="badge bg-success badge-sm">
-                                        <i class="fas fa-check-circle me-1"></i>Verificat
-                                    </span>
-                                    {% endif %}
-                                </div>
-
-                                <p class="text-muted mb-1 small">
-                                    <i class="fas fa-map-marker-alt me-1"></i>{{ craftsman.county.name }}
-                                </p>
-
-                                {% if craftsman.bio %}
-                                <p class="card-text small text-muted mb-2">{{ craftsman.bio|truncatewords:15 }}</p>
-                                {% endif %}
-
-                                {# Rating stars #}
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        {% for i in "12345" %}
-                                            {% if forloop.counter <= craftsman.average_rating|floatformat:0|add:0 %}
-                                                <i class="fas fa-star text-warning small"></i>
-                                            {% else %}
-                                                <i class="far fa-star text-muted small"></i>
+                                    {# Info #}
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h3 class="craftsman-name">{{ craftsman.display_name|default:craftsman.user.get_full_name|default:"Meșter profesionist" }}</h3>
+                                            {% if craftsman.user.is_verified %}
+                                            <span class="badge-verified">
+                                                <i class="fas fa-check-circle me-1"></i>Verificat
+                                            </span>
                                             {% endif %}
-                                        {% endfor %}
-                                        <span class="ms-1 text-muted small">({{ craftsman.total_reviews|default:0 }})</span>
+                                        </div>
+
+                                        <div class="craftsman-location mb-2">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span>{% if craftsman.city %}{{ craftsman.city.name }}, {% endif %}{{ craftsman.county.name }}</span>
+                                        </div>
+
+                                        <div class="craftsman-rating">
+                                            <div class="stars" style="color: #8B5CF6;">
+                                                {% if craftsman.average_rating > 0 %}
+                                                    {% for i in "12345" %}
+                                                        {% if forloop.counter <= craftsman.average_rating|floatformat:0|add:0 %}
+                                                            <i class="fas fa-star"></i>
+                                                        {% else %}
+                                                            <i class="far fa-star text-muted"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% else %}
+                                                    {% for i in "12345" %}
+                                                        <i class="far fa-star text-muted"></i>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                            <span><strong>{{ craftsman.average_rating|floatformat:1|default:"0.0" }}</strong> ({{ craftsman.total_reviews }} recenzii)</span>
+                                        </div>
+
+                                        {% if craftsman.years_experience %}
+                                        <div class="text-muted small mt-2">
+                                            <i class="fas fa-calendar-alt me-1"></i>{{ craftsman.years_experience }} ani experiență
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 </div>
-                            </div>
 
-                            {# Action buttons #}
-                            <div class="col-md-3 text-md-end text-center mt-2 mt-md-0">
-                                <div class="d-grid gap-2">
-                                    <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}"
-                                       class="btn btn-outline-primary btn-sm">
-                                        <i class="fas fa-eye me-1"></i>Vezi profil
+                                {# Actions #}
+                                <div class="craftsman-actions">
+                                    <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}" class="btn-view-profile text-decoration-none">
+                                        <i class="fas fa-eye me-2"></i>Vezi profil complet
                                     </a>
-                                    {% if user != craftsman.user %}
-                                        <a href="{% url 'services:create_order' %}?craftsman={{ craftsman.pk }}"
-                                           class="btn btn-sm text-white fw-medium"
-                                           style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                                            <i class="fas fa-comments me-1"></i>Contactează
-                                        </a>
+                                    {% if user.is_authenticated and user != craftsman.user and user.user_type != 'craftsman' %}
+                                    <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#contactForm" class="btn-message text-decoration-none">
+                                        <i class="fas fa-comment me-2"></i>Mesaj
+                                    </a>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
 
                 {# Pagination #}
                 {% if page_obj.has_other_pages %}

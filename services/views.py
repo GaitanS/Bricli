@@ -701,9 +701,11 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.order = get_object_or_404(Order, pk=kwargs["pk"])
 
-        # Check if user can review this order
+        # Check if user can review this order (silently redirect craftsmen without error message)
         if self.order.client != request.user:
-            messages.error(request, "Nu poți lăsa o recenzie pentru această comandă.")
+            # Don't show error message for craftsmen
+            if not (hasattr(request.user, 'user_type') and request.user.user_type == 'craftsman'):
+                messages.error(request, "Nu poți lăsa o recenzie pentru această comandă.")
             return redirect("services:order_detail", pk=self.order.pk)
 
         # Check if review already exists
@@ -716,7 +718,8 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["order"] = self.order
-        context["image_form"] = MultipleReviewImageForm()
+        context["image_form"] = MultipleReviewImageForm(max_images=5, existing_images_count=0)
+        context["max_images"] = 5
         return context
 
     def form_valid(self, form):
@@ -727,11 +730,31 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
         response = super().form_valid(form)
 
         # Handle image uploads
-        image_form = MultipleReviewImageForm(self.request.POST, self.request.FILES)
+        image_form = MultipleReviewImageForm(
+            max_images=5,
+            existing_images_count=0,
+            files=self.request.FILES
+        )
+
         if image_form.is_valid():
             images = image_form.get_images()
-            for i, image in enumerate(images):
-                ReviewImage.objects.create(review=self.object, image=image, description=f"Imagine {i + 1}")
+            logger.info(f"Creating review with {len(images)} images for order {self.order.pk}")
+
+            for i, image in enumerate(images, start=1):
+                try:
+                    ReviewImage.objects.create(
+                        review=self.object,
+                        image=image,
+                        description=f"Imagine {i}"
+                    )
+                except Exception as e:
+                    logger.error(f"Error creating ReviewImage: {e}")
+                    messages.warning(self.request, f"Imaginea {i} nu a putut fi salvată.")
+        else:
+            # Log form errors for debugging
+            logger.warning(f"Image form errors: {image_form.errors}")
+            for error in image_form.non_field_errors():
+                messages.warning(self.request, error)
 
         # Update craftsman ratings
         self._update_craftsman_ratings()
@@ -740,7 +763,15 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
         self.order.status = "completed"
         self.order.save()
 
-        messages.success(self.request, "Recenzia a fost adăugată cu succes!")
+        images_count = self.object.images.count()
+        if images_count > 0:
+            messages.success(
+                self.request,
+                f"Recenzia a fost adăugată cu succes cu {images_count} {'imagine' if images_count == 1 else 'imagini'}!"
+            )
+        else:
+            messages.success(self.request, "Recenzia a fost adăugată cu succes!")
+
         return response
 
     def _update_craftsman_ratings(self):
@@ -781,6 +812,10 @@ class EditReviewView(LoginRequiredMixin, UpdateView):
     form_class = ReviewForm
     template_name = "services/create_review.html"  # Reuse create template
 
+    def get_queryset(self):
+        """Prefetch images for efficient access"""
+        return Review.objects.select_related("order", "craftsman", "client").prefetch_related("images")
+
     def dispatch(self, request, *args, **kwargs):
         review = self.get_object()
 
@@ -794,27 +829,61 @@ class EditReviewView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["order"] = self.object.order
-        context["image_form"] = MultipleReviewImageForm()
+        existing_images_count = self.object.images.count()
+        context["image_form"] = MultipleReviewImageForm(
+            max_images=5,
+            existing_images_count=existing_images_count
+        )
         context["is_edit"] = True  # Flag to change template text
         context["existing_images"] = self.object.images.all()
+        context["max_images"] = 5
+        context["remaining_images"] = 5 - existing_images_count
         return context
 
     def form_valid(self, form):
         response = super().form_valid(form)
 
         # Handle new image uploads
-        image_form = MultipleReviewImageForm(self.request.POST, self.request.FILES)
+        existing_count = self.object.images.count()
+        image_form = MultipleReviewImageForm(
+            max_images=5,
+            existing_images_count=existing_count,
+            files=self.request.FILES
+        )
+
         if image_form.is_valid():
             images = image_form.get_images()
-            for i, image in enumerate(images):
-                ReviewImage.objects.create(
-                    review=self.object, image=image, description=f"Imagine {len(self.object.images.all()) + i + 1}"
-                )
+            logger.info(f"Editing review: adding {len(images)} images (existing: {existing_count})")
+
+            for i, image in enumerate(images, start=existing_count + 1):
+                try:
+                    ReviewImage.objects.create(
+                        review=self.object,
+                        image=image,
+                        description=f"Imagine {i}"
+                    )
+                except Exception as e:
+                    logger.error(f"Error creating ReviewImage: {e}")
+                    messages.warning(self.request, f"Imaginea nu a putut fi salvată.")
+        else:
+            # Log form errors
+            logger.warning(f"Image form errors on edit: {image_form.errors}")
+            for error in image_form.non_field_errors():
+                messages.warning(self.request, error)
 
         # Update craftsman ratings
         self._update_craftsman_ratings()
 
-        messages.success(self.request, "Recenzia a fost actualizată cu succes!")
+        total_images = self.object.images.count()
+        if total_images > existing_count:
+            new_images = total_images - existing_count
+            messages.success(
+                self.request,
+                f"Recenzia a fost actualizată cu succes! Ai adăugat {new_images} {'imagine nouă' if new_images == 1 else 'imagini noi'}."
+            )
+        else:
+            messages.success(self.request, "Recenzia a fost actualizată cu succes!")
+
         return response
 
     def _update_craftsman_ratings(self):

@@ -49,25 +49,57 @@
 
                         <!-- Overall Rating Section -->
                         <div class="mb-5">
-                            <h5 class="mb-4 rating-section-title">
-                                <i class="fas fa-star me-2"></i>
-                                Rating general <span class="text-danger">*</span>
-                            </h5>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0 rating-section-title">
+                                    <i class="fas fa-star me-2"></i>
+                                    Rating general <span class="text-danger">*</span>
+                                </h5>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="ratingGuideBtn">
+                                    <i class="fas fa-question-circle me-1"></i>
+                                    Ajutor
+                                </button>
+                            </div>
 
-                            <div class="interactive-stars-container">
-                                {% for choice in form.rating %}
-                                <div class="star-option" data-rating="{{ choice.choice_value }}">
-                                    {{ choice.tag }}
-                                    <label for="{{ choice.id_for_label }}" class="star-option-label">
-                                        <div class="stars-display mb-2">
-                                            {% for i in "12345"|make_list %}
-                                                <i class="star-icon {% if forloop.counter <= choice.choice_value %}fas{% else %}far{% endif %} fa-star"></i>
-                                            {% endfor %}
-                                        </div>
-                                        <span class="rating-text">{{ choice.choice_label }}</span>
-                                    </label>
+                            <!-- Smart Help Banner -->
+                            <div class="alert alert-info border-0 mb-4" id="smartGuideBanner" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-left: 4px solid #8B5CF6 !important;">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-lightbulb fs-4 me-3 mt-1" style="color: #8B5CF6;"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-2" style="color: #1f2937; font-weight: 600;">
+                                            Cum funcționează evaluarea?
+                                        </h6>
+                                        <p class="mb-2 small text-muted">
+                                            <strong>Treci cu mouse-ul peste stele</strong> pentru a previzualiza ratingul, apoi <strong>click pentru a selecta</strong>. Poți evalua experiența ta de la 1 stea (nesatisfăcător) la 5 stele (excelent).
+                                        </p>
+                                        <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" id="dismissGuide" style="color: #8B5CF6; font-weight: 600;">
+                                            Am înțeles <i class="fas fa-times ms-1"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                {% endfor %}
+                            </div>
+
+                            <!-- Overall Rating with Hover Stars -->
+                            <div class="overall-rating-container">
+                                <div class="hover-star-rating overall-stars" data-rating-name="rating">
+                                    {% for choice in form.rating %}
+                                        {{ choice.tag }}
+                                    {% endfor %}
+                                    <div class="star-container-large">
+                                        <i class="far fa-star hover-star-large" data-value="1"></i>
+                                        <i class="far fa-star hover-star-large" data-value="2"></i>
+                                        <i class="far fa-star hover-star-large" data-value="3"></i>
+                                        <i class="far fa-star hover-star-large" data-value="4"></i>
+                                        <i class="far fa-star hover-star-large" data-value="5"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Rating Description -->
+                                <div class="rating-description-container mt-4">
+                                    <div class="rating-description" id="ratingDescription">
+                                        <i class="fas fa-hand-pointer me-2" style="color: #8B5CF6;"></i>
+                                        <span class="text-muted">Selectează un rating pentru a continua</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -78,88 +110,68 @@
                                 Evaluări detaliate (opțional)
                             </h5>
 
-                            <div class="row g-4">
-                                <!-- Quality Rating -->
-                                <div class="col-12 col-md-4">
-                                    <div class="detailed-rating-card">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <div class="rating-icon-circle bg-primary">
-                                                <i class="fas fa-check-circle"></i>
-                                            </div>
-                                            <h6 class="mb-0 ms-3">Calitate lucrare</h6>
-                                        </div>
-                                        <div class="rating-options">
-                                            {% for choice in form.quality_rating %}
-                                            <div class="form-check mb-2">
-                                                {{ choice.tag }}
-                                                <label class="form-check-label" for="{{ choice.id_for_label }}">
-                                                    {% for i in "12345"|make_list %}
-                                                        {% if forloop.counter <= choice.choice_value %}
-                                                            <i class="fas fa-star star-mini"></i>
-                                                        {% else %}
-                                                            <i class="far fa-star star-mini text-muted"></i>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </label>
-                                            </div>
-                                            {% endfor %}
-                                        </div>
+                            <!-- Quality Rating Row -->
+                            <div class="detailed-rating-row mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="rating-icon-circle bg-primary">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <h6 class="mb-0 ms-3 rating-label">Calitate lucrare</h6>
+                                </div>
+                                <div class="hover-star-rating" data-rating-name="quality_rating">
+                                    {% for choice in form.quality_rating %}
+                                        {{ choice.tag }}
+                                    {% endfor %}
+                                    <div class="star-container">
+                                        <i class="far fa-star hover-star" data-value="1"></i>
+                                        <i class="far fa-star hover-star" data-value="2"></i>
+                                        <i class="far fa-star hover-star" data-value="3"></i>
+                                        <i class="far fa-star hover-star" data-value="4"></i>
+                                        <i class="far fa-star hover-star" data-value="5"></i>
                                     </div>
                                 </div>
+                            </div>
 
-                                <!-- Punctuality Rating -->
-                                <div class="col-12 col-md-4">
-                                    <div class="detailed-rating-card">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <div class="rating-icon-circle bg-info">
-                                                <i class="fas fa-clock"></i>
-                                            </div>
-                                            <h6 class="mb-0 ms-3">Punctualitate</h6>
-                                        </div>
-                                        <div class="rating-options">
-                                            {% for choice in form.punctuality_rating %}
-                                            <div class="form-check mb-2">
-                                                {{ choice.tag }}
-                                                <label class="form-check-label" for="{{ choice.id_for_label }}">
-                                                    {% for i in "12345"|make_list %}
-                                                        {% if forloop.counter <= choice.choice_value %}
-                                                            <i class="fas fa-star star-mini"></i>
-                                                        {% else %}
-                                                            <i class="far fa-star star-mini text-muted"></i>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </label>
-                                            </div>
-                                            {% endfor %}
-                                        </div>
+                            <!-- Punctuality Rating Row -->
+                            <div class="detailed-rating-row mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="rating-icon-circle bg-info">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <h6 class="mb-0 ms-3 rating-label">Punctualitate</h6>
+                                </div>
+                                <div class="hover-star-rating" data-rating-name="punctuality_rating">
+                                    {% for choice in form.punctuality_rating %}
+                                        {{ choice.tag }}
+                                    {% endfor %}
+                                    <div class="star-container">
+                                        <i class="far fa-star hover-star" data-value="1"></i>
+                                        <i class="far fa-star hover-star" data-value="2"></i>
+                                        <i class="far fa-star hover-star" data-value="3"></i>
+                                        <i class="far fa-star hover-star" data-value="4"></i>
+                                        <i class="far fa-star hover-star" data-value="5"></i>
                                     </div>
                                 </div>
+                            </div>
 
-                                <!-- Communication Rating -->
-                                <div class="col-12 col-md-4">
-                                    <div class="detailed-rating-card">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <div class="rating-icon-circle bg-success">
-                                                <i class="fas fa-comments"></i>
-                                            </div>
-                                            <h6 class="mb-0 ms-3">Comunicare</h6>
-                                        </div>
-                                        <div class="rating-options">
-                                            {% for choice in form.communication_rating %}
-                                            <div class="form-check mb-2">
-                                                {{ choice.tag }}
-                                                <label class="form-check-label" for="{{ choice.id_for_label }}">
-                                                    {% for i in "12345"|make_list %}
-                                                        {% if forloop.counter <= choice.choice_value %}
-                                                            <i class="fas fa-star star-mini"></i>
-                                                        {% else %}
-                                                            <i class="far fa-star star-mini text-muted"></i>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </label>
-                                            </div>
-                                            {% endfor %}
-                                        </div>
+                            <!-- Communication Rating Row -->
+                            <div class="detailed-rating-row mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="rating-icon-circle bg-success">
+                                        <i class="fas fa-comments"></i>
+                                    </div>
+                                    <h6 class="mb-0 ms-3 rating-label">Comunicare</h6>
+                                </div>
+                                <div class="hover-star-rating" data-rating-name="communication_rating">
+                                    {% for choice in form.communication_rating %}
+                                        {{ choice.tag }}
+                                    {% endfor %}
+                                    <div class="star-container">
+                                        <i class="far fa-star hover-star" data-value="1"></i>
+                                        <i class="far fa-star hover-star" data-value="2"></i>
+                                        <i class="far fa-star hover-star" data-value="3"></i>
+                                        <i class="far fa-star hover-star" data-value="4"></i>
+                                        <i class="far fa-star hover-star" data-value="5"></i>
                                     </div>
                                 </div>
                             </div>
@@ -184,26 +196,89 @@
                                 <i class="fas fa-images me-2"></i>
                                 Adaugă imagini (opțional)
                             </h5>
-                            <div class="upload-area">
-                                {{ image_form.images }}
-                                <div class="form-text mt-2">
-                                    <i class="fas fa-image me-1"></i>
-                                    Poți adăuga imagini cu lucrarea finalizată (max 5MB per imagine)
-                                </div>
-                            </div>
 
                             {% if is_edit and existing_images %}
-                            <div class="mt-3">
-                                <small class="text-muted d-block mb-2">Imagini existente:</small>
-                                <div class="row g-2">
+                            <!-- Existing Images -->
+                            <div class="existing-images-section mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                        Imagini existente ({{ existing_images|length }})
+                                    </h6>
+                                    {% if remaining_images > 0 %}
+                                    <small class="text-muted">
+                                        Poți adăuga încă {{ remaining_images }} {{ remaining_images|pluralize:"imagine,imagini" }}
+                                    </small>
+                                    {% else %}
+                                    <small class="text-warning">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        Ai atins limita de 5 imagini
+                                    </small>
+                                    {% endif %}
+                                </div>
+                                <div class="existing-images-grid">
                                     {% for image in existing_images %}
-                                    <div class="col-6 col-sm-4 col-md-3">
-                                        <img src="{{ image.image.url }}" alt="Review image" class="img-fluid rounded shadow-sm" style="height: 100px; width: 100%; object-fit: cover;">
+                                    <div class="existing-image-card">
+                                        <img src="{{ image.image.url }}" alt="Review image {{ forloop.counter }}" class="existing-image-thumb">
+                                        <div class="existing-image-overlay">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
                                     </div>
                                     {% endfor %}
                                 </div>
                             </div>
                             {% endif %}
+
+                            <!-- Upload Area -->
+                            {% if not is_edit or remaining_images > 0 %}
+                            <div class="modern-upload-area" id="uploadArea">
+                                <input type="file"
+                                       name="images"
+                                       id="reviewImages"
+                                       multiple
+                                       accept="image/*"
+                                       capture="camera"
+                                       style="display: none;"
+                                       {% if is_edit %}data-max="{{ remaining_images }}"{% else %}data-max="5"{% endif %}>
+
+                                <label for="reviewImages" class="upload-trigger" id="uploadTrigger">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-camera fa-3x mb-3"></i>
+                                    </div>
+                                    <h6 class="upload-title">Adaugă imagini cu lucrarea</h6>
+                                    <p class="upload-subtitle text-muted">
+                                        <i class="fas fa-mobile-alt me-1"></i> Camera sau fișiere
+                                        <span class="mx-2">•</span>
+                                        <i class="fas fa-image me-1"></i> {% if is_edit %}Max {{ remaining_images }}{% else %}Max 5{% endif %} imagini
+                                        <span class="mx-2">•</span>
+                                        <i class="fas fa-file-image me-1"></i> 5MB/imagine
+                                    </p>
+                                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="document.getElementById('reviewImages').click(); return false;">
+                                        <i class="fas fa-plus-circle me-2"></i>Selectează imagini
+                                    </button>
+                                </label>
+
+                                <!-- Preview Container -->
+                                <div id="imagePreviewContainer" class="image-preview-grid mt-4" style="display: none;"></div>
+
+                                <!-- Upload Stats -->
+                                <div id="uploadStats" class="upload-stats mt-3" style="display: none;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-primary" id="selectedCount">0 imagini selectate</span>
+                                        <button type="button" class="btn btn-sm btn-link text-danger" id="clearAll">
+                                            <i class="fas fa-trash me-1"></i>Șterge toate
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Help Text -->
+                            <div class="form-text mt-3">
+                                <i class="fas fa-info-circle me-1" style="color: #8B5CF6;"></i>
+                                <strong>Sfat:</strong> Adaugă imagini clare cu lucrarea finalizată pentru a ajuta alți clienți.
+                                Pe mobil poți face poze direct cu camera!
+                            </div>
                         </div>
 
                         <!-- Guidelines Box -->
@@ -286,135 +361,209 @@
     color: #8B5CF6;
 }
 
-/* Interactive Stars Container */
-.interactive-stars-container {
+/* Smart Guide Banner */
+#smartGuideBanner {
+    animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* Overall Rating Container */
+.overall-rating-container {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(249, 250, 251, 1) 100%);
+    transition: all 0.3s ease;
+}
+
+.overall-rating-container:hover {
+    border-color: #8B5CF6;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.12);
+}
+
+.overall-stars {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 1rem;
 }
 
-.star-option {
-    position: relative;
-}
-
-.star-option input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-}
-
-.star-option-label {
+.star-container-large {
     display: flex;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
+    gap: 1rem;
     cursor: pointer;
+}
+
+.hover-star-large {
+    font-size: 3rem;
+    color: #d1d5db;
     transition: all 0.3s ease;
-    background: white;
+    cursor: pointer;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.star-option-label:hover {
-    border-color: #8B5CF6;
-    background: #f3f4f6;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+.hover-star-large:hover {
+    transform: scale(1.2) rotate(-10deg);
+    filter: drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3));
 }
 
-.star-option input[type="radio"]:checked + .star-option-label {
-    border-color: #8B5CF6;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
-}
-
-.stars-display {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.star-icon {
-    font-size: 1.5rem;
+.hover-star-large.filled {
     color: #8B5CF6;
-    transition: all 0.2s ease;
+    filter: drop-shadow(0 4px 8px rgba(139, 92, 246, 0.4));
 }
 
-.star-option:hover .star-icon {
-    transform: scale(1.1);
+.hover-star-large.active {
+    animation: starBounce 0.6s ease;
 }
 
-.star-option input[type="radio"]:checked + .star-option-label .star-icon {
-    animation: starPop 0.5s ease;
+/* Rating Description */
+.rating-description-container {
+    width: 100%;
+    max-width: 600px;
 }
 
-@keyframes starPop {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-}
-
-.rating-text {
-    margin-left: 1rem;
-    font-weight: 500;
-    color: #374151;
-}
-
-/* Detailed Rating Cards */
-.detailed-rating-card {
-    padding: 1.5rem;
-    border: 1px solid #e5e7eb;
+.rating-description {
+    text-align: center;
+    padding: 1rem 1.5rem;
     border-radius: 12px;
     background: #f9fafb;
-    height: 100%;
+    border: 2px dashed #e5e7eb;
+    transition: all 0.3s ease;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rating-description.active {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-color: #8B5CF6;
+    border-style: solid;
+}
+
+.rating-description .rating-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.rating-badge-1 { background: #FEE2E2; color: #991B1B; }
+.rating-badge-2 { background: #FED7AA; color: #9A3412; }
+.rating-badge-3 { background: #FEF3C7; color: #92400E; }
+.rating-badge-4 { background: #D1FAE5; color: #065F46; }
+.rating-badge-5 { background: #DBEAFE; color: #1E40AF; }
+
+/* Detailed Rating Rows */
+.detailed-rating-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    background: #f9fafb;
     transition: all 0.3s ease;
 }
 
-.detailed-rating-card:hover {
+.detailed-rating-row:hover {
     border-color: #8B5CF6;
     background: white;
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+    transform: translateY(-2px);
 }
 
 .rating-icon-circle {
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
+    flex-shrink: 0;
 }
 
-.rating-options .form-check {
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition: background 0.2s ease;
+.rating-label {
+    color: #1f2937;
+    font-weight: 600;
+    min-width: 150px;
 }
 
-.rating-options .form-check:hover {
-    background: white;
+/* Hover Star Rating */
+.hover-star-rating {
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
-.rating-options .form-check-input {
+.hover-star-rating input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.star-container {
+    display: flex;
+    gap: 0.5rem;
     cursor: pointer;
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-top: 0.25rem;
 }
 
-.rating-options .form-check-input:checked {
-    background-color: #8B5CF6;
-    border-color: #8B5CF6;
-}
-
-.rating-options .form-check-label {
+.hover-star {
+    font-size: 1.75rem;
+    color: #d1d5db;
+    transition: all 0.2s ease;
     cursor: pointer;
-    margin-left: 0.5rem;
-    display: inline-flex;
-    gap: 0.1rem;
 }
 
-.star-mini {
-    font-size: 0.875rem;
+.hover-star:hover {
+    transform: scale(1.15);
+}
+
+.hover-star.filled {
     color: #8B5CF6;
+}
+
+.hover-star.active {
+    color: #8B5CF6;
+    animation: starBounce 0.5s ease;
+}
+
+@keyframes starBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
 }
 
 /* Textarea Styling */
@@ -433,26 +582,202 @@
     outline: none;
 }
 
-/* Upload Area */
-.upload-area {
-    border: 2px dashed #e5e7eb;
-    border-radius: 12px;
+/* Modern Upload Area */
+.modern-upload-area {
+    border: 3px dashed #d1d5db;
+    border-radius: 16px;
     padding: 2rem;
-    text-align: center;
-    background: #f9fafb;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
     transition: all 0.3s ease;
 }
 
-.upload-area:hover {
+.modern-upload-area:hover {
     border-color: #8B5CF6;
-    background: #f3f4f6;
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
 }
 
-#id_images {
-    padding: 0.75rem;
-    border-radius: 8px;
+.upload-trigger {
+    cursor: pointer;
+    display: block;
+    text-align: center;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.upload-trigger:hover .upload-icon i {
+    transform: scale(1.1);
+    color: #8B5CF6;
+}
+
+.upload-icon i {
+    color: #9ca3af;
+    transition: all 0.3s ease;
+}
+
+.upload-title {
+    color: #1f2937;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.upload-subtitle {
+    font-size: 0.875rem;
+    margin-bottom: 0;
+}
+
+/* Image Preview Grid */
+.image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.preview-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+    animation: slideUp 0.3s ease;
+}
+
+.preview-card:hover {
+    border-color: #8B5CF6;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(139, 92, 246, 0.15);
+}
+
+.preview-image {
     width: 100%;
-    max-width: 400px;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+}
+
+.preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent);
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.preview-badge {
+    background: rgba(139, 92, 246, 0.9);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.preview-remove {
+    background: rgba(220, 38, 38, 0.9);
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.preview-remove:hover {
+    background: rgba(185, 28, 28, 1);
+    transform: scale(1.1);
+}
+
+.preview-info {
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+.preview-filename {
+    font-size: 0.75rem;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.preview-filesize {
+    font-size: 0.7rem;
+    color: #9ca3af;
+}
+
+/* Existing Images Grid */
+.existing-images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.existing-image-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.existing-image-card:hover {
+    border-color: #10b981;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.existing-image-thumb {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    display: block;
+}
+
+.existing-image-overlay {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(16, 185, 129, 0.9);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+
+/* Upload Stats */
+.upload-stats {
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Responsive Design */
@@ -484,6 +809,41 @@
     .star-icon {
         font-size: 1.25rem;
     }
+
+    .detailed-rating-row {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .rating-label {
+        min-width: auto;
+        text-align: center;
+    }
+
+    .hover-star {
+        font-size: 1.5rem;
+    }
+
+    .star-container {
+        gap: 0.35rem;
+    }
+
+    .overall-rating-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .hover-star-large {
+        font-size: 2rem;
+    }
+
+    .star-container-large {
+        gap: 0.5rem;
+    }
+
+    #smartGuideBanner {
+        font-size: 0.875rem;
+    }
 }
 
 /* Button Enhancements */
@@ -501,19 +861,230 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Enhanced star rating interaction with animations
-    const starOptions = document.querySelectorAll('.star-option input[type="radio"]');
+    // Rating descriptions
+    const ratingDescriptions = {
+        1: {
+            text: '⭐ Nesatisfăcător',
+            description: 'Experiență foarte slabă, probleme majore cu lucrarea sau meșterul.',
+            badge: 'rating-badge-1'
+        },
+        2: {
+            text: '⭐⭐ Sub așteptări',
+            description: 'Experiență mediocră, mai multe probleme decât aspecte pozitive.',
+            badge: 'rating-badge-2'
+        },
+        3: {
+            text: '⭐⭐⭐ Acceptabil',
+            description: 'Experiență medie, lucrarea este acceptabilă dar cu îmbunătățiri necesare.',
+            badge: 'rating-badge-3'
+        },
+        4: {
+            text: '⭐⭐⭐⭐ Foarte bun',
+            description: 'Experiență foarte bună, lucrare de calitate cu mici aspecte de îmbunătățit.',
+            badge: 'rating-badge-4'
+        },
+        5: {
+            text: '⭐⭐⭐⭐⭐ Excelent',
+            description: 'Experiență excepțională! Lucrare impecabilă, profesionalism maxim.',
+            badge: 'rating-badge-5'
+        }
+    };
 
-    starOptions.forEach(function(radio) {
-        radio.addEventListener('change', function() {
-            // Add selection animation
-            const label = this.nextElementSibling;
-            label.style.animation = 'none';
-            setTimeout(() => {
-                label.style.animation = 'starPop 0.5s ease';
-            }, 10);
+    // Smart Guide System
+    const smartGuideBanner = document.getElementById('smartGuideBanner');
+    const dismissGuideBtn = document.getElementById('dismissGuide');
+    const ratingGuideBtn = document.getElementById('ratingGuideBtn');
+
+    // Check if user has dismissed guide before
+    const hasSeenGuide = localStorage.getItem('bricli_review_guide_seen');
+
+    if (hasSeenGuide) {
+        smartGuideBanner.style.display = 'none';
+    }
+
+    dismissGuideBtn.addEventListener('click', function() {
+        smartGuideBanner.style.animation = 'slideUp 0.3s ease';
+        setTimeout(() => {
+            smartGuideBanner.style.display = 'none';
+        }, 300);
+        localStorage.setItem('bricli_review_guide_seen', 'true');
+    });
+
+    ratingGuideBtn.addEventListener('click', function() {
+        smartGuideBanner.style.display = 'block';
+        smartGuideBanner.style.animation = 'slideDown 0.5s ease';
+        smartGuideBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    // Overall Rating Stars
+    const overallStars = document.querySelector('.overall-stars');
+    if (overallStars) {
+        const stars = overallStars.querySelectorAll('.hover-star-large');
+        const radioInputs = overallStars.querySelectorAll('input[type="radio"]');
+        const ratingDescription = document.getElementById('ratingDescription');
+
+        // Initialize with existing selection
+        const checkedInput = overallStars.querySelector('input[type="radio"]:checked');
+        if (checkedInput) {
+            const value = parseInt(checkedInput.value);
+            updateOverallStars(stars, value);
+            updateRatingDescription(value);
+        }
+
+        // Hover effect
+        stars.forEach((star, index) => {
+            star.addEventListener('mouseenter', function() {
+                const value = parseInt(this.dataset.value);
+                updateOverallStars(stars, value);
+                updateRatingDescription(value, true);
+            });
+
+            // Click to select
+            star.addEventListener('click', function() {
+                const value = parseInt(this.dataset.value);
+
+                // Update radio input
+                radioInputs.forEach(input => {
+                    if (parseInt(input.value) === value) {
+                        input.checked = true;
+                    }
+                });
+
+                // Update visual stars with animation
+                updateOverallStars(stars, value);
+                updateRatingDescription(value);
+
+                // Add bounce animation
+                stars.forEach((s, i) => {
+                    if (i < value) {
+                        s.classList.add('active');
+                        setTimeout(() => s.classList.remove('active'), 600);
+                    }
+                });
+
+                // Scroll to next section after selection
+                setTimeout(() => {
+                    document.querySelector('.detailed-rating-row').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }, 800);
+            });
+        });
+
+        // Reset on mouse leave
+        overallStars.addEventListener('mouseleave', function() {
+            const checkedInput = overallStars.querySelector('input[type="radio"]:checked');
+            if (checkedInput) {
+                const value = parseInt(checkedInput.value);
+                updateOverallStars(stars, value);
+                updateRatingDescription(value);
+            } else {
+                updateOverallStars(stars, 0);
+                ratingDescription.innerHTML = '<i class="fas fa-hand-pointer me-2" style="color: #8B5CF6;"></i><span class="text-muted">Selectează un rating pentru a continua</span>';
+                ratingDescription.classList.remove('active');
+            }
+        });
+
+        function updateOverallStars(stars, value) {
+            stars.forEach((star, index) => {
+                if (index < value) {
+                    star.classList.remove('far');
+                    star.classList.add('fas', 'filled');
+                } else {
+                    star.classList.remove('fas', 'filled');
+                    star.classList.add('far');
+                }
+            });
+        }
+
+        function updateRatingDescription(value, isHover = false) {
+            if (value && ratingDescriptions[value]) {
+                const desc = ratingDescriptions[value];
+                ratingDescription.innerHTML = `
+                    <div>
+                        <div class="rating-badge ${desc.badge} mb-2">
+                            ${desc.text}
+                        </div>
+                        <div class="small text-muted">
+                            ${isHover ? '<i class="fas fa-mouse-pointer me-1"></i> Click pentru a selecta - ' : ''}${desc.description}
+                        </div>
+                    </div>
+                `;
+                ratingDescription.classList.add('active');
+            }
+        }
+    }
+
+    // Hover star rating functionality for detailed ratings
+    const hoverRatingContainers = document.querySelectorAll('.hover-star-rating:not(.overall-stars)');
+
+    hoverRatingContainers.forEach(container => {
+        const stars = container.querySelectorAll('.hover-star');
+        const ratingName = container.dataset.ratingName;
+        const radioInputs = container.querySelectorAll('input[type="radio"]');
+
+        // Initialize with existing selection
+        const checkedInput = container.querySelector('input[type="radio"]:checked');
+        if (checkedInput) {
+            const value = parseInt(checkedInput.value);
+            updateStars(stars, value, true);
+        }
+
+        // Hover effect
+        stars.forEach((star, index) => {
+            star.addEventListener('mouseenter', function() {
+                const value = parseInt(this.dataset.value);
+                updateStars(stars, value, false);
+            });
+
+            // Click to select
+            star.addEventListener('click', function() {
+                const value = parseInt(this.dataset.value);
+
+                // Update radio input
+                radioInputs.forEach(input => {
+                    if (parseInt(input.value) === value) {
+                        input.checked = true;
+                    }
+                });
+
+                // Update visual stars with animation
+                updateStars(stars, value, true);
+
+                // Add bounce animation
+                stars.forEach((s, i) => {
+                    if (i < value) {
+                        s.classList.add('active');
+                        setTimeout(() => s.classList.remove('active'), 500);
+                    }
+                });
+            });
+        });
+
+        // Reset on mouse leave
+        container.addEventListener('mouseleave', function() {
+            const checkedInput = container.querySelector('input[type="radio"]:checked');
+            if (checkedInput) {
+                const value = parseInt(checkedInput.value);
+                updateStars(stars, value, true);
+            } else {
+                updateStars(stars, 0, false);
+            }
         });
     });
+
+    function updateStars(stars, value, permanent) {
+        stars.forEach((star, index) => {
+            if (index < value) {
+                star.classList.remove('far');
+                star.classList.add('fas', 'filled');
+            } else {
+                star.classList.remove('fas', 'filled');
+                star.classList.add('far');
+            }
+        });
+    }
 
     // Character counter for comment
     const commentField = document.getElementById('id_comment');
@@ -528,13 +1099,134 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form validation enhancement
     const form = document.getElementById('reviewForm');
     form.addEventListener('submit', function(e) {
-        const ratingSelected = document.querySelector('.star-option input[type="radio"]:checked');
+        const ratingSelected = document.querySelector('.overall-stars input[type="radio"]:checked');
         if (!ratingSelected) {
             e.preventDefault();
             alert('Te rugăm să selectezi un rating general!');
-            document.querySelector('.interactive-stars-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.querySelector('.overall-rating-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     });
+
+    // ===== IMAGE UPLOAD HANDLER =====
+    const imageInput = document.getElementById('reviewImages');
+    if (imageInput) {
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const uploadStats = document.getElementById('uploadStats');
+        const selectedCountEl = document.getElementById('selectedCount');
+        const clearAllBtn = document.getElementById('clearAll');
+        const uploadTrigger = document.getElementById('uploadTrigger');
+
+        const maxImages = parseInt(imageInput.dataset.max) || 5;
+        let selectedFiles = [];
+
+        // Handle file selection
+        imageInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        });
+
+        // Clear all button
+        if (clearAllBtn) {
+            clearAllBtn.addEventListener('click', function() {
+                selectedFiles = [];
+                updatePreview();
+                imageInput.value = '';
+            });
+        }
+
+        function handleFiles(files) {
+            // Filter and validate
+            const validFiles = files.filter(file => {
+                // Check if image
+                if (!file.type.startsWith('image/')) {
+                    alert(`Fișierul "${file.name}" nu este o imagine validă.`);
+                    return false;
+                }
+
+                // Check size (5MB)
+                const maxSize = 5 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    alert(`Imaginea "${file.name}" este prea mare (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maxim 5MB.`);
+                    return false;
+                }
+
+                return true;
+            });
+
+            // Check total count
+            if (selectedFiles.length + validFiles.length > maxImages) {
+                alert(`Poți adăuga maximum ${maxImages} imagini. Ai selectat ${selectedFiles.length + validFiles.length}.`);
+                return;
+            }
+
+            // Add to selected files
+            selectedFiles = [...selectedFiles, ...validFiles];
+            updatePreview();
+            updateFileInput();
+        }
+
+        function updatePreview() {
+            if (selectedFiles.length === 0) {
+                previewContainer.style.display = 'none';
+                uploadStats.style.display = 'none';
+                uploadTrigger.style.display = 'block';
+                return;
+            }
+
+            previewContainer.style.display = 'grid';
+            uploadStats.style.display = 'block';
+            uploadTrigger.style.display = 'none';
+            previewContainer.innerHTML = '';
+
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const card = document.createElement('div');
+                    card.className = 'preview-card';
+                    card.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview ${index + 1}" class="preview-image">
+                        <div class="preview-overlay">
+                            <span class="preview-badge">#${index + 1}</span>
+                            <button type="button" class="preview-remove" data-index="${index}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="preview-info">
+                            <p class="preview-filename" title="${file.name}">${file.name}</p>
+                            <small class="preview-filesize">${(file.size / 1024).toFixed(1)} KB</small>
+                        </div>
+                    `;
+
+                    // Remove button handler
+                    const removeBtn = card.querySelector('.preview-remove');
+                    removeBtn.addEventListener('click', function() {
+                        removeFile(parseInt(this.dataset.index));
+                    });
+
+                    previewContainer.appendChild(card);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Update stats
+            selectedCountEl.textContent = `${selectedFiles.length} ${selectedFiles.length === 1 ? 'imagine selectată' : 'imagini selectate'}`;
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updatePreview();
+            updateFileInput();
+        }
+
+        function updateFileInput() {
+            // Create new DataTransfer to update input files
+            const dataTransfer = new DataTransfer();
+            selectedFiles.forEach(file => {
+                dataTransfer.items.add(file);
+            });
+            imageInput.files = dataTransfer.files;
+        }
+    }
 });
 </script>
 {% endblock %}

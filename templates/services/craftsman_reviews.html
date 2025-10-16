@@ -115,13 +115,20 @@
                         <!-- Review Images -->
                         {% if review.images.exists %}
                             <div class="mt-3">
+                                <h6 class="small text-muted mb-2">
+                                    <i class="fas fa-images me-1"></i>
+                                    {{ review.images.count }} {{ review.images.count|pluralize:"imagine,imagini" }}
+                                </h6>
                                 <div class="row g-2">
                                     {% for image in review.images.all %}
-                                        <div class="col-md-3">
-                                            <img src="{{ image.image.url }}" alt="{{ image.description }}" 
-                                                 class="img-fluid rounded shadow-sm" 
-                                                 style="height: 100px; width: 100%; object-fit: cover; cursor: pointer;"
-                                                 data-bs-toggle="modal" data-bs-target="#imageModal{{ image.id }}">
+                                        <div class="col-4 col-sm-3 col-md-2">
+                                            <img src="{{ image.image.url }}"
+                                                 alt="Review image {{ forloop.counter }}"
+                                                 class="img-fluid rounded shadow-sm review-thumbnail"
+                                                 style="height: 80px; width: 100%; object-fit: cover; cursor: pointer; transition: all 0.3s ease;"
+                                                 onmouseover="this.style.transform='scale(1.05)'"
+                                                 onmouseout="this.style.transform='scale(1)'"
+                                                 data-title="{{ image.description }}">
                                         </div>
                                     {% endfor %}
                                 </div>
@@ -254,22 +261,25 @@
     </div>
 </div>
 
-<!-- Image Modals -->
-{% for review in reviews %}
-    {% for image in review.images.all %}
-        <div class="modal fade" id="imageModal{{ image.id }}" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">{{ image.description|default:"Imagine recenzie" }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <img src="{{ image.image.url }}" class="img-fluid rounded" alt="{{ image.description }}">
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endfor %}
-{% endfor %}
+<!-- Include Universal Lightbox for Review Images -->
+{% if reviews %}
+{% include "partials/image_lightbox.html" %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<!-- Load Lightbox Script for Review Images -->
+{% if reviews %}
+<script src="{% static 'js/lightbox.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Lightbox for all review thumbnails
+    BricliLightbox.init('.review-thumbnail', {
+        title: 'Imagini Recenzii',
+        showCaption: true,
+        initGuardKey: 'craftsmanReviewsLightboxInit'
+    });
+});
+</script>
+{% endif %}
 {% endblock %}

@@ -16,16 +16,6 @@
         </select>
     </div>
 
-    <!-- View Toggle -->
-    <div class="btn-group btn-group-sm" role="group">
-        <a href="{% querystring view='grid' %}" class="btn {% if view == 'grid' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-            <i class="fas fa-th"></i>
-        </a>
-        <a href="{% querystring view='list' %}" class="btn {% if view == 'list' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-            <i class="fas fa-list"></i>
-        </a>
-    </div>
-
     <!-- Per Page -->
     <div class="d-flex align-items-center gap-2">
         <label for="per_page" class="form-label mb-0 d-none d-md-inline">Afișează:</label>

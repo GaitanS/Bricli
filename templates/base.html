@@ -111,6 +111,11 @@
                                 </a></li>
                                 <li><a class="dropdown-item" href="{% url 'services:notifications' %}">
                                     <i class="fas fa-bell me-2"></i>Notificările mele
+                                    {% if unread_notifications_count > 0 %}
+                                        <span id="notifications-badge" class="badge bg-danger ms-2">{{ unread_notifications_count }}</span>
+                                    {% else %}
+                                        <span id="notifications-badge" class="badge bg-danger ms-2" style="display: none;">0</span>
+                                    {% endif %}
                                 </a></li>
                                 {% if user.user_type == 'client' %}
                                     <li><a class="dropdown-item" href="{% url 'services:my_orders' %}">
@@ -185,13 +190,24 @@
                     <!-- Quick Actions -->
                     <div class="row g-2">
                         <div class="col-6">
-                            <a href="{% url 'messaging:conversation_list' %}" class="btn btn-outline-primary btn-sm w-100">
+                            <a href="{% url 'messaging:conversation_list' %}" class="btn btn-outline-primary btn-sm w-100 position-relative">
                                 <i class="fas fa-envelope me-1"></i>Mesaje
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{% url 'services:notifications' %}" class="btn btn-outline-primary btn-sm w-100">
+                            <a href="{% url 'services:notifications' %}" class="btn btn-outline-primary btn-sm w-100 position-relative">
                                 <i class="fas fa-bell me-1"></i>Notificări
+                                {% if unread_notifications_count > 0 %}
+                                    <span id="notifications-badge-mobile" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {{ unread_notifications_count }}
+                                        <span class="visually-hidden">notificări necitite</span>
+                                    </span>
+                                {% else %}
+                                    <span id="notifications-badge-mobile" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+                                        0
+                                        <span class="visually-hidden">notificări necitite</span>
+                                    </span>
+                                {% endif %}
                             </a>
                         </div>
                     </div>
@@ -365,6 +381,9 @@
     <script src="{% static 'js/mobile-condensed.js' %}"></script>
     <script src="{% static 'js/form-live-validate.js' %}"></script>
     <script src="{% static 'js/mobile-menu-autohide.js' %}"></script>
+    {% if user.is_authenticated %}
+    <script src="{% static 'js/notifications-live.js' %}" defer></script>
+    {% endif %}
 
     {% block extra_js %}{% endblock %}
 </body>

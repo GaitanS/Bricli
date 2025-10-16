@@ -503,9 +503,12 @@ class CraftsmanDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Reviews
+        # Reviews with images prefetched for performance
         context["reviews"] = (
-            getattr(self.object, "received_reviews", []).all()[:5] if hasattr(self.object, "received_reviews") else []
+            self.object.received_reviews
+            .select_related("client")
+            .prefetch_related("images")
+            .order_by("-created_at")[:5]
         )
         # Portfolio images (first 6)
         context["portfolio_images"] = self.object.portfolio_images.all()[:6]
@@ -1101,14 +1104,22 @@ def craftsman_reviews_ajax(request, pk):
         offset = int(request.GET.get("offset", 0))
         limit = int(request.GET.get("limit", 10))
 
-        # Get reviews
-        reviews_qs = Review.objects.filter(craftsman=craftsman).select_related("client").order_by("-created_at")
+        # Get reviews with images
+        reviews_qs = Review.objects.filter(craftsman=craftsman).select_related("client").prefetch_related("images").order_by("-created_at")
         total_reviews = reviews_qs.count()
         reviews = reviews_qs[offset : offset + limit]
 
         # Format reviews data
         reviews_data = []
         for review in reviews:
+            # Get review images
+            images_data = []
+            for img in review.images.all():
+                images_data.append({
+                    "url": img.image.url,
+                    "description": img.description or ""
+                })
+
             reviews_data.append(
                 {
                     "id": review.pk,
@@ -1116,6 +1127,8 @@ def craftsman_reviews_ajax(request, pk):
                     "rating": review.rating,
                     "comment": review.comment or "",
                     "created_at": review.created_at.strftime("%d %b %Y"),
+                    "images": images_data,
+                    "images_count": len(images_data)
                 }
             )
 

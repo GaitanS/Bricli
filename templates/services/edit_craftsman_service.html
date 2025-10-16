@@ -13,15 +13,6 @@
                 <h1><i class="fas fa-edit me-2"></i>Editează Serviciu</h1>
             </div>
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Editează Detalii Serviciu</h5>

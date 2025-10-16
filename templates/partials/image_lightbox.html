@@ -1,0 +1,41 @@
+<!-- Universal Image Lightbox Modal with Zoom, Pan, and Navigation -->
+<div class="modal fade" id="imageLightbox" tabindex="-1" aria-labelledby="lightboxTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-0">
+                <h5 id="lightboxTitle" class="text-white">Imagine</h5>
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Zoom Controls -->
+                    <div class="btn-group" role="group" aria-label="Controale zoom">
+                        <button type="button" id="lightboxZoomOut" class="btn btn-sm btn-outline-light" aria-label="Micșorează">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" id="lightboxZoomReset" class="btn btn-sm btn-outline-light" aria-label="Resetează zoom">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button type="button" id="lightboxZoomIn" class="btn btn-sm btn-outline-light" aria-label="Mărește">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Închide"></button>
+                </div>
+            </div>
+            <div class="modal-body p-0 position-relative" style="overflow: hidden; min-height: 400px;">
+                <div id="lightboxImageContainer" style="width: 100%; height: 70vh; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <img id="lightboxImage" src="" alt="" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.3s ease; cursor: grab; user-select: none;" />
+                </div>
+                <div class="position-absolute bottom-0 start-0 end-0 p-3 d-flex justify-content-between align-items-center text-white" style="background: rgba(0,0,0,0.5);">
+                    <div id="lightboxCaption" class="small"></div>
+                    <div id="lightboxCounter" class="fw-bold"></div>
+                </div>
+                <!-- Navigation Buttons -->
+                <button type="button" id="lightboxPrevBtn" class="btn btn-dark position-absolute top-50 start-0 translate-middle-y ms-3" style="opacity: 0.8;" aria-label="Imagine precedentă">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button type="button" id="lightboxNextBtn" class="btn btn-dark position-absolute top-50 end-0 translate-middle-y me-3" style="opacity: 0.8;" aria-label="Imagine următoare">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

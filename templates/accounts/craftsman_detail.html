@@ -87,7 +87,7 @@
                         <small>Așa îți văd clienții profilul pe platformă.</small>
                     </div>
                     {% elif not user.is_authenticated %}
-                    <div class="alert alert-info mb-3">
+                    <div class="alert alert-info alert-permanent mb-3">
                         <i class="fas fa-info-circle me-2"></i>
                         <strong>Pentru a contacta meșterul</strong><br>
                         <small>Trebuie să te <a href="{% url 'auth:login' %}?next={{ request.get_full_path }}" class="alert-link">autentifici</a> sau să îți <a href="{% url 'auth:register' %}" class="alert-link">creezi un cont</a>.</small>
@@ -228,9 +228,9 @@
                         {% endif %}
                     </h5>
 
-                    {% if craftsman.received_reviews.exists %}
+                    {% if reviews %}
                         <div id="reviews-container">
-                            {% for review in craftsman.received_reviews.all|slice:":5" %}
+                            {% for review in reviews %}
                             <div class="review-item border-bottom pb-4 mb-4" data-review-id="{{ review.pk }}">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <div>
@@ -256,7 +256,30 @@
                                     <span class="badge bg-success">Verificat</span>
                                 </div>
                                 {% if review.comment %}
-                                <p class="mb-0">{{ review.comment }}</p>
+                                <p class="mb-3">{{ review.comment }}</p>
+                                {% endif %}
+
+                                <!-- Review Images -->
+                                {% if review.images.exists %}
+                                <div class="review-images-grid mt-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-images me-2" style="color: #8B5CF6;"></i>
+                                        <small class="text-muted">{{ review.images.count }} {{ review.images.count|pluralize:"imagine,imagini" }}</small>
+                                    </div>
+                                    <div class="row g-2">
+                                        {% for image in review.images.all %}
+                                        <div class="col-4 col-sm-3 col-md-2">
+                                            <img src="{{ image.image.url }}"
+                                                 alt="Review image {{ forloop.counter }}"
+                                                 class="img-fluid rounded shadow-sm review-thumbnail-profile"
+                                                 style="height: 80px; width: 100%; object-fit: cover; cursor: pointer; transition: all 0.3s ease;"
+                                                 onmouseover="this.style.transform='scale(1.05)'"
+                                                 onmouseout="this.style.transform='scale(1)'"
+                                                 data-title="{{ image.description }}">
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
                                 {% endif %}
                             </div>
                             {% endfor %}
@@ -306,60 +329,84 @@
                 </div>
             </div>
 
-            <!-- Contact Info (Always Visible) -->
+            <!-- Contact Info (Authenticated Users Only) -->
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <h5 class="card-title mb-3">
                         <i class="fas fa-phone me-2" style="color: #8B5CF6;"></i>Date de contact
                     </h5>
-                    <div class="contact-info">
-                        {% if craftsman.phone or craftsman.user.phone_number %}
-                            <p class="mb-2">
-                                <i class="fas fa-phone me-2"></i>
-                                <a href="tel:{{ craftsman.phone|default:craftsman.user.phone_number }}" class="text-decoration-none">
-                                    {{ craftsman.phone|default:craftsman.user.phone_number }}
-                                </a>
-                            </p>
-                        {% endif %}
-                        {% if craftsman.user.email %}
-                            <p class="mb-2">
-                                <i class="fas fa-envelope me-2"></i>
-                                <a href="mailto:{{ craftsman.user.email }}" class="text-decoration-none">{{ craftsman.user.email }}</a>
-                            </p>
-                        {% endif %}
-                        {% if craftsman.user.phone_number %}
-                            <p class="mb-2">
-                                <i class="fab fa-whatsapp me-2"></i>
-                                <a href="{{ craftsman.user.get_whatsapp_link }}" target="_blank" class="text-decoration-none">
-                                    WhatsApp
-                                </a>
-                            </p>
-                        {% endif %}
-                        {% if craftsman.website_url %}
-                            <p class="mb-2">
-                                <i class="fas fa-globe me-2"></i>
-                                <a href="{{ craftsman.website_url }}" target="_blank" class="text-decoration-none">Website</a>
-                            </p>
-                        {% endif %}
-                        {% if craftsman.facebook_url %}
-                            <p class="mb-2">
-                                <i class="fab fa-facebook me-2"></i>
-                                <a href="{{ craftsman.facebook_url }}" target="_blank" class="text-decoration-none">Facebook</a>
-                            </p>
-                        {% endif %}
-                        {% if craftsman.instagram_url %}
-                            <p class="mb-2">
-                                <i class="fab fa-instagram me-2"></i>
-                                <a href="{{ craftsman.instagram_url }}" target="_blank" class="text-decoration-none">Instagram</a>
-                            </p>
-                        {% endif %}
-                        {% if craftsman.city and craftsman.county %}
-                            <p class="mb-0">
-                                <i class="fas fa-map-marker-alt me-2"></i>
-                                {{ craftsman.city.name }}, {{ craftsman.county.name }}
-                            </p>
-                        {% endif %}
-                    </div>
+
+                    {% if user.is_authenticated %}
+                        <div class="contact-info">
+                            {% if craftsman.phone or craftsman.user.phone_number %}
+                                <p class="mb-2">
+                                    <i class="fas fa-phone me-2"></i>
+                                    <a href="tel:{{ craftsman.phone|default:craftsman.user.phone_number }}" class="text-decoration-none">
+                                        {{ craftsman.phone|default:craftsman.user.phone_number }}
+                                    </a>
+                                </p>
+                            {% endif %}
+                            {% if craftsman.user.email %}
+                                <p class="mb-2">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    <a href="mailto:{{ craftsman.user.email }}" class="text-decoration-none">{{ craftsman.user.email }}</a>
+                                </p>
+                            {% endif %}
+                            {% if craftsman.user.phone_number %}
+                                <p class="mb-2">
+                                    <i class="fab fa-whatsapp me-2"></i>
+                                    <a href="{{ craftsman.user.get_whatsapp_link }}" target="_blank" class="text-decoration-none">
+                                        WhatsApp
+                                    </a>
+                                </p>
+                            {% endif %}
+                            {% if craftsman.website_url %}
+                                <p class="mb-2">
+                                    <i class="fas fa-globe me-2"></i>
+                                    <a href="{{ craftsman.website_url }}" target="_blank" class="text-decoration-none">Website</a>
+                                </p>
+                            {% endif %}
+                            {% if craftsman.facebook_url %}
+                                <p class="mb-2">
+                                    <i class="fab fa-facebook me-2"></i>
+                                    <a href="{{ craftsman.facebook_url }}" target="_blank" class="text-decoration-none">Facebook</a>
+                                </p>
+                            {% endif %}
+                            {% if craftsman.instagram_url %}
+                                <p class="mb-2">
+                                    <i class="fab fa-instagram me-2"></i>
+                                    <a href="{{ craftsman.instagram_url }}" target="_blank" class="text-decoration-none">Instagram</a>
+                                </p>
+                            {% endif %}
+                            {% if craftsman.city and craftsman.county %}
+                                <p class="mb-0">
+                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                    {{ craftsman.city.name }}, {{ craftsman.county.name }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <!-- Alert for unauthenticated users -->
+                        <div class="alert text-center mb-0" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 2px solid #8B5CF6;">
+                            <div class="mb-3">
+                                <i class="fas fa-lock fa-3x mb-3" style="color: #8B5CF6;"></i>
+                                <h6 class="fw-bold mb-2" style="color: #5b21b6;">Creează un cont pentru a vedea datele de contact</h6>
+                                <p class="small mb-3" style="color: #6b21a8;">
+                                    Pentru a proteja meșterii de spam, datele de contact sunt disponibile doar pentru clienți înregistrați.
+                                </p>
+                            </div>
+                            <a href="{% url 'auth:register' %}?type=client&next={{ request.get_full_path }}"
+                               class="btn btn-lg text-white fw-bold w-100 mb-3"
+                               style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); border: none; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);">
+                                <i class="fas fa-user-plus me-2"></i>Creează cont gratuit
+                            </a>
+                            <div class="mt-2">
+                                <small style="color: #6b21a8;">
+                                    Ai deja cont? <a href="{% url 'auth:login' %}?next={{ request.get_full_path }}" class="fw-bold" style="color: #8B5CF6; text-decoration: none;">Autentifică-te</a>
+                                </small>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -426,10 +473,18 @@
 <script src="{% static 'js/lightbox.js' %}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize lightbox for portfolio images
     BricliLightbox.init('.portfolio-image', {
         title: 'Portfolio',
         showCaption: true,
         initGuardKey: 'portfolioLightboxInit'
+    });
+
+    // Initialize lightbox for review images
+    BricliLightbox.init('.review-thumbnail-profile', {
+        title: 'Imagini Recenzii',
+        showCaption: true,
+        initGuardKey: 'reviewImagesProfileInit'
     });
 
     // Load More Reviews Functionality
@@ -482,10 +537,22 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                     <span class="badge bg-success">Verificat</span>
                                 </div>
-                                ${review.comment ? `<p class="mb-0">${escapeHtml(review.comment)}</p>` : ''}
+                                ${review.comment ? `<p class="mb-3">${escapeHtml(review.comment)}</p>` : ''}
+                                ${generateReviewImages(review)}
                             </div>
                         `;
                         reviewsContainer.insertAdjacentHTML('beforeend', reviewHtml);
+
+                        // Re-initialize lightbox for newly added images
+                        if (review.images && review.images.length > 0) {
+                            setTimeout(() => {
+                                BricliLightbox.init('.review-thumbnail-profile', {
+                                    title: 'Imagini Recenzii',
+                                    showCaption: true,
+                                    initGuardKey: 'reviewImagesProfileInit'
+                                });
+                            }, 100);
+                        }
                     });
 
                     // Update offset and remaining count
@@ -532,6 +599,43 @@ document.addEventListener('DOMContentLoaded', function() {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    // Helper function to generate review images HTML
+    function generateReviewImages(review) {
+        if (!review.images || review.images.length === 0) {
+            return '';
+        }
+
+        let imagesHtml = `
+            <div class="review-images-grid mt-3">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-images me-2" style="color: #8B5CF6;"></i>
+                    <small class="text-muted">${review.images_count} ${review.images_count === 1 ? 'imagine' : 'imagini'}</small>
+                </div>
+                <div class="row g-2">
+        `;
+
+        review.images.forEach((image, index) => {
+            imagesHtml += `
+                <div class="col-4 col-sm-3 col-md-2">
+                    <img src="${image.url}"
+                         alt="Review image ${index + 1}"
+                         class="img-fluid rounded shadow-sm review-thumbnail-profile"
+                         style="height: 80px; width: 100%; object-fit: cover; cursor: pointer; transition: all 0.3s ease;"
+                         onmouseover="this.style.transform='scale(1.05)'"
+                         onmouseout="this.style.transform='scale(1)'"
+                         data-title="${escapeHtml(image.description)}">
+                </div>
+            `;
+        });
+
+        imagesHtml += `
+                </div>
+            </div>
+        `;
+
+        return imagesHtml;
     }
 });
 </script>

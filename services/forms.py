@@ -182,49 +182,75 @@ class ReviewImageForm(forms.ModelForm):
 
 
 class MultipleReviewImageForm(forms.Form):
-    """Form for uploading multiple review images"""
+    """Form for uploading multiple review images (max 5)"""
 
-    image1 = forms.ImageField(required=False, label="Imagine 1")
-    image2 = forms.ImageField(required=False, label="Imagine 2")
-    image3 = forms.ImageField(required=False, label="Imagine 3")
-    image4 = forms.ImageField(required=False, label="Imagine 4")
-    image5 = forms.ImageField(required=False, label="Imagine 5")
+    # Note: We don't use a FileField here because Django's FileInput doesn't support multiple files
+    # Instead, we process files directly from request.FILES in the view
+    # This form is used only for validation
 
     def __init__(self, *args, **kwargs):
+        self.max_images = kwargs.pop('max_images', 5)
+        self.existing_images_count = kwargs.pop('existing_images_count', 0)
+        # Store files for validation
+        self.uploaded_files = kwargs.pop('files', None)
         super().__init__(*args, **kwargs)
-        for field_name in ["image1", "image2", "image3", "image4", "image5"]:
-            self.fields[field_name].widget.attrs.update({"class": "form-control", "accept": "image/*"})
 
     def clean(self):
-        """Validate and optimize all uploaded images"""
+        """Validate all uploaded images"""
         from accounts.utils import optimize_review_image
 
         cleaned_data = super().clean()
 
-        for field_name in ["image1", "image2", "image3", "image4", "image5"]:
-            image = cleaned_data.get(field_name)
-            if image:
-                # Check file size (max 10MB)
-                if image.size > 10 * 1024 * 1024:
-                    raise forms.ValidationError(f"{field_name}: Imaginea este prea mare. Dimensiunea maximă este 10MB.")
+        if not self.uploaded_files:
+            return cleaned_data
 
-                # Check file type
-                if not image.content_type.startswith("image/"):
-                    raise forms.ValidationError(f"{field_name}: Fișierul trebuie să fie o imagine.")
+        images = self.uploaded_files.getlist('images')
 
-                # Optimize the image
-                cleaned_data[field_name] = optimize_review_image(image)
+        # Check maximum number of images
+        if len(images) > self.max_images:
+            raise forms.ValidationError(
+                f"Poți încărca maximum {self.max_images} imagini. Ai selectat {len(images)}."
+            )
 
+        # Check total images including existing ones
+        total_images = len(images) + self.existing_images_count
+        if total_images > self.max_images:
+            remaining = self.max_images - self.existing_images_count
+            raise forms.ValidationError(
+                f"Poți adăuga maximum {remaining} imagini noi (ai deja {self.existing_images_count})."
+            )
+
+        # Validate each image
+        optimized_images = []
+        for idx, image in enumerate(images, start=1):
+            # Check file size (max 5MB)
+            if image.size > 5 * 1024 * 1024:
+                raise forms.ValidationError(
+                    f"Imaginea #{idx} este prea mare. Dimensiunea maximă este 5MB. "
+                    f"Dimensiunea ta: {image.size / (1024 * 1024):.1f}MB"
+                )
+
+            # Check file type
+            if not image.content_type.startswith("image/"):
+                raise forms.ValidationError(
+                    f"Fișierul #{idx} nu este o imagine validă. Tip: {image.content_type}"
+                )
+
+            # Optimize the image
+            try:
+                optimized_image = optimize_review_image(image)
+                optimized_images.append(optimized_image)
+            except Exception as e:
+                raise forms.ValidationError(
+                    f"Eroare la procesarea imaginii #{idx}: {str(e)}"
+                )
+
+        cleaned_data['images'] = optimized_images
         return cleaned_data
 
     def get_images(self):
-        """Return list of uploaded images"""
-        images = []
-        for field_name in ["image1", "image2", "image3", "image4", "image5"]:
-            image = self.cleaned_data.get(field_name)
-            if image:
-                images.append(image)
-        return images
+        """Return list of uploaded and optimized images"""
+        return self.cleaned_data.get('images', [])
 
 
 class QuoteForm(forms.ModelForm):

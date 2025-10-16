@@ -209,7 +209,7 @@
                                 <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}" class="btn-view-profile text-decoration-none">
                                     <i class="fas fa-eye me-2"></i>Vezi profil complet
                                 </a>
-                                {% if user.is_authenticated and user != craftsman.user %}
+                                {% if user.is_authenticated and user != craftsman.user and user.user_type != 'craftsman' %}
                                 <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#contactForm" class="btn-message text-decoration-none">
                                     <i class="fas fa-comment me-2"></i>Mesaj
                                 </a>

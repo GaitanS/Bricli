@@ -2,7 +2,7 @@
 {# Sort and pagination controls bar (above results grid) #}
 <div class="row align-items-center mb-3 g-2">
     {# Left: Sort dropdown #}
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-6">
         <form method="GET" action="{% url 'core:search' %}" id="sortForm">
             {# Preserve all current filters #}
             <input type="hidden" name="q" value="{{ query }}">
@@ -10,7 +10,6 @@
             {% if active_category %}<input type="hidden" name="category" value="{{ active_category.slug }}">{% endif %}
             {% if rating_min %}<input type="hidden" name="rating" value="{{ rating_min }}">{% endif %}
             {% if per_page %}<input type="hidden" name="per_page" value="{{ per_page }}">{% endif %}
-            {% if view_mode %}<input type="hidden" name="view" value="{{ view_mode }}">{% endif %}
 
             <div class="input-group input-group-sm">
                 <label class="input-group-text" for="sortSelect">
@@ -34,8 +33,8 @@
         </form>
     </div>
 
-    {# Center: Per-page dropdown #}
-    <div class="col-12 col-md-4">
+    {# Right: Per-page dropdown #}
+    <div class="col-12 col-md-6">
         <form method="GET" action="{% url 'core:search' %}" id="perPageForm">
             {# Preserve all current filters #}
             <input type="hidden" name="q" value="{{ query }}">
@@ -43,7 +42,6 @@
             {% if active_category %}<input type="hidden" name="category" value="{{ active_category.slug }}">{% endif %}
             {% if rating_min %}<input type="hidden" name="rating" value="{{ rating_min }}">{% endif %}
             {% if sort_by %}<input type="hidden" name="sort" value="{{ sort_by }}">{% endif %}
-            {% if view_mode %}<input type="hidden" name="view" value="{{ view_mode }}">{% endif %}
 
             <div class="input-group input-group-sm">
                 <label class="input-group-text" for="perPageSelect">
@@ -56,23 +54,5 @@
                 </select>
             </div>
         </form>
-    </div>
-
-    {# Right: View toggle buttons (list/grid) #}
-    <div class="col-12 col-md-4 text-md-end">
-        <div class="btn-group btn-group-sm" role="group" aria-label="View toggle">
-            <a href="?{% querystring view='list' %}"
-               class="btn btn-outline-secondary {% if view_mode == 'list' %}active{% endif %}"
-               title="Vizualizare listă">
-                <i class="fas fa-list"></i>
-                <span class="d-none d-sm-inline ms-1">Listă</span>
-            </a>
-            <a href="?{% querystring view='grid' %}"
-               class="btn btn-outline-secondary {% if view_mode == 'grid' or not view_mode %}active{% endif %}"
-               title="Vizualizare grilă">
-                <i class="fas fa-th"></i>
-                <span class="d-none d-sm-inline ms-1">Grilă</span>
-            </a>
-        </div>
     </div>
 </div>

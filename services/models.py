@@ -238,21 +238,22 @@ def notify_quote_rejected(quote):
 
 
 def notify_order_request(order, craftsman):
-    """Notify craftsman about new order request (direct invitation) using NotificationService"""
+    """Notify craftsman about new personal/direct order request using NotificationService"""
     return NotificationService().create_notification(
         recipient=craftsman.user,
-        notification_type="new_order",
-        title="Solicitare nouă de ofertă",
+        notification_type="personal_order",
+        title="Solicitare personală de ofertă",
         message=(
-            f'Ai primit o solicitare de ofertă pentru "{order.title}" în '
-            f"{order.city.name}, {order.county.name}. Clientul așteaptă oferta ta!"
+            f'Ai primit o solicitare personală de ofertă pentru "{order.title}" în '
+            f"{order.city.name}, {order.county.name}. Clientul {order.client.get_full_name() or order.client.username} "
+            "te-a ales special pentru această lucrare!"
         ),
         priority="high",
         sender=order.client,
         action_url=f"/services/order/{order.id}/",
         related_object_type="order",
         related_object_id=order.id,
-        data={"order_id": order.id, "invited_craftsman_id": craftsman.user.id},
+        data={"order_id": order.id, "is_personal_request": True, "invited_craftsman_id": craftsman.user.id},
     )
 
 

@@ -128,12 +128,32 @@ document.addEventListener('DOMContentLoaded', function() {
 {% block content %}
 <div class="container mt-4">
     <h1>{{ order.title }}</h1>
-    
+
+    <!-- Mesaj pentru client când a trimis solicitare personală -->
+    {% if user == order.client and order.assigned_craftsman and order.status in 'draft,published' %}
+    <div class="alert alert-info mb-3">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Solicitare personală</strong> trimisă către
+        <a href="{% url 'accounts:craftsman_detail' order.assigned_craftsman.pk %}" class="alert-link">
+            {{ order.assigned_craftsman.display_name|default:order.assigned_craftsman.user.get_full_name }}
+        </a>.
+        Doar acest meșter poate vedea și oferta pentru această comandă.
+    </div>
+    {% endif %}
+
     <div class="row">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <h5>Detalii Comandă</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Detalii Comandă</h5>
+                        <!-- Badge pentru solicitare personală -->
+                        {% if order.assigned_craftsman and order.status in 'draft,published' %}
+                        <span class="badge" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); font-size: 0.9rem; padding: 0.5rem 1rem;">
+                            <i class="fas fa-user-check me-1"></i>Solicitare Personală
+                        </span>
+                        {% endif %}
+                    </div>
                     <p><strong>Descriere:</strong> {{ order.description }}</p>
                     <p><strong>Status:</strong>
                         <span class="badge
@@ -175,18 +195,41 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Data preferată:</strong> {{ order.preferred_date|date:"d.m.Y" }}</p>
                     {% endif %}
 
-                    {% if user.user_type == 'craftsman' and invitation %}
-                    <div class="mt-3">
-                        {% if invitation.status == 'pending' %}
-                            <div class="alert alert-primary">
-                                <i class="fas fa-handshake me-2"></i>Ai fost invitat de client să ofertezi pentru această lucrare.
+                    {% if user.user_type == 'craftsman' %}
+                        {% if order.assigned_craftsman == user.craftsman_profile and order.status in 'draft,published' %}
+                            <!-- Alert pentru solicitare personală -->
+                            <div class="mt-3">
+                                <div class="alert" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border-left: 4px solid #8B5CF6; border: none;">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-star fa-2x me-3" style="color: #8B5CF6;"></i>
+                                        <div>
+                                            <h6 class="fw-bold mb-2" style="color: #5b21b6;">
+                                                Solicitare Personală de Ofertă
+                                            </h6>
+                                            <p class="mb-2" style="color: #6b21a8;">
+                                                Clientul <strong>{{ order.client.get_full_name|default:order.client.username }}</strong>
+                                                te-a ales special pentru această lucrare. Această comandă este vizibilă doar pentru tine.
+                                            </p>
+                                            <small class="text-muted">
+                                                <i class="fas fa-lock me-1"></i>Comandă privată - nu apare în lista publică
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        {% elif invitation.status == 'accepted' %}
-                            <div class="alert alert-success">
-                                <i class="fas fa-check-circle me-2"></i>Invitația este acceptată. Trimite oferta ta!
+                        {% elif invitation %}
+                            <div class="mt-3">
+                                {% if invitation.status == 'pending' %}
+                                    <div class="alert alert-primary">
+                                        <i class="fas fa-handshake me-2"></i>Ai fost invitat de client să ofertezi pentru această lucrare publică.
+                                    </div>
+                                {% elif invitation.status == 'accepted' %}
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-check-circle me-2"></i>Invitația este acceptată. Trimite oferta ta!
+                                    </div>
+                                {% endif %}
                             </div>
                         {% endif %}
-                    </div>
                     {% endif %}
                     
                     {% if order.budget_min or order.budget_max %}
@@ -297,12 +340,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         {% endif %}
                     {% endif %}
 
-                    <!-- Craftsman: Order completed - thank you message -->
+                    <!-- Craftsman: Order completed - show disabled button -->
                     {% if user.user_type == 'craftsman' and order.assigned_craftsman == user.craftsman_profile and order.status == 'completed' %}
-                    <div class="alert alert-success">
-                        <h6><i class="fas fa-check-circle me-2"></i>Comandă finalizată</h6>
-                        <p class="mb-0">Felicitări! Ai finalizat această comandă. Clientul a fost notificat și poate să lase o recenzie.</p>
-                    </div>
+                    <button class="btn btn-secondary w-100" disabled title="Comanda a fost finalizată">
+                        <i class="fas fa-lock me-2"></i>Comandă finalizată
+                    </button>
+
+                    <small class="text-muted d-block mt-2">
+                        <i class="fas fa-info-circle me-1"></i>Comanda a fost finalizată. Clientul poate lăsa o recenzie.
+                    </small>
                     {% endif %}
                 </div>
             </div>
@@ -647,88 +693,99 @@ document.addEventListener('DOMContentLoaded', function() {
             {% elif user.user_type == 'craftsman' and quote_disabled_reason %}
             <div class="card mt-3">
                 <div class="card-body">
-                    {% if invitation %}
-                        {% if invitation.status == 'pending' %}
-                            <div class="alert alert-info alert-permanent">
-                                <h6><i class="fas fa-envelope-open-text me-2"></i>Invitație de la client</h6>
-                                <p class="mb-2">Clientul te-a invitat să ofertezi pentru această lucrare. Acceptă invitația pentru a trimite oferta.</p>
-                                <div class="d-flex gap-2">
-                                    <form method="post" action="{% url 'services:accept_invitation' order.pk %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-check me-2"></i>Acceptă invitația
-                                        </button>
-                                    </form>
-                                    <form method="post" action="{% url 'services:decline_invitation' order.pk %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Sigur vrei să refuzi invitația?')">
-                                            <i class="fas fa-times me-2"></i>Refuză
-                                        </button>
-                                    </form>
-                                </div>
+                    {% if order.status == 'completed' and order.review %}
+                        <!-- Comandă completată cu succes și cu review -->
+                        <div class="alert alert-success mb-0" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; color: white;">
+                            <div class="text-center">
+                                <i class="fas fa-check-circle fa-3x mb-3"></i>
+                                <h5 class="fw-bold mb-2">Comandă închisă cu succes!</h5>
+                                <p class="mb-0">Această comandă a fost finalizată și clientul a lăsat deja o recenzie.</p>
                             </div>
-                        {% elif invitation.status == 'accepted' %}
-                            <div class="alert alert-success">
-                                <i class="fas fa-check-circle me-2"></i>Ai acceptat invitația! Poți trimite oferta.
-                            </div>
-                        {% endif %}
-                    {% endif %}
-                    <button class="btn btn-secondary w-100" disabled title="{{ quote_disabled_reason }}">
-                        <i class="fas fa-lock me-2"></i>Nu poți licita
-                    </button>
-
-                    {% if 'Profil incomplet' in quote_disabled_reason %}
-                    <!-- Profile Completion Progress -->
-                    <div class="mt-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <small class="fw-bold">Completare profil:</small>
-                            <small class="fw-bold text-primary">{{ user.craftsman_profile.profile_completion }}%</small>
                         </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar" role="progressbar"
-                                 style="width: {{ user.craftsman_profile.profile_completion }}%; background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);"
-                                 aria-valuenow="{{ user.craftsman_profile.profile_completion }}"
-                                 aria-valuemin="0"
-                                 aria-valuemax="100"></div>
-                        </div>
-
-                        {% if user.craftsman_profile.profile_completion < 100 %}
-                        <div class="mt-3">
-                            <small class="text-muted d-block mb-2"><strong>Ce mai lipsește:</strong></small>
-                            <ul class="list-unstyled small">
-                                {% if not user.craftsman_profile.display_name %}
-                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Nume afișat (10p)</li>
-                                {% endif %}
-                                {% if not user.craftsman_profile.county or not user.craftsman_profile.city %}
-                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Județ și oraș (10p)</li>
-                                {% endif %}
-                                {% if not user.craftsman_profile.coverage_radius_km or user.craftsman_profile.coverage_radius_km < 5 or user.craftsman_profile.coverage_radius_km > 150 %}
-                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Rază acoperire (10p)</li>
-                                {% endif %}
-                                {% if not user.craftsman_profile.bio or user.craftsman_profile.bio|length < 200 %}
-                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Bio minim 200 caractere (15p)</li>
-                                {% endif %}
-                                {% if not user.craftsman_profile.profile_photo %}
-                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Poză de profil (15p)</li>
-                                {% endif %}
-                                {% if user.craftsman_profile.portfolio_images.count < 3 %}
-                                <li class="mb-1"><i class="fas fa-circle text-warning" style="font-size: 0.5rem;"></i> Portfolio: {{ user.craftsman_profile.portfolio_images.count }}/3 poze (40p)</li>
-                                {% endif %}
-                                {% if not user.craftsman_profile.services.exists %}
-                                <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Minim 1 serviciu (20p)</li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary btn-sm mt-3 w-100">
-                        <i class="fas fa-user-edit me-2"></i>Completează profilul
-                    </a>
                     {% else %}
-                    <small class="text-muted d-block mt-2">
-                        <i class="fas fa-info-circle me-1"></i>{{ quote_disabled_reason }}
-                    </small>
+                        {% if invitation %}
+                            {% if invitation.status == 'pending' %}
+                                <div class="alert alert-info alert-permanent">
+                                    <h6><i class="fas fa-envelope-open-text me-2"></i>Invitație de la client</h6>
+                                    <p class="mb-2">Clientul te-a invitat să ofertezi pentru această lucrare. Acceptă invitația pentru a trimite oferta.</p>
+                                    <div class="d-flex gap-2">
+                                        <form method="post" action="{% url 'services:accept_invitation' order.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-check me-2"></i>Acceptă invitația
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{% url 'services:decline_invitation' order.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Sigur vrei să refuzi invitația?')">
+                                                <i class="fas fa-times me-2"></i>Refuză
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% elif invitation.status == 'accepted' %}
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i>Ai acceptat invitația! Poți trimite oferta.
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        <button class="btn btn-secondary w-100" disabled title="{{ quote_disabled_reason }}">
+                            <i class="fas fa-lock me-2"></i>Nu poți licita
+                        </button>
+
+                        {% if 'Profil incomplet' in quote_disabled_reason %}
+                        <!-- Profile Completion Progress -->
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <small class="fw-bold">Completare profil:</small>
+                                <small class="fw-bold text-primary">{{ user.craftsman_profile.profile_completion }}%</small>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" role="progressbar"
+                                     style="width: {{ user.craftsman_profile.profile_completion }}%; background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);"
+                                     aria-valuenow="{{ user.craftsman_profile.profile_completion }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"></div>
+                            </div>
+
+                            {% if user.craftsman_profile.profile_completion < 100 %}
+                            <div class="mt-3">
+                                <small class="text-muted d-block mb-2"><strong>Ce mai lipsește:</strong></small>
+                                <ul class="list-unstyled small">
+                                    {% if not user.craftsman_profile.display_name %}
+                                    <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Nume afișat (10p)</li>
+                                    {% endif %}
+                                    {% if not user.craftsman_profile.county or not user.craftsman_profile.city %}
+                                    <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Județ și oraș (10p)</li>
+                                    {% endif %}
+                                    {% if not user.craftsman_profile.coverage_radius_km or user.craftsman_profile.coverage_radius_km < 5 or user.craftsman_profile.coverage_radius_km > 150 %}
+                                    <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Rază acoperire (10p)</li>
+                                    {% endif %}
+                                    {% if not user.craftsman_profile.bio or user.craftsman_profile.bio|length < 200 %}
+                                    <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Bio minim 200 caractere (15p)</li>
+                                    {% endif %}
+                                    {% if not user.craftsman_profile.profile_photo %}
+                                    <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Poză de profil (15p)</li>
+                                    {% endif %}
+                                    {% if user.craftsman_profile.portfolio_images.count < 3 %}
+                                    <li class="mb-1"><i class="fas fa-circle text-warning" style="font-size: 0.5rem;"></i> Portfolio: {{ user.craftsman_profile.portfolio_images.count }}/3 poze (40p)</li>
+                                    {% endif %}
+                                    {% if not user.craftsman_profile.services.exists %}
+                                    <li class="mb-1"><i class="fas fa-circle text-danger" style="font-size: 0.5rem;"></i> Minim 1 serviciu (20p)</li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary btn-sm mt-3 w-100">
+                            <i class="fas fa-user-edit me-2"></i>Completează profilul
+                        </a>
+                        {% else %}
+                        <small class="text-muted d-block mt-2">
+                            <i class="fas fa-info-circle me-1"></i>{{ quote_disabled_reason }}
+                        </small>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

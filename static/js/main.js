@@ -32,12 +32,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Auto-hide alerts after 5 seconds
+    // Auto-hide alerts after 5 seconds (except permanent and action alerts)
     setTimeout(function() {
         const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
         alerts.forEach(function(alert) {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
+            // Don't auto-hide alerts with buttons/forms (action alerts)
+            const hasButtons = alert.querySelector('button, form, a.btn');
+            if (!hasButtons) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
         });
     }, 5000);
 

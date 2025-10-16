@@ -246,7 +246,7 @@ class SearchView(ListView):
         category_param = self.request.GET.get("category", "")
         rating_min = self.request.GET.get("rating", "")
         sort_by = self.request.GET.get("sort", "popular")
-        view_mode = self.request.GET.get("view", "grid")
+        # view_mode = self.request.GET.get("view", "grid")  # REMOVED: View toggle eliminated
         per_page = self.get_paginate_by(None)
 
         # Get county object if specified (by id, slug, or name)
@@ -341,7 +341,7 @@ class SearchView(ListView):
                 "rating_min": rating_min,
                 "rating_counts": rating_counts,  # Pass rating bucket counts to template
                 "sort_by": sort_by,  # Current sort option
-                "view_mode": view_mode,  # Current view mode (list/grid)
+                # "view_mode": view_mode,  # REMOVED: View toggle eliminated
                 "per_page": per_page,  # Current per-page setting
                 "counties": County.objects.all().order_by("name"),
                 "total_craftsmen": total_craftsmen,

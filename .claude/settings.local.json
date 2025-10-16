@@ -10,7 +10,8 @@
       "Bash(black:*)",
       "Bash(curl:*)",
       "Bash(python:*)",
-      "Bash(/bashes)"
+      "Bash(/bashes)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
