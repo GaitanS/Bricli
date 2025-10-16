@@ -4,29 +4,41 @@
 {% block title %}Recenzie pentru {{ review.craftsman.user.get_full_name }} - Bricli{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container py-4 py-md-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-12 col-lg-10 col-xl-8">
             <!-- Back Button -->
-            <div class="mb-4">
-                <a href="{% url 'services:order_detail' review.order.pk %}" class="btn btn-outline-secondary">
+            <div class="mb-3 mb-md-4">
+                <a href="{% url 'services:order_detail' review.order.pk %}" class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-arrow-left me-2"></i>Înapoi la comandă
                 </a>
             </div>
 
             <!-- Review Card -->
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h3 class="mb-2" style="color: #8B5CF6;">
+                <!-- Card Header -->
+                <div class="card-header bg-white border-bottom py-3 py-md-4">
+                    <div class="row align-items-center g-3">
+                        <!-- Left: Title and Info -->
+                        <div class="col-12 col-md-6">
+                            <h3 class="mb-2 h4 h3-md" style="color: #8B5CF6;">
                                 <i class="fas fa-star me-2"></i>Recenzie
                             </h3>
-                            <p class="text-muted mb-0">Publicată {{ review.created_at|timesince }} în urmă</p>
+                            <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-3 text-muted small">
+                                <span>
+                                    <i class="fas fa-user me-1"></i>
+                                    {{ review.client.get_full_name|default:review.client.username }}
+                                </span>
+                                <span>
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ review.created_at|date:"d M Y" }}
+                                </span>
+                            </div>
                         </div>
-                        <div class="text-end">
-                            <!-- Overall Rating Stars -->
-                            <div class="mb-1">
+
+                        <!-- Right: Rating -->
+                        <div class="col-12 col-md-6 text-start text-md-end">
+                            <div class="mb-2">
                                 {% for i in "12345" %}
                                     {% if forloop.counter <= review.rating %}
                                         <i class="fas fa-star" style="color: #FFC107; font-size: 1.5rem;"></i>
@@ -35,28 +47,34 @@
                                     {% endif %}
                                 {% endfor %}
                             </div>
-                            <small class="text-muted">{{ review.rating }}/5</small>
+                            <div class="badge bg-warning text-dark fs-6">{{ review.rating }}.0/5.0</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card-body">
-                    <!-- Order Info -->
-                    <div class="alert alert-light mb-4">
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <h6 class="mb-1">
-                                    <i class="fas fa-clipboard-list me-2 text-primary"></i>
-                                    {{ review.order.title }}
-                                </h6>
-                                <small class="text-muted">Comandă finalizată</small>
+                <div class="card-body p-3 p-md-4">
+                    <!-- Craftsman and Order Info Banner -->
+                    <div class="alert alert-light border mb-4">
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-hard-hat text-primary fs-4 me-3"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Meșter</small>
+                                        <strong>{{ review.craftsman.user.get_full_name|default:review.craftsman.user.username }}</strong>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <h6 class="mb-1">
-                                    <i class="fas fa-user-hard-hat me-2 text-success"></i>
-                                    {{ review.craftsman.user.get_full_name|default:review.craftsman.user.username }}
-                                </h6>
-                                <small class="text-muted">Meșter</small>
+                            <div class="col-12 col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-clipboard-list text-success fs-4 me-3"></i>
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">Comandă</small>
+                                        <strong class="d-block text-truncate" style="max-width: 250px;" title="{{ review.order.title }}">
+                                            {{ review.order.title }}
+                                        </strong>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -64,69 +82,69 @@
                     <!-- Detailed Ratings -->
                     {% if review.quality_rating or review.punctuality_rating or review.communication_rating %}
                     <div class="mb-4">
-                        <h5 class="mb-3">
-                            <i class="fas fa-chart-bar me-2"></i>
+                        <h5 class="mb-3 h6 h5-md">
+                            <i class="fas fa-chart-bar me-2" style="color: #8B5CF6;"></i>
                             Evaluări detaliate
                         </h5>
-                        <div class="row">
+                        <div class="row g-3">
                             {% if review.quality_rating %}
-                            <div class="col-md-4 mb-3">
-                                <div class="p-3 bg-light rounded">
-                                    <h6 class="mb-2">
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <div class="p-3 bg-light rounded h-100">
+                                    <div class="d-flex align-items-center mb-2">
                                         <i class="fas fa-check-circle me-2 text-primary"></i>
-                                        Calitate
-                                    </h6>
+                                        <h6 class="mb-0 small">Calitate</h6>
+                                    </div>
                                     <div class="d-flex align-items-center">
                                         {% for i in "12345" %}
                                             {% if forloop.counter <= review.quality_rating %}
-                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning small"></i>
                                             {% else %}
-                                                <i class="far fa-star text-muted"></i>
+                                                <i class="far fa-star text-muted small"></i>
                                             {% endif %}
                                         {% endfor %}
-                                        <span class="ms-2 fw-bold">{{ review.quality_rating }}/5</span>
+                                        <span class="ms-2 fw-bold small">{{ review.quality_rating }}/5</span>
                                     </div>
                                 </div>
                             </div>
                             {% endif %}
 
                             {% if review.punctuality_rating %}
-                            <div class="col-md-4 mb-3">
-                                <div class="p-3 bg-light rounded">
-                                    <h6 class="mb-2">
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <div class="p-3 bg-light rounded h-100">
+                                    <div class="d-flex align-items-center mb-2">
                                         <i class="fas fa-clock me-2 text-info"></i>
-                                        Punctualitate
-                                    </h6>
+                                        <h6 class="mb-0 small">Punctualitate</h6>
+                                    </div>
                                     <div class="d-flex align-items-center">
                                         {% for i in "12345" %}
                                             {% if forloop.counter <= review.punctuality_rating %}
-                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning small"></i>
                                             {% else %}
-                                                <i class="far fa-star text-muted"></i>
+                                                <i class="far fa-star text-muted small"></i>
                                             {% endif %}
                                         {% endfor %}
-                                        <span class="ms-2 fw-bold">{{ review.punctuality_rating }}/5</span>
+                                        <span class="ms-2 fw-bold small">{{ review.punctuality_rating }}/5</span>
                                     </div>
                                 </div>
                             </div>
                             {% endif %}
 
                             {% if review.communication_rating %}
-                            <div class="col-md-4 mb-3">
-                                <div class="p-3 bg-light rounded">
-                                    <h6 class="mb-2">
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <div class="p-3 bg-light rounded h-100">
+                                    <div class="d-flex align-items-center mb-2">
                                         <i class="fas fa-comments me-2 text-success"></i>
-                                        Comunicare
-                                    </h6>
+                                        <h6 class="mb-0 small">Comunicare</h6>
+                                    </div>
                                     <div class="d-flex align-items-center">
                                         {% for i in "12345" %}
                                             {% if forloop.counter <= review.communication_rating %}
-                                                <i class="fas fa-star text-warning"></i>
+                                                <i class="fas fa-star text-warning small"></i>
                                             {% else %}
-                                                <i class="far fa-star text-muted"></i>
+                                                <i class="far fa-star text-muted small"></i>
                                             {% endif %}
                                         {% endfor %}
-                                        <span class="ms-2 fw-bold">{{ review.communication_rating }}/5</span>
+                                        <span class="ms-2 fw-bold small">{{ review.communication_rating }}/5</span>
                                     </div>
                                 </div>
                             </div>
@@ -138,12 +156,12 @@
                     <!-- Comment -->
                     {% if review.comment %}
                     <div class="mb-4">
-                        <h5 class="mb-3">
-                            <i class="fas fa-comment-alt me-2"></i>
+                        <h5 class="mb-3 h6 h5-md">
+                            <i class="fas fa-comment-alt me-2" style="color: #8B5CF6;"></i>
                             Comentariu
                         </h5>
                         <div class="p-3 bg-light rounded">
-                            <p class="mb-0" style="white-space: pre-wrap;">{{ review.comment }}</p>
+                            <p class="mb-0" style="white-space: pre-wrap; word-wrap: break-word;">{{ review.comment }}</p>
                         </div>
                     </div>
                     {% endif %}
@@ -151,25 +169,25 @@
                     <!-- Review Images -->
                     {% if review_images %}
                     <div class="mb-4">
-                        <h5 class="mb-3">
-                            <i class="fas fa-images me-2"></i>
+                        <h5 class="mb-3 h6 h5-md">
+                            <i class="fas fa-images me-2" style="color: #8B5CF6;"></i>
                             Imagini ({{ review_images.count }})
                         </h5>
-                        <div class="row g-3">
+                        <div class="row g-2 g-md-3">
                             {% for image in review_images %}
-                            <div class="col-md-4 col-sm-6">
+                            <div class="col-6 col-sm-4 col-md-3">
                                 <div class="position-relative">
                                     <img src="{{ image.image.url }}"
                                          alt="Review image"
                                          class="img-fluid rounded shadow-sm review-image-thumbnail"
-                                         style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;"
+                                         style="width: 100%; height: 150px; object-fit: cover; cursor: pointer;"
                                          data-image-index="{{ forloop.counter0 }}">
                                     <div class="position-absolute top-0 end-0 m-2">
-                                        <span class="badge bg-dark bg-opacity-75">{{ forloop.counter }}/{{ review_images.count }}</span>
+                                        <span class="badge bg-dark bg-opacity-75 small">{{ forloop.counter }}/{{ review_images.count }}</span>
                                     </div>
                                     {% if image.description %}
-                                    <div class="position-absolute bottom-0 start-0 end-0 p-2 bg-dark bg-opacity-75 text-white small">
-                                        {{ image.description }}
+                                    <div class="position-absolute bottom-0 start-0 end-0 p-2 bg-dark bg-opacity-75 text-white" style="font-size: 0.75rem;">
+                                        {{ image.description|truncatewords:5 }}
                                     </div>
                                     {% endif %}
                                 </div>
@@ -178,33 +196,24 @@
                         </div>
                     </div>
                     {% endif %}
-
-                    <!-- Client Info -->
-                    <div class="border-top pt-4 mt-4">
-                        <div class="d-flex align-items-center">
-                            <div class="me-3">
-                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                                     style="width: 50px; height: 50px; font-size: 1.5rem;">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <h6 class="mb-1">{{ review.client.get_full_name|default:review.client.username }}</h6>
-                                <small class="text-muted">Client</small>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Card Footer -->
-                <div class="card-footer bg-white border-top">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="{% url 'accounts:craftsman_detail' slug=review.craftsman.slug %}" class="btn btn-outline-primary">
-                            <i class="fas fa-user me-2"></i>Vezi profilul meșterului
+                <div class="card-footer bg-white border-top p-3 p-md-4">
+                    <div class="d-flex flex-column flex-sm-row gap-2 justify-content-between align-items-stretch align-items-sm-center">
+                        <a href="{% url 'accounts:craftsman_detail' slug=review.craftsman.slug %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-user me-2"></i>Vezi profil meșter
                         </a>
-                        <a href="{% url 'services:order_detail' review.order.pk %}" class="btn btn-outline-secondary">
-                            <i class="fas fa-clipboard-list me-2"></i>Vezi comanda
-                        </a>
+                        <div class="d-flex gap-2">
+                            {% if user == review.client %}
+                            <a href="{% url 'services:edit_review' review.pk %}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit me-2"></i>Editează recenzia
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'services:order_detail' review.order.pk %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-clipboard-list me-2"></i>Vezi comandă
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

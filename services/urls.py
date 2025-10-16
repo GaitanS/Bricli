@@ -18,9 +18,11 @@ urlpatterns = [
     path("oferta/<int:pk>/refuzare/", views.RejectQuoteView.as_view(), name="reject_quote"),
     path("comanda/<int:pk>/confirmare/", views.ConfirmOrderView.as_view(), name="confirm_order"),
     path("comanda/<int:pk>/refuzare/", views.DeclineOrderView.as_view(), name="decline_order"),
+    path("comanda/<int:pk>/finalizare/", views.CompleteOrderView.as_view(), name="complete_order"),
     path("comanda/<int:order_pk>/oferta/", views.CreateQuoteView.as_view(), name="create_quote"),
     path("comanda/<int:pk>/recenzie/", views.CreateReviewView.as_view(), name="create_review"),
     path("recenzie/<int:pk>/", views.ReviewDetailView.as_view(), name="review_detail"),
+    path("recenzie/<int:pk>/editare/", views.EditReviewView.as_view(), name="edit_review"),
     path("mester/<int:pk>/recenzii/", views.CraftsmanReviewsView.as_view(), name="craftsman_reviews"),
     path(
         "recenzie/<int:review_pk>/incarcare-imagine/", views.ReviewImageUploadView.as_view(), name="upload_review_image"

@@ -774,6 +774,67 @@ class ReviewDetailView(DetailView):
         return context
 
 
+class EditReviewView(LoginRequiredMixin, UpdateView):
+    """View for clients to edit their reviews"""
+
+    model = Review
+    form_class = ReviewForm
+    template_name = "services/create_review.html"  # Reuse create template
+
+    def dispatch(self, request, *args, **kwargs):
+        review = self.get_object()
+
+        # Check if user is the review owner
+        if review.client != request.user:
+            messages.error(request, "Nu poți edita această recenzie.")
+            return redirect("services:review_detail", pk=review.pk)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["order"] = self.object.order
+        context["image_form"] = MultipleReviewImageForm()
+        context["is_edit"] = True  # Flag to change template text
+        context["existing_images"] = self.object.images.all()
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        # Handle new image uploads
+        image_form = MultipleReviewImageForm(self.request.POST, self.request.FILES)
+        if image_form.is_valid():
+            images = image_form.get_images()
+            for i, image in enumerate(images):
+                ReviewImage.objects.create(
+                    review=self.object, image=image, description=f"Imagine {len(self.object.images.all()) + i + 1}"
+                )
+
+        # Update craftsman ratings
+        self._update_craftsman_ratings()
+
+        messages.success(self.request, "Recenzia a fost actualizată cu succes!")
+        return response
+
+    def _update_craftsman_ratings(self):
+        """Update craftsman's average rating and review count"""
+        craftsman = self.object.craftsman
+        reviews = Review.objects.filter(craftsman=craftsman)
+
+        # Calculate new averages
+        avg_rating = reviews.aggregate(Avg("rating"))["rating__avg"] or 0
+        total_reviews = reviews.count()
+
+        # Update craftsman profile
+        craftsman.average_rating = round(avg_rating, 2)
+        craftsman.total_reviews = total_reviews
+        craftsman.save()
+
+    def get_success_url(self):
+        return reverse_lazy("services:review_detail", kwargs={"pk": self.object.pk})
+
+
 class CraftsmanReviewsView(ListView):
     """View for displaying all reviews for a craftsman"""
 
