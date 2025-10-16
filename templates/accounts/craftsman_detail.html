@@ -1,34 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load lazy_loading %}
 
 {% block title %}{{ craftsman.display_name }} - Meșter {{ craftsman.services.first.service.category.name|default:"Profesionist" }} - Bricli{% endblock %}
 
 {% block content %}
-<!-- Preview Mode Alert -->
-{% if request.GET.preview %}
-<div class="alert alert-info alert-dismissible fade show m-0" role="alert" style="border-radius: 0; border: none; background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white;">
-    <div class="container">
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-eye me-3"></i>
-                <div>
-                    <strong>Mod previzualizare</strong><br>
-                    <small>Așa îți văd clienții profilul pe platformă</small>
-                </div>
-            </div>
-            <div>
-                <a href="{% url 'services:craftsman_services' %}" class="btn btn-light btn-sm me-2">
-                    <i class="fas fa-arrow-left me-1"></i>Înapoi la servicii
-                </a>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    </div>
-</div>
-
-{% lazy_loading_scripts %}
-{% endif %}
-
 <div class="container-fluid py-5" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
     <!-- Hero Section -->
     <div class="row align-items-center mb-5">
@@ -44,7 +20,7 @@
         </div>
         <div class="col-md-6">
             <h1 class="h2 fw-bold mb-2" style="color: #1e293b;">
-                <i class="fas fa-user-circle me-2"></i>{{ craftsman.display_name }}
+                {{ craftsman.display_name }}
             </h1>
             <p class="text-muted mb-3">
                 <i class="fas fa-tools me-2"></i>
@@ -104,14 +80,8 @@
             <!-- Contact Actions -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
-                    {% if request.GET.preview %}
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Mod previzualizare</strong><br>
-                        <small>În mod normal, clienții ar vedea aici butoanele de contact și solicitare ofertă.</small>
-                    </div>
-                    {% elif user == craftsman.user %}
-                    <div class="alert alert-info mb-3">
+                    {% if user == craftsman.user %}
+                    <div class="alert alert-info alert-permanent mb-3">
                         <i class="fas fa-info-circle me-2"></i>
                         <strong>Acesta este profilul tău</strong><br>
                         <small>Așa îți văd clienții profilul pe platformă.</small>
@@ -123,10 +93,10 @@
                         <small>Trebuie să te <a href="{% url 'auth:login' %}?next={{ request.get_full_path }}" class="alert-link">autentifici</a> sau să îți <a href="{% url 'auth:register' %}" class="alert-link">creezi un cont</a>.</small>
                     </div>
                     {% elif user.is_authenticated and user.user_type == 'craftsman' and user != craftsman.user %}
-                    <div class="alert alert-warning mb-3">
+                    <div class="alert alert-warning alert-permanent mb-3">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>Funcționalitate în dezvoltare</strong><br>
-                        <small>Comunicarea între meșteri va fi disponibilă în curând. Momentan, doar clienții pot contacta meșterii.</small>
+                        <strong>Nu se pot trimite mesaje între meșteri</strong><br>
+                        <small>Doar clienții pot contacta meșterii prin platformă.</small>
                     </div>
                     {% endif %}
                     
@@ -237,102 +207,6 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Lightbox Modal for portfolio images -->
-                    <div class="modal fade" id="portfolioLightbox" tabindex="-1" aria-labelledby="lightboxTitle" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-xl">
-                            <div class="modal-content bg-dark">
-                                <div class="modal-header border-0">
-                                    <h5 id="lightboxTitle" class="visually-hidden">Portofoliu</h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Închide"></button>
-                                </div>
-                                <div class="modal-body p-0 position-relative">
-                                    <img id="lightboxImage" src="" alt="" class="img-fluid w-100" style="max-height: 80vh; object-fit: contain;" />
-                                    <div class="position-absolute bottom-0 start-0 end-0 p-2 d-flex justify-content-between align-items-center text-white" style="background: rgba(0,0,0,0.4);">
-                                        <div id="lightboxCaption" class="small"></div>
-                                        <div id="lightboxCounter" class="small"></div>
-                                    </div>
-                                    <button type="button" id="prevBtn" class="btn btn-dark position-absolute top-50 start-0 translate-middle-y" style="opacity: 0.7;" aria-label="Imagine precedentă">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </button>
-                                    <button type="button" id="nextBtn" class="btn btn-dark position-absolute top-50 end-0 translate-middle-y" style="opacity: 0.7;" aria-label="Imagine următoare">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <script>
-                        (function() {
-                            const images = Array.from(document.querySelectorAll('.portfolio-image'));
-                            const lightbox = document.getElementById('portfolioLightbox');
-                            const lightboxImage = document.getElementById('lightboxImage');
-                            const prevBtn = document.getElementById('prevBtn');
-                            const nextBtn = document.getElementById('nextBtn');
-                            const captionEl = document.getElementById('lightboxCaption');
-                            const counterEl = document.getElementById('lightboxCounter');
-                            let currentIndex = 0;
-                            let modal = null;
-
-                            function updateImage(index) {
-                                // Update image content without showing/hiding modal
-                                if (index < 0) index = images.length - 1;
-                                if (index >= images.length) index = 0;
-                                currentIndex = index;
-                                const img = images[currentIndex];
-                                lightboxImage.src = img.getAttribute('src');
-                                lightboxImage.alt = img.getAttribute('alt') || '';
-                                captionEl.textContent = lightboxImage.alt || '';
-                                counterEl.textContent = `${currentIndex + 1} / ${images.length}`;
-                            }
-
-                            function openLightbox(index) {
-                                // Open modal and show specific image
-                                updateImage(index);
-                                if (!modal) {
-                                    modal = new bootstrap.Modal(lightbox);
-                                }
-                                modal.show();
-                            }
-
-                            // Click on portfolio image to open lightbox
-                            images.forEach((img, idx) => {
-                                img.addEventListener('click', (e) => {
-                                    e.stopPropagation();
-                                    openLightbox(idx);
-                                });
-                            });
-
-                            // Navigation buttons (only update image, don't re-show modal)
-                            prevBtn.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                updateImage(currentIndex - 1);
-                            });
-                            nextBtn.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                updateImage(currentIndex + 1);
-                            });
-
-                            // Keyboard navigation
-                            document.addEventListener('keydown', (e) => {
-                                const isOpen = lightbox.classList.contains('show');
-                                if (!isOpen) return;
-                                if (e.key === 'ArrowLeft') {
-                                    e.preventDefault();
-                                    updateImage(currentIndex - 1);
-                                }
-                                if (e.key === 'ArrowRight') {
-                                    e.preventDefault();
-                                    updateImage(currentIndex + 1);
-                                }
-                                if (e.key === 'Escape') {
-                                    e.preventDefault();
-                                    modal?.hide();
-                                }
-                            });
-                        })();
-                    </script>
-
                     {% if craftsman.portfolio_images.count > 6 %}
                     <div class="text-center mt-4">
                         <button class="btn btn-outline-primary">
@@ -345,7 +219,7 @@
             {% endif %}
 
             <!-- Reviews -->
-            <div class="card border-0 shadow-sm mb-4">
+            <div class="card border-0 shadow-sm mb-4" id="reviews-section">
                 <div class="card-body p-4">
                     <h5 class="card-title mb-3">
                         <i class="fas fa-star me-2" style="color: #8B5CF6;"></i>Recenzii
@@ -355,39 +229,53 @@
                     </h5>
 
                     {% if craftsman.user.received_reviews.exists %}
-                        {% for review in craftsman.user.received_reviews.all|slice:":3" %}
-                        <div class="border-bottom pb-4 mb-4 last:border-0 last:pb-0 last:mb-0">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
-                                            <i class="fas fa-user text-muted"></i>
+                        <div id="reviews-container">
+                            {% for review in craftsman.user.received_reviews.all|slice:":5" %}
+                            <div class="review-item border-bottom pb-4 mb-4" data-review-id="{{ review.pk }}">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                                                <i class="fas fa-user text-muted"></i>
+                                            </div>
+                                            <div>
+                                                <strong>{{ review.client.get_full_name|default:review.client.username }}</strong>
+                                                <div class="text-muted small">{{ review.created_at|date:"d M Y" }}</div>
+                                            </div>
                                         </div>
                                         <div>
-                                            <strong>{{ review.author.get_full_name|default:review.author.username }}</strong>
-                                            <div class="text-muted small">{{ review.created_at|date:"d M Y" }}</div>
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                    <i class="fas fa-star text-warning"></i>
+                                                {% else %}
+                                                    <i class="far fa-star text-muted"></i>
+                                                {% endif %}
+                                            {% endfor %}
                                         </div>
                                     </div>
-                                    <div>
-                                        {% for i in "12345" %}
-                                            {% if forloop.counter <= review.rating %}
-                                                <i class="fas fa-star text-warning"></i>
-                                            {% else %}
-                                                <i class="far fa-star text-muted"></i>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
+                                    <span class="badge bg-success">Verificat</span>
                                 </div>
-                                <span class="badge bg-success">Verificat</span>
+                                {% if review.comment %}
+                                <p class="mb-0">{{ review.comment }}</p>
+                                {% endif %}
                             </div>
-                            <p class="mb-0">{{ review.comment }}</p>
+                            {% endfor %}
                         </div>
-                        {% empty %}
-                        <div class="text-center text-muted py-4">
-                            <i class="fas fa-comments fa-2x mb-3"></i>
-                            <p>Încă nu există recenzii pentru acest meșter.</p>
+
+                        <!-- Load More Button -->
+                        {% if craftsman.total_reviews > 5 %}
+                        <div class="text-center mt-4" id="load-more-reviews-container">
+                            <button class="btn btn-outline-primary" id="load-more-reviews" data-craftsman-id="{{ craftsman.pk }}" data-offset="5">
+                                <i class="fas fa-plus-circle me-2"></i>Mai multe recenzii
+                                <span id="reviews-remaining" class="badge bg-primary ms-2">{{ craftsman.total_reviews|add:"-5" }}</span>
+                            </button>
+                            <div id="reviews-loading" class="d-none mt-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Se încarcă...</span>
+                                </div>
+                            </div>
                         </div>
-                        {% endfor %}
+                        {% endif %}
                     {% else %}
                         <div class="text-center text-muted py-4">
                             <i class="fas fa-comments fa-2x mb-3"></i>
@@ -530,4 +418,121 @@
         </div>
     </div>
 </div>
+
+<!-- Include Universal Lightbox -->
+{% include "partials/image_lightbox.html" %}
+
+<!-- Initialize Lightbox for Portfolio Images -->
+<script src="{% static 'js/lightbox.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    BricliLightbox.init('.portfolio-image', {
+        title: 'Portfolio',
+        showCaption: true,
+        initGuardKey: 'portfolioLightboxInit'
+    });
+
+    // Load More Reviews Functionality
+    const loadMoreBtn = document.getElementById('load-more-reviews');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', async function() {
+            const craftsmanId = this.dataset.craftsmanId;
+            let offset = parseInt(this.dataset.offset);
+            const reviewsContainer = document.getElementById('reviews-container');
+            const reviewsLoading = document.getElementById('reviews-loading');
+            const reviewsRemaining = document.getElementById('reviews-remaining');
+
+            // Show loading spinner
+            this.classList.add('d-none');
+            reviewsLoading.classList.remove('d-none');
+
+            try {
+                const response = await fetch(`/accounts/craftsman/${craftsmanId}/reviews/?offset=${offset}&limit=10`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+
+                // Append new reviews
+                if (data.reviews && data.reviews.length > 0) {
+                    data.reviews.forEach(review => {
+                        const reviewHtml = `
+                            <div class="review-item border-bottom pb-4 mb-4" data-review-id="${review.id}">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                                                <i class="fas fa-user text-muted"></i>
+                                            </div>
+                                            <div>
+                                                <strong>${review.client_name}</strong>
+                                                <div class="text-muted small">${review.created_at}</div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            ${generateStars(review.rating)}
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-success">Verificat</span>
+                                </div>
+                                ${review.comment ? `<p class="mb-0">${escapeHtml(review.comment)}</p>` : ''}
+                            </div>
+                        `;
+                        reviewsContainer.insertAdjacentHTML('beforeend', reviewHtml);
+                    });
+
+                    // Update offset and remaining count
+                    offset += data.reviews.length;
+                    this.dataset.offset = offset;
+                    const remaining = data.total_reviews - offset;
+
+                    if (remaining > 0) {
+                        reviewsRemaining.textContent = remaining;
+                        this.classList.remove('d-none');
+                        reviewsLoading.classList.add('d-none');
+                    } else {
+                        // No more reviews, hide button
+                        document.getElementById('load-more-reviews-container').style.display = 'none';
+                    }
+                } else {
+                    // No more reviews
+                    document.getElementById('load-more-reviews-container').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+                alert('A apărut o eroare la încărcarea recenziilor. Te rugăm să încerci din nou.');
+                this.classList.remove('d-none');
+                reviewsLoading.classList.add('d-none');
+            }
+        });
+    }
+
+    // Helper function to generate star HTML
+    function generateStars(rating) {
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+            if (i <= rating) {
+                starsHtml += '<i class="fas fa-star text-warning"></i>';
+            } else {
+                starsHtml += '<i class="far fa-star text-muted"></i>';
+            }
+        }
+        return starsHtml;
+    }
+
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+});
+</script>
 {% endblock %}

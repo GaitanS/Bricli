@@ -1089,3 +1089,37 @@ class CraftsmanIdRedirectView(DetailView):
             return redirect("accounts:craftsmen_list")
 
         return redirect("accounts:craftsman_detail", slug=craftsman.slug, permanent=True)
+
+
+@require_http_methods(["GET"])
+def craftsman_reviews_ajax(request, pk):
+    """AJAX endpoint for loading more reviews"""
+    try:
+        from services.models import Review
+
+        craftsman = get_object_or_404(CraftsmanProfile, pk=pk)
+        offset = int(request.GET.get("offset", 0))
+        limit = int(request.GET.get("limit", 10))
+
+        # Get reviews
+        reviews_qs = Review.objects.filter(craftsman=craftsman).select_related("client").order_by("-created_at")
+        total_reviews = reviews_qs.count()
+        reviews = reviews_qs[offset : offset + limit]
+
+        # Format reviews data
+        reviews_data = []
+        for review in reviews:
+            reviews_data.append(
+                {
+                    "id": review.pk,
+                    "client_name": review.client.get_full_name() or review.client.username,
+                    "rating": review.rating,
+                    "comment": review.comment or "",
+                    "created_at": review.created_at.strftime("%d %b %Y"),
+                }
+            )
+
+        return JsonResponse({"reviews": reviews_data, "total_reviews": total_reviews, "offset": offset, "limit": limit})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

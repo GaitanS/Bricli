@@ -28,4 +28,6 @@ urlpatterns = [
     # AJAX validation endpoints
     path("api/validare-email/", views.validate_email_ajax, name="validate_email_ajax"),
     path("api/validare-telefon/", views.validate_phone_ajax, name="validate_phone_ajax"),
+    # AJAX reviews endpoint
+    path("craftsman/<int:pk>/reviews/", views.craftsman_reviews_ajax, name="craftsman_reviews_ajax"),
 ]
