@@ -270,7 +270,21 @@
                             <img src="{% static 'images/avatar.svg' %}" alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;" loading="lazy">
                         {% endif %}
                         
-                        <h5 class="card-title">{{ craftsman.user.get_full_name|default:craftsman.user.username }}</h5>
+                        <h5 class="card-title">
+                            {{ craftsman.user.get_full_name|default:craftsman.user.username }}
+                            {# Phase 9: Tier Badge #}
+                            {% if craftsman.subscription %}
+                                {% if craftsman.subscription.tier.name == 'pro' %}
+                                <span class="tier-badge tier-pro ms-2">
+                                    <i class="fas fa-crown"></i>Pro
+                                </span>
+                                {% elif craftsman.subscription.tier.name == 'plus' %}
+                                <span class="tier-badge tier-plus ms-2">
+                                    <i class="fas fa-star"></i>Plus
+                                </span>
+                                {% endif %}
+                            {% endif %}
+                        </h5>
                         <p class="text-muted">{{ craftsman.company_name|default:"Meșter independent" }}</p>
                         
                         <div class="mb-2">
@@ -281,7 +295,14 @@
                                     <i class="far fa-star" style="color: #8B5CF6;"></i>
                                 {% endif %}
                             {% endfor %}
-                            <span class="text-muted ms-2">({{ craftsman.total_reviews }} recenzii)</span>
+                            <span class="text-muted ms-2">
+                                <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#reviews"
+                                   style="color: #6c757d; text-decoration: none; transition: color 0.2s ease;"
+                                   onmouseover="this.style.color='#8B5CF6'; this.style.textDecoration='underline';"
+                                   onmouseout="this.style.color='#6c757d'; this.style.textDecoration='none';">
+                                    ({{ craftsman.total_reviews }} recenzii)
+                                </a>
+                            </span>
                         </div>
                         
                         <p class="text-muted small">{{ craftsman.city }}, {{ craftsman.county }}</p>
@@ -357,6 +378,35 @@
 
 .step-icon {
     font-size: 2rem;
+}
+
+/* Phase 9: Tier Badges */
+.tier-badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.tier-plus {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+    color: white;
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.3);
+}
+
+.tier-pro {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: white;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+}
+
+.tier-badge i {
+    font-size: 0.7rem;
 }
 </style>
 

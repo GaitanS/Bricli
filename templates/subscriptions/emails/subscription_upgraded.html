@@ -1,0 +1,42 @@
+{% extends "subscriptions/emails/base_email.html" %}
+
+{% block content %}
+<h1>🎉 Bine ai venit la {{ tier_name }}!</h1>
+
+<p>Salut {{ user_name }},</p>
+
+<p>Îți mulțumim că ai ales <strong>{{ tier_name }}</strong>! Abonamentul tău este acum activ.</p>
+
+<div class="highlight success">
+    <h2>Detalii abonament:</h2>
+    <ul>
+        <li><strong>Plan:</strong> {{ tier_name }}</li>
+        <li><strong>Preț:</strong> {{ tier_price }} RON/lună</li>
+        <li><strong>Următoarea facturare:</strong> {{ renewal_date|date:"d.m.Y" }}</li>
+    </ul>
+</div>
+
+<h2>Ce beneficii ai acum:</h2>
+<ul>
+    {% for feature in features %}
+    <li>{{ feature }}</li>
+    {% endfor %}
+</ul>
+
+{% if can_request_refund %}
+<div class="highlight">
+    <h3>Drept de retragere (14 zile)</h3>
+    <p>Conform OUG 34/2014, ai dreptul să te retragi din acest contract în termen de 14 zile, fără a fi nevoie să justifici decizia.</p>
+    <p><strong>Termen limită:</strong> {{ withdrawal_deadline|date:"d.m.Y, H:i" }}</p>
+    <p>Pentru a solicita rambursarea, accesează secțiunea de abonamente.</p>
+</div>
+{% endif %}
+
+<p style="text-align: center;">
+    <a href="{{ site_url }}/abonamente/" class="button">Gestionează abonamentul</a>
+</p>
+
+<p>Mult succes în obținerea de noi proiecte!</p>
+
+<p>Cu respect,<br>Echipa {{ site_name }}</p>
+{% endblock %}

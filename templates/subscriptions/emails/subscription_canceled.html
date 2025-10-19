@@ -1,0 +1,31 @@
+{% extends "subscriptions/emails/base_email.html" %}
+
+{% block content %}
+<h1>Abonamentul {{ old_tier_name }} a fost dezactivat</h1>
+
+<p>Salut {{ user_name }},</p>
+
+<p>Abonamentul tău <strong>{{ old_tier_name }}</strong> a fost {% if reason == 'manual' %}anulat la cererea ta{% elif reason == 'grace_expired' %}dezactivat din cauza eșecului plății{% else %}suspendat{% endif %}.</p>
+
+<div class="highlight">
+    <h2>Contul tău acum:</h2>
+    <ul>
+        <li><strong>Plan activ:</strong> {{ new_tier_name }}</li>
+        <li><strong>Lead-uri disponibile:</strong> {{ free_lead_limit }} pe lună</li>
+        <li><strong>Cost:</strong> 0 RON</li>
+    </ul>
+</div>
+
+<h2>Vrei să revii la funcții nelimitate?</h2>
+<p>Poți oricând să reactivezi abonamentul pentru a beneficia de lead-uri nelimitate și funcții premium.</p>
+
+<p style="text-align: center;">
+    <a href="{{ upgrade_url }}" class="button">Reactivează abonamentul</a>
+</p>
+
+{% if reason == 'manual' %}
+<p>Îți mulțumim că ai fost abonat! Dacă ai feedback despre serviciul nostru, ne-ar plăcea să auzim de la tine.</p>
+{% endif %}
+
+<p>Cu respect,<br>Echipa {{ site_name }}</p>
+{% endblock %}

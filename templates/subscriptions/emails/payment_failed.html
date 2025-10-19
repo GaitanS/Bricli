@@ -1,0 +1,33 @@
+{% extends "subscriptions/emails/base_email.html" %}
+
+{% block content %}
+<h1>⚠️ Plata pentru {{ tier_name }} nu a reușit</h1>
+
+<p>Salut {{ user_name }},</p>
+
+<div class="highlight warning">
+    <p><strong>Nu am putut procesa plata pentru abonamentul tău {{ tier_name }}.</strong></p>
+    <p>Te rugăm să actualizezi metoda de plată cât mai curând posibil pentru a evita întreruperea serviciilor.</p>
+</div>
+
+<h2>Ce se întâmplă acum?</h2>
+<ul>
+    <li>✅ Ai acces complet timp de <strong>7 zile</strong> (până la {{ grace_period_end|date:"d.m.Y" }})</li>
+    <li>⏰ Dacă nu actualizezi plata în 7 zile, vei fi retrogradat automat la Plan Gratuit (5 lead-uri/lună)</li>
+</ul>
+
+<h2>Cum rezolv problema?</h2>
+<ol>
+    <li>Verifică că metoda de plată are fonduri suficiente</li>
+    <li>Accesează portalul de facturare pentru a actualiza cardul</li>
+    <li>Vom reîncerca automat plata în următoarele zile</li>
+</ol>
+
+<p style="text-align: center;">
+    <a href="{{ update_payment_url }}" class="button">Actualizează metoda de plată</a>
+</p>
+
+<p>Dacă ai întrebări, nu ezita să ne contactezi.</p>
+
+<p>Cu respect,<br>Echipa {{ site_name }}</p>
+{% endblock %}

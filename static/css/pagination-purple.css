@@ -1,0 +1,66 @@
+/* Purple Pagination Styling for Bricli */
+
+/* Active page item - Purple gradient background */
+.pagination .page-item.active .page-link {
+    background-color: #8B5CF6;
+    background-image: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    border-color: #8B5CF6;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+.pagination .page-item.active .page-link:hover {
+    background-color: #7C3AED;
+    background-image: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    border-color: #7C3AED;
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+/* Non-active page links - Purple hover */
+.pagination .page-item:not(.active):not(.disabled) .page-link {
+    color: #6b7280;
+    border-color: #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+    color: #8B5CF6;
+    background-color: rgba(139, 92, 246, 0.1);
+    border-color: #8B5CF6;
+}
+
+/* Disabled page items */
+.pagination .page-item.disabled .page-link {
+    color: #d1d5db;
+    background-color: #f9fafb;
+    border-color: #e5e7eb;
+}
+
+/* Focus state for accessibility */
+.pagination .page-link:focus {
+    box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+    border-color: #8B5CF6;
+    color: #8B5CF6;
+}
+
+/* Pagination size variants */
+.pagination-sm .page-item.active .page-link {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+}
+
+.pagination-lg .page-item.active .page-link {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+}
+
+/* Responsive pagination styling */
+@media (max-width: 576px) {
+    .pagination {
+        font-size: 0.875rem;
+    }
+
+    .pagination .page-link {
+        padding: 0.5rem 0.75rem;
+    }
+}

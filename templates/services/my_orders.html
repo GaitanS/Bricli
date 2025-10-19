@@ -132,13 +132,17 @@
                                                class="btn btn-outline-primary btn-sm">
                                                 <i class="fas fa-eye me-1"></i>Vezi
                                             </a>
-                                            {% if order.status == 'draft' %}
                                             <a href="{% url 'services:edit_order' order.pk %}"
                                                class="btn btn-sm text-white"
                                                style="background: #8B5CF6;">
                                                 <i class="fas fa-edit me-1"></i>Editează
                                             </a>
-                                            {% endif %}
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal{{ order.pk }}">
+                                                <i class="fas fa-trash me-1"></i>Șterge
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -161,6 +165,33 @@
                                             <small class="text-muted">Postată acum</small>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Confirmation Modal -->
+                    <div class="modal fade" id="deleteModal{{ order.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ order.pk }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header border-0">
+                                    <h5 class="modal-title fw-bold" id="deleteModalLabel{{ order.pk }}">
+                                        <i class="fas fa-exclamation-triangle text-danger me-2"></i>Confirmare ștergere
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="mb-0">Ești sigur că vrei să ștergi comanda <strong>"{{ order.title }}"</strong>?</p>
+                                    <p class="text-muted small mb-0 mt-2">Această acțiune este permanentă și nu poate fi anulată.</p>
+                                </div>
+                                <div class="modal-footer border-0">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                                    <form method="post" action="{% url 'services:delete_order' order.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="fas fa-trash me-1"></i>Șterge definitiv
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

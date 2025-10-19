@@ -1,0 +1,687 @@
+/**
+ * Order Detail Mobile Layout - OLX Style
+ * Optimized for mobile devices (max-width: 767px)
+ * Features: Image carousel, compact cards, collapsible sections, fixed action bar
+ */
+
+/* ============================================
+   MOBILE-ONLY STYLES (max-width: 767px)
+   ============================================ */
+
+/* Hide mobile layout on desktop */
+@media (min-width: 768px) {
+    .mobile-layout {
+        display: none !important;
+    }
+}
+
+/* Show mobile layout only on mobile */
+@media (max-width: 767px) {
+    .desktop-layout {
+        display: none !important;
+    }
+
+    .mobile-layout {
+        display: block !important;
+    }
+
+    /* Add padding bottom for fixed action bar */
+    body {
+        padding-bottom: 100px;
+    }
+}
+
+/* ============================================
+   IMAGE CAROUSEL (OLX Style)
+   ============================================ */
+
+.mobile-carousel {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    max-height: 450px;
+    overflow: hidden;
+    background: #1f2937;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.carousel-dots {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+.carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.carousel-dot.active {
+    background: white;
+    width: 24px;
+    border-radius: 4px;
+}
+
+.back-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: #1f2937;
+    transition: all 0.2s ease;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.back-btn:hover {
+    background: white;
+    transform: translateX(-2px);
+}
+
+.back-btn:active {
+    transform: scale(0.95);
+}
+
+.carousel-empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #8B5CF6 0%, #6366f1 100%);
+    color: white;
+}
+
+.carousel-empty i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+}
+
+/* ============================================
+   MOBILE ORDER HEADER
+   ============================================ */
+
+.mobile-order-header {
+    padding: 1rem;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.status-badge {
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.status-badge.bg-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+.status-badge.bg-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.status-badge.bg-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.status-badge.bg-info {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    color: white;
+}
+
+.time-badge {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.time-badge i {
+    color: #8B5CF6;
+}
+
+/* ============================================
+   MOBILE TITLE SECTION
+   ============================================ */
+
+.mobile-title-section {
+    padding: 1rem;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.mobile-order-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.mobile-location {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.9375rem;
+}
+
+.mobile-location i {
+    color: #8B5CF6;
+    font-size: 1rem;
+}
+
+/* ============================================
+   BUDGET CARD (OLX Gradient Style)
+   ============================================ */
+
+.budget-card-mobile {
+    margin: 1rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #8B5CF6 0%, #6366f1 100%);
+    border-radius: 16px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.budget-label {
+    font-size: 0.8125rem;
+    opacity: 0.9;
+    margin-bottom: 0.375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.budget-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.urgency-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+/* ============================================
+   CLIENT INFO CARD (Compact)
+   ============================================ */
+
+.client-card-mobile {
+    margin: 0 1rem 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.client-header-mobile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.875rem;
+}
+
+.client-avatar-sm {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #8B5CF6;
+}
+
+.client-info-mobile {
+    flex: 1;
+}
+
+.client-name-mobile {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.125rem;
+}
+
+.client-meta-mobile {
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.verified-badge-mobile {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #10b981;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+
+.reveal-phone-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    border: 2px solid #8B5CF6;
+    border-radius: 12px;
+    color: #8B5CF6;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.reveal-phone-btn:active {
+    transform: scale(0.98);
+    background: #8B5CF6;
+    color: white;
+}
+
+.reveal-phone-btn.revealed {
+    background: #8B5CF6;
+    color: white;
+    border-color: #8B5CF6;
+}
+
+/* ============================================
+   COLLAPSIBLE SECTIONS (Accordion)
+   ============================================ */
+
+.mobile-section {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.section-toggle {
+    width: 100%;
+    padding: 1rem;
+    background: white;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    text-align: left;
+    transition: background 0.2s ease;
+}
+
+.section-toggle:active {
+    background: #f9fafb;
+}
+
+.section-toggle i {
+    color: #8B5CF6;
+    transition: transform 0.3s ease;
+    font-size: 0.875rem;
+}
+
+.section-toggle.active i {
+    transform: rotate(180deg);
+}
+
+.section-content {
+    padding: 0 1rem 1rem;
+    color: #4b5563;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    display: none;
+    animation: slideDown 0.3s ease;
+}
+
+.section-content.show {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   QUOTE CARDS COMPRESSED (Mobile)
+   ============================================ */
+
+.quote-card-mobile {
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e5e7eb;
+}
+
+.quote-header-mobile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.quote-avatar-xs {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #8B5CF6;
+}
+
+.quote-info-mobile {
+    flex: 1;
+    min-width: 0;
+}
+
+.quote-craftsman-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.125rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rating-xs {
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.rating-xs i {
+    color: #8B5CF6;
+}
+
+.quote-price-mobile {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #8B5CF6;
+    white-space: nowrap;
+}
+
+.quote-description-mobile {
+    margin-bottom: 0.75rem;
+}
+
+.quote-desc-short-mobile,
+.quote-desc-full-mobile {
+    font-size: 0.875rem;
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.show-more-mobile,
+.show-less-mobile {
+    color: #8B5CF6;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    margin-left: 0.25rem;
+    cursor: pointer;
+}
+
+.show-more-mobile:hover,
+.show-less-mobile:hover {
+    text-decoration: underline;
+}
+
+.quote-description-short {
+    font-size: 0.875rem;
+    color: #4b5563;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.quote-actions-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    margin-top: 0.875rem;
+}
+
+.btn-xs {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    min-height: 48px;
+}
+
+.btn-xs.primary {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+.btn-xs.secondary {
+    background: white;
+    border: 2px solid #e5e7eb;
+    color: #374151;
+}
+
+.btn-xs:active {
+    transform: scale(0.98);
+}
+
+.btn-xs.primary:active {
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+}
+
+/* Quote status badges in actions area */
+.quote-actions-mobile .badge {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 12px;
+}
+
+/* ============================================
+   FIXED BOTTOM ACTION BAR (OLX Style)
+   ============================================ */
+
+.mobile-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: white;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+    z-index: 1000;
+    border-top: 1px solid #e5e7eb;
+}
+
+.action-btn-mobile {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.875rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    min-height: 64px;
+}
+
+.action-btn-mobile i {
+    font-size: 1.25rem;
+}
+
+.action-btn-mobile.primary {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.action-btn-mobile.secondary {
+    background: white;
+    border: 2px solid #8B5CF6;
+    color: #8B5CF6;
+}
+
+.action-btn-mobile:active {
+    transform: scale(0.98);
+}
+
+.action-btn-mobile.primary:active {
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+
+.mobile-divider {
+    height: 8px;
+    background: #f3f4f6;
+}
+
+.mobile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    background: #f3f4f6;
+    border-radius: 20px;
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.mobile-badge i {
+    color: #8B5CF6;
+}
+
+/* Empty state */
+.mobile-empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #6b7280;
+}
+
+.mobile-empty-state i {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+}
+
+.mobile-empty-state p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.mobile-layout {
+    animation: fadeIn 0.3s ease;
+}
+
+.mobile-action-bar {
+    animation: slideUp 0.4s ease;
+}

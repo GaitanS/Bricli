@@ -392,6 +392,13 @@ class CraftsmenListView(ListView):
     context_object_name = "results"
     paginate_by = 20
 
+    def dispatch(self, request, *args, **kwargs):
+        """Redirect craftsmen to their dashboard"""
+        if request.user.is_authenticated and getattr(request.user, "user_type", None) == "craftsman":
+            messages.info(request, "Meșterii nu pot accesa lista de meșteri.")
+            return redirect("services:my_quotes")
+        return super().dispatch(request, *args, **kwargs)
+
     def get_paginate_by(self, queryset):
         """Allow dynamic page size"""
         per_page = self.request.GET.get("per_page")
@@ -1123,7 +1130,7 @@ def craftsman_reviews_ajax(request, pk):
             reviews_data.append(
                 {
                     "id": review.pk,
-                    "client_name": review.client.get_full_name() or review.client.username,
+                    "client_name": (review.client.get_full_name() or review.client.username) if review.client else "Client",
                     "rating": review.rating,
                     "comment": review.comment or "",
                     "created_at": review.created_at.strftime("%d %b %Y"),

@@ -1,0 +1,27 @@
+{% extends "subscriptions/emails/base_email.html" %}
+
+{% block content %}
+<h1>🚨 Ultimă șansă - {{ days_remaining }} zile rămase</h1>
+
+<p>Salut {{ user_name }},</p>
+
+<div class="highlight warning">
+    <p><strong>Aceasta este o ultimă reamintire!</strong></p>
+    <p>Mai ai doar <strong>{{ days_remaining }} zile</strong> pentru a actualiza metoda de plată.</p>
+</div>
+
+<p>După <strong>{{ grace_period_end|date:"d.m.Y" }}</strong>, dacă plata nu este procesată:</p>
+<ul>
+    <li>❌ Vei fi retrogradat automat la Plan Gratuit</li>
+    <li>📉 Limitat la doar 5 lead-uri pe lună</li>
+    <li>🔒 Pierderea accesului la funcțiile premium</li>
+</ul>
+
+<p style="text-align: center;">
+    <a href="{{ update_payment_url }}" class="button">Actualizează plata ACUM</a>
+</p>
+
+<p>Nu pierde clienții potențiali! Actualizează metoda de plată pentru a continua cu {{ tier_name }}.</p>
+
+<p>Cu respect,<br>Echipa {{ site_name }}</p>
+{% endblock %}

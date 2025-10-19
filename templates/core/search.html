@@ -79,13 +79,27 @@
 
                                     {# Info #}
                                     <div class="flex-grow-1">
-                                        <div class="d-flex justify-content-between align-items-start">
+                                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                                             <h3 class="craftsman-name">{{ craftsman.display_name|default:craftsman.user.get_full_name|default:"Meșter profesionist" }}</h3>
-                                            {% if craftsman.user.is_verified %}
-                                            <span class="badge-verified">
-                                                <i class="fas fa-check-circle me-1"></i>Verificat
-                                            </span>
-                                            {% endif %}
+                                            <div class="d-flex gap-2 align-items-center">
+                                                {% if craftsman.user.is_verified %}
+                                                <span class="badge-verified">
+                                                    <i class="fas fa-check-circle me-1"></i>Verificat
+                                                </span>
+                                                {% endif %}
+                                                {# Phase 9: Tier Badge #}
+                                                {% if craftsman.subscription %}
+                                                    {% if craftsman.subscription.tier.name == 'pro' %}
+                                                    <span class="tier-badge tier-pro">
+                                                        <i class="fas fa-crown me-1"></i>Pro
+                                                    </span>
+                                                    {% elif craftsman.subscription.tier.name == 'plus' %}
+                                                    <span class="tier-badge tier-plus">
+                                                        <i class="fas fa-star me-1"></i>Plus
+                                                    </span>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
                                         </div>
 
                                         <div class="craftsman-location mb-2">
@@ -109,7 +123,14 @@
                                                     {% endfor %}
                                                 {% endif %}
                                             </div>
-                                            <span><strong>{{ craftsman.average_rating|floatformat:1|default:"0.0" }}</strong> ({{ craftsman.total_reviews }} recenzii)</span>
+                                            <span><strong>{{ craftsman.average_rating|floatformat:1|default:"0.0" }}</strong>
+                                                <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#reviews"
+                                                   style="color: inherit; text-decoration: none; transition: color 0.2s ease;"
+                                                   onmouseover="this.style.color='#8B5CF6'; this.style.textDecoration='underline';"
+                                                   onmouseout="this.style.color='inherit'; this.style.textDecoration='none';">
+                                                    ({{ craftsman.total_reviews }} recenzii)
+                                                </a>
+                                            </span>
                                         </div>
 
                                         {% if craftsman.years_experience %}

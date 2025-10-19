@@ -136,7 +136,37 @@ class Quote(models.Model):
 
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(max_length=1000)
+
+    # Duration fields - structured data
+    duration_value = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Valoare durată",
+        help_text="Numărul de unități de timp (ex: 5 pentru '5 zile')"
+    )
+    duration_unit = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        choices=[
+            ('hours', 'Ore'),
+            ('days', 'Zile'),
+            ('weeks', 'Săptămâni'),
+            ('months', 'Luni'),
+        ],
+        verbose_name="Unitate durată",
+        help_text="Unitatea de măsură pentru durată"
+    )
+
+    # Keep for backwards compatibility & display
     estimated_duration = models.CharField(max_length=100, blank=True)
+
+    proposed_start_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="Data propusă pornire",
+        help_text="Data la care meșterul propune să înceapă lucrarea"
+    )
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
 
@@ -151,10 +181,61 @@ class Quote(models.Model):
     def __str__(self):
         return f"Ofertă pentru {self.order.title} de la {self.craftsman.user.username}"
 
+    def save(self, *args, **kwargs):
+        """Auto-generate estimated_duration from duration_value + duration_unit"""
+        if self.duration_value and self.duration_unit:
+            # Romanian plural forms
+            unit_map = {
+                'hours': 'oră' if self.duration_value == 1 else 'ore',
+                'days': 'zi' if self.duration_value == 1 else 'zile',
+                'weeks': 'săptămână' if self.duration_value == 1 else 'săptămâni',
+                'months': 'lună' if self.duration_value == 1 else 'luni',
+            }
+            self.estimated_duration = f"{self.duration_value} {unit_map[self.duration_unit]}"
+        super().save(*args, **kwargs)
+
+
+class QuoteAttachment(models.Model):
+    """Atașamente pentru oferte (imagini, PDF-uri, documente)"""
+
+    quote = models.ForeignKey(Quote, on_delete=models.CASCADE, related_name="attachments")
+    file = models.FileField(upload_to="quote_attachments/%Y/%m/")
+
+    FILE_TYPE_CHOICES = [
+        ("image", "Imagine"),
+        ("pdf", "PDF"),
+        ("document", "Document"),
+        ("other", "Altele"),
+    ]
+    file_type = models.CharField(max_length=20, choices=FILE_TYPE_CHOICES)
+    file_size = models.PositiveIntegerField(help_text="Mărime fișier în bytes")
+
+    description = models.CharField(max_length=200, blank=True, help_text="Descriere scurtă (opțional)")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        verbose_name = "Atașament Ofertă"
+        verbose_name_plural = "Atașamente Oferte"
+
+    def __str__(self):
+        return f"Atașament {self.file_type} - {self.quote}"
+
+    @property
+    def file_size_mb(self):
+        """Returnează mărimea fișierului în MB"""
+        return round(self.file_size / (1024 * 1024), 2)
+
+    @property
+    def filename(self):
+        """Returnează numele fișierului fără path"""
+        import os
+        return os.path.basename(self.file.name)
+
 
 class Review(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="review")
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name="given_reviews")
+    order = models.OneToOneField(Order, on_delete=models.SET_NULL, null=True, blank=True, related_name="review")
+    client = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="given_reviews")
     craftsman = models.ForeignKey(CraftsmanProfile, on_delete=models.CASCADE, related_name="received_reviews")
 
     rating = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 6)])  # 1-5 stars
@@ -197,7 +278,7 @@ def notify_new_quote(quote):
         notification_type="new_quote",
         priority="high",
         sender=quote.craftsman.user,
-        action_url=f"/services/order/{quote.order.id}/",
+        action_url=f"/servicii/comanda/{quote.order.id}/",
         related_object_type="quote",
         related_object_id=quote.id,
         data={"order_id": quote.order.id, "quote_id": quote.id, "price": float(quote.price)},
@@ -215,7 +296,7 @@ def notify_quote_accepted(quote):
         ),
         notification_type="quote_accepted",
         priority="high",
-        action_url=f"/services/order/{quote.order.id}/",
+        action_url=f"/servicii/comanda/{quote.order.id}/",
         related_object_type="quote",
         related_object_id=quote.id,
         data={"order_id": quote.order.id, "quote_id": quote.id},
@@ -230,7 +311,7 @@ def notify_quote_rejected(quote):
         message=(f'Din păcate, oferta ta pentru "{quote.order.title}" nu a fost acceptată.'),
         notification_type="quote_rejected",
         priority="medium",
-        action_url=f"/services/order/{quote.order.id}/",
+        action_url=f"/servicii/comanda/{quote.order.id}/",
         related_object_type="quote",
         related_object_id=quote.id,
         data={"order_id": quote.order.id, "quote_id": quote.id},
@@ -250,11 +331,107 @@ def notify_order_request(order, craftsman):
         ),
         priority="high",
         sender=order.client,
-        action_url=f"/services/order/{order.id}/",
+        action_url=f"/servicii/comanda/{order.id}/",
         related_object_type="order",
         related_object_id=order.id,
         data={"order_id": order.id, "is_personal_request": True, "invited_craftsman_id": craftsman.user.id},
     )
+
+
+def notify_new_order_to_craftsmen(order):
+    """
+    Notify all craftsmen who have the order's service registered that a new order is available.
+
+    Professional notification system that:
+    - Filters craftsmen by registered matching service
+    - Excludes craftsmen who already quoted on this order
+    - Respects user notification preferences
+    - Priority-based delivery: urgent orders get email + push, others get push only
+    - Limits to maximum 50 craftsmen to avoid spam
+
+    Args:
+        order: Order instance that was just published
+
+    Returns:
+        int: Number of notifications successfully sent
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    # Get all craftsmen who have this service registered
+    craftsmen_with_service = CraftsmanProfile.objects.filter(
+        services__service=order.service,
+        user__is_active=True
+    ).select_related('user').distinct()
+
+    # Exclude craftsmen who already quoted on this order
+    craftsmen_who_quoted = Quote.objects.filter(
+        order=order
+    ).values_list('craftsman_id', flat=True)
+
+    eligible_craftsmen = craftsmen_with_service.exclude(
+        id__in=craftsmen_who_quoted
+    )[:50]  # Limit to 50 to avoid overwhelming the system
+
+    if not eligible_craftsmen.exists():
+        logger.info(f"No eligible craftsmen to notify for order {order.id}")
+        return 0
+
+    # Determine notification priority based on order urgency
+    is_urgent = order.urgency in ['urgent', 'high']
+    priority = "urgent" if is_urgent else "normal"
+
+    # Prepare notification content
+    budget_text = ""
+    if order.budget_min and order.budget_max:
+        budget_text = f" Buget: {order.budget_min}-{order.budget_max} RON."
+    elif order.budget_max:
+        budget_text = f" Buget: până la {order.budget_max} RON."
+
+    urgency_text = {
+        'urgent': ' URGENT!',
+        'high': ' (În următoarele zile)',
+        'medium': '',
+        'low': ''
+    }.get(order.urgency, '')
+
+    title = f"Comandă nouă: {order.service.name}{urgency_text}"
+    message = (
+        f'Comandă nouă în {order.city.name}, {order.county.name}: "{order.title}".{budget_text} '
+        f'Click pentru a vedea detalii și a trimite ofertă!'
+    )
+
+    # Send notifications
+    notifications_sent = 0
+    for craftsman in eligible_craftsmen:
+        try:
+            NotificationService.create_notification(
+                recipient=craftsman.user,
+                title=title,
+                message=message,
+                notification_type="new_order",
+                priority=priority,
+                sender=None,  # System notification
+                action_url=f"/servicii/comanda/{order.id}/",
+                related_object_type="order",
+                related_object_id=order.id,
+                send_email=is_urgent,  # Only send email for urgent/high urgency orders
+                send_push=True,  # Always send push notification
+                data={
+                    "order_id": order.id,
+                    "service_id": order.service.id,
+                    "service_name": order.service.name,
+                    "location": f"{order.city.name}, {order.county.name}",
+                    "urgency": order.urgency
+                }
+            )
+            notifications_sent += 1
+        except Exception as e:
+            logger.error(f"Failed to notify craftsman {craftsman.user.id} about order {order.id}: {str(e)}")
+            continue
+
+    logger.info(f"Notified {notifications_sent} craftsmen about new order {order.id}")
+    return notifications_sent
 
 
 # MyBuilder-style Lead System Models
@@ -315,76 +492,11 @@ class Shortlist(models.Model):
         return True  # Contactele sunt întotdeauna vizibile
 
 
-class CreditWallet(models.Model):
-    """Wallet cu credit pentru meșteri - pentru plata lead fees"""
-
-    user = models.OneToOneField("accounts.User", on_delete=models.CASCADE, related_name="wallet")
-    balance_cents = models.IntegerField(default=0, help_text="Soldul în bani (cents)")
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"Wallet {self.user.get_full_name()} - {self.balance_lei} lei"
-
-    @property
-    def balance_lei(self):
-        """Returnează soldul în lei"""
-        return self.balance_cents / 100
-
-    def has_sufficient_balance(self, amount_cents):
-        """Verifică dacă are suficient credit"""
-        return self.balance_cents >= amount_cents
-
-    def deduct_amount(self, amount_cents, reason, meta=None):
-        """Deduce o sumă din wallet și creează tranzacția"""
-        if not self.has_sufficient_balance(amount_cents):
-            raise ValueError("Sold insuficient în wallet")
-
-        self.balance_cents -= amount_cents
-        self.save(update_fields=["balance_cents", "updated_at"])
-
-        return WalletTransaction.objects.create(wallet=self, amount_cents=-amount_cents, reason=reason, meta=meta or {})
-
-    def add_amount(self, amount_cents, reason, meta=None):
-        """Adaugă o sumă în wallet și creează tranzacția"""
-        self.balance_cents += amount_cents
-        self.save(update_fields=["balance_cents", "updated_at"])
-
-        return WalletTransaction.objects.create(wallet=self, amount_cents=amount_cents, reason=reason, meta=meta or {})
-
-
-class WalletTransaction(models.Model):
-    """Istoric tranzacții wallet"""
-
-    wallet = models.ForeignKey(CreditWallet, on_delete=models.CASCADE, related_name="transactions")
-    amount_cents = models.IntegerField(
-        help_text="Suma în bani (cents) - pozitivă pentru încărcare, negativă pentru taxe"
-    )
-
-    REASON_CHOICES = [
-        ("top_up", "Încărcare credit"),
-        ("lead_fee", "Taxă lead (shortlist)"),
-        ("refund", "Rambursare"),
-        ("bonus", "Bonus"),
-        ("adjustment", "Ajustare"),
-    ]
-    reason = models.CharField(max_length=64, choices=REASON_CHOICES)
-    meta = models.JSONField(default=dict, blank=True, help_text="Date suplimentare (order_id, client_id, etc.)")
-
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        sign = "+" if self.amount_cents > 0 else ""
-        return f"{sign}{self.amount_lei} lei - {self.get_reason_display()}"
-
-    @property
-    def amount_lei(self):
-        """Returnează suma în lei"""
-        return self.amount_cents / 100
+# REMOVED: CreditWallet and WalletTransaction models
+# Wallet system removed in favor of subscription-based model
+# All wallet data exported to CSV before removal (see subscriptions/management/commands/export_wallet_data.py)
+# Transition date: 2025-10-18
+# Migration: subscriptions/migrations/00XX_remove_wallet_system.py
 
 
 class CoverageArea(models.Model):
@@ -403,3 +515,40 @@ class CoverageArea(models.Model):
     class Meta:
         verbose_name = "Zonă de acoperire"
         verbose_name_plural = "Zone de acoperire"
+
+
+# Helper functions for Quote Attachments
+def validate_quote_attachment(file):
+    """Validează tipul și mărimea fișierului pentru atașamente oferte"""
+    import os
+    from django.core.exceptions import ValidationError
+
+    # Check file size (max 5MB)
+    max_size = 5 * 1024 * 1024  # 5MB in bytes
+    if file.size > max_size:
+        raise ValidationError(f"Fișierul este prea mare ({file.size / (1024 * 1024):.1f}MB). Mărimea maximă permisă este 5MB.")
+
+    # Check file extension
+    allowed_extensions = [".jpg", ".jpeg", ".png", ".gif", ".pdf", ".doc", ".docx"]
+    ext = os.path.splitext(file.name)[1].lower()
+    if ext not in allowed_extensions:
+        raise ValidationError(
+            f"Tip fișier nepermis ({ext}). Tipuri permise: {', '.join(allowed_extensions)}"
+        )
+
+    return file
+
+
+def detect_file_type(file):
+    """Detectează tipul fișierului bazat pe extensie"""
+    import os
+
+    ext = os.path.splitext(file.name)[1].lower()
+    if ext in [".jpg", ".jpeg", ".png", ".gif"]:
+        return "image"
+    elif ext == ".pdf":
+        return "pdf"
+    elif ext in [".doc", ".docx"]:
+        return "document"
+    else:
+        return "other"

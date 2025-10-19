@@ -1,6 +1,7 @@
+from django.contrib import messages
 from django.db import models
 from django.db.models import Avg, Count, Q
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils.text import slugify
 from django.views.generic import ListView, TemplateView
 
@@ -19,6 +20,12 @@ def preview_404(request):
 
 class HomeView(TemplateView):
     template_name = "core/home.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        """Redirect authenticated craftsmen to their dashboard"""
+        if request.user.is_authenticated and getattr(request.user, "user_type", None) == "craftsman":
+            return redirect("services:my_quotes")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -42,8 +49,21 @@ class HomeView(TemplateView):
                     orders_count=models.Count("services__order", filter=models.Q(services__order__status="published"))
                 )[:8],
                 "featured_testimonials": Testimonial.objects.filter(is_featured=True)[:3],
-                "top_craftsmen": CraftsmanProfile.objects.filter(user__is_verified=True).order_by(
-                    "-average_rating", "-total_reviews"
+                # Phase 9: Prioritize Pro members in featured craftsmen
+                "top_craftsmen": CraftsmanProfile.objects.filter(user__is_verified=True)
+                .select_related("subscription", "subscription__tier")
+                .annotate(
+                    tier_priority=models.Case(
+                        models.When(subscription__tier__name='pro', then=models.Value(0)),
+                        models.When(subscription__tier__name='plus', then=models.Value(1)),
+                        models.When(subscription__tier__name='free', then=models.Value(2)),
+                        default=models.Value(3),
+                        output_field=models.IntegerField(),
+                    )
+                ).order_by(
+                    "tier_priority",  # Pro > Plus > Free
+                    "-average_rating",
+                    "-total_reviews"
                 )[:6],
                 "counties": County.objects.all().order_by("name"),  # All counties
                 # Platform statistics
@@ -122,9 +142,10 @@ class SearchView(ListView):
         rating_min = self.request.GET.get("rating", "")
 
         # Base queryset with active craftsmen
+        # Phase 9: Include subscription data for tier badges
         queryset = (
             CraftsmanProfile.objects.filter(user__is_active=True)
-            .select_related("user", "county", "city")
+            .select_related("user", "county", "city", "subscription", "subscription__tier")
             .prefetch_related("services", "services__service", "services__service__category")
         )
 
@@ -228,8 +249,18 @@ class SearchView(ListView):
             # Highest rated craftsmen first
             queryset = queryset.order_by("-average_rating", "-total_reviews")
         else:  # Default: "popular"
-            # Intelligent ordering with multiple factors
-            queryset = queryset.order_by(
+            # Phase 9: Intelligent ordering with subscription tier priority
+            from django.db.models import Case, When, Value, IntegerField
+            queryset = queryset.annotate(
+                tier_priority=Case(
+                    When(subscription__tier__name='pro', then=Value(0)),
+                    When(subscription__tier__name='plus', then=Value(1)),
+                    When(subscription__tier__name='free', then=Value(2)),
+                    default=Value(3),
+                    output_field=IntegerField(),
+                )
+            ).order_by(
+                "tier_priority",  # Pro > Plus > Free
                 "-user__is_verified",  # Verified craftsmen first
                 "-average_rating",  # Higher rated craftsmen
                 "-total_reviews",  # More reviewed craftsmen

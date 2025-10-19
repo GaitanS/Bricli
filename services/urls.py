@@ -10,6 +10,7 @@ urlpatterns = [
     path("comanda/creare/", views.CreateOrderView.as_view(), name="create_order"),
     path("comanda/<int:pk>/", views.OrderDetailView.as_view(), name="order_detail"),
     path("comanda/<int:pk>/editare/", views.EditOrderView.as_view(), name="edit_order"),
+    path("comanda/<int:pk>/stergere/", views.DeleteOrderView.as_view(), name="delete_order"),
     path("comanda/<int:pk>/publicare/", views.PublishOrderView.as_view(), name="publish_order"),
     path("comenzile-mele/", views.MyOrdersView.as_view(), name="my_orders"),
     path("ofertele-mele/", views.MyQuotesView.as_view(), name="my_quotes"),
@@ -36,7 +37,8 @@ urlpatterns = [
     ),
     path("comanda/<int:pk>/invitatie/acceptare/", views.AcceptInvitationView.as_view(), name="accept_invitation"),
     path("comanda/<int:pk>/invitatie/refuzare/", views.DeclineInvitationView.as_view(), name="decline_invitation"),
-    path("portofel/", views.WalletView.as_view(), name="wallet"),
+    # REMOVED: Wallet URL - wallet system removed in Phase 2
+    # path("portofel/", views.WalletView.as_view(), name="wallet"),
     # URLs gestionare servicii meșter
     path("serviciile-mele/", views.CraftsmanServicesView.as_view(), name="craftsman_services"),
     path("serviciile-mele/adaugare/", views.AddCraftsmanServiceView.as_view(), name="add_craftsman_service"),
@@ -48,6 +50,9 @@ urlpatterns = [
     ),
     # Notificări
     path("notificari/", views.NotificationsView.as_view(), name="notifications"),
-    # Sistem plăți
-    path("plati/", include("services.payment_urls")),
+    # Dashboard Meșter
+    path("dashboard/", views.CraftsmanDashboardView.as_view(), name="craftsman_dashboard"),
+    # REMOVED: Payment system URLs - wallet system removed in Phase 2
+    # TODO Phase 3: Replace with subscription payment URLs
+    # path("plati/", include("services.payment_urls")),
 ]

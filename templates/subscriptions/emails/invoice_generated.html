@@ -1,0 +1,37 @@
+{% extends "subscriptions/emails/base_email.html" %}
+
+{% block content %}
+<h1>📄 Factura {{ invoice_series }}-{{ invoice_number }}</h1>
+
+<p>Salut {{ user_name }},</p>
+
+<p>Îți mulțumim pentru plată! Găsești atașată factura fiscală pentru abonamentul tău <strong>{{ tier_name }}</strong>.</p>
+
+<div class="highlight success">
+    <h2>Detalii factură:</h2>
+    <ul>
+        <li><strong>Serie și număr:</strong> {{ invoice_series }}-{{ invoice_number }}</li>
+        <li><strong>Data emiterii:</strong> {{ invoice_date|date:"d.m.Y" }}</li>
+        <li><strong>Bază impozabilă:</strong> {{ base_ron }} RON</li>
+        <li><strong>TVA (19%):</strong> {{ tva_ron }} RON</li>
+        <li><strong>Total de plată:</strong> <strong>{{ total_ron }} RON</strong></li>
+    </ul>
+</div>
+
+<h2>Ce urmează?</h2>
+<ul>
+    <li>✅ Abonamentul tău {{ tier_name }} este activ</li>
+    <li>📅 Următoarea facturare va fi generată automat</li>
+    <li>📥 Poți descărca oricând facturile din contul tău</li>
+</ul>
+
+<p style="text-align: center;">
+    <a href="{{ invoice_url }}" class="button">Descarcă factura PDF</a>
+</p>
+
+<p><small><em>Nota: Factura PDF este atașată acestui email. Dacă nu o găsești, verifică secțiunea Spam sau descarcă-o din link-ul de mai sus.</em></small></p>
+
+<p>Îți mulțumim pentru încredere!</p>
+
+<p>Cu respect,<br>Echipa {{ site_name }}</p>
+{% endblock %}

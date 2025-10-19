@@ -42,7 +42,14 @@
                             {% endif %}
                         {% endfor %}
                         <span class="ms-2 fw-medium">{{ craftsman.average_rating|floatformat:1 }}</span>
-                        <small class="text-muted ms-1">({{ craftsman.total_reviews }} recenzii)</small>
+                        <small class="text-muted ms-1">
+                            <a href="#reviews-section"
+                               style="color: #6c757d; text-decoration: none; transition: color 0.2s ease;"
+                               onmouseover="this.style.color='#8B5CF6'; this.style.textDecoration='underline';"
+                               onmouseout="this.style.color='#6c757d'; this.style.textDecoration='none';">
+                                ({{ craftsman.total_reviews }} recenzii)
+                            </a>
+                        </small>
                     {% else %}
                         <span class="text-muted">Fără recenzii încă</span>
                     {% endif %}
@@ -239,7 +246,7 @@
                                                 <i class="fas fa-user text-muted"></i>
                                             </div>
                                             <div>
-                                                <strong>{{ review.client.get_full_name|default:review.client.username }}</strong>
+                                                <strong>{% if review.client %}{{ review.client.get_full_name|default:review.client.username }}{% else %}Client{% endif %}</strong>
                                                 <div class="text-muted small">{{ review.created_at|date:"d M Y" }}</div>
                                             </div>
                                         </div>
@@ -527,7 +534,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 <i class="fas fa-user text-muted"></i>
                                             </div>
                                             <div>
-                                                <strong>${review.client_name}</strong>
+                                                <strong>${review.client_name || 'Client'}</strong>
                                                 <div class="text-muted small">${review.created_at}</div>
                                             </div>
                                         </div>

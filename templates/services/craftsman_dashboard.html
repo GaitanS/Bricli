@@ -1,0 +1,844 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Meșter - Bricli{% endblock %}
+
+{% block extra_css %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
+<style>
+/* Purple & White Theme - Mobile First */
+:root {
+    --primary-purple: #8B5CF6;
+    --dark-purple: #7C3AED;
+    --light-purple: #F3E8FF;
+    --white: #FFFFFF;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-600: #4B5563;
+    --gray-800: #1F2937;
+}
+
+body {
+    background: var(--gray-50);
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    background: linear-gradient(135deg, var(--primary-purple) 0%, var(--dark-purple) 100%);
+    color: white;
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+}
+
+.dashboard-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.dashboard-header p {
+    opacity: 0.9;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--light-purple);
+    color: var(--primary-purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin: 0;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin-top: 0.25rem;
+}
+
+/* Tab Navigation - Mobile Friendly with Scroll Indicators */
+.tab-nav {
+    background: white;
+    border-radius: 12px;
+    padding: 0.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    scroll-behavior: smooth;
+    /* Hide scrollbar for all browsers */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.tab-nav::-webkit-scrollbar {
+    display: none;
+}
+
+/* Gradient fade indicators for scroll visibility */
+.tab-nav::before,
+.tab-nav::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tab-nav::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0));
+}
+
+.tab-nav::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0));
+}
+
+/* Show fade indicators when content is scrollable */
+.tab-nav.can-scroll-left::before {
+    opacity: 1;
+}
+
+.tab-nav.can-scroll-right::after {
+    opacity: 1;
+}
+
+.tab-nav-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 0.5rem;
+    min-width: max-content;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 1rem;
+}
+
+.tab-nav-item {
+    flex: 1;
+    scroll-snap-align: start;
+}
+
+.tab-nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--gray-600);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tab-nav-link i {
+    margin-right: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.tab-nav-link:hover {
+    background: var(--light-purple);
+    color: var(--primary-purple);
+}
+
+.tab-nav-link.active {
+    background: var(--primary-purple);
+    color: white;
+}
+
+/* Tab Content */
+.tab-content {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    min-height: 400px;
+}
+
+/* Order Cards */
+.order-card {
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.order-card:hover {
+    border-color: var(--primary-purple);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+}
+
+.order-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.order-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin-bottom: 0.75rem;
+}
+
+.order-meta-item {
+    display: flex;
+    align-items: center;
+}
+
+.order-meta-item i {
+    margin-right: 0.25rem;
+    color: var(--primary-purple);
+}
+
+.order-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-purple);
+}
+
+/* Calendar Styles */
+#calendar {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.fc {
+    font-family: inherit;
+}
+
+.fc-button-primary {
+    background-color: var(--primary-purple) !important;
+    border-color: var(--primary-purple) !important;
+}
+
+.fc-button-primary:hover {
+    background-color: var(--dark-purple) !important;
+}
+
+/* Remove underlines from calendar links */
+.fc a {
+    text-decoration: none !important;
+}
+
+.fc-daygrid-day-number,
+.fc-list-event-title {
+    text-decoration: none !important;
+}
+
+/* Mobile Calendar Optimization */
+@media (max-width: 768px) {
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .fc .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .fc .fc-button {
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.1rem;
+    }
+
+    /* Simplify month view on mobile */
+    .fc-dayGridMonth-view .fc-day-number {
+        font-size: 0.875rem;
+    }
+
+    /* List view optimization for mobile */
+    .fc-list-event {
+        font-size: 0.875rem;
+    }
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--gray-600);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: var(--gray-200);
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    margin-bottom: 1.5rem;
+}
+
+.btn-purple {
+    background: var(--primary-purple);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.btn-purple:hover {
+    background: var(--dark-purple);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+    .dashboard-header h1 {
+        font-size: 2rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .tab-nav-link {
+        font-size: 1rem;
+    }
+
+    .tab-content {
+        padding: 2rem;
+    }
+}
+
+/* Badge Styles */
+.badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-pending {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.badge-accepted {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.badge-rejected {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 3px solid var(--gray-200);
+    border-top: 3px solid var(--primary-purple);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="container">
+        <h1><i class="fas fa-tachometer-alt me-2"></i>Dashboard Meșter</h1>
+        <p>Bine ai venit, {{ user.get_full_name|default:user.username }}!</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="stat-value">{{ total_shortlists }}</div>
+            <div class="stat-label">Liste Scurte</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-value">{{ total_quotes }}</div>
+            <div class="stat-label">Oferte Trimise</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value">{{ accepted_quotes }}</div>
+            <div class="stat-label">Acceptate</div>
+        </div>
+
+        <!-- Phase 9: Subscription stat card -->
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-crown"></i>
+            </div>
+            {% if subscription %}
+                <div class="stat-value">{{ subscription.tier.display_name }}</div>
+                <div class="stat-label">Abonament Activ</div>
+            {% else %}
+                <div class="stat-value">-</div>
+                <div class="stat-label">Fără Abonament</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Phase 9: Subscription Widget -->
+    {% if subscription %}
+        {% include 'subscriptions/_subscription_widget.html' with subscription=subscription %}
+    {% endif %}
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+        <ul class="tab-nav-list">
+            <li class="tab-nav-item">
+                <a href="?tab=overview" class="tab-nav-link {% if active_tab == 'overview' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span>Prezentare</span>
+                </a>
+            </li>
+            <li class="tab-nav-item">
+                <a href="?tab=orders" class="tab-nav-link {% if active_tab == 'orders' %}active{% endif %}">
+                    <i class="fas fa-tasks"></i>
+                    <span>Comenzi</span>
+                </a>
+            </li>
+            <li class="tab-nav-item">
+                <a href="?tab=quotes" class="tab-nav-link {% if active_tab == 'quotes' %}active{% endif %}">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Oferte</span>
+                </a>
+            </li>
+            <li class="tab-nav-item">
+                <a href="?tab=calendar" class="tab-nav-link {% if active_tab == 'calendar' %}active{% endif %}">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Calendar</span>
+                </a>
+            </li>
+            <li class="tab-nav-item">
+                <a href="?tab=stats" class="tab-nav-link {% if active_tab == 'stats' %}active{% endif %}">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistici</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        {% if active_tab == 'overview' %}
+            <!-- OVERVIEW TAB -->
+            <h2 class="mb-4">Prezentare Generală</h2>
+
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <h5 class="mb-3"><i class="fas fa-clock text-purple me-2"></i>Comenzi Recente</h5>
+                    {% if recent_orders %}
+                        {% for order in recent_orders %}
+                        <div class="order-card">
+                            <div class="order-title">{{ order.title }}</div>
+                            <div class="order-meta">
+                                <span class="order-meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ order.city.name }}, {{ order.county.name }}
+                                </span>
+                                <span class="order-meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ order.created_at|date:"d M Y" }}
+                                </span>
+                            </div>
+                            {% if order.budget_max %}
+                            <div class="order-price">{{ order.budget_max }} RON</div>
+                            {% endif %}
+                            <a href="{% url 'services:order_detail' order.pk %}" class="btn btn-sm btn-purple mt-2">
+                                <i class="fas fa-eye me-1"></i>Vezi Detalii
+                            </a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>Nu ai comenzi recente</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-6 mb-4">
+                    <h5 class="mb-3"><i class="fas fa-briefcase text-purple me-2"></i>Lucrări Viitoare</h5>
+                    {% if upcoming_jobs %}
+                        {% for quote in upcoming_jobs %}
+                        <div class="order-card">
+                            <div class="order-title">{{ quote.order.title }}</div>
+                            <div class="order-meta">
+                                <span class="order-meta-item">
+                                    <i class="fas fa-calendar-check"></i>
+                                    Start: {{ quote.proposed_start_date|date:"d M Y" }}
+                                </span>
+                                <span class="order-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    {{ quote.estimated_duration }}
+                                </span>
+                            </div>
+                            <div class="order-price">{{ quote.price }} RON</div>
+                            <a href="{% url 'services:order_detail' quote.order.pk %}" class="btn btn-sm btn-purple mt-2">
+                                <i class="fas fa-eye me-1"></i>Vezi Detalii
+                            </a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>Nu ai lucrări programate</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        {% elif active_tab == 'orders' %}
+            <!-- ORDERS TAB -->
+            <h2 class="mb-4">Comenzile Mele</h2>
+            {% if orders %}
+                {% for order in orders %}
+                <div class="order-card">
+                    <div class="order-title">{{ order.title }}</div>
+                    <div class="order-meta">
+                        <span class="order-meta-item">
+                            <i class="fas fa-user"></i>
+                            {{ order.client.get_full_name|default:order.client.username }}
+                        </span>
+                        <span class="order-meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            {{ order.city.name }}, {{ order.county.name }}
+                        </span>
+                        <span class="order-meta-item">
+                            <i class="fas fa-tag"></i>
+                            {{ order.service.name }}
+                        </span>
+                    </div>
+                    <p class="mb-2">{{ order.description|truncatewords:20 }}</p>
+                    {% if order.budget_max %}
+                    <div class="order-price mb-2">Buget: {{ order.budget_max }} RON</div>
+                    {% endif %}
+                    <a href="{% url 'services:order_detail' order.pk %}" class="btn btn-purple">
+                        <i class="fas fa-eye me-1"></i>Vezi Comandă
+                    </a>
+                </div>
+                {% endfor %}
+
+                {% if is_paginated %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mt-4">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab=orders&page={{ page_obj.previous_page_number }}">Anterior</a>
+                        </li>
+                        {% endif %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab=orders&page={{ page_obj.next_page_number }}">Următor</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>Nu ai comenzi</h3>
+                    <p>Când vei fi adăugat pe liste scurte, comenzile vor apărea aici</p>
+                    <a href="{% url 'services:available_orders' %}" class="btn-purple">
+                        <i class="fas fa-search me-2"></i>Explorează Comenzi
+                    </a>
+                </div>
+            {% endif %}
+
+        {% elif active_tab == 'quotes' %}
+            <!-- QUOTES TAB -->
+            <h2 class="mb-4">Ofertele Mele</h2>
+            {% if recent_quotes %}
+                {% for quote in recent_quotes %}
+                <div class="order-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="order-title">{{ quote.order.title }}</div>
+                        <span class="badge badge-{{ quote.status }}">
+                            {{ quote.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="order-meta">
+                        <span class="order-meta-item">
+                            <i class="fas fa-euro-sign"></i>
+                            {{ quote.price }} RON
+                        </span>
+                        <span class="order-meta-item">
+                            <i class="fas fa-clock"></i>
+                            {{ quote.estimated_duration }}
+                        </span>
+                        {% if quote.proposed_start_date %}
+                        <span class="order-meta-item">
+                            <i class="fas fa-calendar-day"></i>
+                            {{ quote.proposed_start_date|date:"d M Y" }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <p class="mt-2 mb-2">{{ quote.description|truncatewords:15 }}</p>
+                    <small class="text-muted">Trimisă la {{ quote.created_at|date:"d M Y H:i" }}</small>
+                    <div class="mt-2">
+                        <a href="{% url 'services:order_detail' quote.order.pk %}" class="btn btn-purple btn-sm">
+                            <i class="fas fa-eye me-1"></i>Vezi Comandă
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-file-invoice"></i>
+                    <h3>Nu ai oferte trimise</h3>
+                    <p>Explorează comenzile disponibile și trimite prima ta ofertă</p>
+                    <a href="{% url 'services:available_orders' %}" class="btn-purple">
+                        <i class="fas fa-search me-2"></i>Vezi Comenzi Disponibile
+                    </a>
+                </div>
+            {% endif %}
+
+        {% elif active_tab == 'calendar' %}
+            <!-- CALENDAR TAB -->
+            <h2 class="mb-4">Calendarul Meu</h2>
+            <div id="calendar"></div>
+
+        {% elif active_tab == 'stats' %}
+            <!-- STATS TAB -->
+            <h2 class="mb-4">Statistici</h2>
+
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-value">{{ total_quote_value|floatformat:0 }}</div>
+                        <div class="stat-label">Valoare Totală Oferte (RON)</div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <div class="stat-value">{{ avg_quote_value|floatformat:0 }}</div>
+                        <div class="stat-label">Valoare Medie Ofertă (RON)</div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stat-value">{{ acceptance_rate|floatformat:0 }}%</div>
+                        <div class="stat-label">Rata Acceptare</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REMOVED: Recent wallet transactions section - wallet system removed in Phase 2 -->
+            <!-- TODO Phase 3: Add subscription history section here -->
+            <h5 class="mb-3">Istoric Abonament</h5>
+            <div class="empty-state">
+                <i class="fas fa-crown"></i>
+                <p>Sistemul de abonamente va fi disponibil în curând</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ========================================
+    // Tab Navigation - Smart Scroll Indicators
+    // ========================================
+    const tabNav = document.querySelector('.tab-nav');
+    const activeTab = document.querySelector('.tab-nav-link.active');
+
+    if (tabNav && activeTab) {
+        // Auto-scroll active tab into view (centered if possible)
+        setTimeout(() => {
+            activeTab.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center'
+            });
+        }, 100);
+
+        // Function to update scroll indicators
+        function updateScrollIndicators() {
+            const scrollLeft = tabNav.scrollLeft;
+            const maxScroll = tabNav.scrollWidth - tabNav.clientWidth;
+
+            // Show left indicator if not at start
+            if (scrollLeft > 10) {
+                tabNav.classList.add('can-scroll-left');
+            } else {
+                tabNav.classList.remove('can-scroll-left');
+            }
+
+            // Show right indicator if not at end
+            if (scrollLeft < maxScroll - 10) {
+                tabNav.classList.add('can-scroll-right');
+            } else {
+                tabNav.classList.remove('can-scroll-right');
+            }
+        }
+
+        // Update on scroll
+        tabNav.addEventListener('scroll', updateScrollIndicators);
+
+        // Update on resize
+        window.addEventListener('resize', updateScrollIndicators);
+
+        // Initial update
+        updateScrollIndicators();
+    }
+
+    // ========================================
+    // Calendar - Mobile Optimized
+    // ========================================
+    {% if active_tab == 'calendar' %}
+    var calendarEl = document.getElementById('calendar');
+
+    // Detect mobile device
+    const isMobile = window.innerWidth <= 768;
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        // Use list view on mobile for better readability
+        initialView: isMobile ? 'listWeek' : 'dayGridMonth',
+
+        // Simplified toolbar for mobile
+        headerToolbar: {
+            left: 'prev,next',
+            center: 'title',
+            right: isMobile ? 'listWeek,dayGridMonth' : 'dayGridMonth,timeGridWeek,listWeek'
+        },
+
+        locale: 'ro',
+        firstDay: 1,
+
+        buttonText: {
+            today: 'Azi',
+            month: 'Lună',
+            week: 'Săptămână',
+            list: 'Listă'
+        },
+
+        events: {{ calendar_events|safe }},
+
+        eventClick: function(info) {
+            info.jsEvent.preventDefault();
+            if (info.event.url) {
+                window.location.href = info.event.url;
+            }
+        },
+
+        eventDisplay: 'block',
+        displayEventTime: false,
+        height: 'auto',
+
+        // Disable navLinks to prevent underlines on numbers
+        navLinks: false
+    });
+
+    calendar.render();
+
+    // Handle orientation change on mobile
+    window.addEventListener('resize', function() {
+        const newIsMobile = window.innerWidth <= 768;
+        if (newIsMobile !== isMobile) {
+            location.reload(); // Reload to apply mobile/desktop view
+        }
+    });
+    {% endif %}
+});
+</script>
+{% endblock %}

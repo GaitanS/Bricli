@@ -13,6 +13,8 @@
     // Badge elements
     const notificationsBadge = document.getElementById('notifications-badge');
     const notificationsBadgeMobile = document.getElementById('notifications-badge-mobile');
+    const navbarNotificationBadge = document.getElementById('navbar-notification-badge');
+    const navbarNotificationBadgeMobileTop = document.getElementById('navbar-notification-badge-mobile-top');
 
     let previousCount = 0;
     let pollTimer = null;
@@ -49,7 +51,7 @@
     function updateBadges(count) {
         const countText = count > 99 ? '99+' : count.toString();
 
-        // Update desktop badge
+        // Update desktop dropdown badge
         if (notificationsBadge) {
             if (count > 0) {
                 notificationsBadge.textContent = countText;
@@ -59,7 +61,7 @@
             }
         }
 
-        // Update mobile badge
+        // Update mobile dropdown badge
         if (notificationsBadgeMobile) {
             if (count > 0) {
                 // Extract the text node (first child) and update it
@@ -77,13 +79,33 @@
                 notificationsBadgeMobile.style.display = 'none';
             }
         }
+
+        // Update navbar notification badge (desktop)
+        if (navbarNotificationBadge) {
+            if (count > 0) {
+                navbarNotificationBadge.textContent = countText;
+                navbarNotificationBadge.style.display = '';
+            } else {
+                navbarNotificationBadge.style.display = 'none';
+            }
+        }
+
+        // Update navbar notification badge (mobile top)
+        if (navbarNotificationBadgeMobileTop) {
+            if (count > 0) {
+                navbarNotificationBadgeMobileTop.textContent = countText;
+                navbarNotificationBadgeMobileTop.style.display = '';
+            } else {
+                navbarNotificationBadgeMobileTop.style.display = 'none';
+            }
+        }
     }
 
     /**
      * Show notification animation/alert
      */
     function showNewNotificationAlert(count) {
-        // Add subtle animation to badge
+        // Add subtle animation to dropdown badges
         if (notificationsBadge) {
             notificationsBadge.classList.add('animate-pulse');
             setTimeout(() => {
@@ -95,6 +117,21 @@
             notificationsBadgeMobile.classList.add('animate-pulse');
             setTimeout(() => {
                 notificationsBadgeMobile.classList.remove('animate-pulse');
+            }, 1000);
+        }
+
+        // Add subtle animation to navbar badges
+        if (navbarNotificationBadge) {
+            navbarNotificationBadge.classList.add('animate-pulse');
+            setTimeout(() => {
+                navbarNotificationBadge.classList.remove('animate-pulse');
+            }, 1000);
+        }
+
+        if (navbarNotificationBadgeMobileTop) {
+            navbarNotificationBadgeMobileTop.classList.add('animate-pulse');
+            setTimeout(() => {
+                navbarNotificationBadgeMobileTop.classList.remove('animate-pulse');
             }, 1000);
         }
 

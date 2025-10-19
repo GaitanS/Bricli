@@ -7,7 +7,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 logger = logging.getLogger(__name__)
 from accounts.models import County, CraftsmanProfile
@@ -17,10 +17,9 @@ from notifications.models import Notification
 from notifications.services import NotificationService
 
 from .decorators import ClientRequiredMixin, CraftsmanRequiredMixin
-from .forms import CraftsmanServiceForm, MultipleReviewImageForm, OrderForm, ReviewForm, ReviewImageForm
+from .forms import CraftsmanServiceForm, MultipleReviewImageForm, OrderForm, QuoteForm, ReviewForm, ReviewImageForm
 from .models import (
     CraftsmanService,
-    CreditWallet,
     Invitation,
     Order,
     OrderImage,
@@ -29,7 +28,6 @@ from .models import (
     ReviewImage,
     ServiceCategory,
     Shortlist,
-    WalletTransaction,
 )
 from .querydefs import q_active, q_completed, q_public_orders, q_active_craftsmen
 
@@ -214,6 +212,10 @@ class OrderDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
 
+        # Detect mobile devices for layout switching
+        user_agent = self.request.META.get('HTTP_USER_AGENT', '').lower()
+        context['is_mobile'] = any(keyword in user_agent for keyword in ['mobile', 'android', 'iphone', 'ipad', 'ipod'])
+
         # Get all quotes for this order
         context["quotes"] = order.quotes.select_related("craftsman__user").order_by("-created_at")
 
@@ -279,6 +281,30 @@ class EditOrderView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("services:order_detail", kwargs={"pk": self.object.pk})
+
+
+class DeleteOrderView(LoginRequiredMixin, DeleteView):
+    """View for clients to delete their orders"""
+    model = Order
+    success_url = reverse_lazy("services:my_orders")
+
+    def get_queryset(self):
+        """Only allow clients to delete their own orders"""
+        return Order.objects.filter(client=self.request.user)
+
+    def post(self, request, *args, **kwargs):
+        """Handle the delete request with confirmation"""
+        order = self.get_object()
+        order_title = order.title
+
+        # Log the deletion for audit purposes
+        logger.info(f"Order {order.pk} '{order_title}' deleted by client {request.user.pk}")
+
+        # Perform deletion
+        response = self.delete(request, *args, **kwargs)
+
+        messages.success(request, f'Comanda "{order_title}" a fost ștearsă cu succes!')
+        return response
 
 
 class MyOrdersView(ClientRequiredMixin, ListView):
@@ -375,10 +401,20 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
         # Create cache key based on craftsman, filters, and page size
         category = self.request.GET.get("category", "")
         county = self.request.GET.get("county", "")
+        urgency = self.request.GET.get("urgency", "")
+        budget_min = self.request.GET.get("budget_min", "")
+        sort = self.request.GET.get("sort", "newest")
         page_size = self.get_paginate_by(None)
 
         cache_key = CacheManager.generate_key(
-            "available_orders", craftsman_id=craftsman.id, category=category, county=county, page_size=page_size
+            "available_orders",
+            craftsman_id=craftsman.id,
+            category=category,
+            county=county,
+            urgency=urgency,
+            budget_min=budget_min,
+            sort=sort,
+            page_size=page_size
         )
 
         # Try to get from cache first (shorter cache time for orders)
@@ -397,9 +433,7 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
             .exclude(assigned_craftsman__isnull=False)  # Hide direct requests
             .select_related("client", "service", "service__category", "county", "city")
             .prefetch_related("quotes", "invitations")
-            .order_by("-created_at")
         )
-        # Include invited orders even if not published? We keep only published here for listing
 
         # Filter by service category if requested
         if category:
@@ -408,6 +442,38 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
         # Filter by county if requested
         if county:
             queryset = queryset.filter(county=county)
+
+        # Filter by urgency if requested
+        if urgency:
+            queryset = queryset.filter(urgency=urgency)
+
+        # Filter by minimum budget if requested
+        if budget_min and budget_min.isdigit():
+            queryset = queryset.filter(budget_max__gte=int(budget_min))
+
+        # Apply sorting
+        from django.db.models import Count, F, IntegerField, Q, Value, Case, When
+
+        if sort == "budget_high":
+            queryset = queryset.order_by(F("budget_max").desc(nulls_last=True), "-created_at")
+        elif sort == "urgent":
+            # Prioritize urgent orders first
+            queryset = queryset.order_by(
+                Case(
+                    When(urgency='urgent', then=Value(0)),
+                    When(urgency='normal', then=Value(1)),
+                    When(urgency='flexible', then=Value(2)),
+                    default=Value(3),
+                    output_field=IntegerField(),
+                ),
+                "-created_at"
+            )
+        elif sort == "least_quotes":
+            queryset = queryset.annotate(
+                quotes_count=Count('quotes')
+            ).order_by('quotes_count', '-created_at')
+        else:  # newest (default)
+            queryset = queryset.order_by("-created_at")
 
         queryset = queryset.distinct()
 
@@ -420,11 +486,31 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         craftsman = self.request.user.craftsman_profile
 
-        # Filtre pentru UI
-        context["categories"] = ServiceCategory.objects.all().order_by("name")
+        # Count registered services
+        registered_services_count = CraftsmanService.objects.filter(craftsman=craftsman).count()
+        context["registered_services_count"] = registered_services_count
+        context["has_no_services"] = registered_services_count == 0
+
+        # Get only categories that the craftsman has services in
+        craftsman_service_ids = CraftsmanService.objects.filter(
+            craftsman=craftsman
+        ).values_list("service_id", flat=True)
+
+        craftsman_categories = ServiceCategory.objects.filter(
+            services__id__in=craftsman_service_ids
+        ).annotate(
+            service_count=Count('services', filter=Q(services__id__in=craftsman_service_ids))
+        ).distinct().order_by('name')
+
+        # Filtre pentru UI (doar categoriile meșterului)
+        context["categories"] = craftsman_categories
         context["counties"] = County.objects.values_list("name", flat=True).order_by("name")
+        context["craftsman_county"] = craftsman.county  # Județul meșterului pentru prioritizare
         context["current_category"] = self.request.GET.get("category", "")
         context["current_county"] = self.request.GET.get("county", "")
+        context["current_urgency"] = self.request.GET.get("urgency", "")
+        context["current_budget_min"] = self.request.GET.get("budget_min", "")
+        context["current_sort"] = self.request.GET.get("sort", "newest")
 
         # Comenzi la care meșterul a fost invitat
         context["invited_order_ids"] = set(
@@ -437,7 +523,7 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
 class CreateQuoteView(LoginRequiredMixin, CreateView):
     model = Quote
     template_name = "services/create_quote.html"
-    fields = ["price", "description", "estimated_duration"]
+    form_class = QuoteForm
 
     # Rate limiting ELIMINAT - nu mai sunt restricții
 
@@ -504,6 +590,8 @@ class PublishOrderView(LoginRequiredMixin, DetailView):
     model = Order
 
     def post(self, request, *args, **kwargs):
+        from .models import notify_new_order_to_craftsmen
+
         order = self.get_object()
 
         # Check if user is the owner
@@ -514,6 +602,14 @@ class PublishOrderView(LoginRequiredMixin, DetailView):
         order.status = "published"
         order.published_at = timezone.now()
         order.save()
+
+        # Notify craftsmen about the new order
+        try:
+            notifications_sent = notify_new_order_to_craftsmen(order)
+            logger.info(f"Sent {notifications_sent} notifications for order {order.id}")
+        except Exception as e:
+            logger.error(f"Failed to send order notifications for order {order.id}: {str(e)}")
+            # Don't fail the publish if notifications fail
 
         messages.success(request, "Comanda a fost publicată și este acum disponibilă pentru oferte!")
         return redirect("services:order_detail", pk=order.pk)
@@ -699,7 +795,12 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
     template_name = "services/create_review.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.order = get_object_or_404(Order, pk=kwargs["pk"])
+        # Handle deleted orders gracefully
+        try:
+            self.order = Order.objects.get(pk=kwargs["pk"])
+        except Order.DoesNotExist:
+            messages.info(request, "Comanda asociată acestei recenzii nu mai există.")
+            return redirect("services:my_orders")
 
         # Check if user can review this order (silently redirect craftsmen without error message)
         if self.order.client != request.user:
@@ -731,9 +832,10 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
 
         # Handle image uploads
         image_form = MultipleReviewImageForm(
+            data=self.request.POST,  # CRITICAL: Form must be bound to data
+            files=self.request.FILES,
             max_images=5,
-            existing_images_count=0,
-            files=self.request.FILES
+            existing_images_count=0
         )
 
         if image_form.is_valid():
@@ -819,8 +921,8 @@ class EditReviewView(LoginRequiredMixin, UpdateView):
     def dispatch(self, request, *args, **kwargs):
         review = self.get_object()
 
-        # Check if user is the review owner
-        if review.client != request.user:
+        # Check if user is the review owner (handle deleted clients)
+        if not review.client or review.client != request.user:
             messages.error(request, "Nu poți edita această recenzie.")
             return redirect("services:review_detail", pk=review.pk)
 
@@ -846,9 +948,10 @@ class EditReviewView(LoginRequiredMixin, UpdateView):
         # Handle new image uploads
         existing_count = self.object.images.count()
         image_form = MultipleReviewImageForm(
+            data=self.request.POST,  # CRITICAL: Form must be bound to data
+            files=self.request.FILES,
             max_images=5,
-            existing_images_count=existing_count,
-            files=self.request.FILES
+            existing_images_count=existing_count
         )
 
         if image_form.is_valid():
@@ -949,8 +1052,8 @@ class ReviewImageUploadView(LoginRequiredMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.review = get_object_or_404(Review, pk=kwargs["review_pk"])
 
-        # Check if user owns this review
-        if self.review.client != request.user:
+        # Check if user owns this review (handle deleted clients)
+        if not self.review.client or self.review.client != request.user:
             messages.error(request, "Nu poți adăuga imagini la această recenzie.")
             return redirect("services:review_detail", pk=self.review.pk)
 
@@ -1178,19 +1281,9 @@ class ShortlistCraftsmanView(LoginRequiredMixin, DetailView):
         return redirect("services:invite_craftsmen", pk=order.pk)
 
 
-class WalletView(LoginRequiredMixin, DetailView):
-    model = CreditWallet
-    template_name = "services/wallet.html"
-
-    def get_object(self):
-        from .wallet_service import get_or_create_wallet
-        # Use service layer for safe wallet retrieval
-        return get_or_create_wallet(self.request.user)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["transactions"] = WalletTransaction.objects.filter(wallet=self.object).order_by("-created_at")
-        return context
+# REMOVED: WalletView - Wallet system removed in favor of subscription-based model
+# See Phase 2: Wallet Removal in SUBSCRIPTION_PLAN.md
+# Transition date: 2025-10-18
 
 
 # Craftsman Services Management Views
@@ -1334,3 +1427,140 @@ class NotificationsView(LoginRequiredMixin, ListView):
         Notification.objects.filter(recipient=request.user, is_read=False).update(is_read=True, read_at=timezone.now())
 
         return super().get(request, *args, **kwargs)
+
+
+class CraftsmanDashboardView(LoginRequiredMixin, CraftsmanRequiredMixin, ListView):
+    """Dashboard for craftsman with 5 tabs: Overview, Orders, Quotes, Calendar, Stats"""
+
+    model = Order
+    template_name = "services/craftsman_dashboard.html"
+    context_object_name = "orders"
+    paginate_by = 10
+
+    def get_queryset(self):
+        """Return orders based on active tab"""
+        # Use correct relationship name: craftsman_profile (not craftsmanprofile)
+        if not hasattr(self.request.user, 'craftsman_profile'):
+            return Order.objects.none()
+
+        craftsman = self.request.user.craftsman_profile
+        tab = self.request.GET.get('tab', 'overview')
+
+        if tab == 'orders':
+            # Show all orders the craftsman has shortlisted
+            shortlisted_order_ids = Shortlist.objects.filter(
+                craftsman=craftsman.user
+            ).values_list('order_id', flat=True)
+
+            return Order.objects.filter(
+                id__in=shortlisted_order_ids
+            ).select_related('client', 'service', 'county', 'city').order_by('-created_at')
+
+        elif tab == 'quotes':
+            # Show orders where craftsman has submitted quotes
+            quoted_order_ids = Quote.objects.filter(
+                craftsman=craftsman
+            ).values_list('order_id', flat=True)
+
+            return Order.objects.filter(
+                id__in=quoted_order_ids
+            ).select_related('client', 'service', 'county', 'city').order_by('-created_at')
+
+        # For overview tab, return recent shortlisted orders (limit 5)
+        shortlisted_order_ids = Shortlist.objects.filter(
+            craftsman=craftsman.user
+        ).values_list('order_id', flat=True)[:5]
+
+        return Order.objects.filter(
+            id__in=shortlisted_order_ids
+        ).select_related('client', 'service', 'county', 'city').order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Use correct relationship name: craftsman_profile (not craftsmanprofile)
+        if not hasattr(self.request.user, 'craftsman_profile'):
+            context['error'] = "Profil meșter lipsă"
+            return context
+
+        craftsman = self.request.user.craftsman_profile
+        tab = self.request.GET.get('tab', 'overview')
+
+        context['active_tab'] = tab
+
+        # Common stats for all tabs
+        context['total_shortlists'] = Shortlist.objects.filter(craftsman=craftsman.user).count()
+        context['total_quotes'] = Quote.objects.filter(craftsman=craftsman).count()
+        context['accepted_quotes'] = Quote.objects.filter(craftsman=craftsman, status='accepted').count()
+        context['pending_quotes'] = Quote.objects.filter(craftsman=craftsman, status='pending').count()
+
+        # Phase 9: Add subscription info
+        try:
+            from subscriptions.models import CraftsmanSubscription
+            subscription = CraftsmanSubscription.objects.get(craftsman=craftsman)
+            context['subscription'] = subscription
+        except Exception:
+            context['subscription'] = None
+
+        if tab == 'overview':
+            # Overview tab: Show dashboard summary
+            context['recent_orders'] = self.get_queryset()[:5]
+            context['recent_quotes'] = Quote.objects.filter(
+                craftsman=craftsman
+            ).select_related('order', 'order__client').order_by('-created_at')[:5]
+
+            # Upcoming jobs (quotes with proposed_start_date)
+            from datetime import date
+            context['upcoming_jobs'] = Quote.objects.filter(
+                craftsman=craftsman,
+                status='accepted',
+                proposed_start_date__gte=date.today()
+            ).select_related('order').order_by('proposed_start_date')[:5]
+
+        elif tab == 'calendar':
+            # Calendar tab: Get all quotes with start dates for calendar view
+            all_quotes = Quote.objects.filter(
+                craftsman=craftsman,
+                proposed_start_date__isnull=False
+            ).select_related('order', 'order__client')
+
+            # Format for FullCalendar.js
+            context['calendar_events'] = [
+                {
+                    'id': quote.id,
+                    'title': quote.order.title,
+                    'start': quote.proposed_start_date.isoformat(),
+                    'url': reverse('services:order_detail', kwargs={'pk': quote.order.pk}),
+                    'backgroundColor': '#8B5CF6' if quote.status == 'accepted' else '#6b7280',
+                    'borderColor': '#7C3AED' if quote.status == 'accepted' else '#4b5563',
+                    'textColor': '#ffffff',
+                    'extendedProps': {
+                        'status': quote.status,
+                        'price': float(quote.price),
+                        'duration': quote.estimated_duration,
+                    }
+                }
+                for quote in all_quotes
+            ]
+
+        elif tab == 'stats':
+            # Stats tab: Detailed statistics
+            from django.db.models import Sum
+
+            # Quote statistics
+            context['total_quote_value'] = Quote.objects.filter(
+                craftsman=craftsman
+            ).aggregate(total=Sum('price'))['total'] or 0
+
+            context['avg_quote_value'] = Quote.objects.filter(
+                craftsman=craftsman
+            ).aggregate(avg=Avg('price'))['avg'] or 0
+
+            context['acceptance_rate'] = 0
+            if context['total_quotes'] > 0:
+                context['acceptance_rate'] = (context['accepted_quotes'] / context['total_quotes']) * 100
+
+            # REMOVED: Recent wallet transactions - wallet system removed
+            # TODO Phase 3: Add subscription history here
+
+        return context

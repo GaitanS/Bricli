@@ -1,0 +1,36 @@
+{% extends "subscriptions/emails/base_email.html" %}
+
+{% block content %}
+<h1>⚠️ {{ leads_used }}/{{ leads_limit }} lead-uri folosite</h1>
+
+<p>Salut {{ user_name }},</p>
+
+<div class="highlight">
+    <p><strong>Ești aproape de limita lunară de lead-uri!</strong></p>
+    <p>Ai folosit <strong>{{ leads_used }} din {{ leads_limit }}</strong> lead-uri disponibile pe Plan Gratuit.</p>
+    <p>Mai rămân doar <strong>{{ leads_remaining }} lead-uri</strong> până la finalul perioadei de facturare.</p>
+</div>
+
+<h2>Ce se întâmplă când ating limita?</h2>
+<ul>
+    <li>❌ Nu vei mai putea să te înscrii la noi proiecte</li>
+    <li>📅 Limita se resetează la începutul lunii următoare</li>
+    <li>💡 Upgrade la Plan Plus = lead-uri nelimitate</li>
+</ul>
+
+<h2>Soluția: Upgrade la Plan Plus</h2>
+<ul>
+    <li>✅ Lead-uri nelimitate</li>
+    <li>✅ Prioritate în rezultatele căutării</li>
+    <li>✅ Mai multe imagini în portofoliu</li>
+    <li>💰 Doar 49 RON/lună</li>
+</ul>
+
+<p style="text-align: center;">
+    <a href="{{ upgrade_url }}" class="button">Upgrade la Plan Plus</a>
+</p>
+
+<p>Nu pierde oportunități! Upgrade acum pentru acces nelimitat.</p>
+
+<p>Cu respect,<br>Echipa {{ site_name }}</p>
+{% endblock %}

@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Date Fiscale - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .fiscal-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #7c3aed;
+    }
+
+    .form-header h1 {
+        color: #1f2937;
+        margin-bottom: 10px;
+    }
+
+    .form-header p {
+        color: #6b7280;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .form-section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #7c3aed;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        padding: 10px 15px;
+    }
+
+    .form-control:focus {
+        border-color: #7c3aed;
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+
+    .form-text {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 5px;
+    }
+
+    .error-message {
+        color: #dc2626;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 12px;
+        font-weight: 600;
+        border-radius: 8px;
+        background: #7c3aed;
+        border-color: #7c3aed;
+        margin-top: 20px;
+    }
+
+    .btn-submit:hover {
+        background: #6d28d9;
+        border-color: #6d28d9;
+    }
+
+    .info-box {
+        background: #eff6ff;
+        border-left: 4px solid #3b82f6;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 25px;
+    }
+
+    .info-box i {
+        color: #3b82f6;
+        margin-right: 10px;
+    }
+
+    #pfa-srl-fields, #pf-fields {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="fiscal-container">
+    <div class="form-header">
+        <h1><i class="fas fa-file-invoice me-2"></i>Date Fiscale</h1>
+        <p>Completează datele fiscale necesare pentru emiterea facturilor</p>
+    </div>
+
+    <div class="info-box">
+        <i class="fas fa-info-circle"></i>
+        <strong>De ce sunt necesare?</strong> Conform legii românești, facturile fiscale trebuie să conțină date complete despre cumpărător. Aceste date sunt folosite exclusiv pentru emiterea facturilor lunare.
+    </div>
+
+    <form method="post" id="fiscal-form">
+        {% csrf_token %}
+
+        <!-- Tip Persoană -->
+        <div class="form-section">
+            <div class="form-section-title">Tip Persoană Juridică</div>
+
+            <div class="form-group">
+                <label for="{{ form.fiscal_type.id_for_label }}" class="form-label">{{ form.fiscal_type.label }}</label>
+                {{ form.fiscal_type }}
+                {% if form.fiscal_type.help_text %}
+                    <div class="form-text">{{ form.fiscal_type.help_text }}</div>
+                {% endif %}
+                {% if form.fiscal_type.errors %}
+                    <div class="error-message">{{ form.fiscal_type.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- PF Fields -->
+        <div id="pf-fields" class="form-section">
+            <div class="form-section-title">Date Persoană Fizică</div>
+
+            <div class="form-group">
+                <label for="{{ form.cnp.id_for_label }}" class="form-label">{{ form.cnp.label }}</label>
+                {{ form.cnp }}
+                {% if form.cnp.help_text %}
+                    <div class="form-text">{{ form.cnp.help_text }}</div>
+                {% endif %}
+                {% if form.cnp.errors %}
+                    <div class="error-message">{{ form.cnp.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- PFA/SRL Fields -->
+        <div id="pfa-srl-fields" class="form-section">
+            <div class="form-section-title">Date Companie</div>
+
+            <div class="form-group">
+                <label for="{{ form.cui.id_for_label }}" class="form-label">{{ form.cui.label }}</label>
+                {{ form.cui }}
+                {% if form.cui.help_text %}
+                    <div class="form-text">{{ form.cui.help_text }}</div>
+                {% endif %}
+                {% if form.cui.errors %}
+                    <div class="error-message">{{ form.cui.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.company_name.id_for_label }}" class="form-label">{{ form.company_name.label }}</label>
+                {{ form.company_name }}
+                {% if form.company_name.help_text %}
+                    <div class="form-text">{{ form.company_name.help_text }}</div>
+                {% endif %}
+                {% if form.company_name.errors %}
+                    <div class="error-message">{{ form.company_name.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Adresă Fiscală -->
+        <div class="form-section">
+            <div class="form-section-title">Adresă Fiscală</div>
+
+            <div class="form-group">
+                <label for="{{ form.fiscal_address_street.id_for_label }}" class="form-label">{{ form.fiscal_address_street.label }}</label>
+                {{ form.fiscal_address_street }}
+                {% if form.fiscal_address_street.errors %}
+                    <div class="error-message">{{ form.fiscal_address_street.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.fiscal_address_city.id_for_label }}" class="form-label">{{ form.fiscal_address_city.label }}</label>
+                        {{ form.fiscal_address_city }}
+                        {% if form.fiscal_address_city.errors %}
+                            <div class="error-message">{{ form.fiscal_address_city.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.fiscal_address_county.id_for_label }}" class="form-label">{{ form.fiscal_address_county.label }}</label>
+                        {{ form.fiscal_address_county }}
+                        {% if form.fiscal_address_county.errors %}
+                            <div class="error-message">{{ form.fiscal_address_county.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.fiscal_address_postal_code.id_for_label }}" class="form-label">{{ form.fiscal_address_postal_code.label }}</label>
+                {{ form.fiscal_address_postal_code }}
+                {% if form.fiscal_address_postal_code.errors %}
+                    <div class="error-message">{{ form.fiscal_address_postal_code.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="form-section">
+            <div class="form-section-title">Date de Contact</div>
+
+            <div class="form-group">
+                <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }}</label>
+                {{ form.phone }}
+                {% if form.phone.help_text %}
+                    <div class="form-text">{{ form.phone.help_text }}</div>
+                {% endif %}
+                {% if form.phone.errors %}
+                    <div class="error-message">{{ form.phone.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-submit">
+            <i class="fas fa-save me-2"></i> Salvează Datele Fiscale
+        </button>
+    </form>
+</div>
+
+<script>
+// Show/hide fields based on fiscal_type
+document.addEventListener('DOMContentLoaded', function() {
+    const fiscalTypeSelect = document.getElementById('{{ form.fiscal_type.id_for_label }}');
+    const pfFields = document.getElementById('pf-fields');
+    const pfaSrlFields = document.getElementById('pfa-srl-fields');
+
+    function updateFields() {
+        const selectedType = fiscalTypeSelect.value;
+
+        if (selectedType === 'PF') {
+            pfFields.style.display = 'block';
+            pfaSrlFields.style.display = 'none';
+        } else if (selectedType === 'PFA' || selectedType === 'SRL') {
+            pfFields.style.display = 'none';
+            pfaSrlFields.style.display = 'block';
+        } else {
+            pfFields.style.display = 'none';
+            pfaSrlFields.style.display = 'none';
+        }
+    }
+
+    fiscalTypeSelect.addEventListener('change', updateFields);
+    updateFields(); // Initial state
+});
+</script>
+{% endblock %}

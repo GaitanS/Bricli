@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     "messaging",
     "moderation",
     "notifications",
+    "subscriptions",  # NEW: Subscription management for tiered pricing
 ]
 
 MIDDLEWARE = [

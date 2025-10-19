@@ -1,0 +1,252 @@
+{% load static %}
+
+{# Subscription Widget - Displays current tier, usage, and upgrade options #}
+<div class="subscription-widget">
+    <div class="widget-header">
+        <h5 class="widget-title">
+            <i class="fas fa-crown me-2"></i>Abonamentul Meu
+        </h5>
+        {% if subscription.tier.name == 'free' %}
+            <span class="tier-badge tier-free">Gratuit</span>
+        {% elif subscription.tier.name == 'plus' %}
+            <span class="tier-badge tier-plus">
+                <i class="fas fa-star me-1"></i>Plus
+            </span>
+        {% elif subscription.tier.name == 'pro' %}
+            <span class="tier-badge tier-pro">
+                <i class="fas fa-crown me-1"></i>Pro
+            </span>
+        {% endif %}
+    </div>
+
+    {# Usage Progress #}
+    <div class="widget-usage mt-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="usage-label">Lead-uri folosite</span>
+            <span class="usage-value">
+                <strong>{{ subscription.leads_used_this_month }}</strong>
+                {% if subscription.tier.monthly_lead_limit %}
+                    / {{ subscription.tier.monthly_lead_limit }}
+                {% else %}
+                    / ∞
+                {% endif %}
+            </span>
+        </div>
+
+        {% if subscription.tier.monthly_lead_limit %}
+            {% widthratio subscription.leads_used_this_month subscription.tier.monthly_lead_limit 100 as usage_percentage %}
+            <div class="progress usage-progress">
+                <div class="progress-bar {% if usage_percentage >= 80 %}bg-danger{% elif usage_percentage >= 60 %}bg-warning{% else %}bg-success{% endif %}"
+                     role="progressbar"
+                     style="width: {% if usage_percentage > 100 %}100{% else %}{{ usage_percentage }}{% endif %}%"
+                     aria-valuenow="{{ subscription.leads_used_this_month }}"
+                     aria-valuemin="0"
+                     aria-valuemax="{{ subscription.tier.monthly_lead_limit }}">
+                </div>
+            </div>
+
+            {# Warning for high usage #}
+            {% if usage_percentage >= 80 %}
+                <div class="alert alert-warning mt-2 mb-0 py-2 px-3">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    <small>
+                        {% if usage_percentage >= 100 %}
+                            Ai atins limita lunară! Upgrade pentru lead-uri nelimitate.
+                        {% else %}
+                            {{ subscription.tier.monthly_lead_limit|add:"-"|add:subscription.leads_used_this_month }} lead-uri rămase.
+                        {% endif %}
+                    </small>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-success mt-2 mb-0 py-2 px-3">
+                <i class="fas fa-infinity me-1"></i>
+                <small>Lead-uri nelimitate!</small>
+            </div>
+        {% endif %}
+    </div>
+
+    {# Tier Info #}
+    <div class="widget-info mt-3">
+        {% if subscription.tier.name == 'free' %}
+            <p class="mb-2"><small class="text-muted">Plan gratuit - limitat la {{ subscription.tier.monthly_lead_limit }} lead-uri/lună</small></p>
+        {% elif subscription.tier.name == 'plus' %}
+            <p class="mb-2"><small class="text-muted">{{ subscription.tier.price_ron }} RON/lună - Lead-uri nelimitate</small></p>
+        {% elif subscription.tier.name == 'pro' %}
+            <p class="mb-2"><small class="text-muted">{{ subscription.tier.price_ron }} RON/lună - Lead-uri + Features Premium</small></p>
+        {% endif %}
+
+        {# Renewal Date #}
+        {% if subscription.stripe_subscription_id and subscription.current_period_end %}
+            <p class="mb-0"><small class="text-muted">
+                <i class="fas fa-calendar-alt me-1"></i>
+                Reînnoire: {{ subscription.current_period_end|date:"d M Y" }}
+            </small></p>
+        {% endif %}
+    </div>
+
+    {# Actions #}
+    <div class="widget-actions mt-3">
+        {% if subscription.tier.name == 'free' %}
+            <a href="{% url 'subscriptions:pricing' %}" class="btn btn-upgrade w-100">
+                <i class="fas fa-arrow-up me-2"></i>Upgrade la Plus sau Pro
+            </a>
+        {% elif subscription.tier.name == 'plus' %}
+            <a href="{% url 'subscriptions:upgrade' 'pro' %}" class="btn btn-upgrade w-100 mb-2">
+                <i class="fas fa-crown me-2"></i>Upgrade la Pro
+            </a>
+            <a href="{% url 'subscriptions:manage' %}" class="btn btn-manage w-100">
+                <i class="fas fa-cog me-2"></i>Gestionează Abonament
+            </a>
+        {% else %}
+            <a href="{% url 'subscriptions:manage' %}" class="btn btn-manage w-100">
+                <i class="fas fa-cog me-2"></i>Gestionează Abonament
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Subscription Widget Styles */
+.subscription-widget {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.widget-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1F2937;
+    margin: 0;
+}
+
+.tier-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
+
+.tier-free {
+    background: #E5E7EB;
+    color: #4B5563;
+}
+
+.tier-plus {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+    color: white;
+}
+
+.tier-pro {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: white;
+}
+
+.widget-usage {
+    padding: 1rem;
+    background: #F9FAFB;
+    border-radius: 8px;
+}
+
+.usage-label {
+    font-size: 0.9rem;
+    color: #6B7280;
+}
+
+.usage-value {
+    font-size: 0.95rem;
+    color: #1F2937;
+}
+
+.usage-progress {
+    height: 8px;
+    border-radius: 10px;
+    background: #E5E7EB;
+}
+
+.usage-progress .progress-bar {
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.widget-info {
+    border-top: 1px solid #E5E7EB;
+    padding-top: 1rem;
+}
+
+.widget-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.btn-upgrade {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-upgrade:hover {
+    background: linear-gradient(135deg, #7C3AED, #6D28D9);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-manage {
+    background: white;
+    color: #8B5CF6;
+    border: 2px solid #8B5CF6;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-manage:hover {
+    background: #F3E8FF;
+    color: #7C3AED;
+    border-color: #7C3AED;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .subscription-widget {
+        padding: 1rem;
+    }
+
+    .widget-title {
+        font-size: 1rem;
+    }
+
+    .tier-badge {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.7rem;
+    }
+}
+</style>

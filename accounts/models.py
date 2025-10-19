@@ -197,8 +197,57 @@ class CraftsmanProfile(models.Model):
         max_length=255, blank=True, default="", verbose_name="Adresa sediu (opțional)", help_text="Adresa sediului firmei/PFA (opțional)"
     )
 
+    # NEW: Fiscal data for Smart Bill invoices (OUG 34/2014 compliance)
+    fiscal_type = models.CharField(
+        max_length=3,
+        choices=[
+            ('PF', 'Persoană Fizică'),
+            ('PFA', 'PFA/Întreprindere Individuală'),
+            ('SRL', 'SRL/SRL-D')
+        ],
+        default='PF',
+        help_text="Tip persoană (obligatoriu pentru facturare)"
+    )
+    cui = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="CUI (obligatoriu pentru PFA/SRL, lăsat gol pentru PF)"
+    )
+    cnp = models.CharField(
+        max_length=13,
+        blank=True,
+        help_text="CNP (obligatoriu pentru Persoană Fizică, lăsat gol pentru PFA/SRL)"
+    )
+    company_name = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Denumire firmă (obligatoriu pentru PFA/SRL)"
+    )
+
+    # Fiscal address (mandatory for Smart Bill invoicing)
+    fiscal_address_street = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Adresă completă (stradă, număr) - obligatoriu pentru facturare"
+    )
+    fiscal_address_city = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Oraș - obligatoriu pentru facturare"
+    )
+    fiscal_address_county = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Județ - obligatoriu pentru facturare"
+    )
+    fiscal_address_postal_code = models.CharField(
+        max_length=10,
+        blank=True,
+        help_text="Cod poștal"
+    )
+
     # Contact info
-    phone = models.CharField(max_length=15, blank=True, help_text="Telefon de contact (opțional)")
+    phone = models.CharField(max_length=20, blank=True, help_text="Telefon de contact (format: +407XXXXXXXX)")
 
     # Linkuri publice (opțional)
     website_url = models.URLField(blank=True, help_text="Site web")
@@ -232,6 +281,31 @@ class CraftsmanProfile(models.Model):
         city_name = self.city.name if self.city else "Necunoscut"
         county_name = self.county.name if self.county else "Necunoscut"
         return f"{self.display_name} - {city_name}, {county_name}"
+
+    def clean(self):
+        """
+        Validate fiscal data (Romanian legal requirements for Smart Bill invoicing)
+        Per OUG 34/2014, fiscal data must be complete before upgrade
+        """
+        import re
+        from django.core.exceptions import ValidationError
+
+        # Validate CUI for PFA/SRL
+        if self.fiscal_type in ['PFA', 'SRL'] and not self.cui:
+            raise ValidationError({'cui': 'CUI obligatoriu pentru PFA/SRL'})
+
+        # Validate CNP for PF
+        if self.fiscal_type == 'PF' and not self.cnp:
+            raise ValidationError({'cnp': 'CNP obligatoriu pentru Persoană Fizică'})
+
+        # Validate Romanian phone format (+40XXXXXXXXX)
+        if self.phone:
+            pattern = r'^(\+40|0040|0)(7\d{8})$'
+            if not re.match(pattern, self.phone):
+                raise ValidationError({'phone': 'Număr de telefon românesc invalid (format: 07XX XXX XXX sau +407XX XXX XXX)'})
+
+            # Normalize phone to +407XXXXXXXX
+            self.phone = re.sub(r'^(\+40|0040|0)', '+40', self.phone)
 
     def save(self, *args, **kwargs):
         """Auto-generate slug from display_name or username if not set"""

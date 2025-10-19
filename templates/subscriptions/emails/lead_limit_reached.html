@@ -1,0 +1,51 @@
+{% extends "subscriptions/emails/base_email.html" %}
+
+{% block content %}
+<h1>🚫 Limită atinsă - Upgrade pentru mai multe lead-uri</h1>
+
+<p>Salut {{ user_name }},</p>
+
+<div class="highlight warning">
+    <p><strong>Ai atins limita de 5 lead-uri pe Plan Gratuit!</strong></p>
+    <p>Nu vei mai putea să te înscrii la noi proiecte până luna viitoare, cu excepția cazului în care faci upgrade.</p>
+</div>
+
+<h2>De ce să faci upgrade ACUM?</h2>
+<ul>
+    <li>🚀 <strong>Lead-uri nelimitate</strong> - nu mai pierde niciun client potențial</li>
+    <li>⭐ <strong>Prioritate în căutare</strong> - apari mai sus în rezultate</li>
+    <li>📈 <strong>Mai multe vânzări</strong> - mai multe lead-uri = mai multe proiecte</li>
+</ul>
+
+<h2>Alege planul potrivit:</h2>
+
+<div class="highlight success">
+    <h3>Plan Plus - {{ plus_price }} RON/lună</h3>
+    <ul>
+        <li>✅ Lead-uri nelimitate</li>
+        <li>✅ 10 imagini în portofoliu</li>
+        <li>✅ Prioritate în căutare</li>
+    </ul>
+    <p style="text-align: center;">
+        <a href="{{ upgrade_url }}" class="button">Upgrade la Plus</a>
+    </p>
+</div>
+
+<div class="highlight">
+    <h3>Plan Pro - {{ pro_price }} RON/lună</h3>
+    <ul>
+        <li>✅ Toate beneficiile Plus</li>
+        <li>✅ 30 imagini în portofoliu</li>
+        <li>✅ Afișare în secțiunea Featured</li>
+        <li>✅ Analytics avansate</li>
+        <li>✅ Atașare documente PDF</li>
+    </ul>
+    <p style="text-align: center;">
+        <a href="{{ upgrade_url }}pro/" class="button">Upgrade la Pro</a>
+    </p>
+</div>
+
+<p>Nu lăsa concurența să-ți ia clienții! Upgrade acum pentru lead-uri nelimitate.</p>
+
+<p>Cu respect,<br>Echipa {{ site_name }}</p>
+{% endblock %}

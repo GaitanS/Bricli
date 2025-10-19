@@ -1,0 +1,38 @@
+{% extends "subscriptions/emails/base_email.html" %}
+
+{% block content %}
+<h1>✅ Cerere de rambursare confirmată</h1>
+
+<p>Salut {{ user_name }},</p>
+
+<p>Am primit cererea ta de rambursare pentru abonamentul <strong>{{ tier_name }}</strong> și am procesat-o cu succes.</p>
+
+<div class="highlight success">
+    <h2>Detalii rambursare:</h2>
+    <ul>
+        <li><strong>Sumă rambursată:</strong> {{ amount_ron }} RON</li>
+        <li><strong>Metodă de plată:</strong> Card bancar (aceeași metodă folosită la plată)</li>
+        <li><strong>Timp estimat:</strong> {{ processing_days }} zile lucrătoare</li>
+    </ul>
+</div>
+
+<h2>Ce se întâmplă acum?</h2>
+<ul>
+    <li>💳 Banii vor fi returnați pe cardul folosit la plată</li>
+    <li>⏱️ Procesarea durează {{ processing_days }} zile lucrătoare</li>
+    <li>📧 Vei primi confirmare din partea băncii când banii ajung în cont</li>
+    <li>📊 Contul tău a fost retrogradat la Plan Gratuit (5 lead-uri/lună)</li>
+</ul>
+
+<div class="highlight">
+    <h3>Ai schimbat părerea?</h3>
+    <p>Dacă dorești să reactivezi abonamentul, poți face upgrade oricând.</p>
+    <p style="text-align: center;">
+        <a href="{{ site_url }}/abonamente/upgrade/plus/" class="button">Reactivează abonamentul</a>
+    </p>
+</div>
+
+<p>Ne pare rău că ne părăsești! Dacă ai feedback despre serviciul nostru, ne-ar ajuta foarte mult să auzim de la tine.</p>
+
+<p>Cu respect,<br>Echipa {{ site_name }}</p>
+{% endblock %}

@@ -24,6 +24,8 @@ urlpatterns = [
     path("mesaje/", include("messaging.urls")),  # /mesaje/conversatie/
     path("moderation/", include("moderation.urls")),
     path("notifications/", include("notifications.urls")),
+    # Subscriptions (webhooks and management)
+    path("abonamente/", include("subscriptions.urls")),  # /abonamente/webhook/stripe/
 ]
 
 # Custom error handlers

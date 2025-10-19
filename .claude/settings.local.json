@@ -11,7 +11,18 @@
       "Bash(curl:*)",
       "Bash(python:*)",
       "Bash(/bashes)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(if not exist \"services\\management\\commands\" mkdir \"services\\management\\commands\")",
+      "Bash(timeout 3 echo:*)",
+      "Bash(if not exist \"subscriptions\\management\\commands\" mkdir \"subscriptions\\management\\commands\")",
+      "Bash(venvScriptspip.exe install django-ratelimit)",
+      "Bash(./venv/Scripts/pip.exe install:*)",
+      "Bash(timeout:*)",
+      "Bash(./venv/Scripts/python.exe manage.py:*)",
+      "Bash(./venv/Scripts/python.exe:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(del check_review_images.py)"
     ],
     "deny": [],
     "ask": []

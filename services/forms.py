@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 
 from accounts.models import County
 
-from .models import CraftsmanService, Order, OrderImage, Quote, Review, ReviewImage
+from .models import CraftsmanService, Order, OrderImage, Quote, QuoteAttachment, Review, ReviewImage, validate_quote_attachment
 
 
 class OrderImageForm(forms.ModelForm):
@@ -184,9 +184,9 @@ class ReviewImageForm(forms.ModelForm):
 class MultipleReviewImageForm(forms.Form):
     """Form for uploading multiple review images (max 5)"""
 
-    # Note: We don't use a FileField here because Django's FileInput doesn't support multiple files
-    # Instead, we process files directly from request.FILES in the view
-    # This form is used only for validation
+    # Dummy field to make Django consider the form valid
+    # The actual validation happens in clean()
+    images = forms.CharField(required=False, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         self.max_images = kwargs.pop('max_images', 5)
@@ -254,54 +254,142 @@ class MultipleReviewImageForm(forms.Form):
 
 
 class QuoteForm(forms.ModelForm):
-    """Form for craftsmen to submit quotes"""
+    """Form for craftsmen to submit quotes - Simplified version with inline duration"""
+
+    # Custom field: duration value (number input)
+    duration_value = forms.IntegerField(
+        required=True,
+        min_value=1,
+        max_value=365,
+        label="Durată Estimată",
+        widget=forms.NumberInput(attrs={
+            "class": "form-control duration-input",
+            "placeholder": "ex: 5",
+            "min": "1",
+            "max": "365"
+        })
+    )
+
+    # Custom field: duration unit (dropdown)
+    duration_unit = forms.ChoiceField(
+        required=True,
+        choices=[
+            ('hours', 'Ore'),
+            ('days', 'Zile'),
+            ('weeks', 'Săptămâni'),
+            ('months', 'Luni'),
+        ],
+        label="",  # No label - inline with input
+        widget=forms.Select(attrs={
+            "class": "form-select duration-unit"
+        })
+    )
+
+    # Optional PDF attachment
+    pdf_attachment = forms.FileField(
+        required=False,
+        label="Atașează Ofertă PDF (Opțional)",
+        help_text="Poți atașa un document PDF cu oferta ta detaliată (max 5MB)",
+        widget=forms.FileInput(attrs={
+            "class": "form-control",
+            "accept": ".pdf,application/pdf"
+        })
+    )
 
     class Meta:
         model = Quote
-        fields = ("price", "description", "estimated_duration")
+        fields = ("price", "proposed_start_date", "description")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Add CSS classes
-        for field in self.fields:
-            self.fields[field].widget.attrs.update({"class": "form-control"})
-
-        # Update labels to Romanian
-        self.fields["price"].label = "Preț ofertat (RON)"
-        self.fields["description"].label = "Descrierea ofertei"
-        self.fields["estimated_duration"].label = "Durata estimată"
-
-        # Add placeholders and validation attributes
-        self.fields["price"].widget.attrs.update(
-            {
-                "type": "number",
-                "placeholder": "ex. 1500",
-                "step": "0.01",
-                "min": "1",
-                "max": "1000000",
-                "required": True,
-            }
-        )
-        self.fields["description"].widget.attrs.update(
-            {
-                "placeholder": "Descrie ce include oferta ta...",
-                "rows": 4,
-                "required": True,
-                "minlength": "20",
-                "maxlength": "1000",
-            }
-        )
-        self.fields["estimated_duration"].widget.attrs.update(
-            {"placeholder": "ex. 3-5 zile lucrătoare", "required": True, "maxlength": "100"}
-        )
-
-        # Make description a textarea
-        self.fields["description"].widget = forms.Textarea(attrs={"rows": 4, "class": "form-control"})
-
-        # Add help text
+        # Price field
+        self.fields["price"].label = "Preț Ofertă"
+        self.fields["price"].widget.attrs.update({
+            "class": "form-control form-control-lg",
+            "type": "number",
+            "placeholder": "Ex: 1500",
+            "step": "0.01",
+            "min": "1",
+            "required": True,
+        })
         self.fields["price"].help_text = "Prețul final pentru întreaga lucrare"
+
+        # Proposed start date
+        self.fields["proposed_start_date"].label = "Data propusă de tine"
+        self.fields["proposed_start_date"].required = False
+        self.fields["proposed_start_date"].widget.attrs.update({
+            "type": "date",
+            "class": "form-control"
+        })
+        self.fields["proposed_start_date"].help_text = "Când propui să începi această lucrare"
+
+        # Description
+        self.fields["description"].label = "Descrierea Ofertei"
+        self.fields["description"].widget = forms.Textarea(attrs={
+            "rows": 6,
+            "class": "form-control",
+            "placeholder": "Descrie în detaliu cum vei realiza lucrarea...",
+            "required": True,
+            "minlength": "20",
+        })
         self.fields["description"].help_text = "Explică ce include prețul și cum vei realiza lucrarea"
+
+        # Pre-populate duration fields if editing
+        if self.instance and self.instance.pk:
+            if self.instance.duration_value:
+                self.initial['duration_value'] = self.instance.duration_value
+            if self.instance.duration_unit:
+                self.initial['duration_unit'] = self.instance.duration_unit
+
+    def clean_pdf_attachment(self):
+        """Validate PDF file"""
+        pdf_file = self.cleaned_data.get('pdf_attachment')
+
+        if pdf_file:
+            # Check file size (max 5MB)
+            max_size = 5 * 1024 * 1024  # 5MB in bytes
+            if pdf_file.size > max_size:
+                raise forms.ValidationError(
+                    f"Fișierul este prea mare ({pdf_file.size / 1024 / 1024:.1f}MB). "
+                    f"Dimensiunea maximă permisă este 5MB."
+                )
+
+            # Check file extension
+            if not pdf_file.name.lower().endswith('.pdf'):
+                raise forms.ValidationError("Doar fișiere PDF sunt permise.")
+
+            # Check MIME type
+            if pdf_file.content_type not in ['application/pdf', 'application/x-pdf']:
+                raise forms.ValidationError("Tipul fișierului nu este PDF valid.")
+
+        return pdf_file
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Set duration fields from form
+        instance.duration_value = self.cleaned_data['duration_value']
+        instance.duration_unit = self.cleaned_data['duration_unit']
+
+        # estimated_duration will be auto-generated in model's save()
+
+        if commit:
+            instance.save()
+
+            # Handle PDF attachment if provided
+            pdf_file = self.cleaned_data.get('pdf_attachment')
+            if pdf_file:
+                from .models import QuoteAttachment
+                QuoteAttachment.objects.create(
+                    quote=instance,
+                    file=pdf_file,
+                    file_type='pdf',
+                    file_size=pdf_file.size,
+                    description='Ofertă PDF'
+                )
+
+        return instance
 
 
 class OrderSearchForm(forms.Form):
@@ -396,3 +484,43 @@ class CraftsmanServiceForm(forms.ModelForm):
             raise ValidationError("Prețul maxim trebuie să fie mai mare decât prețul minim.")
 
         return cleaned_data
+
+
+class QuoteAttachmentForm(forms.ModelForm):
+    """Form pentru adăugare atașamente la oferte"""
+
+    class Meta:
+        model = QuoteAttachment
+        fields = ["file", "description"]
+        widgets = {
+            "file": forms.FileInput(
+                attrs={
+                    "accept": ".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx",
+                    "class": "form-control",
+                }
+            ),
+            "description": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Descriere fișier (opțional)",
+                    "maxlength": "200",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["file"].label = "Fișier"
+        self.fields["description"].label = "Descriere"
+        self.fields["description"].required = False
+
+        self.fields["file"].help_text = "PDF, imagini (JPG, PNG, GIF), documente (DOC, DOCX) - Max 5MB"
+
+    def clean_file(self):
+        """Validează tip și mărime fișier"""
+        file = self.cleaned_data.get("file")
+        if file:
+            # Apelează funcția de validare din models.py
+            file = validate_quote_attachment(file)
+        return file

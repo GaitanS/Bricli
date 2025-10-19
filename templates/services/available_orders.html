@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load time_filters %}
 
 {% block title %}Comenzi Disponibile - Bricli{% endblock %}
 
@@ -113,6 +114,9 @@
                 <div class="d-flex flex-column align-items-md-end">
                     <div class="h4 mb-1">{{ orders|length }}</div>
                     <small class="opacity-75">comenzi disponibile</small>
+                    <div class="mt-2">
+                        <small class="opacity-75">{{ registered_services_count }} servicii înregistrate</small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -120,39 +124,126 @@
 </div>
 
 <div class="container">
-    <!-- Filters -->
+    <!-- No Services Alert -->
+    {% if has_no_services %}
+    <div class="alert alert-warning mb-4" style="border-left: 4px solid #f59e0b;">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-exclamation-triangle fa-2x me-3" style="color: #f59e0b;"></i>
+            <div class="flex-grow-1">
+                <h5 class="fw-bold mb-2">Nu ai servicii înregistrate</h5>
+                <p class="mb-3">Pentru a vedea comenzi disponibile, trebuie să îți înregistrezi serviciile pe care le oferă.</p>
+                <a href="{% url 'services:add_craftsman_service' %}" class="btn btn-warning">
+                    <i class="fas fa-plus me-2"></i>Adaugă primul serviciu
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <!-- Smart Filters for Craftsmen -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card filter-card">
                 <div class="card-body">
                     <form method="get" class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-medium">Categorie</label>
+                        <!-- Row 1: Category, Urgency, Budget, Location -->
+                        <div class="col-md-3">
+                            <label class="form-label fw-medium">
+                                <i class="fas fa-tag me-1 text-purple" style="color: #8B5CF6;"></i>Categorie
+                            </label>
                             <select name="category" class="form-select">
-                                <option value="">Toate categoriile</option>
+                                <option value="">Toate serviciile mele</option>
                                 {% for category in categories %}
-                                    <option value="{{ category.slug }}" 
+                                    <option value="{{ category.slug }}"
                                             {% if current_category == category.slug %}selected{% endif %}>
                                         {{ category.name }}
                                     </option>
                                 {% endfor %}
                             </select>
+                            {% if not categories %}
+                            <small class="text-muted">Nu ai servicii înregistrate</small>
+                            {% endif %}
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-medium">Județ</label>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-medium">
+                                <i class="fas fa-clock me-1" style="color: #f59e0b;"></i>Urgență
+                            </label>
+                            <select name="urgency" class="form-select">
+                                <option value="">Toate</option>
+                                <option value="urgent" {% if current_urgency == 'urgent' %}selected{% endif %}>
+                                    Urgent
+                                </option>
+                                <option value="normal" {% if current_urgency == 'normal' %}selected{% endif %}>
+                                    Normal
+                                </option>
+                                <option value="flexible" {% if current_urgency == 'flexible' %}selected{% endif %}>
+                                    Flexibil
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-medium">
+                                <i class="fas fa-money-bill-wave me-1" style="color: #10b981;"></i>Buget minim
+                            </label>
+                            <select name="budget_min" class="form-select">
+                                <option value="">Orice buget</option>
+                                <option value="500" {% if current_budget_min == '500' %}selected{% endif %}>Peste 500 RON</option>
+                                <option value="1000" {% if current_budget_min == '1000' %}selected{% endif %}>Peste 1.000 RON</option>
+                                <option value="2000" {% if current_budget_min == '2000' %}selected{% endif %}>Peste 2.000 RON</option>
+                                <option value="5000" {% if current_budget_min == '5000' %}selected{% endif %}>Peste 5.000 RON</option>
+                                <option value="10000" {% if current_budget_min == '10000' %}selected{% endif %}>Peste 10.000 RON</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-medium">
+                                <i class="fas fa-map-marker-alt me-1" style="color: #ef4444;"></i>Locație
+                            </label>
                             <select name="county" class="form-select">
                                 <option value="">Toate județele</option>
+                                {% if craftsman_county %}
+                                <option value="{{ craftsman_county.name }}"
+                                        {% if current_county == craftsman_county.name %}selected{% endif %}>
+                                    📍 {{ craftsman_county.name }} (județul meu)
+                                </option>
+                                <option disabled>──────────</option>
+                                {% endif %}
                                 {% for county in counties %}
-                                    <option value="{{ county }}" 
+                                    {% if not craftsman_county or county != craftsman_county.name %}
+                                    <option value="{{ county }}"
                                             {% if current_county == county %}selected{% endif %}>
                                         {{ county }}
                                     </option>
+                                    {% endif %}
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-md-4 d-flex align-items-end">
-                            <button type="submit" class="btn filter-btn me-2">
-                                <i class="fas fa-filter me-2"></i>Filtrează
+
+                        <!-- Row 2: Sorting and Actions -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">
+                                <i class="fas fa-sort me-1" style="color: #6366f1;"></i>Sortează după
+                            </label>
+                            <select name="sort" class="form-select">
+                                <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>
+                                    Cele mai noi
+                                </option>
+                                <option value="budget_high" {% if current_sort == 'budget_high' %}selected{% endif %}>
+                                    Buget mare → mic
+                                </option>
+                                <option value="urgent" {% if current_sort == 'urgent' %}selected{% endif %}>
+                                    Urgente primele
+                                </option>
+                                <option value="least_quotes" {% if current_sort == 'least_quotes' %}selected{% endif %}>
+                                    Puține oferte (mai multă șansă)
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn filter-btn flex-grow-1">
+                                <i class="fas fa-filter me-2"></i>Aplică Filtre
                             </button>
                             <a href="{% url 'services:available_orders' %}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times me-2"></i>Resetează
@@ -220,13 +311,23 @@
 
                             <!-- Order Info -->
                             <div class="row text-center mb-3">
-                                <div class="col-6">
-                                    <div class="fw-bold text-primary">{{ order.quotes.count }}</div>
-                                    <small class="text-muted">Oferte</small>
+                                <div class="col-6 border-end">
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
+                                        <i class="fas fa-comment-dots text-muted"></i>
+                                        <div class="text-start">
+                                            <div class="fw-bold" style="color: #8B5CF6; font-size: 0.95rem;">{{ order.quotes.count }}</div>
+                                            <small class="text-muted d-block" style="font-size: 0.7rem;">oferte</small>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="fw-bold text-primary">{{ order.created_at|timesince }}</div>
-                                    <small class="text-muted">Postată acum</small>
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
+                                        <i class="far fa-clock text-muted"></i>
+                                        <div class="text-start">
+                                            <div class="fw-bold" style="color: #8B5CF6; font-size: 0.95rem; white-space: nowrap;">{{ order.created_at|compact_timesince }}</div>
+                                            <small class="text-muted d-block" style="font-size: 0.7rem;">acum</small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -260,13 +361,19 @@
             <p class="text-muted mb-4 lead">
                 {% if current_category or current_county %}
                     Nu există comenzi care să corespundă filtrelor selectate. Încearcă să modifici criteriile de căutare.
+                {% elif has_no_services %}
+                    Înregistrează serviciile pe care le oferă pentru a vedea comenzi disponibile.
                 {% else %}
-                    Momentan nu sunt comenzi disponibile pentru ofertare. Verifică din nou mai târziu!
+                    Momentan nu sunt comenzi disponibile pentru serviciile tale înregistrate ({{ registered_services_count }}). Verifică din nou mai târziu sau adaugă mai multe servicii!
                 {% endif %}
             </p>
             {% if current_category or current_county %}
                 <a href="{% url 'services:available_orders' %}" class="btn btn-outline-primary">
                     <i class="fas fa-times me-2"></i>Elimină filtrele
+                </a>
+            {% elif not has_no_services %}
+                <a href="{% url 'services:add_craftsman_service' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-plus me-2"></i>Adaugă mai multe servicii
                 </a>
             {% endif %}
         </div>

@@ -502,3 +502,42 @@
         text-align: center;
     }
 }
+
+/* ============================================
+   Tier Badges - Subscription System (Phase 9)
+   ============================================ */
+
+.tier-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+}
+
+.tier-plus {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+    color: white;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+.tier-pro {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: white;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.tier-badge i {
+    font-size: 0.75rem;
+}
+
+/* Mobile tier badge adjustments */
+@media (max-width: 575.98px) {
+    .tier-badge {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.65rem;
+    }
+}

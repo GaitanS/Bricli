@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Upgrade la {{ tier.display_name }} - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upgrade-container {
+        max-width: 900px;
+        margin: 40px auto;
+    }
+
+    .tier-summary {
+        background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+
+    .tier-summary h1 {
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+
+    .tier-summary .price {
+        font-size: 48px;
+        font-weight: 800;
+        margin: 20px 0;
+    }
+
+    .tier-summary .price small {
+        font-size: 20px;
+        font-weight: 400;
+    }
+
+    .tier-features {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .tier-features li {
+        display: flex;
+        align-items: center;
+    }
+
+    .tier-features li i {
+        margin-right: 10px;
+        font-size: 18px;
+    }
+
+    .payment-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .payment-card h3 {
+        color: #1f2937;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .legal-checkbox {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 20px;
+        border-radius: 4px;
+        margin: 20px 0;
+    }
+
+    .legal-checkbox .form-check {
+        margin-bottom: 15px;
+    }
+
+    .legal-checkbox label {
+        font-weight: 600;
+        color: #92400e;
+    }
+
+    .legal-checkbox .help-text {
+        font-size: 13px;
+        color: #78350f;
+        margin-top: 5px;
+        margin-left: 25px;
+    }
+
+    #card-element {
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: white;
+        margin-bottom: 20px;
+    }
+
+    #card-errors {
+        color: #dc2626;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 15px;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 8px;
+        background: #7c3aed;
+        border-color: #7c3aed;
+        position: relative;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+        background: #6d28d9;
+        border-color: #6d28d9;
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .btn-submit .spinner {
+        display: none;
+    }
+
+    .btn-submit.processing .spinner {
+        display: inline-block;
+    }
+
+    .btn-submit.processing .text {
+        display: none;
+    }
+
+    .security-badge {
+        text-align: center;
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 20px;
+    }
+
+    .security-badge i {
+        color: #10b981;
+        margin-right: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="upgrade-container">
+    <!-- Tier Summary -->
+    <div class="tier-summary">
+        <h1>Upgrade la {{ tier.display_name }}</h1>
+        <div class="price">{{ tier.price|floatformat:0|slice:":-2" }} <small>RON/lună</small></div>
+
+        <ul class="tier-features">
+            {% if tier.monthly_lead_limit %}
+                <li><i class="fas fa-check-circle"></i> {{ tier.monthly_lead_limit }} lead-uri/lună</li>
+            {% else %}
+                <li><i class="fas fa-infinity"></i> Lead-uri nelimitate</li>
+            {% endif %}
+            <li><i class="fas fa-images"></i> {{ tier.max_portfolio_images }} imagini portofoliu</li>
+            {% if tier.priority_in_search > 0 %}
+                <li><i class="fas fa-star"></i> Prioritate în căutare</li>
+            {% endif %}
+            {% if tier.show_in_featured %}
+                <li><i class="fas fa-trophy"></i> Secțiune Featured</li>
+            {% endif %}
+            {% if tier.can_attach_pdf %}
+                <li><i class="fas fa-file-pdf"></i> Atașare PDF</li>
+            {% endif %}
+            {% if tier.analytics_access %}
+                <li><i class="fas fa-chart-line"></i> Analytics</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Payment Form -->
+    <div class="payment-card">
+        <h3><i class="fas fa-credit-card me-2"></i>Detalii Plată</h3>
+
+        <form id="payment-form" method="post">
+            {% csrf_token %}
+
+            <!-- Stripe Card Element -->
+            <div id="card-element"></div>
+            <div id="card-errors" role="alert"></div>
+
+            <!-- Legal Checkboxes -->
+            <div class="legal-checkbox">
+                <div class="form-check">
+                    {{ form.waive_withdrawal_right }}
+                    <label class="form-check-label" for="{{ form.waive_withdrawal_right.id_for_label }}">
+                        {{ form.waive_withdrawal_right.label }}
+                    </label>
+                    <div class="help-text">
+                        Conform OUG 34/2014, ai dreptul de a te retrage din acest contract în termen de 14 zile fără justificare.
+                        Bifând această căsuță, accepți ca serviciul să înceapă imediat și renunți la dreptul de retragere pentru perioada consumată.
+                    </div>
+                    {% if form.waive_withdrawal_right.errors %}
+                        <div class="text-danger mt-2">{{ form.waive_withdrawal_right.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-check">
+                    {{ form.agree_terms }}
+                    <label class="form-check-label" for="{{ form.agree_terms.id_for_label }}">
+                        {{ form.agree_terms.label }} (<a href="/termeni/" target="_blank">citește aici</a>)
+                    </label>
+                    {% if form.agree_terms.errors %}
+                        <div class="text-danger mt-2">{{ form.agree_terms.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Hidden payment_method_id -->
+            {{ form.payment_method_id }}
+
+            <!-- Submit Button -->
+            <button type="submit" id="submit-button" class="btn btn-primary btn-submit">
+                <span class="spinner spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <span class="text">
+                    <i class="fas fa-lock me-2"></i>
+                    Plătește {{ tier.price|floatformat:0|slice:":-2" }} RON
+                </span>
+            </button>
+
+            <div class="security-badge">
+                <i class="fas fa-shield-check"></i>
+                Plată securizată prin Stripe. Nu stocăm datele cardului tău.
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+// Initialize Stripe
+const stripe = Stripe('{{ stripe_publishable_key }}');
+const elements = stripe.elements();
+
+// Create card element
+const cardElement = elements.create('card', {
+    style: {
+        base: {
+            fontSize: '16px',
+            color: '#1f2937',
+            '::placeholder': {
+                color: '#9ca3af',
+            },
+        },
+        invalid: {
+            color: '#dc2626',
+        },
+    },
+});
+
+cardElement.mount('#card-element');
+
+// Handle real-time validation errors
+cardElement.on('change', function(event) {
+    const displayError = document.getElementById('card-errors');
+    if (event.error) {
+        displayError.textContent = event.error.message;
+    } else {
+        displayError.textContent = '';
+    }
+});
+
+// Handle form submission
+const form = document.getElementById('payment-form');
+const submitButton = document.getElementById('submit-button');
+
+form.addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    // Validate checkboxes
+    const waiveWithdrawal = document.getElementById('{{ form.waive_withdrawal_right.id_for_label }}');
+    const agreeTerms = document.getElementById('{{ form.agree_terms.id_for_label }}');
+
+    if (!waiveWithdrawal.checked) {
+        alert('Trebuie să accepți renunțarea la dreptul de retragere pentru a continua.');
+        return;
+    }
+
+    if (!agreeTerms.checked) {
+        alert('Trebuie să accepți Termenii și Condițiile pentru a continua.');
+        return;
+    }
+
+    // Disable submit button and show spinner
+    submitButton.disabled = true;
+    submitButton.classList.add('processing');
+
+    // Create payment method
+    const {paymentMethod, error} = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+    });
+
+    if (error) {
+        // Show error
+        document.getElementById('card-errors').textContent = error.message;
+        submitButton.disabled = false;
+        submitButton.classList.remove('processing');
+    } else {
+        // Set payment_method_id and submit form
+        document.getElementById('{{ form.payment_method_id.id_for_label }}').value = paymentMethod.id;
+        form.submit();
+    }
+});
+</script>
+{% endblock %}

@@ -193,7 +193,14 @@
                                                 {% endfor %}
                                             {% endif %}
                                         </div>
-                                        <span><strong>{{ craftsman.average_rating|floatformat:1|default:"0,0" }}</strong> ({{ craftsman.total_reviews }} recenzii)</span>
+                                        <span><strong>{{ craftsman.average_rating|floatformat:1|default:"0,0" }}</strong>
+                                            <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#reviews"
+                                               style="color: inherit; text-decoration: none; transition: color 0.2s ease;"
+                                               onmouseover="this.style.color='#8B5CF6'; this.style.textDecoration='underline';"
+                                               onmouseout="this.style.color='inherit'; this.style.textDecoration='none';">
+                                                ({{ craftsman.total_reviews }} recenzii)
+                                            </a>
+                                        </span>
                                     </div>
 
                                     {% if craftsman.years_experience %}

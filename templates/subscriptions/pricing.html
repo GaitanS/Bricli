@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Planuri și Prețuri - Bricli{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pricing-hero {
+        background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+    }
+
+    .pricing-card {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        transition: all 0.3s ease;
+        height: 100%;
+        background: white;
+    }
+
+    .pricing-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(124, 58, 237, 0.15);
+        border-color: #7c3aed;
+    }
+
+    .pricing-card.featured {
+        border-color: #7c3aed;
+        border-width: 3px;
+        position: relative;
+    }
+
+    .pricing-card.featured::before {
+        content: "RECOMANDAT";
+        position: absolute;
+        top: -15px;
+        right: 20px;
+        background: #7c3aed;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .pricing-card.current {
+        background: #f3f4f6;
+        border-color: #10b981;
+    }
+
+    .tier-name {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 10px;
+    }
+
+    .tier-price {
+        font-size: 48px;
+        font-weight: 800;
+        color: #7c3aed;
+        margin-bottom: 5px;
+    }
+
+    .tier-price small {
+        font-size: 18px;
+        color: #6b7280;
+        font-weight: 400;
+    }
+
+    .tier-features {
+        list-style: none;
+        padding: 0;
+        margin: 25px 0;
+    }
+
+    .tier-features li {
+        padding: 10px 0;
+        border-bottom: 1px solid #f3f4f6;
+        color: #4b5563;
+    }
+
+    .tier-features li:last-child {
+        border-bottom: none;
+    }
+
+    .tier-features li i {
+        color: #10b981;
+        margin-right: 10px;
+        width: 20px;
+    }
+
+    .tier-features li.disabled {
+        color: #9ca3af;
+        text-decoration: line-through;
+    }
+
+    .tier-features li.disabled i {
+        color: #d1d5db;
+    }
+
+    .btn-upgrade {
+        width: 100%;
+        padding: 12px;
+        font-weight: 600;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .btn-current {
+        background: #10b981;
+        border-color: #10b981;
+        cursor: default;
+    }
+
+    .faq-section {
+        margin-top: 60px;
+        padding: 40px 0;
+        background: #f9fafb;
+    }
+
+    .faq-item {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        border: 1px solid #e5e7eb;
+    }
+
+    .faq-item:hover {
+        border-color: #7c3aed;
+    }
+
+    .faq-question {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 16px;
+    }
+
+    .faq-answer {
+        margin-top: 10px;
+        color: #6b7280;
+        display: none;
+    }
+
+    .faq-item.active .faq-answer {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pricing-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-3">Alege Planul Potrivit Pentru Tine</h1>
+                <p class="lead">Crește-ți afacerea cu lead-uri de calitate. Fără costuri ascunse.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        {% for tier in tiers %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="pricing-card {% if tier.name == 'plus' %}featured{% endif %} {% if current_subscription and current_subscription.tier.id == tier.id %}current{% endif %}">
+                <div class="tier-name">{{ tier.display_name }}</div>
+                <div class="tier-price">
+                    {% if tier.price == 0 %}
+                        GRATUIT
+                    {% else %}
+                        {{ tier.price|floatformat:0|slice:":-2" }} <small>RON/lună</small>
+                    {% endif %}
+                </div>
+
+                <ul class="tier-features">
+                    {% if tier.monthly_lead_limit %}
+                        <li><i class="fas fa-check-circle"></i> {{ tier.monthly_lead_limit }} lead-uri/lună</li>
+                    {% else %}
+                        <li><i class="fas fa-infinity"></i> <strong>Lead-uri nelimitate</strong></li>
+                    {% endif %}
+
+                    <li><i class="fas fa-images"></i> {{ tier.max_portfolio_images }} imagini în portofoliu</li>
+
+                    {% if tier.priority_in_search > 0 %}
+                        <li><i class="fas fa-star"></i> Prioritate în căutare</li>
+                    {% else %}
+                        <li class="disabled"><i class="fas fa-times-circle"></i> Prioritate în căutare</li>
+                    {% endif %}
+
+                    {% if tier.show_in_featured %}
+                        <li><i class="fas fa-trophy"></i> Secțiune Featured</li>
+                    {% else %}
+                        <li class="disabled"><i class="fas fa-times-circle"></i> Secțiune Featured</li>
+                    {% endif %}
+
+                    {% if tier.can_attach_pdf %}
+                        <li><i class="fas fa-file-pdf"></i> Atașare PDF la oferte</li>
+                    {% else %}
+                        <li class="disabled"><i class="fas fa-times-circle"></i> Atașare PDF la oferte</li>
+                    {% endif %}
+
+                    {% if tier.analytics_access %}
+                        <li><i class="fas fa-chart-line"></i> Analytics avansate</li>
+                    {% else %}
+                        <li class="disabled"><i class="fas fa-times-circle"></i> Analytics avansate</li>
+                    {% endif %}
+
+                    {% if tier.profile_badge %}
+                        <li><i class="fas fa-badge-check"></i> Badge: {{ tier.profile_badge }}</li>
+                    {% endif %}
+                </ul>
+
+                {% if current_subscription and current_subscription.tier.id == tier.id %}
+                    <button class="btn btn-success btn-upgrade btn-current" disabled>
+                        <i class="fas fa-check-circle me-2"></i> Plan Activ
+                    </button>
+                {% elif tier.name == 'free' %}
+                    <a href="{% url 'accounts:craftsman_register' %}" class="btn btn-outline-primary btn-upgrade">
+                        <i class="fas fa-rocket me-2"></i> Începe Gratuit
+                    </a>
+                {% else %}
+                    {% if user.is_authenticated and user.user_type == 'craftsman' %}
+                        <a href="{% url 'subscriptions:upgrade' tier.name %}" class="btn btn-primary btn-upgrade">
+                            <i class="fas fa-arrow-up me-2"></i> Upgrade la {{ tier.display_name }}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}?next={% url 'subscriptions:upgrade' tier.name %}" class="btn btn-primary btn-upgrade">
+                            <i class="fas fa-sign-in-alt me-2"></i> Autentifică-te pentru Upgrade
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="faq-section">
+        <div class="container">
+            <h2 class="text-center mb-4">Întrebări Frecvente</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question-circle me-2 text-primary"></i>
+                    Ce sunt lead-urile și cum funcționează?
+                </div>
+                <div class="faq-answer">
+                    Un lead reprezintă un client potențial care te contactează pentru un proiect. Când un client adaugă meseriașul la shortlist, acesta primește datele de contact ale clientului și poate trimite o ofertă.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question-circle me-2 text-primary"></i>
+                    Pot anula abonamentul oricând?
+                </div>
+                <div class="faq-answer">
+                    Da! Poți anula abonamentul oricând din secțiunea "Gestionează Abonament". Vei păstra accesul până la sfârșitul perioadei de facturare curente, fără taxe de anulare.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question-circle me-2 text-primary"></i>
+                    Ce se întâmplă dacă depășesc limita de 5 lead-uri pe planul gratuit?
+                </div>
+                <div class="faq-answer">
+                    Nu vei mai putea primi lead-uri noi până la începutul lunii următoare când contorul se resetează. Pentru lead-uri nelimitate, upgrade la Plan Plus sau Pro.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question-circle me-2 text-primary"></i>
+                    Am drept de rambursare?
+                </div>
+                <div class="faq-answer">
+                    Da, conform OUG 34/2014 ai 14 zile de la upgrade să soliciti rambursarea sumei plătite, fără a fi nevoie să justifici decizia.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question-circle me-2 text-primary"></i>
+                    Cum primesc factura?
+                </div>
+                <div class="faq-answer">
+                    Facturile fiscale sunt generate automat prin Smart Bill și trimise pe email la fiecare plată lunară. Poți descărca facturile și din secțiunea "Facturi" din contul tău.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// FAQ accordion
+document.querySelectorAll('.faq-item').forEach(item => {
+    item.addEventListener('click', function() {
+        this.classList.toggle('active');
+    });
+});
+</script>
+{% endblock %}

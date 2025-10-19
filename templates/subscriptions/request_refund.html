@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Solicită Rambursare - Bricli{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 700px; margin: 40px auto;">
+    <div class="card shadow">
+        <div class="card-body p-4">
+            <h2 class="mb-4"><i class="fas fa-undo me-2 text-warning"></i>Solicită Rambursare</h2>
+
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Drept de retragere (OUG 34/2014)</strong><br>
+                Conform legislației românești, ai dreptul să te retragi din acest contract în termen de 14 zile fără a justifica decizia.
+            </div>
+
+            <div class="mb-4">
+                <h5>Detalii Rambursare:</h5>
+                <ul>
+                    <li><strong>Plan actual:</strong> {{ subscription.tier.display_name }}</li>
+                    <li><strong>Sumă de rambursat:</strong> {{ refund_amount }} RON</li>
+                    <li><strong>Termen limită:</strong> {{ subscription.withdrawal_deadline|date:"d M Y, H:i" }}</li>
+                    <li><strong>Timp estimat:</strong> 5-7 zile lucrătoare</li>
+                </ul>
+            </div>
+
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Atenție!</strong> După procesarea rambursării, vei fi retrogradat imediat la <strong>Plan Gratuit</strong> (5 lead-uri/lună).
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="{{ form.reason.id_for_label }}" class="form-label">{{ form.reason.label }}</label>
+                    {{ form.reason }}
+                </div>
+
+                <div class="mb-4">
+                    <div class="form-check">
+                        {{ form.confirm_refund }}
+                        <label class="form-check-label fw-bold" for="{{ form.confirm_refund.id_for_label }}">
+                            {{ form.confirm_refund.label }}
+                        </label>
+                        {% if form.confirm_refund.help_text %}
+                            <div class="form-text">{{ form.confirm_refund.help_text }}</div>
+                        {% endif %}
+                        {% if form.confirm_refund.errors %}
+                            <div class="text-danger">{{ form.confirm_refund.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-warning btn-lg">
+                        <i class="fas fa-check-circle me-2"></i>Confirmă Rambursarea
+                    </button>
+                    <a href="{% url 'subscriptions:manage' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Înapoi
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
