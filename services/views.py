@@ -86,7 +86,13 @@ class ServiceCategoryDetailView(DetailView):
 
         # Services in this category
         context["services"] = category.services.filter(is_active=True)
-        context["popular_services"] = category.services.filter(is_active=True, is_popular=True).order_by("name")[:100]
+
+        # Popular services: Show is_popular=True services first, if none exist show first 10 services
+        popular_services = category.services.filter(is_active=True, is_popular=True).order_by("name")[:100]
+        if not popular_services.exists():
+            # Fallback: Show first 10 services from category if no popular services exist
+            popular_services = category.services.filter(is_active=True).order_by("name")[:10]
+        context["popular_services"] = popular_services
 
         # Public orders in this category (show more orders - 12 instead of 6)
         context["recent_orders"] = (

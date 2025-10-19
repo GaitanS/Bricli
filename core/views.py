@@ -28,6 +28,8 @@ class HomeView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        from django.conf import settings
+
         context = super().get_context_data(**kwargs)
 
         # Get site settings
@@ -41,6 +43,11 @@ class HomeView(TemplateView):
         avg_rating_data = Review.objects.aggregate(avg=Avg("rating"))
         avg_rating = avg_rating_data["avg"] or 0.0
         completed_projects = Order.objects.filter(status="completed").count()
+
+        # BETA MODE: Count registered BETA members
+        beta_count = 0
+        if not settings.SUBSCRIPTIONS_ENABLED:
+            beta_count = CraftsmanProfile.objects.filter(beta_member=True).count()
 
         context.update(
             {
@@ -72,6 +79,8 @@ class HomeView(TemplateView):
                     "avg_rating": round(avg_rating, 1) if avg_rating else 0,
                     "completed_projects": completed_projects,
                 },
+                # BETA MODE: Counter for first 100 members
+                "beta_count": beta_count,
             }
         )
         return context

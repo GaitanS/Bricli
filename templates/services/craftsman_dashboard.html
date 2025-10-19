@@ -446,24 +446,71 @@ body {
             <div class="stat-label">Acceptate</div>
         </div>
 
-        <!-- Phase 9: Subscription stat card -->
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-crown"></i>
+        <!-- BETA/Subscription stat card -->
+        {% if SUBSCRIPTIONS_ENABLED %}
+            <!-- Production: Subscription Tier -->
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                {% if subscription %}
+                    <div class="stat-value">{{ subscription.tier.display_name }}</div>
+                    <div class="stat-label">Abonament Activ</div>
+                {% else %}
+                    <div class="stat-value">-</div>
+                    <div class="stat-label">Fără Abonament</div>
+                {% endif %}
             </div>
-            {% if subscription %}
-                <div class="stat-value">{{ subscription.tier.display_name }}</div>
-                <div class="stat-label">Abonament Activ</div>
-            {% else %}
-                <div class="stat-value">-</div>
-                <div class="stat-label">Fără Abonament</div>
-            {% endif %}
-        </div>
+        {% else %}
+            <!-- BETA: Free Access Badge -->
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="stat-value">BETA</div>
+                <div class="stat-label">Acces Gratuit</div>
+            </div>
+        {% endif %}
     </div>
 
-    <!-- Phase 9: Subscription Widget -->
-    {% if subscription %}
-        {% include 'subscriptions/_subscription_widget.html' with subscription=subscription %}
+    <!-- BETA/Subscription Widget -->
+    {% if SUBSCRIPTIONS_ENABLED %}
+        <!-- Production: Subscription Widget -->
+        {% if subscription %}
+            {% include 'subscriptions/_subscription_widget.html' with subscription=subscription %}
+        {% endif %}
+    {% else %}
+        <!-- BETA: Free Access Card -->
+        <div class="alert alert-success shadow-sm mt-3" style="border-left: 4px solid #10b981; background: linear-gradient(135deg, #D1FAE5 0%, #ECFDF5 100%);">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="alert-heading mb-2">
+                        <i class="fas fa-rocket me-2"></i>
+                        <strong>BETA - Acces 100% Gratuit!</strong>
+                    </h5>
+                    <p class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>Lead-uri nelimitate</strong> - fără taxe, fără restricții
+                    </p>
+                    <p class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>Mesaje nelimitate</strong> cu clienții
+                    </p>
+                    <p class="mb-0">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>Toate funcțiile premium</strong> disponibile gratuit
+                    </p>
+                </div>
+                <div class="col-md-4 text-center mt-3 mt-md-0">
+                    <div class="badge bg-success px-4 py-3 fs-5">
+                        <i class="fas fa-infinity me-2"></i>Nelimitat
+                    </div>
+                    <p class="small text-muted mt-2 mb-0">
+                        Primii 100 meseriași<br>din România
+                    </p>
+                </div>
+            </div>
+        </div>
     {% endif %}
 
     <!-- Tab Navigation -->

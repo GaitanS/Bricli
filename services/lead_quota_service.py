@@ -3,10 +3,14 @@ Lead Quota Service - Manages lead distribution based on subscription tiers
 
 Replaces the old wallet-based LeadFeeService.
 Now uses subscription tier limits instead of wallet deductions.
+
+BETA MODE: When SUBSCRIPTIONS_ENABLED = False, all checks are bypassed and
+everyone gets unlimited leads for free.
 """
 
 import logging
 
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
@@ -39,6 +43,13 @@ class LeadQuotaService:
         Returns:
             tuple: (can_receive: bool, error_message: str or None)
         """
+        # BETA MODE: Bypass all checks when subscriptions are disabled
+        if not settings.SUBSCRIPTIONS_ENABLED:
+            # Everyone gets unlimited leads for free during BETA
+            if craftsman_user.user_type != 'craftsman':
+                return (False, "User is not a craftsman")
+            return (True, None)
+
         # Validation
         if craftsman_user.user_type != 'craftsman':
             return (False, "User is not a craftsman")
@@ -120,6 +131,27 @@ class LeadQuotaService:
             )
             raise InsufficientQuotaError(error_msg)
 
+        # BETA MODE: Skip subscription checks and usage tracking
+        if not settings.SUBSCRIPTIONS_ENABLED:
+            # Create shortlist without subscription tracking
+            shortlist, created = Shortlist.objects.get_or_create(
+                order=order,
+                craftsman=craftsman_user,
+                defaults={
+                    'lead_fee_amount': 0,  # Free during BETA
+                    'charged_at': timezone.now(),
+                },
+            )
+
+            if not created:
+                shortlist.charged_at = timezone.now()
+                shortlist.save(update_fields=['charged_at'])
+                logger.info(f"[BETA] Updated existing shortlist {shortlist.id}")
+            else:
+                logger.info(f"[BETA] Created new shortlist {shortlist.id} (free unlimited)")
+
+            return shortlist
+
         # Get subscription with row-level lock to prevent race conditions
         subscription = CraftsmanSubscription.objects.select_for_update().get(
             craftsman__user=craftsman_user
@@ -191,6 +223,20 @@ class LeadQuotaService:
                 - can_receive: bool
                 - error_message: str or None
         """
+        # BETA MODE: Return unlimited status
+        if not settings.SUBSCRIPTIONS_ENABLED:
+            return {
+                'tier_name': 'BETA',
+                'tier_display': 'BETA - Acces Gratuit',
+                'leads_used': 0,
+                'leads_limit': None,  # Unlimited
+                'leads_remaining': None,  # Unlimited
+                'can_receive': True,
+                'error_message': None,
+                'status': 'active',
+                'period_end': None,
+            }
+
         try:
             subscription = CraftsmanSubscription.objects.select_related('tier').get(
                 craftsman__user=craftsman_user

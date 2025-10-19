@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sitemaps",  # SEO: XML sitemaps for blog and pages
     # Third party apps
     "crispy_forms",
     "crispy_bootstrap5",
@@ -70,6 +71,7 @@ INSTALLED_APPS = [
     "moderation",
     "notifications",
     "subscriptions",  # NEW: Subscription management for tiered pricing
+    "blog",  # SEO-optimized blog for organic traffic
 ]
 
 MIDDLEWARE = [
@@ -102,6 +104,7 @@ TEMPLATES = [
                 "core.context_processors.site_settings_context",
                 "core.context_processors.user_context",
                 "core.context_processors.navigation_context",
+                "core.context_processors.feature_flags_context",  # BETA: Feature flags
             ],
         },
     },
@@ -216,6 +219,14 @@ TIME_ZONE = "Europe/Bucharest"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Feature Flags
+# ============================================
+# Control which features are enabled in the application
+# Set SUBSCRIPTIONS_ENABLED = False for BETA launch (free for everyone)
+# Set SUBSCRIPTIONS_ENABLED = True to enable paid subscriptions
+SUBSCRIPTIONS_ENABLED = False  # BETA MODE: All features free for everyone
+BETA_FREE_TIER_LIMIT = None  # Unlimited leads for everyone during BETA
 
 # Stripe Configuration
 STRIPE_PUBLISHABLE_KEY = "pk_test_51234567890abcdef"  # Replace with your actual test key

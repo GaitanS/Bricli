@@ -269,6 +269,17 @@ class CraftsmanProfile(models.Model):
     is_active = models.BooleanField(default=False)  # După 3 joburi finalizate
     is_trusted = models.BooleanField(default=False)  # După 10 recenzii verificate
 
+    # BETA TRACKING (Primii 100 meseriași)
+    beta_member = models.BooleanField(
+        default=False,
+        help_text="Meșter înregistrat în perioada BETA (primii 100)"
+    )
+    beta_registration_number = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Număr de ordine în programul BETA (1-100)"
+    )
+
     # TIMESTAMPS
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

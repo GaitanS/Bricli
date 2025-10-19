@@ -5,9 +5,17 @@ URL configuration for bricli project.
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 
 from core.api_views import HealthCheckAPIView
+from blog.sitemaps import BlogPostSitemap, BlogCategorySitemap
+
+# Sitemap configuration for SEO
+sitemaps = {
+    'blog': BlogPostSitemap,
+    'blog_categories': BlogCategorySitemap,
+}
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -26,6 +34,10 @@ urlpatterns = [
     path("notifications/", include("notifications.urls")),
     # Subscriptions (webhooks and management)
     path("abonamente/", include("subscriptions.urls")),  # /abonamente/webhook/stripe/
+    # Blog - SEO-optimized content for organic traffic
+    path("blog/", include("blog.urls")),  # /blog/articol-slug/
+    # SEO - Sitemap
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap"),
 ]
 
 # Custom error handlers

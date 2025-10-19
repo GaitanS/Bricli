@@ -1387,3 +1387,231 @@ python manage.py check
 **Next Phase:** Production Deployment & Go-Live 🚀
 **Target Date:** After Stripe/Smart Bill configuration complete
 **Estimated Time to Launch:** 2-4 hours configuration + testing
+
+## 🎉 REVIEW SYSTEM IMPROVEMENTS - 19 Octombrie 2025
+
+**Duration:** ~3 hours across multiple bug fixes and feature enhancements
+**Status:** All issues resolved and tested
+
+### Summary
+
+Completed critical fixes and enhancements to the review system, addressing image upload failures, review permanence issues, and implementing clickable review counts throughout the application. All changes maintain existing functionality while improving user experience and data integrity.
+
+### Issues Resolved
+
+#### 1. Review Image Upload Failure ✅
+**Problem:** Users could upload review images, but they weren't being saved to the database (0 ReviewImages despite 2 files uploaded).
+
+**Root Cause:** Django Forms require `data` parameter to be bound. The `MultipleReviewImageForm` was created without `data=request.POST`, causing `is_valid()` to return `False` without executing `clean()` method.
+
+**Solution:**
+- Added `data=self.request.POST` to form initialization in both CreateReviewView and EditReviewView
+- Added dummy CharField to MultipleReviewImageForm to satisfy Django's form validation
+- Implemented extensive logging to track upload flow
+
+**Files Modified:**
+- [services/views.py](services/views.py):
+  - CreateReviewView (lines 829-842): Added `data=self.request.POST`
+  - EditReviewView (lines 945-949): Added `data=self.request.POST`
+- [services/forms.py](services/forms.py) (line 189): Added dummy field
+
+**Code Pattern:**
+```python
+# BEFORE (broken)
+image_form = MultipleReviewImageForm(files=self.request.FILES, max_images=5, existing_images_count=0)
+
+# AFTER (working)
+image_form = MultipleReviewImageForm(
+    data=self.request.POST,  # CRITICAL: Form must be bound to data
+    files=self.request.FILES,
+    max_images=5,
+    existing_images_count=0
+)
+```
+
+#### 2. Reviews Deleted When Orders Deleted ✅
+**Problem:** When clients deleted completed orders, associated reviews disappeared from craftsman profiles, removing valuable testimonials.
+
+**Root Cause:** Review model used `on_delete=models.CASCADE` for both order and client foreign keys.
+
+**Solution:**
+- Changed Review.order to `on_delete=models.SET_NULL, null=True, blank=True`
+- Changed Review.client to `on_delete=models.SET_NULL, null=True, blank=True`
+- Created migration [0013_review_preserve_on_order_delete.py](services/migrations/0013_review_preserve_on_order_delete.py)
+- Updated all templates to handle null clients gracefully (display "Client" as fallback)
+
+**Files Modified:**
+- [services/models.py](services/models.py) (lines 237-238): Changed CASCADE to SET_NULL
+- [templates/accounts/craftsman_detail.html](templates/accounts/craftsman_detail.html):
+  - Line 249: Handle null review.client
+  - Line 537: JavaScript fallback for null client_name
+- [accounts/views.py](accounts/views.py) (line 1133): AJAX endpoint returns "Client" fallback
+
+**Migration Details:**
+```python
+# Migration 0013_review_preserve_on_order_delete.py
+operations = [
+    migrations.AlterField(
+        model_name='review',
+        name='order',
+        field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='review', to='services.order'),
+    ),
+    migrations.AlterField(
+        model_name='review',
+        name='client',
+        field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='given_reviews', to=settings.AUTH_USER_MODEL),
+    ),
+]
+```
+
+#### 3. 404 Error on Review Links After Order Deletion ✅
+**Problem:** After deleting orders, old notification links (e.g., `/servicii/comanda/22/recenzie/`) caused "Page not found (404) No Order matches the given query".
+
+**Root Cause:** CreateReviewView used `get_object_or_404(Order, pk=kwargs["pk"])` which throws 404 when order doesn't exist.
+
+**Solution:**
+- Added try/except block in CreateReviewView.dispatch()
+- Redirect to my_orders with informative message instead of 404
+- Applied same pattern to EditReviewView and ReviewImageUploadView
+
+**Files Modified:**
+- [services/views.py](services/views.py):
+  - CreateReviewView (lines 797-803): Try/except for deleted orders
+  - EditReviewView (lines 924-927): Handle null clients
+  - ReviewImageUploadView (lines 1055-1058): Handle null clients
+
+**Code Pattern:**
+```python
+def dispatch(self, request, *args, **kwargs):
+    try:
+        self.order = Order.objects.get(pk=kwargs["pk"])
+    except Order.DoesNotExist:
+        messages.info(request, "Comanda asociată acestei recenzii nu mai există.")
+        return redirect("services:my_orders")
+    # ... continue with normal flow
+```
+
+#### 4. Clickable Review Counts Throughout Application ✅
+**Feature:** Made all "(X recenzii)" text clickable, linking to craftsman profile review sections with hover effects.
+
+**Implementation:**
+- Wrapped review counts in `<a>` tags linking to `{% url 'accounts:craftsman_detail' slug=craftsman.slug %}#reviews`
+- Added hover effects: purple color (#8B5CF6) + underline transition
+- Applied consistently across all pages where review counts appear
+
+**Files Modified:**
+1. [templates/services/order_detail_simple.html](templates/services/order_detail_simple.html):
+   - Lines 420-424: Mobile layout
+   - Lines 717-721: Assigned craftsman section
+   - Lines 901-909: Desktop quote cards
+
+2. [templates/core/search.html](templates/core/search.html) (lines 127-131)
+3. [templates/accounts/craftsmen_list.html](templates/accounts/craftsmen_list.html) (lines 197-201)
+4. [templates/core/home.html](templates/core/home.html) (lines 299-303)
+
+**Styling Pattern:**
+```django
+<a href="{% url 'accounts:craftsman_detail' slug=craftsman.slug %}#reviews"
+   style="color: #6b7280; text-decoration: none; transition: color 0.2s ease;"
+   onmouseover="this.style.color='#8B5CF6'; this.style.textDecoration='underline';"
+   onmouseout="this.style.color='#6b7280'; this.style.textDecoration='none';">
+    ({{ craftsman.total_reviews }} recenzii)
+</a>
+```
+
+### Database Changes
+
+**Migration Created:**
+- `0013_review_preserve_on_order_delete.py`
+- Alters Review.order and Review.client to SET_NULL with null=True, blank=True
+- Safe to apply on production (no data loss)
+
+### Template Changes
+
+**Null Handling Pattern:**
+```django
+{# Django Template #}
+{% if review.client %}
+    {{ review.client.get_full_name|default:review.client.username }}
+{% else %}
+    Client
+{% endif %}
+
+{# JavaScript #}
+<strong>${review.client_name || 'Client'}</strong>
+```
+
+### Verification Results
+
+All verification steps passed:
+- ✅ **pytest**: All existing tests passing
+- ✅ **python manage.py check**: 0 issues
+- ✅ **Migration applied**: 0013_review_preserve_on_order_delete.py
+- ✅ **Manual testing**: Review images upload successfully
+- ✅ **Manual testing**: Reviews persist after order deletion
+- ✅ **Manual testing**: No 404 errors on deleted order URLs
+
+### Files Modified Summary
+
+**Total Files Modified:** 9 files
+1. services/models.py (Review model relationships)
+2. services/views.py (CreateReviewView, EditReviewView, ReviewImageUploadView)
+3. services/forms.py (MultipleReviewImageForm dummy field)
+4. templates/accounts/craftsman_detail.html (null client handling)
+5. templates/services/order_detail_simple.html (clickable review counts)
+6. templates/core/search.html (clickable review counts)
+7. templates/accounts/craftsmen_list.html (clickable review counts)
+8. templates/core/home.html (clickable review counts)
+9. accounts/views.py (AJAX endpoint null fallback)
+
+**New Files:**
+- services/migrations/0013_review_preserve_on_order_delete.py
+
+### Business Impact
+
+**Data Integrity:**
+- Reviews now persist as permanent testimonials, increasing trust
+- Craftsmen maintain their reputation history even after order deletion
+
+**User Experience:**
+- Review counts are now interactive and navigable
+- Clear visual feedback with purple hover effects
+- No more 404 errors from old notification links
+
+**Technical Benefits:**
+- Proper null handling prevents future crashes
+- Graceful degradation for missing data
+- Maintains backwards compatibility
+
+### Testing
+
+**Manual Test Scenarios Verified:**
+1. ✅ Upload 2 images during review creation → both appear on craftsman profile
+2. ✅ Client deletes completed order → review still visible on craftsman profile
+3. ✅ Click old notification link for deleted order → redirects gracefully with message
+4. ✅ Click "(X recenzii)" on search results → navigates to review section
+5. ✅ Hover over review counts → purple color + underline appears
+6. ✅ Review displays "Client" when original client deleted
+7. ✅ Edit existing review with new images → images save correctly
+
+### Known Limitations
+
+**None** - All functionality working as expected.
+
+### Next Steps (Optional Enhancements)
+
+Future improvements could include:
+1. Bulk review image upload with drag-and-drop
+2. Review response system (craftsmen reply to reviews)
+3. Review helpfulness voting (useful/not useful)
+4. Review filtering by rating on craftsman profile
+
+---
+
+**Total Implementation Time:** ~3 hours
+**Bugs Fixed:** 3 critical issues
+**Features Added:** 1 UX enhancement (clickable review counts)
+**Files Modified:** 9 files + 1 migration
+**Status:** ✅ All issues resolved and production-ready
+
+**Updated:** 19 Octombrie 2025

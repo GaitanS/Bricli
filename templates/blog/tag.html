@@ -1,0 +1,27 @@
+{% extends 'blog/post_list.html' %}
+
+{% block title %}Articole cu eticheta "{{ tag.name }}" - Articole Bricli{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="Toate articolele etichetate cu {{ tag.name }}. Ghiduri și sfaturi pentru renovări și construcții.">
+{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-white text-decoration-none">Acasă</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'blog:post_list' %}" class="text-white text-decoration-none">Articole</a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">{{ tag.name }}</li>
+            </ol>
+        </nav>
+        <h1 class="display-4 mb-3 text-white">
+            <i class="fas fa-tag me-3"></i>{{ tag.name }}
+        </h1>
+        <p class="lead text-white">Articole etichetate cu "{{ tag.name }}"</p>
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

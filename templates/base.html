@@ -100,6 +100,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'core:how_it_works' %}">Cum funcționează</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blog:post_list' %}">Articole</a>
+                    </li>
                 </ul>
 
                 <!-- Desktop User Menu -->
@@ -278,6 +281,11 @@
                         <i class="fas fa-question-circle me-2"></i>Cum funcționează
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link mobile-nav-link" href="{% url 'blog:post_list' %}">
+                        <i class="fas fa-newspaper me-2"></i>Articole
+                    </a>
+                </li>
             </ul>
 
             <!-- Account Menu -->
@@ -335,6 +343,46 @@
 
     <!-- Main Content -->
     <main style="margin-top: 76px;">
+        <!-- BETA Banner (Global - All Pages) -->
+        {% if not SUBSCRIPTIONS_ENABLED %}
+        <div class="container mt-3">
+            <div id="beta-banner" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-left: 4px solid #10b981;">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-rocket fa-2x me-3 text-success"></i>
+                    <div class="flex-grow-1">
+                        <h6 class="alert-heading mb-1 fw-bold">🎉 Bricli BETA - 100% Gratuit!</h6>
+                        <small class="mb-0">
+                            Primii <strong>100 meseriași</strong> din România beneficiază de acces gratuit nelimitat. Fără taxe ascunse!
+                        </small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+        <script>
+        // Remember dismissal for 7 days using localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const banner = document.getElementById('beta-banner');
+            const closeBtn = banner?.querySelector('.btn-close');
+
+            // Check if banner was dismissed recently
+            const dismissedTime = localStorage.getItem('beta_banner_dismissed');
+            if (dismissedTime) {
+                const daysSince = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24);
+                if (daysSince < 7) {
+                    // Still within 7 days - hide banner
+                    banner.remove();
+                }
+            }
+
+            // Save dismissal time when close button clicked
+            closeBtn?.addEventListener('click', function() {
+                localStorage.setItem('beta_banner_dismissed', Date.now().toString());
+            });
+        });
+        </script>
+        {% endif %}
+
         {% include "partials/messages.html" %}
 
         {% block content %}{% endblock %}
@@ -404,10 +452,22 @@
             
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <p class="text-light mb-0">&copy; 2024 Bricli. Toate drepturile rezervate.</p>
+                    <p class="text-light mb-0">
+                        &copy; 2025 Bricli.
+                        {% if not SUBSCRIPTIONS_ENABLED %}
+                            <span class="badge bg-success ms-2">BETA</span>
+                        {% endif %}
+                        Toate drepturile rezervate.
+                    </p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <p class="text-light mb-0">Făcut cu <i class="fas fa-heart text-danger"></i> în România</p>
+                    <p class="text-light mb-0">
+                        {% if not SUBSCRIPTIONS_ENABLED %}
+                            BETA 2025 - Platformă 100% gratuită pentru primii 100 meseriași din România
+                        {% else %}
+                            Făcut cu <i class="fas fa-heart text-danger"></i> în România
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>

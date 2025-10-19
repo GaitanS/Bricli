@@ -22,7 +22,11 @@
       "Bash(./venv/Scripts/python.exe:*)",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(del check_review_images.py)"
+      "Bash(del check_review_images.py)",
+      "Bash(del review_improvements_temp.md)",
+      "Bash(if not exist \"services\\management\" mkdir \"services\\management\")",
+      "Bash(del:*)",
+      "Bash(if not exist \"templates\\blog\" mkdir \"templates\\blog\")"
     ],
     "deny": [],
     "ask": []

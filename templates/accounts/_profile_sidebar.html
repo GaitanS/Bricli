@@ -25,6 +25,7 @@
       {% endif %}
     </div>
 
+    {% if user.user_type == 'craftsman' %}
     <div class="row text-center stats-row-desktop mb-3">
       <div class="col-4 stat-item">
         <span class="stat-value stat-primary">{{ reviews_count|default:0 }}</span>
@@ -39,8 +40,9 @@
         <span class="stat-label">servicii</span>
       </div>
     </div>
+    {% endif %}
 
-    {% if public_url %}
+    {% if user.user_type == 'craftsman' and public_url %}
       <div class="mt-3">
         <a href="{{ public_url }}" class="btn btn-outline-primary w-100">
           <i class="fas fa-eye me-2"></i>Vezi profilul public

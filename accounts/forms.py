@@ -422,6 +422,9 @@ class SimpleCraftsmanRegistrationForm(forms.ModelForm):
         return bio
 
     def save(self, commit=True):
+        from django.conf import settings
+        from django.db.models import Count
+
         user = super().save(commit=False)
         user.username = self.cleaned_data["email"]  # Use email as username
         user.set_password(self.cleaned_data["password"])
@@ -433,9 +436,28 @@ class SimpleCraftsmanRegistrationForm(forms.ModelForm):
         if commit:
             user.save()
 
+            # BETA MODE: Track first 100 craftsmen
+            beta_member = False
+            beta_number = None
+
+            if not settings.SUBSCRIPTIONS_ENABLED:
+                # Count existing BETA members
+                beta_count = CraftsmanProfile.objects.filter(beta_member=True).aggregate(
+                    total=Count('id')
+                )['total'] or 0
+
+                # If under 100, assign BETA status
+                if beta_count < 100:
+                    beta_member = True
+                    beta_number = beta_count + 1
+
             # Create craftsman profile
             craftsman_profile = CraftsmanProfile.objects.create(
-                user=user, county=self.cleaned_data["county"], bio=self.cleaned_data.get("bio", "")
+                user=user,
+                county=self.cleaned_data["county"],
+                bio=self.cleaned_data.get("bio", ""),
+                beta_member=beta_member,
+                beta_registration_number=beta_number
             )
 
             # Add selected services

@@ -2,6 +2,7 @@
 Context processors for Romanian localization and cultural adaptations
 """
 
+from django.conf import settings
 from .models import SiteSettings
 
 
@@ -114,4 +115,14 @@ def navigation_context(request):
         "current_path": request.path,
         "current_url_name": request.resolver_match.url_name if request.resolver_match else None,
         "current_namespace": request.resolver_match.namespace if request.resolver_match else None,
+    }
+
+
+def feature_flags_context(request):
+    """
+    Add feature flags to template context
+    Makes SUBSCRIPTIONS_ENABLED available in all templates
+    """
+    return {
+        "SUBSCRIPTIONS_ENABLED": settings.SUBSCRIPTIONS_ENABLED,
     }

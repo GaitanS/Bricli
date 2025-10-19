@@ -1,0 +1,18 @@
+# Bricli Robots.txt - SEO Configuration
+# Allow search engines to crawl and index public content
+
+User-agent: *
+Allow: /
+Allow: /blog/
+Allow: /conturi/meseriasi/
+Allow: /servicii/
+
+# Disallow private/admin areas
+Disallow: /admin/
+Disallow: /mesaje/
+Disallow: /notifications/
+Disallow: /abonamente/
+Disallow: /moderation/
+
+# Sitemap location for search engines
+Sitemap: https://bricli.ro/sitemap.xml

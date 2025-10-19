@@ -1,0 +1,30 @@
+{% extends 'blog/post_list.html' %}
+
+{% block title %}{{ category.meta_title|default:category.name }} - Articole Bricli{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="{{ category.meta_description|default:category.description }}">
+{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-white text-decoration-none">Acasă</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'blog:post_list' %}" class="text-white text-decoration-none">Articole</a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">{{ category.name }}</li>
+            </ol>
+        </nav>
+        <h1 class="display-4 mb-3 text-white">
+            {% if category.icon %}<i class="{{ category.icon }} me-3"></i>{% endif %}
+            {{ category.name }}
+        </h1>
+        {% if category.description %}
+        <p class="lead text-white">{{ category.description }}</p>
+        {% endif %}
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

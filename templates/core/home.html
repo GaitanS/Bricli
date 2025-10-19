@@ -169,6 +169,125 @@
     </div>
 </section>
 
+<!-- BETA Launch Section -->
+{% if not SUBSCRIPTIONS_ENABLED %}
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <!-- BETA Info & Counter -->
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="text-center text-lg-start">
+                    <span class="badge bg-success px-4 py-2 fs-5 mb-3">
+                        <i class="fas fa-rocket me-2"></i>BETA 2025
+                    </span>
+                    <h2 class="fw-bold mb-3">Alătură-te Primilor 100 Meseriași din România!</h2>
+                    <p class="lead text-muted mb-4">
+                        Bricli lansează oficial în România. Primii 100 meseriași beneficiază de <strong>acces gratuit nelimitat</strong> - fără taxe, fără restricții.
+                    </p>
+
+                    <!-- BETA Counter -->
+                    <div class="beta-counter-card shadow-sm p-4 mb-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-6 text-center mb-3 mb-md-0">
+                                <div class="beta-progress-ring">
+                                    <span class="beta-count-number">{{ beta_count }}</span>
+                                    <span class="beta-count-total">/100</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-center text-md-start">
+                                <h5 class="fw-bold text-success mb-2">
+                                    {% if beta_count < 100 %}
+                                        {{ 100|add:"-"|add:beta_count }} locuri disponibile
+                                    {% else %}
+                                        Complet!
+                                    {% endif %}
+                                </h5>
+                                <p class="text-muted mb-0 small">
+                                    Lead-uri nelimitate • Mesaje gratuite • Toate funcțiile premium
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'auth:craftsman_register' %}" class="btn btn-success btn-lg shadow-sm">
+                        <i class="fas fa-rocket me-2"></i>Înregistrează-te GRATUIT
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mini FAQ -->
+            <div class="col-lg-6">
+                <div class="beta-faq">
+                    <h4 class="fw-bold mb-4 text-center text-lg-start">Întrebări Frecvente BETA</h4>
+
+                    <div class="accordion accordion-flush" id="betaFAQ">
+                        <!-- FAQ 1 -->
+                        <div class="accordion-item border-0 mb-2">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button collapsed bg-light rounded" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                    <i class="fas fa-question-circle text-success me-2"></i>
+                                    Ce înseamnă BETA?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#betaFAQ">
+                                <div class="accordion-body">
+                                    Testăm platforma cu primii 100 meseriași din România. Toate funcțiile sunt 100% gratuite - lead-uri, mesaje, oferte nelimitate.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 2 -->
+                        <div class="accordion-item border-0 mb-2">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed bg-light rounded" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                    <i class="fas fa-question-circle text-success me-2"></i>
+                                    Cât durează perioada BETA?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#betaFAQ">
+                                <div class="accordion-body">
+                                    Perioada BETA durează până la lansarea oficială. Primii 100 membri păstrează accesul gratuit pe toată perioada.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 3 -->
+                        <div class="accordion-item border-0 mb-2">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed bg-light rounded" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                    <i class="fas fa-question-circle text-success me-2"></i>
+                                    Ce se întâmplă după lansare?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#betaFAQ">
+                                <div class="accordion-body">
+                                    După lansare vom introduce planuri plătite. Primii 100 membri BETA vor primi condiții speciale ca mulțumire pentru sprijin.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 4 -->
+                        <div class="accordion-item border-0">
+                            <h2 class="accordion-header" id="faq4">
+                                <button class="accordion-button collapsed bg-light rounded" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                    <i class="fas fa-question-circle text-success me-2"></i>
+                                    De ce doar 100 meseriași?
+                                </button>
+                            </h2>
+                            <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#betaFAQ">
+                                <div class="accordion-body">
+                                    Vrem să oferim o experiență de calitate și suport personalizat. Limita de 100 ne permite să colectăm feedback și să îmbunătățim platforma împreună cu comunitatea.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <!-- Service Categories -->
 <section class="py-5 grid-2-mobile">
     <div class="container">
@@ -407,6 +526,53 @@
 
 .tier-badge i {
     font-size: 0.7rem;
+}
+
+/* BETA Section Styles */
+.beta-counter-card {
+    background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
+    border-radius: 16px;
+    border: 2px solid #10b981;
+}
+
+.beta-progress-ring {
+    position: relative;
+    display: inline-block;
+}
+
+.beta-count-number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #10b981;
+    line-height: 1;
+}
+
+.beta-count-total {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #6b7280;
+    line-height: 1;
+}
+
+.beta-faq .accordion-button {
+    font-weight: 600;
+    color: #1f2937;
+    padding: 1rem 1.25rem;
+}
+
+.beta-faq .accordion-button:not(.collapsed) {
+    background-color: #10b981;
+    color: white;
+}
+
+.beta-faq .accordion-button:not(.collapsed) .fas {
+    color: white !important;
+}
+
+.beta-faq .accordion-body {
+    padding: 1rem 1.25rem;
+    color: #4b5563;
+    line-height: 1.6;
 }
 </style>
 
