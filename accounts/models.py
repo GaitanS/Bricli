@@ -110,6 +110,60 @@ class User(AbstractUser):
         self.save()
 
 
+class VerificationCode(models.Model):
+    """
+    Coduri de verificare temporare pentru înregistrare cont
+    Folosite pentru verificare email/telefon la creare comandă
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='verification_codes')
+    code = models.CharField(max_length=6, help_text="Cod 6 cifre")
+    method = models.CharField(
+        max_length=10,
+        choices=[('email', 'Email'), ('whatsapp', 'WhatsApp')],
+        default='email',
+        help_text="Metodă de livrare cod"
+    )
+    is_used = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(help_text="Expiră după 15 minute")
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Cod Verificare"
+        verbose_name_plural = "Coduri Verificare"
+
+    def __str__(self):
+        return f"{self.user.email} - {self.code} ({self.method})"
+
+    def is_valid(self):
+        """Verifică dacă codul este valid (neutilizat și neexpirat)"""
+        from django.utils import timezone
+        return not self.is_used and self.expires_at > timezone.now()
+
+    @classmethod
+    def generate_code(cls, user, method='email'):
+        """Generează un nou cod de verificare"""
+        import random
+        from django.utils import timezone
+        from datetime import timedelta
+
+        # Generează cod 6 cifre
+        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+
+        # Expiră după 15 minute
+        expires_at = timezone.now() + timedelta(minutes=15)
+
+        # Creează codul
+        verification_code = cls.objects.create(
+            user=user,
+            code=code,
+            method=method,
+            expires_at=expires_at
+        )
+
+        return verification_code
+
+
 class County(models.Model):
     name = models.CharField(max_length=100, unique=True)
     code = models.CharField(max_length=2, unique=True)  # RO county codes

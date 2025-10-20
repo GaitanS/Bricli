@@ -19,12 +19,79 @@ class OrderImageForm(forms.ModelForm):
 
 
 class OrderForm(forms.ModelForm):
-    """Form for creating new orders"""
+    """Form for creating new orders (cu suport pentru utilizatori neautentificați)"""
 
     preferred_date = forms.DateField(
         required=False,
         widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
         label="Data preferată (opțional)",
+    )
+
+    # Câmpuri de autentificare (doar pentru utilizatori neautentificați)
+    user_name = forms.CharField(
+        required=False,
+        max_length=100,
+        label="Nume complet",
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "ex. Ion Popescu",
+            "data-auth-field": "true"
+        })
+    )
+
+    user_email = forms.EmailField(
+        required=False,
+        label="Email",
+        widget=forms.EmailInput(attrs={
+            "class": "form-control",
+            "placeholder": "ex. ion.popescu@email.com",
+            "data-auth-field": "true",
+            "id": "id_user_email"
+        })
+    )
+
+    user_phone = forms.CharField(
+        required=False,
+        max_length=15,
+        label="Telefon (opțional, dar recomandat)",
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "ex. 0740123456",
+            "data-auth-field": "true",
+            "pattern": "^(07|\\+407)\\d{8}$"
+        }),
+        help_text="Format: 0740123456 sau +40740123456"
+    )
+
+    user_password = forms.CharField(
+        required=False,
+        min_length=8,
+        label="Parolă",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Minim 8 caractere",
+            "data-auth-field": "true",
+            "id": "id_user_password"
+        })
+    )
+
+    user_password_confirm = forms.CharField(
+        required=False,
+        label="Confirmă parola",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Reintroduceți parola",
+            "data-auth-field": "true",
+            "id": "id_user_password_confirm"
+        })
+    )
+
+    verification_method = forms.ChoiceField(
+        required=False,
+        choices=[('email', 'Email'), ('whatsapp', 'WhatsApp')],
+        initial='email',
+        label="Primește codul de verificare pe:",
+        widget=forms.RadioSelect(attrs={"data-auth-field": "true"})
     )
 
     class Meta:
@@ -103,6 +170,55 @@ class OrderForm(forms.ModelForm):
 
         # Make description a textarea
         self.fields["description"].widget = forms.Textarea(attrs={"rows": 4, "class": "form-control"})
+
+    def clean_user_phone(self):
+        """Validare format telefon românesc"""
+        phone = self.cleaned_data.get('user_phone')
+        if phone:
+            import re
+            # Remove spaces and dashes
+            clean_phone = re.sub(r'[\s\-]', '', phone)
+            # Validate Romanian phone format
+            if not re.match(r'^(07|\+407)\d{8}$', clean_phone):
+                raise ValidationError("Formatul telefonului nu este valid. Folosește formatul 0740123456 sau +40740123456")
+        return phone
+
+    def clean(self):
+        """Validare câmpuri de autentificare pentru utilizatori neautentificați"""
+        cleaned_data = super().clean()
+
+        # Dacă utilizatorul este autentificat, ignoră validarea câmpurilor auth
+        # (verificare făcută în view)
+
+        user_email = cleaned_data.get('user_email')
+        user_name = cleaned_data.get('user_name')
+        user_password = cleaned_data.get('user_password')
+        user_password_confirm = cleaned_data.get('user_password_confirm')
+
+        # Dacă sunt completate câmpuri auth, validăm
+        if user_email or user_name or user_password:
+            # Email obligatoriu pentru utilizatori noi
+            if not user_email:
+                self.add_error('user_email', 'Emailul este obligatoriu pentru a crea un cont.')
+
+            # Nume obligatoriu
+            if not user_name:
+                self.add_error('user_name', 'Numele complet este obligatoriu.')
+
+            # Parolă obligatorie
+            if not user_password:
+                self.add_error('user_password', 'Parola este obligatorie.')
+
+            # Verificare parolele match
+            if user_password and user_password_confirm:
+                if user_password != user_password_confirm:
+                    self.add_error('user_password_confirm', 'Parolele nu coincid.')
+
+            # Verificare lungime parolă
+            if user_password and len(user_password) < 8:
+                self.add_error('user_password', 'Parola trebuie să aibă minim 8 caractere.')
+
+        return cleaned_data
 
 
 class ReviewForm(forms.ModelForm):

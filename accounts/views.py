@@ -1143,3 +1143,100 @@ def craftsman_reviews_ajax(request, pk):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+
+class VerifyCodeView(FormView):
+    """
+    View pentru verificarea codului primit de către utilizator
+    Utilizatorul introduce codul primit pe email/WhatsApp pentru a-și activa contul
+    """
+    template_name = "accounts/verify_code.html"
+    success_url = reverse_lazy("core:home")
+
+    def dispatch(self, request, *args, **kwargs):
+        """Verifică dacă există un user pending în sesiune"""
+        if not request.session.get('pending_user_id'):
+            messages.error(request, "Nu există o verificare pendinte. Te rugăm să te înregistrezi din nou.")
+            return redirect('services:create_order')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_id = self.request.session.get('pending_user_id')
+        if user_id:
+            try:
+                user = User.objects.get(pk=user_id)
+                context['user'] = user
+                # Get last verification code to show method
+                last_code = user.verification_codes.filter(is_used=False).order_by('-created_at').first()
+                context['method'] = last_code.method if last_code else 'email'
+            except User.DoesNotExist:
+                pass
+        return context
+
+    def post(self, request, *args, **kwargs):
+        """Handle verification code submission"""
+        from .verification_service import VerificationService
+
+        code = request.POST.get('code', '').strip()
+        user_id = request.session.get('pending_user_id')
+        order_id = request.session.get('pending_order_id')
+
+        if not code:
+            messages.error(request, "Te rugăm să introduci codul de verificare.")
+            return self.get(request, *args, **kwargs)
+
+        if not user_id:
+            messages.error(request, "Sesiunea a expirat. Te rugăm să te înregistrezi din nou.")
+            return redirect('services:create_order')
+
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            messages.error(request, "Utilizatorul nu a fost găsit.")
+            return redirect('services:create_order')
+
+        # Verify code
+        success, message = VerificationService.verify_code(user, code)
+
+        if success:
+            # Activate user and publish order
+            user.is_active = True
+            user.is_verified = True
+            user.save()
+
+            # Publish order if exists
+            if order_id:
+                try:
+                    from services.models import Order
+                    order = Order.objects.get(pk=order_id)
+                    order.status = 'published'
+                    order.save()
+
+                    # Login user
+                    login(request, user)
+
+                    # Clear session data
+                    del request.session['pending_user_id']
+                    del request.session['pending_order_id']
+
+                    messages.success(
+                        request,
+                        "Cont verificat cu succes! Comanda ta a fost publicată și meșterii vor putea oferta."
+                    )
+                    return redirect('services:order_detail', pk=order.pk)
+                except Exception as e:
+                    messages.error(request, f"Eroare la publicarea comenzii: {e}")
+                    return redirect('core:home')
+            else:
+                # No order, just login
+                login(request, user)
+                del request.session['pending_user_id']
+                if 'pending_order_id' in request.session:
+                    del request.session['pending_order_id']
+
+                messages.success(request, message)
+                return redirect('core:home')
+        else:
+            messages.error(request, message)
+            return self.get(request, *args, **kwargs)

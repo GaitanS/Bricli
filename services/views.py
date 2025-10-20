@@ -133,7 +133,7 @@ class ServiceCategoryDetailView(DetailView):
         return context
 
 
-class CreateOrderView(ClientRequiredMixin, CreateView):
+class CreateOrderView(CreateView):  # SCHIMBAT: Eliminat ClientRequiredMixin pentru utilizatori neautentificați
     model = Order
     template_name = "services/create_order.html"
     form_class = OrderForm
@@ -141,8 +141,33 @@ class CreateOrderView(ClientRequiredMixin, CreateView):
     # Rate limiting ELIMINAT - nu mai sunt restricții
 
     def get_context_data(self, **kwargs):
+        from .models import Service
+        import json
+
         context = super().get_context_data(**kwargs)
-        context["services"] = ServiceCategory.objects.all().order_by("name")
+
+        # Trimitem CATEGORII pentru selecția inițială (Step 1a)
+        categories = ServiceCategory.objects.filter(is_active=True).order_by("name")
+        context["categories"] = categories
+
+        # Trimitem toate serviciile pentru JavaScript mapping
+        all_services = Service.objects.filter(is_active=True).select_related("category").order_by("category__name", "name")
+
+        # Creăm un mapping JSON: category_id -> [services]
+        services_by_category = {}
+        for service in all_services:
+            cat_id = str(service.category.id)
+            if cat_id not in services_by_category:
+                services_by_category[cat_id] = []
+            services_by_category[cat_id].append({
+                'id': service.id,
+                'name': service.name,
+                'description': service.description or '',
+                'icon': service.category.icon or 'fas fa-tools'
+            })
+
+        context["services_by_category_json"] = json.dumps(services_by_category)
+        context["is_authenticated"] = self.request.user.is_authenticated
 
         # Handle craftsman parameter for quote requests
         craftsman_id = self.request.GET.get("craftsman")
@@ -160,7 +185,21 @@ class CreateOrderView(ClientRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        # Import the notification function
+        from django.contrib.auth import get_user_model, login
+        from accounts.models import User
+        from accounts.verification_service import VerificationService
+
+        User = get_user_model()
+
+        # Dacă utilizatorul este autentificat, folosim flow-ul vechi
+        if self.request.user.is_authenticated:
+            return self._handle_authenticated_user(form)
+
+        # Utilizator ANONIM - logică nouă
+        return self._handle_anonymous_user(form)
+
+    def _handle_authenticated_user(self, form):
+        """Flow existent pentru utilizatori autentificați"""
         from .models import notify_order_request
 
         form.instance.client = self.request.user
@@ -171,7 +210,6 @@ class CreateOrderView(ClientRequiredMixin, CreateView):
         if craftsman_id:
             try:
                 craftsman = CraftsmanProfile.objects.get(pk=craftsman_id)
-                # Set assigned_craftsman to mark this as a direct request
                 form.instance.assigned_craftsman = craftsman
             except CraftsmanProfile.DoesNotExist:
                 pass
@@ -185,13 +223,11 @@ class CreateOrderView(ClientRequiredMixin, CreateView):
 
         messages.success(self.request, "Comanda a fost creată cu succes!")
 
-        # If this was a direct craftsman request, notify the craftsman
+        # Notify craftsman if direct request
         if craftsman_id:
             try:
                 craftsman = CraftsmanProfile.objects.get(pk=craftsman_id)
-                # Create notification for the craftsman
                 notify_order_request(self.object, craftsman)
-                # Create an invitation record so the craftsman can accept/decline
                 Invitation.objects.get_or_create(
                     order=self.object, craftsman=craftsman.user, defaults={"invited_by": self.request.user}
                 )
@@ -199,6 +235,115 @@ class CreateOrderView(ClientRequiredMixin, CreateView):
                 pass
 
         return response
+
+    def _handle_anonymous_user(self, form):
+        """Flow NOU pentru utilizatori neautentificați cu verificare cont"""
+        from django.contrib.auth import get_user_model, login
+        from accounts.verification_service import VerificationService
+
+        User = get_user_model()
+
+        user_email = form.cleaned_data.get('user_email')
+        user_phone = form.cleaned_data.get('user_phone')
+        user_password = form.cleaned_data.get('user_password')
+        user_name = form.cleaned_data.get('user_name')
+        verification_method = form.cleaned_data.get('verification_method', 'email')
+
+        # Verifică dacă utilizatorul există deja
+        existing_user = None
+        if user_email:
+            existing_user = User.objects.filter(email=user_email).first()
+
+        if existing_user:
+            # CONT EXISTENT - Încearcă login
+            from django.contrib.auth import authenticate
+            user = authenticate(username=user_email, password=user_password)
+
+            if user:
+                # Login reușit
+                login(self.request, user)
+                form.instance.client = user
+
+                # Salvează comanda direct (publicată)
+                response = super().form_valid(form)
+
+                # Handle image uploads
+                images = self.request.FILES.getlist("images")
+                for image in images:
+                    OrderImage.objects.create(order=self.object, image=image)
+
+                messages.success(self.request, "Te-ai autentificat și comanda a fost creată cu succes!")
+                return response
+            else:
+                # Parolă incorectă
+                form.add_error('user_password', 'Parolă incorectă. Verifică și încearcă din nou.')
+                return self.form_invalid(form)
+
+        else:
+            # CONT NOU - Creează utilizator
+            try:
+                # Extrage nume și prenume
+                name_parts = user_name.strip().split(' ', 1)
+                first_name = name_parts[0]
+                last_name = name_parts[1] if len(name_parts) > 1 else ''
+
+                # Creează user (INACTIV până la verificare)
+                user = User.objects.create_user(
+                    username=user_email,
+                    email=user_email,
+                    password=user_password,
+                    first_name=first_name,
+                    last_name=last_name,
+                    phone_number=user_phone or '',
+                    user_type='client',
+                    is_active=False,  # Inactive până la verificare
+                    is_verified=False
+                )
+
+                # Salvează comanda ca DRAFT (nepublicată până la verificare)
+                form.instance.client = user
+                form.instance.status = 'draft'  # DRAFT până la verificare
+                response = super().form_valid(form)
+
+                # Handle image uploads
+                images = self.request.FILES.getlist("images")
+                for image in images:
+                    OrderImage.objects.create(order=self.object, image=image)
+
+                # Trimite cod de verificare
+                verification_code = VerificationService.send_verification_code(user, method=verification_method)
+
+                if verification_code:
+                    # Salvează order_id în session pentru după verificare
+                    self.request.session['pending_order_id'] = self.object.pk
+                    self.request.session['pending_user_id'] = user.pk
+
+                    # Redirect la pagină verificare
+                    messages.success(
+                        self.request,
+                        f"Cont creat! Verifică {'emailul' if verification_method == 'email' else 'WhatsApp-ul'} pentru codul de verificare."
+                    )
+                    return redirect(reverse('accounts_api:verify_code'))
+                else:
+                    # Fallback: Activează direct dacă trimiterea codului eșuează
+                    user.is_active = True
+                    user.is_verified = True
+                    user.save()
+
+                    self.object.status = 'published'
+                    self.object.save()
+
+                    login(self.request, user)
+                    messages.warning(
+                        self.request,
+                        "Contul a fost creat dar nu am putut trimite codul de verificare. Ești autentificat automat."
+                    )
+                    return response
+
+            except Exception as e:
+                logger.error(f"Eroare creare utilizator: {e}")
+                messages.error(self.request, "A apărut o eroare la crearea contului. Încearcă din nou.")
+                return self.form_invalid(form)
 
     def get_success_url(self):
         return reverse_lazy("services:order_detail", kwargs={"pk": self.object.pk})

@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verificare Cont - Bricli{% endblock %}
+
+{% block extra_head %}
+<style>
+    .verification-container {
+        max-width: 500px;
+        margin: 80px auto;
+        padding: 40px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .verification-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .verification-icon {
+        font-size: 64px;
+        color: var(--bs-primary);
+        margin-bottom: 20px;
+    }
+
+    .code-input {
+        font-size: 32px;
+        text-align: center;
+        letter-spacing: 12px;
+        font-weight: bold;
+        padding: 20px;
+        border: 2px solid var(--bs-primary);
+        border-radius: 8px;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .code-input:focus {
+        outline: none;
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25);
+    }
+
+    .verification-info {
+        background: #f8f9fa;
+        border-left: 4px solid var(--bs-primary);
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    .verification-info i {
+        color: var(--bs-primary);
+        margin-right: 8px;
+    }
+
+    .resend-code-btn {
+        color: var(--bs-primary);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+    .resend-code-btn:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verification-container">
+    <div class="verification-header">
+        <div class="verification-icon">
+            <i class="fas fa-shield-check"></i>
+        </div>
+        <h2 class="mb-3">Verificare Cont</h2>
+        <p class="text-muted">
+            Am trimis un cod de verificare pe
+            {% if method == 'whatsapp' %}
+                <strong>WhatsApp</strong> la numărul <strong>{{ user.phone_number }}</strong>
+            {% else %}
+                <strong>email</strong> la adresa <strong>{{ user.email }}</strong>
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="verification-info">
+        <i class="fas fa-info-circle"></i>
+        <strong>Introdu codul de 6 cifre primit pentru a-ți activa contul.</strong>
+        <br>
+        <small class="text-muted">Codul expiră în 15 minute.</small>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" id="verifyCodeForm">
+        {% csrf_token %}
+        <div class="mb-4 text-center">
+            <input
+                type="text"
+                name="code"
+                id="codeInput"
+                class="code-input"
+                placeholder="123456"
+                maxlength="6"
+                pattern="[0-9]{6}"
+                required
+                autofocus
+            >
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-3">
+            <i class="fas fa-check-circle me-2"></i>
+            Verifică Contul
+        </button>
+    </form>
+
+    <div class="text-center mt-3">
+        <a href="#" class="resend-code-btn" id="resendCodeBtn">
+            <i class="fas fa-redo me-1"></i>
+            Nu ai primit codul? Retrimite
+        </a>
+    </div>
+
+    <div class="text-center mt-4">
+        <small class="text-muted">
+            <i class="fas fa-lock me-1"></i>
+            Verificarea este necesară pentru securitatea contului tău
+        </small>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const codeInput = document.getElementById('codeInput');
+    const form = document.getElementById('verifyCodeForm');
+    const resendBtn = document.getElementById('resendCodeBtn');
+
+    // Auto-format code input (only digits)
+    codeInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+
+        // Auto-submit when 6 digits entered
+        if (this.value.length === 6) {
+            form.submit();
+        }
+    });
+
+    // Resend code functionality
+    resendBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        // Disable button to prevent spam
+        this.style.pointerEvents = 'none';
+        this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Se retrimite...';
+
+        // TODO: Implement AJAX resend endpoint
+        fetch('/api/accounts/resend-code/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Codul a fost retrimis cu succes!');
+            } else {
+                alert('❌ Eroare: ' + data.message);
+            }
+
+            // Re-enable after 30 seconds
+            setTimeout(() => {
+                this.style.pointerEvents = 'auto';
+                this.innerHTML = '<i class="fas fa-redo me-1"></i> Nu ai primit codul? Retrimite';
+            }, 30000);
+        })
+        .catch(error => {
+            alert('❌ Eroare la retrimite cod. Reîncearcă mai târziu.');
+            this.style.pointerEvents = 'auto';
+            this.innerHTML = '<i class="fas fa-redo me-1"></i> Nu ai primit codul? Retrimite';
+        });
+    });
+
+    // Paste support (for code copied from email)
+    codeInput.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+        const code = pastedText.replace(/[^0-9]/g, '').substring(0, 6);
+        this.value = code;
+
+        // Auto-submit if complete code pasted
+        if (code.length === 6) {
+            form.submit();
+        }
+    });
+});
+</script>
+{% endblock %}

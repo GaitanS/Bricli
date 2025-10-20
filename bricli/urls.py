@@ -21,6 +21,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # API endpoints
     path("api/health/", HealthCheckAPIView.as_view(), name="api_health"),
+    path("api/accounts/", include("accounts.api_urls")),  # AJAX endpoints (check user, etc.)
     # App URLs - Romanian ASCII paths with separate namespaces
     path("", include("core.urls")),
     # Auth URLs at root (namespace: 'auth')

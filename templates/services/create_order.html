@@ -310,8 +310,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 </div>
                 <div class="step" data-step="4">
                     <div class="step-number">4</div>
+                    <div class="step-title">{% if not is_authenticated %}Contact{% else %}Buget{% endif %}</div>
+                </div>
+                {% if not is_authenticated %}
+                <div class="step" data-step="5">
+                    <div class="step-number">5</div>
                     <div class="step-title">Finalizare</div>
                 </div>
+                {% endif %}
             </div>
 
             <div class="card shadow-lg border-0">
@@ -319,20 +325,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                     <form method="post" id="orderForm" class="needs-live-validate" novalidate>
                         {% csrf_token %}
 
-                        <!-- Step 1: Category Selection -->
+                        <!-- Step 1: Category & Service Selection (Two-Level) -->
                         <div class="step-content active" id="step-1">
-                            <div class="text-center mb-4">
-                                {% if is_quote_request and craftsman %}
-                                <h3 class="fw-bold">Ce serviciu dorești de la {{ craftsman.user.get_full_name|default:craftsman.user.username }}?</h3>
-                                <p class="text-muted">Selectează din serviciile oferite de acest meșter</p>
-                                {% else %}
-                                <h3 class="fw-bold">Ce tip de serviciu cauți?</h3>
-                                <p class="text-muted">Selectează categoria care se potrivește cel mai bine nevoilor tale</p>
-                                {% endif %}
-                            </div>
+                            {% if is_quote_request and craftsman_services %}
+                                <!-- For craftsman quote requests, show services directly -->
+                                <div class="text-center mb-4">
+                                    <h3 class="fw-bold">Ce serviciu dorești de la {{ craftsman.user.get_full_name|default:craftsman.user.username }}?</h3>
+                                    <p class="text-muted">Selectează din serviciile oferite de acest meșter</p>
+                                </div>
 
-                            <div class="category-grid">
-                                {% if is_quote_request and craftsman_services %}
+                                <div class="category-grid" id="craftsman-services-grid">
                                     {% for craftsman_service in craftsman_services %}
                                     <div class="category-card" data-service="{{ craftsman_service.service.id }}" data-name="{{ craftsman_service.service.name }}">
                                         <i class="{{ craftsman_service.service.category.icon|default:'fas fa-tools' }}"></i>
@@ -340,16 +342,41 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                                         <small class="text-muted">{{ craftsman_service.service.category.name }}</small>
                                     </div>
                                     {% endfor %}
-                                {% else %}
-                                    {% for service in services %}
-                                    <div class="category-card" data-service="{{ service.id }}" data-name="{{ service.name }}">
-                                        <i class="{{ service.category.icon|default:'fas fa-tools' }}"></i>
-                                        <p class="category-name">{{ service.name }}</p>
-                                        <small class="text-muted">{{ service.category.name }}</small>
+                                </div>
+                            {% else %}
+                                <!-- For general orders, show category → service flow -->
+                                <!-- Step 1a: Category Selection -->
+                                <div id="category-selection">
+                                    <div class="text-center mb-4">
+                                        <h3 class="fw-bold">Ce categorie de serviciu cauți?</h3>
+                                        <p class="text-muted">Selectează categoria care se potrivește nevoilor tale</p>
                                     </div>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
+
+                                    <div class="category-grid" id="categories-grid">
+                                        {% for category in categories %}
+                                        <div class="category-card" data-category-id="{{ category.id }}" data-category-name="{{ category.name }}">
+                                            <i class="{{ category.icon|default:'fas fa-tools' }}"></i>
+                                            <p class="category-name">{{ category.name }}</p>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <!-- Step 1b: Service Selection (hidden initially) -->
+                                <div id="service-selection" style="display: none;">
+                                    <div class="text-center mb-4">
+                                        <button type="button" class="btn btn-link text-decoration-none" id="backToCategoriesBtn">
+                                            <i class="fas fa-arrow-left me-2"></i>Înapoi la categorii
+                                        </button>
+                                        <h3 class="fw-bold mt-2" id="selected-category-title">Selectează serviciul</h3>
+                                        <p class="text-muted">Alege serviciul specific de care ai nevoie</p>
+                                    </div>
+
+                                    <div class="category-grid" id="services-grid">
+                                        <!-- Services will be populated dynamically -->
+                                    </div>
+                                </div>
+                            {% endif %}
 
                             <div class="d-flex justify-content-end mt-4">
                                 <button type="button" class="btn btn-primary btn-lg" id="step1Next" disabled>
@@ -480,8 +507,100 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                             </div>
                         </div>
 
-                        <!-- Step 4: Budget & Finalize -->
+                        <!-- Step 4: Authentication (Anonymous Users Only) -->
+                        {% if not is_authenticated %}
                         <div class="step-content" id="step-4">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold">Detalii de Contact</h3>
+                                <p class="text-muted">Introdu datele tale pentru a continua</p>
+                            </div>
+
+                            <div class="alert alert-info" id="existing-user-alert" style="display: none;">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Ai deja cont!</strong> Te rugăm să introduci parola pentru a continua.
+                            </div>
+
+                            <div class="alert alert-success" id="new-user-alert" style="display: none;">
+                                <i class="fas fa-user-plus me-2"></i>
+                                <strong>Creează cont nou</strong> - Introdu o parolă pentru a-ți securiza contul.
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.user_name.id_for_label }}" class="form-label fw-semibold">
+                                        Nume complet <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.user_name }}
+                                    <div class="form-text">Ex: Ion Popescu</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.user_email.id_for_label }}" class="form-label fw-semibold">
+                                        Email <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.user_email }}
+                                    <div class="form-text" id="email-check-message"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.user_phone.id_for_label }}" class="form-label fw-semibold">
+                                    Telefon (opțional, dar recomandat)
+                                </label>
+                                {{ form.user_phone }}
+                                <div class="form-text">Format: 0740123456 sau +40740123456</div>
+                            </div>
+
+                            <div class="row mb-3" id="password-fields">
+                                <div class="col-md-6">
+                                    <label for="{{ form.user_password.id_for_label }}" class="form-label fw-semibold">
+                                        Parolă <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.user_password }}
+                                    <div class="form-text">Minim 8 caractere</div>
+                                </div>
+                                <div class="col-md-6" id="password-confirm-field">
+                                    <label for="{{ form.user_password_confirm.id_for_label }}" class="form-label fw-semibold">
+                                        Confirmă Parola <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.user_password_confirm }}
+                                </div>
+                            </div>
+
+                            <div class="mb-3" id="verification-method-field">
+                                <label class="form-label fw-semibold">Primește codul de verificare pe:</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="verification_method" id="verify-email" value="email" checked>
+                                        <label class="form-check-label" for="verify-email">
+                                            <i class="fas fa-envelope me-1"></i> Email
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="verification_method" id="verify-whatsapp" value="whatsapp">
+                                        <label class="form-check-label" for="verify-whatsapp">
+                                            <i class="fab fa-whatsapp me-1"></i> WhatsApp
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    Vei primi un cod de verificare pentru a-ți activa contul
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary btn-lg" id="step4Prev">
+                                    <i class="fas fa-arrow-left me-2"></i>Înapoi
+                                </button>
+                                <button type="button" class="btn btn-primary btn-lg" id="step4Next" disabled>
+                                    Continuă <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Step 5 (or 4 for authenticated): Budget & Finalize -->
+                        <div class="step-content" id="step-{% if not is_authenticated %}5{% else %}4{% endif %}">
                             <div class="text-center mb-4">
                                 <h3 class="fw-bold">Care este bugetul tău?</h3>
                                 <p class="text-muted">Stabilește o fourchette de preț pentru a primi oferte relevante</p>
@@ -530,7 +649,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                             </div>
 
                             <div class="d-flex justify-content-between mt-4">
-                                <button type="button" class="btn btn-outline-secondary btn-lg" id="step4Prev">
+                                <button type="button" class="btn btn-outline-secondary btn-lg" id="step{% if not is_authenticated %}5{% else %}4{% endif %}Prev">
                                     <i class="fas fa-arrow-left me-2"></i>Înapoi
                                 </button>
                                 <button type="submit" class="btn btn-success btn-lg">
@@ -555,7 +674,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let currentStep = 1;
-    const totalSteps = 4;
+    const totalSteps = {% if not is_authenticated %}5{% else %}4{% endif %};
+    const isAuthenticated = {{ is_authenticated|yesno:"true,false" }};
 
     // Form data storage
     let formData = {
@@ -604,11 +724,88 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Step 1: Category selection
-    document.querySelectorAll('.category-card').forEach(card => {
+    // Step 1: Two-Level Category → Service Selection
+    const servicesByCategory = {{ services_by_category_json|safe }};
+    const categorySelection = document.getElementById('category-selection');
+    const serviceSelection = document.getElementById('service-selection');
+    const servicesGrid = document.getElementById('services-grid');
+    const selectedCategoryTitle = document.getElementById('selected-category-title');
+    const backToCategoriesBtn = document.getElementById('backToCategoriesBtn');
+
+    // Category selection (Step 1a)
+    document.querySelectorAll('#categories-grid .category-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const categoryId = this.dataset.categoryId;
+            const categoryName = this.dataset.categoryName;
+
+            // Load services for this category
+            loadServicesForCategory(categoryId, categoryName);
+        });
+    });
+
+    function loadServicesForCategory(categoryId, categoryName) {
+        const services = servicesByCategory[categoryId] || [];
+
+        // Clear previous services
+        servicesGrid.innerHTML = '';
+
+        // Populate services
+        services.forEach(service => {
+            const serviceCard = document.createElement('div');
+            serviceCard.className = 'category-card';
+            serviceCard.dataset.service = service.id;
+            serviceCard.dataset.name = service.name;
+
+            serviceCard.innerHTML = `
+                <i class="${service.icon}"></i>
+                <p class="category-name">${service.name}</p>
+            `;
+
+            // Add click handler for service selection
+            serviceCard.addEventListener('click', function() {
+                // Remove previous selection
+                document.querySelectorAll('#services-grid .category-card').forEach(c => c.classList.remove('selected'));
+
+                // Select current
+                this.classList.add('selected');
+
+                // Store data
+                formData.service = service.id;
+                formData.serviceName = service.name;
+                document.getElementById('selected-service').value = service.id;
+
+                // Enable next button
+                document.getElementById('step1Next').disabled = false;
+            });
+
+            servicesGrid.appendChild(serviceCard);
+        });
+
+        // Update title
+        selectedCategoryTitle.textContent = categoryName;
+
+        // Show service selection, hide category selection
+        categorySelection.style.display = 'none';
+        serviceSelection.style.display = 'block';
+
+        // Disable next button until service selected
+        document.getElementById('step1Next').disabled = true;
+    }
+
+    // Back to categories button
+    if (backToCategoriesBtn) {
+        backToCategoriesBtn.addEventListener('click', function() {
+            categorySelection.style.display = 'block';
+            serviceSelection.style.display = 'none';
+            document.getElementById('step1Next').disabled = true;
+        });
+    }
+
+    // For craftsman services (direct selection)
+    document.querySelectorAll('#craftsman-services-grid .category-card').forEach(card => {
         card.addEventListener('click', function() {
             // Remove previous selection
-            document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('#craftsman-services-grid .category-card').forEach(c => c.classList.remove('selected'));
 
             // Select current
             this.classList.add('selected');
@@ -682,6 +879,105 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('step3Prev').addEventListener('click', prevStep);
     document.getElementById('step3Next').addEventListener('click', nextStep);
+
+    // Step 4: Authentication (Anonymous Users Only)
+    if (!isAuthenticated) {
+        const userEmailInput = document.getElementById('{{ form.user_email.id_for_label }}');
+        const userPhoneInput = document.getElementById('{{ form.user_phone.id_for_label }}');
+        const userNameInput = document.getElementById('{{ form.user_name.id_for_label }}');
+        const userPasswordInput = document.getElementById('{{ form.user_password.id_for_label }}');
+        const userPasswordConfirmInput = document.getElementById('{{ form.user_password_confirm.id_for_label }}');
+        const passwordConfirmField = document.getElementById('password-confirm-field');
+        const verificationMethodField = document.getElementById('verification-method-field');
+        const existingUserAlert = document.getElementById('existing-user-alert');
+        const newUserAlert = document.getElementById('new-user-alert');
+        const emailCheckMessage = document.getElementById('email-check-message');
+
+        let userExists = false;
+        let checkDebounceTimer;
+
+        // Check if user exists (AJAX)
+        function checkUserExists() {
+            const email = userEmailInput.value.trim();
+            const phone = userPhoneInput.value.trim();
+
+            if (!email && !phone) {
+                emailCheckMessage.textContent = '';
+                emailCheckMessage.className = 'form-text';
+                return;
+            }
+
+            clearTimeout(checkDebounceTimer);
+            checkDebounceTimer = setTimeout(() => {
+                fetch('/api/accounts/check-user/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ email, phone })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        userExists = true;
+                        existingUserAlert.style.display = 'block';
+                        newUserAlert.style.display = 'none';
+                        passwordConfirmField.style.display = 'none';
+                        verificationMethodField.style.display = 'none';
+                        emailCheckMessage.textContent = '✅ ' + data.message;
+                        emailCheckMessage.className = 'form-text text-success';
+                    } else {
+                        userExists = false;
+                        existingUserAlert.style.display = 'none';
+                        newUserAlert.style.display = 'block';
+                        passwordConfirmField.style.display = 'block';
+                        verificationMethodField.style.display = 'block';
+                        emailCheckMessage.textContent = '📝 Cont nou - introduci datele de mai jos';
+                        emailCheckMessage.className = 'form-text text-primary';
+                    }
+                    checkStep4Completion();
+                })
+                .catch(error => {
+                    console.error('Error checking user:', error);
+                });
+            }, 500);
+        }
+
+        userEmailInput.addEventListener('blur', checkUserExists);
+        userPhoneInput.addEventListener('blur', checkUserExists);
+
+        function checkStep4Completion() {
+            const hasName = userNameInput.value.trim() !== '';
+            const hasEmail = userEmailInput.value.trim() !== '';
+            const hasPassword = userPasswordInput.value.trim() !== '';
+
+            let isValid = hasName && hasEmail && hasPassword;
+
+            // If new user, check password confirmation
+            if (!userExists && hasPassword) {
+                const hasPasswordConfirm = userPasswordConfirmInput.value.trim() !== '';
+                const passwordsMatch = userPasswordInput.value === userPasswordConfirmInput.value;
+                isValid = isValid && hasPasswordConfirm && passwordsMatch;
+
+                if (hasPasswordConfirm && !passwordsMatch) {
+                    userPasswordConfirmInput.setCustomValidity('Parolele nu coincid');
+                } else {
+                    userPasswordConfirmInput.setCustomValidity('');
+                }
+            }
+
+            document.getElementById('step4Next').disabled = !isValid;
+        }
+
+        userNameInput.addEventListener('input', checkStep4Completion);
+        userEmailInput.addEventListener('input', checkStep4Completion);
+        userPasswordInput.addEventListener('input', checkStep4Completion);
+        userPasswordConfirmInput.addEventListener('input', checkStep4Completion);
+
+        document.getElementById('step4Prev').addEventListener('click', prevStep);
+        document.getElementById('step4Next').addEventListener('click', nextStep);
+    }
 
     // Photo Upload Functionality
     const photoInput = document.getElementById('photo-input');
@@ -769,12 +1065,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Step 4: Budget & Summary
-    document.getElementById('step4Prev').addEventListener('click', prevStep);
+    // Step 5 (or 4 for authenticated): Budget & Summary
+    const finalStepPrevBtn = document.getElementById('step{% if not is_authenticated %}5{% else %}4{% endif %}Prev');
+    if (finalStepPrevBtn) {
+        finalStepPrevBtn.addEventListener('click', prevStep);
+    }
 
     // Update summary
     function updateSummary() {
-        if (currentStep >= 4) {
+        const summaryStep = isAuthenticated ? 4 : 5;
+        if (currentStep >= summaryStep) {
             document.getElementById('summary-service').textContent = formData.serviceName || '-';
             document.getElementById('summary-location').textContent =
                 (formData.county && formData.city) ? `${formData.city}, ${formData.county}` : '-';
@@ -789,6 +1089,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Helper function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     // Form submission
     document.getElementById('orderForm').addEventListener('submit', function(e) {
         // Ensure all hidden fields are populated
@@ -797,42 +1113,50 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Te rugăm să completezi toate câmpurile obligatorii.');
             return false;
         }
-        
-        // Add uploaded photos to form data
-        const formElement = this;
-        const formDataObj = new FormData(formElement);
-        
-        // Remove existing images from FormData if any
-        formDataObj.delete('images');
-        
-        // Add uploaded photos
-        uploadedPhotos.forEach(photoData => {
-            formDataObj.append('images', photoData.file);
-        });
-        
-        // Submit form with images
+
+        // Add uploaded photos to form data if any
         if (uploadedPhotos.length > 0) {
             e.preventDefault();
-            
-            fetch(formElement.action, {
+
+            const formElement = this;
+            const formDataObj = new FormData(formElement);
+
+            // Add uploaded photos
+            uploadedPhotos.forEach(photoData => {
+                formDataObj.append('images', photoData.file);
+            });
+
+            // Get CSRF token from cookie
+            const csrftoken = getCookie('csrftoken');
+
+            // Submit form with images using fetch
+            fetch(formElement.action || window.location.href, {
                 method: 'POST',
                 body: formDataObj,
                 headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    'X-CSRFToken': csrftoken
                 }
             })
             .then(response => {
-                if (response.ok) {
-                    window.location.href = response.url || '/services/orders/';
+                if (response.redirected) {
+                    // Follow redirect
+                    window.location.href = response.url;
+                } else if (response.ok) {
+                    // Success but no redirect - manually redirect
+                    window.location.href = '/servicii/comenzi/';
                 } else {
-                    alert('A apărut o eroare la trimiterea comenzii.');
+                    return response.text().then(text => {
+                        console.error('Server error:', text);
+                        alert('A apărut o eroare la trimiterea comenzii. Verifică datele și încearcă din nou.');
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('A apărut o eroare la trimiterea comenzii.');
+                alert('A apărut o eroare la trimiterea comenzii. Verifică conexiunea și încearcă din nou.');
             });
         }
+        // If no photos, form submits normally
     });
 
     // Initialize
