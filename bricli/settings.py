@@ -10,36 +10,50 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Initialize environment variables
+env = environ.Env(
+    # Set default values and casting
+    DEBUG=(bool, True),
+    SUBSCRIPTIONS_ENABLED=(bool, False),
+)
+
+# Read .env file (if it exists)
+env_file = os.path.join(BASE_DIR, '.env')
+if os.path.exists(env_file):
+    environ.Env.read_env(env_file)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-7=u=ieg2ma6h2^xi^&h2jap9r!)_03wl=aexy_$36*_-h$mv#y"
+SECRET_KEY = env('SECRET_KEY', default="django-insecure-7=u=ieg2ma6h2^xi^&h2jap9r!)_03wl=aexy_$36*_-h$mv#y")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
+
+# ALLOWED_HOSTS - Read from environment or use defaults for development
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=["127.0.0.1", "localhost", "testserver"])
 
 # CSRF Protection
 # NOTE: In production (DEBUG=False), add your actual domains here
 # Example: CSRF_TRUSTED_ORIGINS = ['https://bricli.ro', 'https://www.bricli.ro']
-CSRF_TRUSTED_ORIGINS = [
-    "https://bricli.ro",
-    "https://www.bricli.ro",
-]
+CSRF_TRUSTED_ORIGINS = env.list(
+    'CSRF_TRUSTED_ORIGINS',
+    default=["http://localhost:8000", "http://127.0.0.1:8000"]
+)
 
 CSRF_FAILURE_VIEW = "django.views.csrf.csrf_failure"
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_HTTPONLY = False  # Set to True in production
 # CSRF Cookie Security (enabled in production)
 CSRF_COOKIE_SECURE = not DEBUG  # True in production (HTTPS only)
-
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
 
 # Session Security (enabled in production)
 SESSION_COOKIE_SECURE = not DEBUG  # True in production (HTTPS only)
@@ -116,12 +130,19 @@ WSGI_APPLICATION = "bricli.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+# If DATABASE_URL is set in .env, use it (PostgreSQL for production)
+# Otherwise, fall back to SQLite for local development
+if env('DATABASE_URL', default=None):
+    DATABASES = {
+        'default': env.db()
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
@@ -225,13 +246,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Control which features are enabled in the application
 # Set SUBSCRIPTIONS_ENABLED = False for BETA launch (free for everyone)
 # Set SUBSCRIPTIONS_ENABLED = True to enable paid subscriptions
-SUBSCRIPTIONS_ENABLED = False  # BETA MODE: All features free for everyone
+SUBSCRIPTIONS_ENABLED = env('SUBSCRIPTIONS_ENABLED')  # BETA MODE: All features free for everyone
 BETA_FREE_TIER_LIMIT = None  # Unlimited leads for everyone during BETA
 
 # Stripe Configuration
-STRIPE_PUBLISHABLE_KEY = "pk_test_51234567890abcdef"  # Replace with your actual test key
-STRIPE_SECRET_KEY = "sk_test_51234567890abcdef"  # Replace with your actual test key
-STRIPE_WEBHOOK_SECRET = "whsec_1234567890abcdef"  # Replace with your actual webhook secret
+STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY', default="pk_test_51234567890abcdef")
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY', default="sk_test_51234567890abcdef")
+STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET', default="whsec_1234567890abcdef")
+STRIPE_PLUS_PRICE_ID = env('STRIPE_PLUS_PRICE_ID', default="")
+STRIPE_PRO_PRICE_ID = env('STRIPE_PRO_PRICE_ID', default="")
 
 # Push Notification Settings
 VAPID_PRIVATE_KEY = "your-vapid-private-key-here"

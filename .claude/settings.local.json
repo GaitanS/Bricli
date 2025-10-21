@@ -26,7 +26,12 @@
       "Bash(del review_improvements_temp.md)",
       "Bash(if not exist \"services\\management\" mkdir \"services\\management\")",
       "Bash(del:*)",
-      "Bash(if not exist \"templates\\blog\" mkdir \"templates\\blog\")"
+      "Bash(if not exist \"templates\\blog\" mkdir \"templates\\blog\")",
+      "Bash(if [ -f \".env.example\" ])",
+      "Bash(then echo \"EXISTS\")",
+      "Bash(else echo \"NOT_FOUND\")",
+      "Bash(fi)",
+      "Bash(psql:*)"
     ],
     "deny": [],
     "ask": []
