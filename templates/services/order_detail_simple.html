@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {% endif %}
         </div>
 
-        {% if order.client.phone_number %}
+        {% if user.is_authenticated and order.client.phone_number %}
         <button class="reveal-phone-btn" data-phone="{{ order.client.phone_number }}">
             <i class="fas fa-phone"></i>
             Arată numărul de telefon
@@ -541,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Fixed Bottom Action Bar -->
     <div class="mobile-action-bar">
-        {% if order.client.phone_number %}
+        {% if user.is_authenticated and order.client.phone_number %}
         <a href="tel:{{ order.client.phone_number }}" class="action-btn-mobile secondary">
             <i class="fas fa-phone"></i>
             <span>Sună</span>
@@ -1157,31 +1157,47 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     <!-- Client Details -->
                     <div class="client-details">
-                        {% if order.client.phone_number %}
-                        <div class="mb-2">
-                            <strong><i class="fas fa-phone me-2 text-muted"></i>Telefon:</strong>
-                            <div class="d-flex align-items-center">
-                                <span class="blurred-phone me-2" id="phone-{{ order.client.id }}">
-                                    {{ order.client.phone_number|slice:":3" }}xxxx{{ order.client.phone_number|slice:"-2:" }}
-                                </span>
-                                <button class="btn btn-sm btn-outline-primary reveal-phone" 
-                                        data-phone="{{ order.client.phone_number }}" 
-                                        data-target="phone-{{ order.client.id }}"
-                                        title="Click pentru a afișa numărul complet">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                        {% if user.is_authenticated %}
+                            {% if order.client.phone_number %}
+                            <div class="mb-2">
+                                <strong><i class="fas fa-phone me-2 text-muted"></i>Telefon:</strong>
+                                <div class="d-flex align-items-center">
+                                    <span class="blurred-phone me-2" id="phone-{{ order.client.id }}">
+                                        {{ order.client.phone_number|slice:":3" }}xxxx{{ order.client.phone_number|slice:"-2:" }}
+                                    </span>
+                                    <button class="btn btn-sm btn-outline-primary reveal-phone"
+                                            data-phone="{{ order.client.phone_number }}"
+                                            data-target="phone-{{ order.client.id }}"
+                                            title="Click pentru a afișa numărul complet">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                            {% endif %}
+
+                            <div class="mb-2">
+                                <strong><i class="fas fa-envelope me-2 text-muted"></i>Email:</strong>
+                                <div>
+                                    <a href="mailto:{{ order.client.email }}" class="email-link text-break-word">
+                                        {{ order.client.email }}
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <!-- Message for unauthenticated users -->
+                            <div class="alert alert-info mb-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Datele de contact sunt disponibile doar pentru utilizatori autentificați.</strong>
+                                <div class="mt-2">
+                                    <a href="{% url 'auth:login' %}?next={{ request.path }}" class="btn btn-sm btn-primary me-2">
+                                        <i class="fas fa-sign-in-alt me-1"></i>Autentifică-te
+                                    </a>
+                                    <a href="{% url 'auth:register' %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-user-plus me-1"></i>Înregistrează-te
+                                    </a>
+                                </div>
+                            </div>
                         {% endif %}
-                        
-                        <div class="mb-2">
-                            <strong><i class="fas fa-envelope me-2 text-muted"></i>Email:</strong>
-                            <div>
-                                <a href="mailto:{{ order.client.email }}" class="email-link text-break-word">
-                                    {{ order.client.email }}
-                                </a>
-                            </div>
-                        </div>
                         
                         <div class="mb-2">
                             <strong><i class="fas fa-map-marker-alt me-2 text-muted"></i>Locație:</strong>

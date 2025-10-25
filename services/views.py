@@ -95,11 +95,13 @@ class ServiceCategoryDetailView(DetailView):
         context["popular_services"] = popular_services
 
         # Public orders in this category (show more orders - 12 instead of 6)
+        from django.db.models import Count
         context["recent_orders"] = (
             Order.objects
             .filter(q_public_orders())  # Use helper: public orders only
             .filter(service__category=category)
             .select_related('client', 'service', 'county', 'city')
+            .annotate(quotes_count=Count('quotes'))  # Add quote count for display
             .order_by('-created_at')[:12]
         )
 
@@ -544,6 +546,7 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
 
     def get_queryset(self):
         from django.core.cache import cache
+        from django.db.models import Count, F, IntegerField, Q, Value, Case, When
 
         from core.cache_utils import CacheManager
 
@@ -584,6 +587,7 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
             .exclude(assigned_craftsman__isnull=False)  # Hide direct requests
             .select_related("client", "service", "service__category", "county", "city")
             .prefetch_related("quotes", "invitations")
+            .annotate(quotes_count=Count('quotes'))  # Always annotate quote count for display
         )
 
         # Filter by service category if requested
@@ -603,8 +607,6 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
             queryset = queryset.filter(budget_max__gte=int(budget_min))
 
         # Apply sorting
-        from django.db.models import Count, F, IntegerField, Q, Value, Case, When
-
         if sort == "budget_high":
             queryset = queryset.order_by(F("budget_max").desc(nulls_last=True), "-created_at")
         elif sort == "urgent":
@@ -620,9 +622,8 @@ class AvailableOrdersView(CraftsmanRequiredMixin, ListView):
                 "-created_at"
             )
         elif sort == "least_quotes":
-            queryset = queryset.annotate(
-                quotes_count=Count('quotes')
-            ).order_by('quotes_count', '-created_at')
+            # quotes_count already annotated above
+            queryset = queryset.order_by('quotes_count', '-created_at')
         else:  # newest (default)
             queryset = queryset.order_by("-created_at")
 
@@ -719,6 +720,9 @@ class CreateQuoteView(LoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
+        from django.core.cache import cache
+        from core.cache_utils import CacheManager
+
         form.instance.craftsman = self.request.user.craftsman_profile
         form.instance.order = self.order
         # Set quote expiration to 30 days from now
@@ -730,6 +734,19 @@ class CreateQuoteView(LoginRequiredMixin, CreateView):
             return redirect("services:order_detail", pk=self.order.pk)
 
         response = super().form_valid(form)
+
+        # Invalidate available_orders cache for ALL craftsmen (since quote count changed)
+        # We need to clear cache because the quote count annotation has changed
+        # This ensures all craftsmen see updated quote counts immediately
+        try:
+            # Try to use delete_pattern if available (Redis, Memcached)
+            cache.delete_pattern("available_orders:*")
+        except (AttributeError, NotImplementedError):
+            # Fallback: Clear entire cache (LocMemCache doesn't support patterns)
+            # This is acceptable for development; in production use Redis
+            cache.clear()
+            logger.info("Cache cleared after new quote submission")
+
         messages.success(self.request, "Oferta a fost trimisă cu succes!")
         return response
 

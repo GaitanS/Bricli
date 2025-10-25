@@ -556,17 +556,25 @@
 
 .beta-faq .accordion-button {
     font-weight: 600;
-    color: #1f2937;
+    color: #1f2937 !important;
     padding: 1rem 1.25rem;
+}
+
+.beta-faq .accordion-button.collapsed {
+    color: #1f2937 !important;
 }
 
 .beta-faq .accordion-button:not(.collapsed) {
     background-color: #10b981;
-    color: white;
+    color: #1f2937 !important;
 }
 
 .beta-faq .accordion-button:not(.collapsed) .fas {
-    color: white !important;
+    color: #10b981 !important;
+}
+
+.beta-faq .accordion-button.collapsed .fas {
+    color: #10b981 !important;
 }
 
 .beta-faq .accordion-body {

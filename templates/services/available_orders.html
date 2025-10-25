@@ -28,11 +28,50 @@
         border: none;
         transition: transform 0.2s, box-shadow 0.2s;
         height: 100%;
+        display: flex;
+        flex-direction: column;
     }
-    
+
+    .order-card .card-body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
     .order-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    /* Symmetric title height */
+    .order-title {
+        min-height: 3rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.5rem;
+    }
+
+    /* Symmetric location height */
+    .order-location {
+        min-height: 1.5rem;
+    }
+
+    /* Symmetric description height */
+    .order-description {
+        min-height: 4.5rem;
+        max-height: 4.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.5rem;
+    }
+
+    /* Push action button to bottom */
+    .order-card .d-grid {
+        margin-top: auto;
     }
     
     .budget-badge {
@@ -315,7 +354,7 @@
                                     <div class="d-flex align-items-center justify-content-center gap-2">
                                         <i class="fas fa-comment-dots text-muted"></i>
                                         <div class="text-start">
-                                            <div class="fw-bold" style="color: #8B5CF6; font-size: 0.95rem;">{{ order.quotes.count }}</div>
+                                            <div class="fw-bold" style="color: #8B5CF6; font-size: 0.95rem;">{{ order.quotes_count|default:0 }}</div>
                                             <small class="text-muted d-block" style="font-size: 0.7rem;">oferte</small>
                                         </div>
                                     </div>
