@@ -16,4 +16,6 @@ urlpatterns = [
     path("confidentialitate/", views.PrivacyView.as_view(), name="privacy"),
     # Rute debug preview (sigur să păstrezi doar sub DEBUG=True)
     path("debug/404/", views.preview_404, name="preview_404"),
+    # SEO City Landing Pages - IMPORTANT: Must be last to avoid conflicts
+    path("<slug:profession_slug>-<slug:city_slug>/", views.CityLandingPageView.as_view(), name="city_landing"),
 ]

@@ -88,7 +88,7 @@ class OrderForm(forms.ModelForm):
 
     verification_method = forms.ChoiceField(
         required=False,
-        choices=[('email', 'Email'), ('whatsapp', 'WhatsApp')],
+        choices=[('email', 'Email'), ('sms', 'SMS')],
         initial='email',
         label="Primește codul de verificare pe:",
         widget=forms.RadioSelect(attrs={"data-auth-field": "true"})

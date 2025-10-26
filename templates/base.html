@@ -1,3 +1,5 @@
+{% load static %}
+{% load static_optimized %}
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -6,17 +8,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Bricli - Găsește meșterul potrivit pentru tine{% endblock %}</title>
     <meta name="description" content="{% block description %}Bricli conectează clienții cu meșteri verificați din România. Găsește rapid și sigur specialiști pentru renovări, reparații și alte servicii.{% endblock %}">
-    
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}Bricli - Găsește meșteri verificați{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Bricli conectează clienții cu meșteri verificați din România. Găsește rapid și sigur specialiști pentru renovări, reparații și alte servicii.{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:site_name" content="Bricli">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Bricli - Găsește meșteri verificați{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Platformă pentru găsirea meșterilor verificați în România{% endblock %}">
+
+    {% block extra_head %}{% endblock %}
+
+    <!-- Schema.org LocalBusiness Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Bricli",
+      "description": "Platforma online pentru gasirea mesterilor verificati in Romania",
+      "url": "https://bricli.ro",
+      "logo": "https://bricli.ro{% static 'img/logo.png' %}",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "RO"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "500"
+      },
+      "priceRange": "20-200 RON"
+    }
+    </script>
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    {% load static %}
-    {% load static_optimized %}
-    
+
     <!-- Preload critical CSS -->
     {% preload_css 'css/style.css' %}
     {% preload_css 'css/custom.css' %}

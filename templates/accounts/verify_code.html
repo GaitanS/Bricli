@@ -3,70 +3,218 @@
 
 {% block title %}Verificare Cont - Bricli{% endblock %}
 
-{% block extra_head %}
+{% block extra_css %}
 <style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
     .verification-container {
-        max-width: 500px;
-        margin: 80px auto;
-        padding: 40px;
+        max-width: 520px;
+        margin: 60px auto;
+        padding: 50px 40px;
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .verification-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 35px;
     }
 
     .verification-icon {
-        font-size: 64px;
-        color: var(--bs-primary);
-        margin-bottom: 20px;
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .verification-icon i {
+        font-size: 40px;
+        color: white;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+        }
+        50% {
+            box-shadow: 0 0 0 20px rgba(139, 92, 246, 0);
+        }
+    }
+
+    .verification-header h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 12px;
+    }
+
+    .verification-header p {
+        font-size: 15px;
+        line-height: 1.6;
     }
 
     .code-input {
-        font-size: 32px;
+        font-size: 36px;
         text-align: center;
-        letter-spacing: 12px;
-        font-weight: bold;
-        padding: 20px;
-        border: 2px solid var(--bs-primary);
-        border-radius: 8px;
+        letter-spacing: 16px;
+        font-weight: 700;
+        padding: 24px 20px;
+        border: 3px solid #e5e7eb;
+        border-radius: 12px;
         width: 100%;
-        max-width: 300px;
+        max-width: 320px;
         margin: 0 auto;
+        transition: all 0.3s ease;
+        font-family: 'Courier New', monospace;
+        color: #1f2937;
     }
 
     .code-input:focus {
         outline: none;
-        border-color: var(--bs-primary);
-        box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25);
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1), 0 8px 20px rgba(139, 92, 246, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .code-input::placeholder {
+        color: #d1d5db;
+        opacity: 0.5;
     }
 
     .verification-info {
-        background: #f8f9fa;
-        border-left: 4px solid var(--bs-primary);
-        padding: 15px;
-        border-radius: 4px;
-        margin-bottom: 20px;
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        border-left: 5px solid #8B5CF6;
+        padding: 18px 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .verification-info i {
-        color: var(--bs-primary);
-        margin-right: 8px;
+        color: #8B5CF6;
+        margin-right: 10px;
+        font-size: 18px;
+    }
+
+    .verification-info strong {
+        color: #374151;
+        font-size: 15px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        padding: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
     }
 
     .resend-code-btn {
-        color: var(--bs-primary);
+        color: #8B5CF6;
         text-decoration: none;
-        font-weight: 500;
-        display: inline-block;
-        margin-top: 20px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 15px;
     }
 
     .resend-code-btn:hover {
-        text-decoration: underline;
+        background: #f3f4f6;
+        color: #7C3AED;
+        transform: translateX(5px);
+    }
+
+    .resend-code-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    .resend-code-btn:hover i {
+        transform: rotate(180deg);
+    }
+
+    .timer-badge {
+        display: inline-block;
+        background: #fef3c7;
+        color: #92400e;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+
+    .security-footer {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .security-footer small {
+        color: #6b7280;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .security-footer i {
+        color: #10b981;
+    }
+
+    @media (max-width: 576px) {
+        .verification-container {
+            margin: 20px;
+            padding: 35px 25px;
+        }
+
+        .code-input {
+            font-size: 28px;
+            letter-spacing: 12px;
+            padding: 20px 15px;
+        }
+
+        .verification-header h2 {
+            font-size: 24px;
+        }
     }
 </style>
 {% endblock %}
@@ -80,7 +228,9 @@
         <h2 class="mb-3">Verificare Cont</h2>
         <p class="text-muted">
             Am trimis un cod de verificare pe
-            {% if method == 'whatsapp' %}
+            {% if method == 'sms' %}
+                <strong>SMS</strong> la numărul <strong>{{ user.phone_number }}</strong>
+            {% elif method == 'whatsapp' %}
                 <strong>WhatsApp</strong> la numărul <strong>{{ user.phone_number }}</strong>
             {% else %}
                 <strong>email</strong> la adresa <strong>{{ user.email }}</strong>
@@ -89,10 +239,16 @@
     </div>
 
     <div class="verification-info">
-        <i class="fas fa-info-circle"></i>
-        <strong>Introdu codul de 6 cifre primit pentru a-ți activa contul.</strong>
-        <br>
-        <small class="text-muted">Codul expiră în 15 minute.</small>
+        <div>
+            <i class="fas fa-info-circle"></i>
+            <strong>Introdu codul de 6 cifre primit pentru a-ți activa contul.</strong>
+        </div>
+        <div class="text-center mt-2">
+            <span class="timer-badge" id="timerBadge">
+                <i class="far fa-clock me-1"></i>
+                Expiră în <span id="timer">15:00</span>
+            </span>
+        </div>
     </div>
 
     {% if messages %}
@@ -133,10 +289,10 @@
         </a>
     </div>
 
-    <div class="text-center mt-4">
-        <small class="text-muted">
-            <i class="fas fa-lock me-1"></i>
-            Verificarea este necesară pentru securitatea contului tău
+    <div class="security-footer">
+        <small>
+            <i class="fas fa-shield-alt"></i>
+            <span>Conexiune securizată SSL</span>
         </small>
     </div>
 </div>
@@ -146,13 +302,59 @@ document.addEventListener('DOMContentLoaded', function() {
     const codeInput = document.getElementById('codeInput');
     const form = document.getElementById('verifyCodeForm');
     const resendBtn = document.getElementById('resendCodeBtn');
+    const timerElement = document.getElementById('timer');
+    const timerBadge = document.getElementById('timerBadge');
+
+    // Countdown timer - uses server-side expiration time
+    const TIMER_DURATION = 15 * 60; // 15 minutes in seconds
+
+    // Get expiration timestamp from server (Django template variable)
+    {% if expires_at %}
+    // Convert Django datetime to JavaScript timestamp
+    const expiresAtServer = new Date("{{ expires_at|date:'c' }}").getTime();
+    let expirationTime = expiresAtServer;
+    {% else %}
+    // Fallback: set expiration to 15 minutes from now
+    let expirationTime = Date.now() + (TIMER_DURATION * 1000);
+    {% endif %}
+
+    function updateTimer() {
+        const now = Date.now();
+        const timeLeft = Math.max(0, Math.floor((expirationTime - now) / 1000));
+
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        if (timeLeft <= 0) {
+            timerBadge.style.background = '#fee2e2';
+            timerBadge.style.color = '#991b1b';
+            timerElement.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Expirat';
+            form.querySelector('button[type="submit"]').disabled = true;
+            form.querySelector('button[type="submit"]').classList.add('disabled');
+            form.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-times-circle me-2"></i>Cod expirat';
+            clearInterval(timerInterval);
+        } else if (timeLeft <= 60) {
+            // Warning when less than 1 minute
+            timerBadge.style.background = '#fee2e2';
+            timerBadge.style.color = '#991b1b';
+        } else if (timeLeft <= 300) {
+            // Warning when less than 5 minutes
+            timerBadge.style.background = '#fef3c7';
+            timerBadge.style.color = '#92400e';
+        }
+    }
+
+    // Start timer
+    updateTimer();
+    const timerInterval = setInterval(updateTimer, 1000);
 
     // Auto-format code input (only digits)
     codeInput.addEventListener('input', function(e) {
         this.value = this.value.replace(/[^0-9]/g, '');
 
         // Auto-submit when 6 digits entered
-        if (this.value.length === 6) {
+        if (this.value.length === 6 && timeLeft > 0) {
             form.submit();
         }
     });
@@ -161,24 +363,55 @@ document.addEventListener('DOMContentLoaded', function() {
     resendBtn.addEventListener('click', function(e) {
         e.preventDefault();
 
+        if (!confirm('Dorești să retrimitem codul de verificare?')) {
+            return;
+        }
+
         // Disable button to prevent spam
         this.style.pointerEvents = 'none';
         this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Se retrimite...';
+
+        // Get CSRF token from form
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
         // TODO: Implement AJAX resend endpoint
         fetch('/api/accounts/resend-code/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': csrfToken
             }
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('✅ Codul a fost retrimis cu succes!');
+                // Reset timer - set new expiration time (15 minutes from now)
+                expirationTime = Date.now() + (TIMER_DURATION * 1000);
+                timerBadge.style.background = '#fef3c7';
+                timerBadge.style.color = '#92400e';
+
+                // Restart timer interval
+                clearInterval(timerInterval);
+                const newTimerInterval = setInterval(updateTimer, 1000);
+
+                // Re-enable submit button if it was disabled
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('disabled');
+                submitBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Verifică Contul';
+
+                // Show success message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    <i class="fas fa-check-circle me-2"></i>
+                    Codul a fost retrimis cu succes!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.verification-info').after(alertDiv);
+                setTimeout(() => alertDiv.remove(), 5000);
             } else {
-                alert('❌ Eroare: ' + data.message);
+                throw new Error(data.message || 'Eroare necunoscută');
             }
 
             // Re-enable after 30 seconds
@@ -188,7 +421,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 30000);
         })
         .catch(error => {
-            alert('❌ Eroare la retrimite cod. Reîncearcă mai târziu.');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle me-2"></i>
+                ${error.message || 'Eroare la retrimite cod. Reîncearcă mai târziu.'}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.verification-info').after(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+
             this.style.pointerEvents = 'auto';
             this.innerHTML = '<i class="fas fa-redo me-1"></i> Nu ai primit codul? Retrimite';
         });

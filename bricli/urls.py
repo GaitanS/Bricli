@@ -7,14 +7,19 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
+from django.views.generic import TemplateView
 
 from core.api_views import HealthCheckAPIView
 from blog.sitemaps import BlogPostSitemap, BlogCategorySitemap
+from bricli.sitemaps import CityLandingPageSitemap, PublicOrdersSitemap, StaticViewSitemap
 
 # Sitemap configuration for SEO
 sitemaps = {
     'blog': BlogPostSitemap,
     'blog_categories': BlogCategorySitemap,
+    'cities': CityLandingPageSitemap,  # High priority for local SEO
+    'orders': PublicOrdersSitemap,
+    'static': StaticViewSitemap,
 }
 
 urlpatterns = [
@@ -37,8 +42,9 @@ urlpatterns = [
     path("abonamente/", include("subscriptions.urls")),  # /abonamente/webhook/stripe/
     # Blog - SEO-optimized content for organic traffic
     path("blog/", include("blog.urls")),  # /blog/articol-slug/
-    # SEO - Sitemap
+    # SEO - Sitemap and Robots.txt
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap"),
+    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain"), name="robots"),
 ]
 
 # Custom error handlers

@@ -7,7 +7,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, RedirectView
 
 logger = logging.getLogger(__name__)
 from accounts.models import County, CraftsmanProfile
@@ -30,6 +30,31 @@ from .models import (
     Shortlist,
 )
 from .querydefs import q_active, q_completed, q_public_orders, q_active_craftsmen
+
+
+class OrdersRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Redirect /servicii/comenzi/ to the appropriate orders page based on user type.
+
+    - Clients -> /servicii/comenzile-mele/ (my orders)
+    - Craftsmen -> /servicii/comenzi-disponibile/ (available orders)
+    - Unauthenticated -> login page
+    """
+
+    permanent = False  # Use 302 redirect (temporary) instead of 301
+
+    def get_redirect_url(self, *args, **kwargs):
+        user = self.request.user
+
+        # Redirect based on user type
+        if hasattr(user, 'user_type'):
+            if user.user_type == 'craftsman':
+                return reverse('services:available_orders')
+            elif user.user_type == 'client':
+                return reverse('services:my_orders')
+
+        # Default: redirect to my_orders for authenticated users
+        return reverse('services:my_orders')
 
 
 class ServiceCategoryListView(ListView):

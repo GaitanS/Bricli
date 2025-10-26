@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /conturi/profil/
+Disallow: /conturi/portofoliu/
+Disallow: /conturi/setari/
+Disallow: /mesaje/
+Disallow: /notifications/
+Disallow: /abonamente/webhook/
+Disallow: /moderation/
+
+# Allow important pages for SEO
+Allow: /blog/
+Allow: /instalator-*/
+Allow: /electrician-*/
+Allow: /zugrav-*/
+Allow: /dulgher-*/
+
+# Sitemap
+Sitemap: https://bricli.ro/sitemap.xml
+
+# Crawl delay (be nice to our server)
+Crawl-delay: 1

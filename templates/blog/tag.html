@@ -1,4 +1,5 @@
-{% extends 'blog/post_list.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Articole cu eticheta "{{ tag.name }}" - Articole Bricli{% endblock %}
 
@@ -17,11 +18,169 @@
             </ol>
         </nav>
         <h1 class="display-4 mb-3 text-white">
-            <i class="fas fa-tag me-3"></i>{{ tag.name }}
+            {{ tag.name }}
         </h1>
         <p class="lead text-white">Articole etichetate cu "{{ tag.name }}"</p>
     </div>
 </div>
 
-{{ block.super }}
+<div class="container my-5">
+    <div class="row">
+        <!-- Main content -->
+        <div class="col-lg-9">
+            {% if posts %}
+            <div class="row">
+                {% for post in posts %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm hover-card">
+                        {% if post.featured_image %}
+                        <a href="{{ post.get_absolute_url }}">
+                            <img src="{{ post.featured_image.url }}"
+                                 class="card-img-top"
+                                 alt="{{ post.featured_image_alt|default:post.title }}"
+                                 style="height: 200px; object-fit: cover;">
+                        </a>
+                        {% endif %}
+
+                        <div class="card-body d-flex flex-column">
+                            {% if post.category %}
+                            <div class="mb-2">
+                                <a href="{{ post.category.get_absolute_url }}" class="badge bg-primary text-decoration-none">
+                                    {{ post.category.name }}
+                                </a>
+                            </div>
+                            {% endif %}
+
+                            <h5 class="card-title">
+                                <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-dark">
+                                    {{ post.title }}
+                                </a>
+                            </h5>
+
+                            <p class="card-text text-muted small">{{ post.excerpt|truncatewords:20 }}</p>
+
+                            <div class="mt-auto">
+                                <div class="text-muted small mb-3">
+                                    <span><i class="fas fa-calendar me-1"></i>{{ post.published_at|date:"d M Y" }}</span>
+                                    <span class="mx-2">•</span>
+                                    <span><i class="fas fa-clock me-1"></i>{{ post.read_time_minutes }} min</span>
+                                </div>
+                                <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                                    Citește mai mult <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Blog pagination" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                            Următor <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Momentan nu există articole cu această etichetă. Revino curând pentru conținut nou!
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <!-- Categories -->
+            {% if categories %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header" style="background-color: #8B5CF6;">
+                    <h6 class="mb-0 text-white"><i class="fas fa-folder me-2"></i>Categorii</h6>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for category in categories %}
+                    <a href="{{ category.get_absolute_url }}" class="list-group-item list-group-item-action">
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Popular Tags -->
+            {% if popular_tags %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header" style="background-color: #8B5CF6;">
+                    <h6 class="mb-0 text-white"><i class="fas fa-tags me-2"></i>Etichete Populare</h6>
+                </div>
+                <div class="card-body">
+                    {% for popular_tag in popular_tags %}
+                    <a href="{{ popular_tag.get_absolute_url }}"
+                       class="badge text-decoration-none me-2 mb-2 {% if popular_tag.id == tag.id %}tag-active{% else %}bg-secondary{% endif %}">
+                        {{ popular_tag.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- CTA -->
+            <div class="card shadow-sm bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Cauți un meșter?</h5>
+                    <p class="card-text small">Postează gratuit cererea ta și primești oferte de la meșteri verificați.</p>
+                    <a href="{% url 'services:create_order' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Postează comandă
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
+}
+
+/* Purple active tag */
+.tag-active {
+    background-color: #8B5CF6 !important;
+    color: white !important;
+}
+
+.tag-active:hover {
+    background-color: #7C3AED !important;
+    color: white !important;
+}
+</style>
 {% endblock %}

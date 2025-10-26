@@ -1,15 +1,15 @@
 from django.contrib import messages
 from django.db import models
 from django.db.models import Avg, Count, Q
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.utils.text import slugify
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView, TemplateView, DetailView
 
 from accounts.models import County, CraftsmanProfile
 from services.models import Order, Review, Service, ServiceCategory
 
 from .filters import get_county_by_any, sanitize_query
-from .models import FAQ, SiteSettings, Testimonial
+from .models import FAQ, SiteSettings, Testimonial, CityLandingPage
 
 
 def preview_404(request):
@@ -411,3 +411,79 @@ def custom_404_view(request, exception):
 def custom_500_view(request):
     """Custom 500 error handler"""
     return render(request, "500.html", status=500)
+
+
+class CityLandingPageView(DetailView):
+    """
+    SEO landing pages pentru căutări locale: instalator-brasov, electrician-bucuresti, etc.
+    """
+    model = CityLandingPage
+    template_name = 'core/city_landing.html'
+    context_object_name = 'page'
+
+    def get_object(self):
+        return get_object_or_404(
+            CityLandingPage,
+            profession_slug=self.kwargs['profession_slug'],
+            city_slug=self.kwargs['city_slug'],
+            is_active=True
+        )
+
+    def markdown_to_html(self, text):
+        """Convert simple markdown to HTML"""
+        import re
+        if not text:
+            return ''
+
+        # Convert **text** to <strong>text</strong>
+        text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+
+        # Convert lines starting with - to <ul><li>
+        lines = text.split('\n')
+        html_lines = []
+        in_list = False
+
+        for line in lines:
+            line = line.strip()
+            if line.startswith('- '):
+                if not in_list:
+                    html_lines.append('<ul class="list-unstyled">')
+                    in_list = True
+                # Remove the - and wrap in li
+                html_lines.append(f'<li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i>{line[2:]}</li>')
+            else:
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                if line:
+                    html_lines.append(f'<p>{line}</p>')
+
+        if in_list:
+            html_lines.append('</ul>')
+
+        return '\n'.join(html_lines)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        page = self.object
+
+        # Convert markdown to HTML for all text fields
+        context['services_html'] = self.markdown_to_html(page.services_text)
+        context['prices_html'] = self.markdown_to_html(page.prices_text)
+        context['how_it_works_html'] = self.markdown_to_html(page.how_it_works_text)
+
+        # Comenzi recente din oraș (pentru sidebar)
+        # Caută în city.name sau address
+        from django.db.models import Q
+        context['recent_orders'] = Order.objects.filter(
+            Q(city__name__icontains=page.city_name) | Q(address__icontains=page.city_name),
+            status__in=['open', 'published']
+        ).select_related('city', 'service').order_by('-created_at')[:5]
+
+        # Categorii de servicii pentru cross-linking
+        context['service_categories'] = ServiceCategory.objects.filter(is_active=True)[:8]
+
+        # Featured testimonials for SEO (Schema.org Review markup)
+        context['testimonials'] = Testimonial.objects.filter(is_featured=True)[:3]
+
+        return context

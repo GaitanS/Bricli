@@ -1,0 +1,469 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page.meta_title }}{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="{{ page.meta_description }}">
+<meta name="keywords" content="{{ page.profession }} {{ page.city_name }}, mesteri {{ page.city_name }}, {{ page.profession|lower }} verificati">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ page.meta_title }}">
+<meta property="og:description" content="{{ page.meta_description }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+
+<!-- Schema.org Service markup -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "serviceType": "{{ page.profession }}",
+  "name": "{{ page.profession }} în {{ page.city_name }}",
+  "description": "{{ page.meta_description }}",
+  "provider": {
+    "@type": "Organization",
+    "name": "Bricli",
+    "url": "https://bricli.ro",
+    "logo": "https://bricli.ro{% static 'img/logo.png' %}",
+    "telephone": "+40-XXX-XXX-XXX",
+    "email": "contact@bricli.ro"
+  },
+  "areaServed": {
+    "@type": "City",
+    "name": "{{ page.city_name }}",
+    "addressCountry": "RO"
+  },
+  "availableChannel": {
+    "@type": "ServiceChannel",
+    "serviceUrl": "{{ request.build_absolute_uri }}",
+    "servicePhone": "+40-XXX-XXX-XXX",
+    "availableLanguage": {
+      "@type": "Language",
+      "name": "Romanian"
+    }
+  },
+  "hoursAvailable": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "opens": "00:00",
+    "closes": "23:59"
+  },
+  "offers": {
+    "@type": "Offer",
+    "availability": "https://schema.org/InStock",
+    "price": "150",
+    "priceCurrency": "RON",
+    "priceSpecification": {
+      "@type": "PriceSpecification",
+      "minPrice": "100",
+      "maxPrice": "500",
+      "priceCurrency": "RON"
+    }
+  }
+  {% if page.reviews_count > 0 %}
+  ,"aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "reviewCount": "{{ page.reviews_count }}",
+    "bestRating": "5",
+    "worstRating": "1"
+  }
+  {% endif %}
+}
+</script>
+
+<!-- Breadcrumb Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Acasă",
+      "item": "https://bricli.ro"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "{{ page.profession }} {{ page.city_name }}",
+      "item": "{{ request.build_absolute_uri }}"
+    }
+  ]
+}
+</script>
+
+<!-- FAQ Schema (if FAQs exist) -->
+{% if page.faqs.all %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {% for faq in page.faqs.all %}
+    {
+      "@type": "Question",
+      "name": "{{ faq.question|escapejs }}",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "{{ faq.answer|escapejs }}"
+      }
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endif %}
+
+<!-- Review Schema (if testimonials exist) -->
+{% if testimonials %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "{{ page.profession }} în {{ page.city_name }}",
+  "description": "{{ page.meta_description }}",
+  "review": [
+    {% for testimonial in testimonials %}
+    {
+      "@type": "Review",
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "{{ testimonial.rating }}",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "{{ testimonial.name }}"
+      },
+      "reviewBody": "{{ testimonial.content|escapejs }}"
+      {% if testimonial.location %},"locationCreated": {
+        "@type": "Place",
+        "address": "{{ testimonial.location }}"
+      }{% endif %}
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="city-landing-page">
+    <!-- Hero Section -->
+    <div class="hero" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; padding: 3rem 0 4rem;">
+        <div class="container">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb text-white-50 mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-white text-decoration-none">Acasă</a></li>
+                    <li class="breadcrumb-item active text-white">{{ page.profession }} {{ page.city_name }}</li>
+                </ol>
+            </nav>
+
+            <h1 class="display-4 mb-4 fw-bold text-white">{{ page.h1_title }}</h1>
+            <p class="lead mb-4" style="font-size: 1.25rem;">{{ page.intro_text }}</p>
+
+            {% if page.craftsmen_count > 0 or page.reviews_count > 0 %}
+            <div class="stats mt-4 d-flex flex-wrap gap-4">
+                {% if page.craftsmen_count > 0 %}
+                <div class="stat-item">
+                    <div class="h2 mb-0 fw-bold">{{ page.craftsmen_count }}+</div>
+                    <p class="mb-0 text-white-50">Meșteri verificați</p>
+                </div>
+                {% endif %}
+                {% if page.reviews_count > 0 %}
+                <div class="stat-item">
+                    <div class="h2 mb-0 fw-bold">{{ page.reviews_count }}+</div>
+                    <p class="mb-0 text-white-50">Review-uri pozitive</p>
+                </div>
+                {% endif %}
+                <div class="stat-item">
+                    <div class="h2 mb-0 fw-bold">4.8★</div>
+                    <p class="mb-0 text-white-50">Rating mediu</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg mt-4 shadow">
+                <i class="fas fa-plus me-2"></i>Postează Cerere Gratuită
+            </a>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Servicii -->
+                <section class="mb-5">
+                    <h2 class="h3 mb-4">Servicii {{ page.profession }} {{ page.city_name }}</h2>
+                    <div class="content" style="line-height: 1.8;">
+                        {{ services_html|safe }}
+                    </div>
+                </section>
+
+                <!-- Prețuri -->
+                {% if page.prices_text %}
+                <section class="mb-5">
+                    <h2 class="h3 mb-4">Prețuri Orientative în {{ page.city_name }}</h2>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Prețurile sunt orientative și pot varia în funcție de complexitatea lucrării și materialele folosite.
+                    </div>
+                    <div class="content" style="line-height: 1.8;">
+                        {{ prices_html|safe }}
+                    </div>
+                </section>
+                {% endif %}
+
+                <!-- Cum funcționează -->
+                <section class="mb-5">
+                    <h2 class="h3 mb-4">Cum Găsești {{ page.profession }} pe Bricli</h2>
+                    <div class="content" style="line-height: 1.8;">
+                        {{ how_it_works_html|safe }}
+                    </div>
+                    <div class="mt-4">
+                        <a href="{% url 'services:create_order' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-rocket me-2"></i>Începe Acum - Este Gratuit
+                        </a>
+                    </div>
+                </section>
+
+                <!-- De ce Bricli -->
+                <section class="mb-5">
+                    <h2 class="h3 mb-4">De ce să alegi Bricli pentru {{ page.profession }} {{ page.city_name }}?</h2>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-shield-alt text-primary fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h3 class="h5">Meșteri Verificați</h3>
+                                    <p class="text-muted">Toți meșterii sunt verificați cu documente și review-uri reale de la clienți anteriori.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-money-bill-wave text-success fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h3 class="h5">Postare Gratuită</h3>
+                                    <p class="text-muted">Postarea cererilor este 100% gratuită. Plătești doar pentru serviciul efectuat.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-clock text-warning fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h3 class="h5">Răspuns Rapid</h3>
+                                    <p class="text-muted">Primești oferte de la meșteri în maxim 24 de ore de la postarea cererii.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-star text-info fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h3 class="h5">Review-uri Transparente</h3>
+                                    <p class="text-muted">Vezi evaluările reale ale clienților înainte de a alege meșterul.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- FAQ Section -->
+                {% if page.faqs.all %}
+                <section class="mb-5">
+                    <h2 class="mb-4"><i class="fas fa-question-circle me-2 text-primary"></i>Întrebări Frecvente</h2>
+                    <div class="accordion" id="faqAccordion">
+                        {% for faq in page.faqs.all %}
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading{{ forloop.counter }}">
+                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ forloop.counter }}"
+                                        aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}"
+                                        aria-controls="faqCollapse{{ forloop.counter }}">
+                                    {{ faq.question }}
+                                </button>
+                            </h3>
+                            <div id="faqCollapse{{ forloop.counter }}"
+                                 class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+                                 aria-labelledby="faqHeading{{ forloop.counter }}"
+                                 data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    {{ faq.answer }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+
+                <!-- Testimonials Section -->
+                {% if testimonials %}
+                <section class="mb-5">
+                    <h2 class="mb-4"><i class="fas fa-star me-2 text-warning"></i>Ce spun clienții noștri</h2>
+                    <div class="row g-3">
+                        {% for testimonial in testimonials %}
+                        <div class="col-12">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start mb-3">
+                                        {% if testimonial.image %}
+                                        <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}"
+                                             class="rounded-circle me-3" width="50" height="50" style="object-fit: cover;">
+                                        {% else %}
+                                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-3"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">{{ testimonial.name }}</h5>
+                                            {% if testimonial.location %}
+                                            <p class="text-muted small mb-2">
+                                                <i class="fas fa-map-marker-alt me-1"></i>{{ testimonial.location }}
+                                            </p>
+                                            {% endif %}
+                                            <div class="mb-2">
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= testimonial.rating %}
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star text-warning"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="mb-0 text-muted">"{{ testimonial.content }}"</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- CTA Box -->
+                <div class="card shadow-sm mb-4" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; border: none;">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-tools fa-3x mb-3"></i>
+                        <h4 class="mb-3 text-white">Ai nevoie de {{ page.profession }}?</h4>
+                        <p class="mb-4">Postează gratuit cererea ta și primește oferte de la meșteri verificați din {{ page.city_name }}.</p>
+                        <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg w-100">
+                            <i class="fas fa-plus me-2"></i>Postează Cerere
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                {% if recent_orders %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0"><i class="fas fa-list-alt me-2 text-primary"></i>Comenzi Recente {{ page.city_name }}</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for order in recent_orders %}
+                        <a href="{{ order.get_absolute_url }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <strong class="mb-1">{{ order.title|truncatewords:6 }}</strong>
+                                <small class="text-muted">{{ order.created_at|timesince }}</small>
+                            </div>
+                            <p class="mb-1 text-muted small">{{ order.description|truncatewords:12 }}</p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    <div class="card-footer bg-light text-center">
+                        <a href="{% url 'services:available_orders' %}" class="text-decoration-none">Vezi toate comenzile →</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Alte Servicii -->
+                {% if service_categories %}
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0"><i class="fas fa-th me-2 text-primary"></i>Alte Servicii</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for category in service_categories %}
+                            <a href="{% url 'core:search' %}?category={{ category.slug }}" class="badge bg-secondary text-decoration-none">
+                                {{ category.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.city-landing-page .hero {
+    position: relative;
+}
+
+.city-landing-page .stat-item {
+    min-width: 150px;
+}
+
+.city-landing-page .content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.city-landing-page .content ul li:before {
+    content: "✓ ";
+    color: #8B5CF6;
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.city-landing-page .content strong {
+    color: #1f2937;
+}
+
+@media (max-width: 768px) {
+    .city-landing-page .hero {
+        padding: 2rem 0 3rem;
+    }
+
+    .city-landing-page .display-4 {
+        font-size: 2rem;
+    }
+
+    .city-landing-page .lead {
+        font-size: 1.1rem;
+    }
+}
+</style>
+{% endblock %}

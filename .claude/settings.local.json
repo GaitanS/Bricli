@@ -31,7 +31,8 @@
       "Bash(then echo \"EXISTS\")",
       "Bash(else echo \"NOT_FOUND\")",
       "Bash(fi)",
-      "Bash(psql:*)"
+      "Bash(psql:*)",
+      "Bash(if not exist \"core\\templatetags\" mkdir \"core\\templatetags\")"
     ],
     "deny": [],
     "ask": []

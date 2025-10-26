@@ -4,200 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Bricli{% endblock %}</title>
-    <style>
-        /* Email-safe CSS */
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8fafc;
-            color: #374151;
-            line-height: 1.6;
-        }
-        
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .email-header {
-            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
-            padding: 30px 40px;
-            text-align: center;
-        }
-        
-        .email-logo {
-            color: white;
-            font-size: 32px;
-            font-weight: bold;
-            text-decoration: none;
-            margin: 0;
-        }
-        
-        .email-tagline {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-            margin: 5px 0 0 0;
-        }
-        
-        .email-content {
-            padding: 40px;
-        }
-        
-        .email-title {
-            color: #1f2937;
-            font-size: 24px;
-            font-weight: 600;
-            margin: 0 0 20px 0;
-            text-align: center;
-        }
-        
-        .email-text {
-            color: #4b5563;
-            font-size: 16px;
-            margin: 0 0 20px 0;
-        }
-        
-        .email-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
-            color: white !important;
-            text-decoration: none;
-            padding: 14px 28px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
-            text-align: center;
-            margin: 20px 0;
-            transition: all 0.3s ease;
-        }
-        
-        .email-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
-        }
-        
-        .email-footer {
-            background-color: #f9fafb;
-            padding: 30px 40px;
-            text-align: center;
-            border-top: 1px solid #e5e7eb;
-        }
-        
-        .footer-text {
-            color: #6b7280;
-            font-size: 14px;
-            margin: 0 0 10px 0;
-        }
-        
-        .footer-links {
-            margin: 15px 0;
-        }
-        
-        .footer-link {
-            color: #8B5CF6;
-            text-decoration: none;
-            margin: 0 10px;
-            font-size: 14px;
-        }
-        
-        .footer-link:hover {
-            text-decoration: underline;
-        }
-        
-        .social-links {
-            margin: 20px 0 0 0;
-        }
-        
-        .social-link {
-            display: inline-block;
-            margin: 0 8px;
-            color: #6b7280;
-            text-decoration: none;
-            font-size: 18px;
-        }
-        
-        .divider {
-            height: 1px;
-            background-color: #e5e7eb;
-            margin: 30px 0;
-        }
-        
-        .highlight-box {
-            background-color: #f0f9ff;
-            border: 1px solid #0ea5e9;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        
-        .highlight-text {
-            color: #0c4a6e;
-            font-size: 14px;
-            margin: 0;
-        }
-        
-        /* Responsive design */
-        @media only screen and (max-width: 600px) {
-            .email-header,
-            .email-content,
-            .email-footer {
-                padding: 20px;
-            }
-            
-            .email-title {
-                font-size: 20px;
-            }
-            
-            .email-text {
-                font-size: 14px;
-            }
-        }
-    </style>
 </head>
-<body>
-    <div class="email-container">
-        <!-- Header -->
-        <div class="email-header">
-            <h1 class="email-logo">Bricli</h1>
-            <p class="email-tagline">Platforma ta de încredere pentru servicii de construcții</p>
-        </div>
-        
-        <!-- Content -->
-        <div class="email-content">
-            {% block content %}
-            <!-- Email content goes here -->
-            {% endblock %}
-        </div>
-        
-        <!-- Footer -->
-        <div class="email-footer">
-            <p class="footer-text">
-                Acest email a fost trimis de <strong>Bricli</strong><br>
-                Platforma românească pentru servicii de construcții și renovări
-            </p>
-            
-            <div class="footer-links">
-                <a href="https://bricli.ro" class="footer-link">Acasă</a>
-                <a href="https://bricli.ro/help" class="footer-link">Ajutor</a>
-                <a href="https://bricli.ro/contact" class="footer-link">Contact</a>
-                <a href="https://bricli.ro/privacy" class="footer-link">Confidențialitate</a>
-            </div>
-            
-            <div class="social-links">
-                <a href="#" class="social-link">📧</a>
-                <a href="#" class="social-link">📱</a>
-                <a href="#" class="social-link">🌐</a>
-            </div>
-            
-            <p class="footer-text" style="margin-top: 20px; font-size: 12px;">
-                © 2024 Bricli. Toate drepturile rezervate.<br>
-                Dacă nu mai dorești să primești aceste emailuri, 
-                <a href="#" style="color: #8B5CF6;">dezabonează-te aici</a>.
-            </p>
-        </div>
-    </div>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #374151; line-height: 1.6;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0; background-color: #f8fafc;">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <!-- Email Container -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); padding: 30px 40px; text-align: center;">
+                            <h1 style="color: #ffffff; font-size: 32px; font-weight: bold; margin: 0; padding: 0;">Bricli</h1>
+                            <p style="color: rgba(255, 255, 255, 0.9); font-size: 14px; margin: 5px 0 0 0; padding: 0;">Platforma ta de încredere pentru servicii de construcții</p>
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px; color: #374151;">
+                            {% block content %}
+                            <!-- Email content goes here -->
+                            {% endblock %}
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f9fafb; padding: 30px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
+                            <p style="color: #6b7280; font-size: 14px; margin: 0 0 10px 0; padding: 0;">
+                                Acest email a fost trimis de <strong style="color: #374151;">Bricli</strong><br>
+                                Platforma românească pentru servicii de construcții și renovări
+                            </p>
+
+                            <div style="margin: 15px 0;">
+                                <a href="https://bricli.ro" style="color: #8B5CF6; text-decoration: none; margin: 0 10px; font-size: 14px;">Acasă</a>
+                                <a href="https://bricli.ro/help" style="color: #8B5CF6; text-decoration: none; margin: 0 10px; font-size: 14px;">Ajutor</a>
+                                <a href="https://bricli.ro/contact" style="color: #8B5CF6; text-decoration: none; margin: 0 10px; font-size: 14px;">Contact</a>
+                            </div>
+
+                            <p style="color: #6b7280; margin-top: 20px; font-size: 12px; padding: 0;">
+                                © 2024 Bricli. Toate drepturile rezervate.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

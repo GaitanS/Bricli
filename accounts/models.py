@@ -119,7 +119,7 @@ class VerificationCode(models.Model):
     code = models.CharField(max_length=6, help_text="Cod 6 cifre")
     method = models.CharField(
         max_length=10,
-        choices=[('email', 'Email'), ('whatsapp', 'WhatsApp')],
+        choices=[('email', 'Email'), ('sms', 'SMS'), ('whatsapp', 'WhatsApp')],
         default='email',
         help_text="Metodă de livrare cod"
     )

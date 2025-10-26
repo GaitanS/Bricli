@@ -851,7 +851,7 @@ class PasswordResetView(BasePasswordResetView):
     template_name = "accounts/password_reset_form.html"
     email_template_name = "accounts/password_reset_email.html"
     subject_template_name = "accounts/password_reset_subject.txt"
-    success_url = reverse_lazy("accounts:password_reset_done")
+    success_url = reverse_lazy("auth:password_reset_done")
     form_class = CustomPasswordResetForm
 
     def form_valid(self, form):
@@ -869,7 +869,7 @@ class PasswordResetConfirmView(BasePasswordResetConfirmView):
     """Password reset confirmation view"""
 
     template_name = "accounts/password_reset_confirm.html"
-    success_url = reverse_lazy("accounts:password_reset_complete")
+    success_url = reverse_lazy("auth:password_reset_complete")
     form_class = CustomSetPasswordForm
 
     def form_valid(self, form):
@@ -1145,13 +1145,12 @@ def craftsman_reviews_ajax(request, pk):
         return JsonResponse({"error": str(e)}, status=500)
 
 
-class VerifyCodeView(FormView):
+class VerifyCodeView(TemplateView):
     """
     View pentru verificarea codului primit de către utilizator
     Utilizatorul introduce codul primit pe email/WhatsApp pentru a-și activa contul
     """
     template_name = "accounts/verify_code.html"
-    success_url = reverse_lazy("core:home")
 
     def dispatch(self, request, *args, **kwargs):
         """Verifică dacă există un user pending în sesiune"""
@@ -1167,9 +1166,10 @@ class VerifyCodeView(FormView):
             try:
                 user = User.objects.get(pk=user_id)
                 context['user'] = user
-                # Get last verification code to show method
+                # Get last verification code to show method and expiration
                 last_code = user.verification_codes.filter(is_used=False).order_by('-created_at').first()
                 context['method'] = last_code.method if last_code else 'email'
+                context['expires_at'] = last_code.expires_at if last_code else None
             except User.DoesNotExist:
                 pass
         return context

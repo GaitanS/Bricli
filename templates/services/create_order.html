@@ -1089,22 +1089,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Helper function to get CSRF token from cookies
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
     // Form submission
     document.getElementById('orderForm').addEventListener('submit', function(e) {
         // Ensure all hidden fields are populated
@@ -1126,8 +1110,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 formDataObj.append('images', photoData.file);
             });
 
-            // Get CSRF token from cookie
-            const csrftoken = getCookie('csrftoken');
+            // Get CSRF token from form (not cookie) - more reliable
+            const csrftoken = formElement.querySelector('[name=csrfmiddlewaretoken]').value;
 
             // Submit form with images using fetch
             fetch(formElement.action || window.location.href, {
@@ -1142,8 +1126,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Follow redirect
                     window.location.href = response.url;
                 } else if (response.ok) {
-                    // Success but no redirect - manually redirect
-                    window.location.href = '/servicii/comenzi/';
+                    // Success but no redirect - manually redirect to my orders page
+                    window.location.href = '/servicii/comenzile-mele/';
                 } else {
                     return response.text().then(text => {
                         console.error('Server error:', text);

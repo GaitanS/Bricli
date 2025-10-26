@@ -127,9 +127,15 @@ class ResendCodeView(View):
         verification_code = VerificationService.send_verification_code(user, method=method)
 
         if verification_code:
+            method_display = {
+                'email': 'email',
+                'sms': 'SMS',
+                'whatsapp': 'WhatsApp'
+            }.get(method, 'email')
+
             return JsonResponse({
                 'success': True,
-                'message': f'Codul a fost retrimis pe {"email" if method == "email" else "WhatsApp"}!'
+                'message': f'Codul a fost retrimis pe {method_display}!'
             })
         else:
             return JsonResponse({

@@ -64,6 +64,7 @@ SESSION_COOKIE_SAMESITE = "Lax"  # CSRF protection
 # Application definition
 
 INSTALLED_APPS = [
+    "jazzmin",  # Modern Django Admin UI - MUST be before django.contrib.admin
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -223,14 +224,26 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 AUTH_USER_MODEL = "accounts.User"
 
 # Email settings
-from .email_settings import PRODUCTION_EMAIL_CONFIG, get_email_backend
+from .email_settings import PRODUCTION_EMAIL_CONFIG
 
-EMAIL_BACKEND = get_email_backend()
+# Read email backend from environment (allows override)
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = env.int('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
+EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=False)
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+EMAIL_TIMEOUT = env.int('EMAIL_TIMEOUT', default=30)
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='Bricli <noreply@bricli.ro>')
+SERVER_EMAIL = env('SERVER_EMAIL', default='server@bricli.ro')
+SUPPORT_EMAIL = env('SUPPORT_EMAIL', default='support@bricli.ro')
 
-# Apply production email config if not in debug mode
-if not DEBUG:
-    for key, value in PRODUCTION_EMAIL_CONFIG.items():
-        globals()[key] = value
+# Twilio SMS Configuration
+# ============================================
+TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID', default='')
+TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN', default='')
+TWILIO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER', default='')
 
 # Language and localization
 LANGUAGE_CODE = "ro-ro"
@@ -311,3 +324,124 @@ CSP_FRAME_SRC = ("https://js.stripe.com",)  # Stripe payment frames
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
+
+# Jazzmin Admin UI Configuration
+JAZZMIN_SETTINGS = {
+    # Site title and branding
+    "site_title": "Bricli Admin",
+    "site_header": "Bricli",
+    "site_brand": "Bricli - Marketplace Meșteri",
+    "site_logo": None,  # Path to logo (e.g., "images/logo.png")
+    "login_logo": None,
+    "site_logo_classes": "img-circle",
+    "site_icon": None,  # Favicon path
+    "welcome_sign": "Bine ai venit în panoul de administrare Bricli",
+    "copyright": "Bricli",
+
+    # Search model in sidebar
+    "search_model": ["auth.User", "accounts.CraftsmanProfile", "services.Order"],
+
+    # User avatar field
+    "user_avatar": None,
+
+    # Top menu
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Site Principal", "url": "/", "new_window": True},
+        {"model": "auth.User"},
+        {"model": "services.Order"},
+    ],
+
+    # User menu on the right side of top bar
+    "usermenu_links": [
+        {"name": "Site Principal", "url": "/", "new_window": True},
+        {"model": "auth.user"},
+    ],
+
+    # Side menu ordering
+    "order_with_respect_to": ["auth", "accounts", "services", "messaging", "notifications", "subscriptions", "blog"],
+
+    # Custom icons for models (using Font Awesome 5)
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "accounts.CraftsmanProfile": "fas fa-hammer",
+        "accounts.County": "fas fa-map-marked-alt",
+        "accounts.City": "fas fa-city",
+        "accounts.Portfolio": "fas fa-images",
+        "services.Order": "fas fa-clipboard-list",
+        "services.Quote": "fas fa-file-invoice",
+        "services.Review": "fas fa-star",
+        "services.ServiceCategory": "fas fa-tags",
+        "services.Service": "fas fa-wrench",
+        "messaging.Conversation": "fas fa-comments",
+        "messaging.Message": "fas fa-comment",
+        "notifications.Notification": "fas fa-bell",
+        "subscriptions.SubscriptionTier": "fas fa-layer-group",
+        "subscriptions.CraftsmanSubscription": "fas fa-credit-card",
+        "blog.Post": "fas fa-newspaper",
+        "blog.Category": "fas fa-folder",
+    },
+
+    # Default icon for models without custom icon
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+
+    # Related modal for foreign keys
+    "related_modal_active": False,
+
+    # Custom CSS/JS
+    "custom_css": None,
+    "custom_js": None,
+
+    # Show/hide app list
+    "show_sidebar": True,
+
+    # Change sidebar color scheme
+    "navigation_expanded": True,
+
+    # Hide models from sidebar
+    "hide_apps": [],
+    "hide_models": [],
+
+    # UI Tweaks
+    "changeform_format": "horizontal_tabs",  # "horizontal_tabs", "vertical_tabs", "collapsible", "carousel"
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs",
+    },
+}
+
+# Jazzmin UI Tweaks (colors, layout, etc.)
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-purple",  # navbar-primary, navbar-secondary, navbar-info, navbar-warning, navbar-danger, navbar-success
+    "accent": "accent-purple",  # accent-primary, accent-secondary, accent-info, accent-warning, accent-danger, accent-success
+    "navbar": "navbar-dark",  # navbar-white, navbar-dark
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-purple",  # sidebar-dark-primary, sidebar-dark-secondary, sidebar-light-primary, etc.
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",  # "default", "cerulean", "cosmo", "cyborg", "darkly", "flatly", "journal", "litera", "lumen", "lux", "materia", "minty", "pulse", "sandstone", "simplex", "slate", "solar", "spacelab", "superhero", "united", "yeti"
+    "dark_mode_theme": None,  # None or theme name
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+}

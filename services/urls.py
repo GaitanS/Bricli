@@ -1,10 +1,14 @@
 from django.urls import include, path
+from django.views.generic import RedirectView
 
 from . import views
 
 app_name = "services"
 
 urlpatterns = [
+    # Legacy URL redirect: /servicii/comenzi/ -> redirect based on user type
+    path("comenzi/", views.OrdersRedirectView.as_view(), name="orders_redirect"),
+
     path("categorii/", views.ServiceCategoryListView.as_view(), name="categories"),
     path("categorii/<slug:slug>/", views.ServiceCategoryDetailView.as_view(), name="category_detail"),
     path("comanda/creare/", views.CreateOrderView.as_view(), name="create_order"),
