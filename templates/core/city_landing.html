@@ -13,7 +13,7 @@
 <meta property="og:description" content="{{ page.meta_description }}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 
-<!-- Schema.org Service markup -->
+<!-- Schema.org Service markup (Enhanced with Competitor Analysis) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -26,8 +26,13 @@
     "name": "Bricli",
     "url": "https://bricli.ro",
     "logo": "https://bricli.ro{% static 'img/logo.png' %}",
-    "telephone": "+40-XXX-XXX-XXX",
-    "email": "contact@bricli.ro"
+    "telephone": "+40-730-000-000",
+    "email": "contact@bricli.ro",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "{{ page.city_name }}",
+      "addressCountry": "RO"
+    }
   },
   "areaServed": {
     "@type": "City",
@@ -37,38 +42,50 @@
   "availableChannel": {
     "@type": "ServiceChannel",
     "serviceUrl": "{{ request.build_absolute_uri }}",
-    "servicePhone": "+40-XXX-XXX-XXX",
+    "servicePhone": "+40-730-000-000",
     "availableLanguage": {
       "@type": "Language",
       "name": "Romanian"
     }
   },
-  "hoursAvailable": {
+  "hoursAvailable": [{
     "@type": "OpeningHoursSpecification",
-    "dayOfWeek": [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday"
-    ],
+    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
     "opens": "00:00",
     "closes": "23:59"
-  },
+  }],
   "offers": {
     "@type": "Offer",
     "availability": "https://schema.org/InStock",
-    "price": "150",
-    "priceCurrency": "RON",
     "priceSpecification": {
       "@type": "PriceSpecification",
+      {% if page.profession == "Instalator" %}
+      "minPrice": "150",
+      "maxPrice": "5000",
+      {% elif page.profession == "Electrician" %}
       "minPrice": "100",
-      "maxPrice": "500",
+      "maxPrice": "2000",
+      {% elif page.profession == "Zugrav" %}
+      "minPrice": "50",
+      "maxPrice": "150",
+      "unitText": "mp",
+      {% elif page.profession == "Dulgher" %}
+      "minPrice": "1500",
+      "maxPrice": "8000",
+      {% else %}
+      "minPrice": "100",
+      "maxPrice": "1000",
+      {% endif %}
       "priceCurrency": "RON"
-    }
-  }
+    },
+    "acceptedPaymentMethod": [
+      "http://purl.org/goodrelations/v1#Cash",
+      "http://purl.org/goodrelations/v1#ByBankTransferInAdvance",
+      "http://purl.org/goodrelations/v1#PaymentMethodCreditCard"
+    ]
+  },
+  "termsOfService": "Garanție 2 ani pentru toate lucrările",
+  "serviceOutput": "Lucrări profesionale executate de meșteri verificați"
   {% if page.reviews_count > 0 %}
   ,"aggregateRating": {
     "@type": "AggregateRating",
@@ -199,6 +216,42 @@
             <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg mt-4 shadow">
                 <i class="fas fa-plus me-2"></i>Postează Cerere Gratuită
             </a>
+        </div>
+    </div>
+
+    <!-- Trust Signals Bar (Competitor-Inspired) -->
+    <div class="trust-signals-bar py-4 bg-light border-top border-bottom">
+        <div class="container">
+            <div class="row g-3 text-center">
+                <div class="col-6 col-md-3">
+                    <div class="trust-badge">
+                        <i class="fas fa-shield-check text-success fa-2x mb-2"></i>
+                        <h6 class="fw-bold mb-1 text-success">Garanție 2 Ani</h6>
+                        <p class="text-muted small mb-0">Pentru toate lucrările</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="trust-badge">
+                        <i class="fas fa-bolt text-warning fa-2x mb-2"></i>
+                        <h6 class="fw-bold mb-1 text-warning">Răspuns Rapid</h6>
+                        <p class="text-muted small mb-0">În maxim 2-4 ore</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="trust-badge">
+                        <i class="fas fa-gift text-primary fa-2x mb-2"></i>
+                        <h6 class="fw-bold mb-1 text-primary">100% GRATUIT</h6>
+                        <p class="text-muted small mb-0">Pentru clienți</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="trust-badge">
+                        <i class="fas fa-user-check text-info fa-2x mb-2"></i>
+                        <h6 class="fw-bold mb-1 text-info">Meșteri Verificați</h6>
+                        <p class="text-muted small mb-0">Cu recenzii reale</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
