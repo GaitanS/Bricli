@@ -6,30 +6,90 @@
 {% block title %}Meșteri verificați - {{ block.super }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/craftsmen-list-optimized.css' %}">
+<style>
+    /* Dark Premium Form Overrides */
+    .form-control, .form-select {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+    .form-control:focus, .form-select:focus {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: var(--accent-violet);
+        color: white;
+        box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
+    }
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+    .form-select option {
+        background-color: var(--bg-surface);
+        color: white;
+    }
+    .form-check-input {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+    .form-check-input:checked {
+        background-color: var(--accent-violet);
+        border-color: var(--accent-violet);
+    }
+    .form-label {
+        color: var(--text-sub);
+    }
+
+    /* Pagination */
+    .page-link {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+    .page-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    .page-item.active .page-link {
+        background-color: var(--accent-violet);
+        border-color: var(--accent-violet);
+    }
+
+    /* View Toggle */
+    .view-toggle .btn {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+    }
+    .view-toggle .btn.active {
+        background-color: var(--accent-violet);
+        border-color: var(--accent-violet);
+        color: white;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<section class="craftsmen-hero">
-    <div class="container">
-        <div class="row justify-content-center text-center">
-            <div class="col-lg-10">
-                <h1 class="mb-3 text-white">Meșteri verificați</h1>
-                <p class="mb-0 text-white">Găsește meșterul potrivit pentru proiectul tău. Toți meșterii noștri sunt verificați și evaluați de clienți reali.</p>
-            </div>
-        </div>
+<section class="hero-2025" style="min-height: 40vh; padding-top: 120px; padding-bottom: 60px;">
+    <!-- Glows -->
+    <div class="glow-point" style="top: -50%; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);"></div>
+
+    <div class="container position-relative z-2 text-center">
+        <h1 class="display-4 fw-bold mb-3 text-white">Meșteri verificați</h1>
+        <p class="lead text-white opacity-75 mx-auto" style="max-width: 700px;">
+            Găsește meșterul potrivit pentru proiectul tău. Toți meșterii noștri sunt verificați și evaluați de clienți reali.
+        </p>
     </div>
 </section>
 
 <!-- Main Content -->
-<div class="container my-4">
+<div class="container position-relative z-2 pb-5" style="margin-top: -40px;">
     <div class="row">
         <!-- Filters Sidebar (Desktop) -->
         <aside class="col-lg-3 mb-4 d-none d-lg-block">
-            <div class="filters-sidebar">
-                <h5 class="mb-3 fw-bold">
-                    <i class="fas fa-filter me-2"></i>Filtre
+            <div class="card-premium p-4 sticky-top" style="top: 100px;">
+                <h5 class="mb-4 fw-bold text-white">
+                    <i class="fas fa-filter me-2 text-accent"></i>Filtre
                 </h5>
 
                 <form method="get">
@@ -77,10 +137,10 @@
                     </div>
 
                     <!-- Verified -->
-                    <div class="form-check mb-3">
+                    <div class="form-check mb-4">
                         <input class="form-check-input" type="checkbox" name="verified" value="1"
                                id="verified" {% if request.GET.verified == '1' %}checked{% endif %}>
-                        <label class="form-check-label" for="verified">
+                        <label class="form-check-label text-light" for="verified">
                             <i class="fas fa-check-circle text-success me-1"></i>Doar verificați
                         </label>
                     </div>
@@ -90,7 +150,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-search me-2"></i>Caută
                         </button>
-                        <a href="?" class="btn btn-outline-secondary">
+                        <a href="?" class="btn btn-outline-light">
                             <i class="fas fa-redo me-2"></i>Resetează
                         </a>
                     </div>
@@ -102,16 +162,16 @@
         <main class="col-lg-9">
             <!-- Mobile Filter Button -->
             <div class="d-lg-none mb-3">
-                <button class="filters-toggle w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas">
+                <button class="btn btn-primary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas">
                     <i class="fas fa-filter me-2"></i>Filtre și Sortare
                 </button>
             </div>
 
             <!-- Controls Bar -->
-            <div class="controls-bar">
-                <div class="d-flex align-items-center gap-2">
-                    <label for="sort" class="form-label mb-0 d-none d-md-block">Sortează:</label>
-                    <select name="sort" id="sort" class="form-select sort-select" onchange="updateSort(this.value)">
+            <div class="card-premium p-3 mb-4 d-flex flex-wrap gap-3 align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                    <label for="sort" class="form-label mb-0 d-none d-md-block text-nowrap">Sortează:</label>
+                    <select name="sort" id="sort" class="form-select sort-select w-auto" onchange="updateSort(this.value)">
                         {% for key, label in sort_options.items %}
                         <option value="{{ key }}" {% if request.GET.sort == key %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
@@ -130,33 +190,31 @@
 
             <!-- Results Count -->
             {% if page_obj %}
-            <div class="results-count">
-                <i class="fas fa-users"></i>
-                <div>
-                    <strong>{{ page_obj.paginator.count }} meșteri găsiți</strong>
-                </div>
+            <div class="mb-4 text-white opacity-75">
+                <i class="fas fa-users me-2"></i>
+                <strong>{{ page_obj.paginator.count }} meșteri găsiți</strong>
             </div>
             {% endif %}
 
             <!-- Results Grid -->
             {% if results %}
-            <div class="row g-3 {% if view == 'list' %}row-cols-1{% else %}row-cols-1 row-cols-md-2{% endif %}">
+            <div class="row g-4 {% if view == 'list' %}row-cols-1{% else %}row-cols-1 row-cols-md-2{% endif %}">
                 {% for craftsman in results %}
                 <div class="col">
-                    <div class="card craftsman-card h-100">
-                        <div class="card-body">
+                    <div class="card-premium h-100 p-0 overflow-hidden hover-scale transition-all">
+                        <div class="card-body p-4">
                             <div class="d-flex gap-3 mb-3">
                                 <!-- Avatar -->
                                 <div>
                                     {% if craftsman.profile_photo %}
                                         <img src="{{ craftsman.profile_photo.url }}" alt="{{ craftsman.display_name }}"
-                                             class="craftsman-avatar" loading="lazy">
+                                             class="rounded-circle border border-2 border-white border-opacity-25" width="80" height="80" style="object-fit: cover;" loading="lazy">
                                     {% elif craftsman.user.profile_picture %}
                                         <img src="{{ craftsman.user.profile_picture.url }}" alt="{{ craftsman.display_name }}"
-                                             class="craftsman-avatar" loading="lazy">
+                                             class="rounded-circle border border-2 border-white border-opacity-25" width="80" height="80" style="object-fit: cover;" loading="lazy">
                                     {% else %}
-                                        <div class="craftsman-avatar bg-light d-flex align-items-center justify-content-center">
-                                            <i class="fas fa-user fa-2x text-muted"></i>
+                                        <div class="rounded-circle bg-white bg-opacity-10 d-flex align-items-center justify-content-center border border-2 border-white border-opacity-25" style="width: 80px; height: 80px;">
+                                            <i class="fas fa-user fa-2x text-white opacity-50"></i>
                                         </div>
                                     {% endif %}
                                 </div>
@@ -164,47 +222,43 @@
                                 <!-- Info -->
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-start">
-                                        <h3 class="craftsman-name">{{ craftsman.display_name|default:"Meșter profesionist" }}</h3>
+                                        <h3 class="h5 fw-bold text-white mb-1">{{ craftsman.display_name|default:"Meșter profesionist" }}</h3>
                                         {% if craftsman.user.is_verified %}
-                                        <span class="badge-verified">
+                                        <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 rounded-pill px-2 py-1 small">
                                             <i class="fas fa-check-circle me-1"></i>Verificat
                                         </span>
                                         {% endif %}
                                     </div>
 
-                                    <div class="craftsman-location mb-2">
-                                        <i class="fas fa-map-marker-alt"></i>
+                                    <div class="text-white opacity-75 small mb-2">
+                                        <i class="fas fa-map-marker-alt me-1 text-accent"></i>
                                         <span>{% if craftsman.city %}{{ craftsman.city.name }}, {% endif %}{{ craftsman.county.name }}</span>
                                     </div>
 
-                                    <div class="craftsman-rating">
-                                        <div class="stars" style="color: #8B5CF6;">
+                                    <div class="d-flex align-items-center gap-2 small">
+                                        <div class="text-warning">
                                             {% if craftsman.average_rating > 0 %}
                                                 {% for i in "12345" %}
                                                     {% if forloop.counter <= craftsman.average_rating|floatformat:0|add:0 %}
                                                         <i class="fas fa-star"></i>
                                                     {% else %}
-                                                        <i class="far fa-star text-muted"></i>
+                                                        <i class="far fa-star opacity-50"></i>
                                                     {% endif %}
                                                 {% endfor %}
                                             {% else %}
                                                 {% for i in "12345" %}
-                                                    <i class="far fa-star text-muted"></i>
+                                                    <i class="far fa-star opacity-50"></i>
                                                 {% endfor %}
                                             {% endif %}
                                         </div>
-                                        <span><strong>{{ craftsman.average_rating|floatformat:1|default:"0,0" }}</strong>
-                                            <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#reviews"
-                                               style="color: inherit; text-decoration: none; transition: color 0.2s ease;"
-                                               onmouseover="this.style.color='#8B5CF6'; this.style.textDecoration='underline';"
-                                               onmouseout="this.style.color='inherit'; this.style.textDecoration='none';">
-                                                ({{ craftsman.total_reviews }} recenzii)
-                                            </a>
-                                        </span>
+                                        <span class="text-white fw-bold">{{ craftsman.average_rating|floatformat:1|default:"0,0" }}</span>
+                                        <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#reviews" class="text-white opacity-50 text-decoration-none hover-opacity-100">
+                                            ({{ craftsman.total_reviews }} recenzii)
+                                        </a>
                                     </div>
 
                                     {% if craftsman.years_experience %}
-                                    <div class="text-muted small mt-2">
+                                    <div class="text-white opacity-50 small mt-2">
                                         <i class="fas fa-calendar-alt me-1"></i>{{ craftsman.years_experience }} ani experiență
                                     </div>
                                     {% endif %}
@@ -212,13 +266,13 @@
                             </div>
 
                             <!-- Actions -->
-                            <div class="craftsman-actions">
-                                <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}" class="btn-view-profile text-decoration-none">
-                                    <i class="fas fa-eye me-2"></i>Vezi profil complet
+                            <div class="d-flex gap-2 mt-3">
+                                <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}" class="btn btn-primary flex-grow-1">
+                                    <i class="fas fa-eye me-2"></i>Vezi profil
                                 </a>
                                 {% if user.is_authenticated and user != craftsman.user and user.user_type != 'craftsman' %}
-                                <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#contactForm" class="btn-message text-decoration-none">
-                                    <i class="fas fa-comment me-2"></i>Mesaj
+                                <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}#contactForm" class="btn btn-outline-light">
+                                    <i class="fas fa-comment"></i>
                                 </a>
                                 {% endif %}
                             </div>
@@ -230,7 +284,7 @@
 
             <!-- Pagination -->
             {% if page_obj.has_other_pages %}
-            <nav class="mt-4">
+            <nav class="mt-5">
                 <ul class="pagination justify-content-center">
                     {% if page_obj.has_previous %}
                     <li class="page-item">
@@ -261,13 +315,15 @@
 
             {% else %}
             <!-- Empty State -->
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fas fa-search"></i>
+            <div class="card-premium p-5 text-center">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-5 mb-4" style="width: 100px; height: 100px;">
+                    <i class="fas fa-search fa-3x text-white opacity-25"></i>
                 </div>
-                <h3>Nu am găsit meșteri</h3>
-                <p>Încearcă să modifici filtrele de căutare sau să elimini unele criterii pentru a găsi mai mulți meșteri disponibili.</p>
-                <a href="?" class="btn btn-primary btn-lg">
+                <h3 class="text-white mb-3">Nu am găsit meșteri</h3>
+                <p class="text-white opacity-75 mb-4 mx-auto" style="max-width: 500px;">
+                    Încearcă să modifici filtrele de căutare sau să elimini unele criterii pentru a găsi mai mulți meșteri disponibili.
+                </p>
+                <a href="?" class="btn btn-primary">
                     <i class="fas fa-redo me-2"></i>Resetează toate filtrele
                 </a>
             </div>
@@ -277,10 +333,10 @@
 </div>
 
 <!-- Mobile Offcanvas Filters -->
-<div class="offcanvas offcanvas-start offcanvas-filters" tabindex="-1" id="filtersOffcanvas">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title"><i class="fas fa-filter me-2"></i>Filtre</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+<div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="filtersOffcanvas">
+    <div class="offcanvas-header border-bottom border-white border-opacity-10">
+        <h5 class="offcanvas-title"><i class="fas fa-filter me-2 text-accent"></i>Filtre</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
         <form method="get">
@@ -324,10 +380,10 @@
                 </select>
             </div>
 
-            <div class="form-check mb-3">
+            <div class="form-check mb-4">
                 <input class="form-check-input" type="checkbox" name="verified" value="1"
                        id="verified_mobile" {% if request.GET.verified == '1' %}checked{% endif %}>
-                <label class="form-check-label" for="verified_mobile">
+                <label class="form-check-label text-light" for="verified_mobile">
                     <i class="fas fa-check-circle text-success me-1"></i>Doar verificați
                 </label>
             </div>
@@ -336,7 +392,7 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-search me-2"></i>Aplică filtre
                 </button>
-                <a href="?" class="btn btn-outline-secondary">
+                <a href="?" class="btn btn-outline-light">
                     <i class="fas fa-redo me-2"></i>Resetează
                 </a>
             </div>

@@ -4,57 +4,66 @@
 {% block title %}Rezultate căutare: {{ query }} - Bricli{% endblock %}
 
 {% block content %}
-<section class="py-6 bg-light">
-    <div class="container">
-        <div class="mb-5">
-            <h1 class="display-5 fw-bold mb-3">Rezultate pentru "{{ query }}"</h1>
-            <p class="lead text-muted">
-                {% if results %}
-                    Am găsit {{ results.count }} categorii care se potrivesc căutării tale.
-                {% else %}
-                    Nu am găsit rezultate pentru această căutare.
-                {% endif %}
-            </p>
-        </div>
+<section class="hero-2025" style="min-height: 40vh; padding-top: 120px; padding-bottom: 60px;">
+    <!-- Glows -->
+    <div class="glow-point" style="top: -50%; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);"></div>
 
-        {% if results %}
-        <div class="row g-4">
-            {% for category in results %}
-            <div class="col-md-6 col-lg-4">
-                <a href="{{ category.get_absolute_url }}" class="text-decoration-none">
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <i class="fas
-                            {% if category.slug == 'constructii' %}fa-hard-hat
-                            {% elif category.slug == 'instalatii' %}fa-tools
-                            {% elif category.slug == 'electrice' %}fa-bolt
-                            {% elif category.slug == 'amenajari' %}fa-paint-roller
-                            {% elif category.slug == 'curatenie' %}fa-broom
-                            {% elif category.slug == 'gradinarit' %}fa-leaf
-                            {% elif category.slug == 'auto' %}fa-car
-                            {% elif category.slug == 'electrocasnice' %}fa-plug
-                            {% else %}fa-hammer{% endif %}"></i>
-                        </div>
-                        <h3 class="h4 fw-bold mb-3">{{ category.name }}</h3>
-                        <p class="text-muted mb-4">{{ category.description|truncatewords:15 }}</p>
-                        <div class="mt-auto text-accent fw-bold">
-                            Vezi Servicii <i class="fas fa-arrow-right ms-2"></i>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center py-5">
-            <div class="mb-4">
-                <i class="fas fa-search fa-3x text-muted opacity-50"></i>
-            </div>
-            <h3 class="h4 fw-bold mb-3">Nu am găsit ce cauți?</h3>
-            <p class="text-muted mb-4">Încearcă să cauți folosind alți termeni sau explorează toate categoriile.</p>
-            <a href="{% url 'services:categories' %}" class="btn btn-outline-primary">Vezi Toate Categoriile</a>
-        </div>
-        {% endif %}
+    <div class="container position-relative z-2 text-center">
+        <h1 class="display-4 fw-bold mb-3 text-white">Rezultate pentru "{{ query }}"</h1>
+        <p class="lead text-white opacity-75 mx-auto" style="max-width: 700px;">
+            {% if results %}
+                Am găsit <span class="text-accent fw-bold">{{ results.count }}</span> categorii care se potrivesc căutării tale.
+            {% else %}
+                Nu am găsit rezultate pentru această căutare.
+            {% endif %}
+        </p>
     </div>
 </section>
+
+<div class="container position-relative z-2 pb-5" style="margin-top: -40px;">
+    {% if results %}
+    <div class="row g-4">
+        {% for category in results %}
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ category.get_absolute_url }}" class="text-decoration-none">
+                <div class="card-premium h-100 p-4 hover-scale transition-all d-flex flex-column">
+                    <div class="icon-box mb-4 d-flex align-items-center justify-content-center rounded-circle border border-white border-opacity-10" style="width: 60px; height: 60px; background: rgba(255, 255, 255, 0.03);">
+                        <i class="fas fa-2x text-white opacity-75
+                        {% if category.slug == 'constructii' %}fa-hard-hat
+                        {% elif category.slug == 'instalatii' %}fa-tools
+                        {% elif category.slug == 'electrice' %}fa-bolt
+                        {% elif category.slug == 'amenajari' %}fa-paint-roller
+                        {% elif category.slug == 'curatenie' %}fa-broom
+                        {% elif category.slug == 'gradinarit' %}fa-leaf
+                        {% elif category.slug == 'auto' %}fa-car
+                        {% elif category.slug == 'electrocasnice' %}fa-plug
+                        {% else %}fa-hammer{% endif %}"></i>
+                    </div>
+
+                    <h3 class="h4 fw-bold text-white mb-3">{{ category.name }}</h3>
+                    <p class="text-white opacity-50 small mb-4 flex-grow-1">{{ category.description|truncatewords:15 }}</p>
+
+                    <div class="mt-auto text-accent fw-bold d-flex align-items-center small">
+                        Vezi Servicii <i class="fas fa-arrow-right ms-2"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card-premium p-5 text-center">
+        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-5 mb-4" style="width: 100px; height: 100px;">
+            <i class="fas fa-search fa-3x text-white opacity-25"></i>
+        </div>
+        <h3 class="text-white mb-3">Nu am găsit ce cauți?</h3>
+        <p class="text-white opacity-75 mb-4 mx-auto" style="max-width: 500px;">
+            Încearcă să cauți folosind alți termeni sau explorează toate categoriile disponibile.
+        </p>
+        <a href="{% url 'services:categories' %}" class="btn btn-outline-light">
+            <i class="fas fa-th-large me-2"></i>Vezi Toate Categoriile
+        </a>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

@@ -1,110 +1,138 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Cum funcționează - Bricli{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<section class="bg-primary text-white py-5">
-    <div class="container">
-        <div class="text-center">
-            <h1 class="display-4 fw-bold mb-4 text-white">Cum funcționează Bricli</h1>
-            <p class="lead">Simplu, rapid și sigur - conectăm clienții cu meșteri verificați</p>
+<section class="hero-2025" style="min-height: 60vh; padding-top: 140px;">
+    <!-- Glows -->
+    <div class="glow-point" style="top: -20%; left: 50%; transform: translateX(-50%); background: radial-gradient(circle, rgba(124, 58, 237, 0.2) 0%, transparent 70%);"></div>
+
+    <div class="container position-relative z-2 text-center">
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill border border-white border-opacity-25 bg-white bg-opacity-10 mb-4">
+            <span class="small text-white fw-bold">GHID COMPLET</span>
         </div>
+        <h1 class="display-3 fw-bold mb-4 text-white">Cum funcționează Bricli</h1>
+        <p class="lead text-white opacity-75 mx-auto" style="max-width: 700px;">
+            Simplu, rapid și sigur. Conectăm proprietarii de case cu meșteri verificați pentru proiecte de succes.
+        </p>
     </div>
 </section>
 
 <!-- For Clients -->
-<section class="py-5">
+<section class="py-5 position-relative">
     <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">Pentru clienți</h2>
-            <p class="text-muted">Găsește meșterul potrivit în 4 pași simpli</p>
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-6">
+                <h2 class="display-5 fw-bold text-white mb-3">Pentru Clienți</h2>
+                <p class="text-white opacity-75 lead">Găsește meșterul potrivit în 4 pași simpli.</p>
+            </div>
+            <div class="col-lg-6 text-lg-end">
+                {% if not user.is_authenticated or user.user_type != 'craftsman' %}
+                <a href="{% url 'services:create_order' %}" class="btn btn-light rounded-pill px-4 fw-bold">
+                    <i class="fas fa-plus me-2"></i>Postează o comandă
+                </a>
+                {% endif %}
+            </div>
         </div>
-        
+
         <div class="row g-4">
-            <div class="col-lg-3 col-md-6 text-center">
-                <div class="step-circle bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <span class="fs-3 fw-bold">1</span>
+            <div class="col-md-6 col-lg-3">
+                <div class="card-premium h-100 reveal-on-scroll stagger-1">
+                    <div class="icon-box mb-4 d-flex align-items-center justify-content-center rounded-circle border border-white border-opacity-25" style="width: 64px; height: 64px; background: rgba(59, 130, 246, 0.1);">
+                        <span class="h3 fw-bold text-white mb-0">1</span>
+                    </div>
+                    <h4 class="fw-bold text-white mb-3">Postează cererea</h4>
+                    <p class="text-white opacity-75">Descrie lucrarea, adaugă poze și specifică bugetul. Este complet gratuit.</p>
                 </div>
-                <h4>Postează cererea</h4>
-                <p class="text-muted">Descrie lucrarea de care ai nevoie, specifică locația și bugetul aproximativ.</p>
             </div>
-            
-            <div class="col-lg-3 col-md-6 text-center">
-                <div class="step-circle bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <span class="fs-3 fw-bold">2</span>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card-premium h-100 reveal-on-scroll stagger-2">
+                    <div class="icon-box mb-4 d-flex align-items-center justify-content-center rounded-circle border border-white border-opacity-25" style="width: 64px; height: 64px; background: rgba(16, 185, 129, 0.1);">
+                        <span class="h3 fw-bold text-white mb-0">2</span>
+                    </div>
+                    <h4 class="fw-bold text-white mb-3">Primești oferte</h4>
+                    <p class="text-white opacity-75">Meșterii interesați îți trimit oferte. Vezi profilul lor și recenziile.</p>
                 </div>
-                <h4>Primești oferte</h4>
-                <p class="text-muted">Meșterii interesați îți vor trimite oferte personalizate în 24-48 ore.</p>
             </div>
-            
-            <div class="col-lg-3 col-md-6 text-center">
-                <div class="step-circle bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <span class="fs-3 fw-bold">3</span>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card-premium h-100 reveal-on-scroll stagger-3">
+                    <div class="icon-box mb-4 d-flex align-items-center justify-content-center rounded-circle border border-white border-opacity-25" style="width: 64px; height: 64px; background: rgba(245, 158, 11, 0.1);">
+                        <span class="h3 fw-bold text-white mb-0">3</span>
+                    </div>
+                    <h4 class="fw-bold text-white mb-3">Compară și alege</h4>
+                    <p class="text-white opacity-75">Discută prin chat, cere detalii și alege meșterul potrivit pentru tine.</p>
                 </div>
-                <h4>Compară și alege</h4>
-                <p class="text-muted">Analizează profilurile, recenziile și prețurile pentru a face cea mai bună alegere.</p>
             </div>
-            
-            <div class="col-lg-3 col-md-6 text-center">
-                <div class="step-circle bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <span class="fs-3 fw-bold">4</span>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card-premium h-100 reveal-on-scroll stagger-4">
+                    <div class="icon-box mb-4 d-flex align-items-center justify-content-center rounded-circle border border-white border-opacity-25" style="width: 64px; height: 64px; background: rgba(139, 92, 246, 0.1);">
+                        <span class="h3 fw-bold text-white mb-0">4</span>
+                    </div>
+                    <h4 class="fw-bold text-white mb-3">Finalizează</h4>
+                    <p class="text-white opacity-75">După finalizarea lucrării, lasă o recenzie pentru a ajuta comunitatea.</p>
                 </div>
-                <h4>Finalizează</h4>
-                <p class="text-muted">Colaborează cu meșterul ales și lasă o recenzie la finalul lucrării.</p>
             </div>
-        </div>
-        
-        <div class="text-center mt-5">
-            {% if not user.is_authenticated or user.user_type != 'craftsman' %}
-            <a href="{% url 'services:create_order' %}" class="btn btn-primary btn-lg">
-                <i class="fas fa-plus me-2"></i>Postează o comandă gratuită
-            </a>
-            {% endif %}
         </div>
     </div>
 </section>
 
 <!-- For Craftsmen -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">Pentru meșteri</h2>
-            <p class="text-muted">Găsește clienți și dezvoltă-ți afacerea</p>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-lg-4 text-center">
-                <div class="step-circle bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <span class="fs-3 fw-bold">1</span>
+<section class="py-5 position-relative">
+    <!-- Background Glow -->
+    <div class="glow-point" style="right: -20%; top: 20%; background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);"></div>
+
+    <div class="container position-relative z-2">
+        <div class="card-premium border-0 p-5" style="background: rgba(255, 255, 255, 0.02);">
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-6">
+                    <h2 class="display-5 fw-bold text-white mb-3">Pentru Meșteri</h2>
+                    <p class="text-white opacity-75 lead">Dezvoltă-ți afacerea cu clienți serioși.</p>
                 </div>
-                <h4>Înregistrează-te</h4>
-                <p class="text-muted">Creează un profil complet cu serviciile tale, experiența și portofoliul de lucrări.</p>
-            </div>
-            
-            <div class="col-lg-4 text-center">
-                <div class="step-circle bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <span class="fs-3 fw-bold">2</span>
+                <div class="col-lg-6 text-lg-end">
+                    {% if not user.is_authenticated %}
+                    <a href="{% url 'auth:craftsman_register' %}" class="btn btn-outline-light rounded-pill px-4 fw-bold">
+                        <i class="fas fa-user-plus me-2"></i>Înregistrează-te ca Meșter
+                    </a>
+                    {% endif %}
                 </div>
-                <h4>Primești cereri</h4>
-                <p class="text-muted">Vei fi notificat când apar cereri de lucrări în zona ta și domeniul tău de activitate.</p>
             </div>
-            
-            <div class="col-lg-4 text-center">
-                <div class="step-circle bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <span class="fs-3 fw-bold">3</span>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="text-center reveal-on-scroll stagger-1">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-5 mb-4" style="width: 80px; height: 80px;">
+                            <i class="fas fa-id-card text-white fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold text-white">1. Înregistrează-te</h4>
+                        <p class="text-white opacity-75 small">Creează un profil profesional gratuit. Adaugă portofoliu și certificări.</p>
+                    </div>
                 </div>
-                <h4>Trimite oferte</h4>
-                <p class="text-muted">Contactează clienții cu oferte personalizate și câștigă mai multe contracte.</p>
+
+                <div class="col-md-4">
+                    <div class="text-center reveal-on-scroll stagger-2">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-5 mb-4" style="width: 80px; height: 80px;">
+                            <i class="fas fa-bell text-white fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold text-white">2. Primești Cereri</h4>
+                        <p class="text-white opacity-75 small">Te notificăm instant când apar proiecte noi în zona ta.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="text-center reveal-on-scroll stagger-3">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-5 mb-4" style="width: 80px; height: 80px;">
+                            <i class="fas fa-handshake text-white fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold text-white">3. Câștigi Proiecte</h4>
+                        <p class="text-white opacity-75 small">Trimiți oferte, discuți cu clienții și bați palma.</p>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <div class="text-center mt-5">
-            {% if not user.is_authenticated %}
-            <a href="{% url 'auth:craftsman_register' %}" class="btn btn-success btn-lg">
-                <i class="fas fa-user-plus me-2"></i>Înregistrează-te ca meșter
-            </a>
-            {% endif %}
         </div>
     </div>
 </section>
@@ -112,50 +140,57 @@
 <!-- Benefits -->
 <section class="py-5">
     <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">De ce să alegi Bricli?</h2>
+        <div class="text-center mb-5 reveal-on-scroll">
+            <h2 class="display-5 fw-bold text-white mb-3">De ce Bricli?</h2>
+            <p class="text-white opacity-75 lead">Standardul de calitate în construcții și amenajări.</p>
         </div>
-        
+
         <div class="row g-4">
-            <div class="col-lg-4 text-center">
-                <i class="fas fa-shield-alt text-primary fs-1 mb-3"></i>
-                <h4>Meșteri verificați</h4>
-                <p class="text-muted">Toți meșterii sunt verificați prin documente de identitate și certificări profesionale.</p>
+            <div class="col-md-4">
+                <div class="card-premium h-100 text-center p-4 reveal-on-scroll stagger-1">
+                    <i class="fas fa-shield-alt text-success fa-3x mb-4"></i>
+                    <h4 class="fw-bold text-white mb-3">Meșteri Verificați</h4>
+                    <p class="text-white opacity-75">Verificăm identitatea și calificările fiecărui profesionist de pe platformă.</p>
+                </div>
             </div>
-            
-            <div class="col-lg-4 text-center">
-                <i class="fas fa-star text-warning fs-1 mb-3"></i>
-                <h4>Recenzii reale</h4>
-                <p class="text-muted">Citește recenziile altor clienți pentru a lua cea mai bună decizie.</p>
+
+            <div class="col-md-4">
+                <div class="card-premium h-100 text-center p-4 reveal-on-scroll stagger-2">
+                    <i class="fas fa-star text-warning fa-3x mb-4"></i>
+                    <h4 class="fw-bold text-white mb-3">Recenzii Reale</h4>
+                    <p class="text-white opacity-75">Sistem transparent de recenzii. Doar clienții care au lucrat pot lăsa feedback.</p>
+                </div>
             </div>
-            
-            <div class="col-lg-4 text-center">
-                <i class="fas fa-headset text-info fs-1 mb-3"></i>
-                <h4>Suport dedicat</h4>
-                <p class="text-muted">Echipa noastră te ajută în orice moment al procesului.</p>
+
+            <div class="col-md-4">
+                <div class="card-premium h-100 text-center p-4 reveal-on-scroll stagger-3">
+                    <i class="fas fa-headset text-info fa-3x mb-4"></i>
+                    <h4 class="fw-bold text-white mb-3">Suport Dedicat</h4>
+                    <p class="text-white opacity-75">Echipa noastră este aici să te ajute la fiecare pas al proiectului.</p>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- CTA -->
-<section class="py-5 bg-primary text-white">
-    <div class="container text-center">
-        <h2 class="fw-bold mb-4 text-white">Gata să începi?</h2>
-        <div class="row justify-content-center">
-            <div class="col-md-8">
+<section class="py-5 mb-5">
+    <div class="container reveal-on-scroll">
+        <div class="position-relative rounded-5 overflow-hidden p-5 text-center" style="background: linear-gradient(135deg, #7C3AED 0%, #3B82F6 100%);">
+            <h2 class="display-4 fw-bold mb-4 text-white">Gata să începi?</h2>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
                 {% if user.is_authenticated %}
                     {% if user.user_type != 'craftsman' %}
-                        <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg me-3 mb-3">
-                            <i class="fas fa-plus me-2"></i>Postează o comandă
+                        <a href="{% url 'services:create_order' %}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-dark shadow-lg hover-scale">
+                            Postează o comandă
                         </a>
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'services:create_order' %}" class="btn btn-light btn-lg me-3 mb-3">
-                        <i class="fas fa-plus me-2"></i>Postează o comandă
+                    <a href="{% url 'services:create_order' %}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-dark shadow-lg hover-scale">
+                        Postează o comandă
                     </a>
-                    <a href="{% url 'auth:craftsman_register' %}" class="btn btn-outline-light btn-lg mb-3">
-                        <i class="fas fa-user-plus me-2"></i>Devino meșter
+                    <a href="{% url 'auth:craftsman_register' %}" class="btn btn-outline-light rounded-pill px-5 py-3 fw-bold">
+                        Devino Meșter
                     </a>
                 {% endif %}
             </div>
