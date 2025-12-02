@@ -1,0 +1,17 @@
+.notification-item-link {
+    cursor: pointer;
+}
+
+.notification-item-link:hover {
+    background-color: #f8f9fa !important;
+    transform: translateX(4px);
+}
+
+.notification-item-link.bg-light {
+    border-left: 4px solid #8B5CF6;
+}
+
+.notification-item-link:hover .fa-chevron-right {
+    color: #8B5CF6 !important;
+    transform: translateX(3px);
+}

@@ -1,0 +1,801 @@
+/* Purple theme for nav pills */
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+    color: white !important;
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+    background-color: rgba(139, 92, 246, 0.1) !important;
+    color: #8B5CF6 !important;
+}
+
+.nav-pills .nav-link {
+    color: #6B7280;
+    transition: all 0.3s ease;
+}
+
+/**
+ * My Quotes Page - Professional Mobile & Desktop Optimization
+ * Optimized for iPhone SE (375px) and up
+ * Desktop enhancements with hover effects and better spacing
+ */
+
+/* ========== MOBILE FIRST (iPhone SE 375px+) ========== */
+@media (max-width: 991.98px) {
+
+    /* Header: Compact mobile layout */
+    .quotes-header {
+        padding: 16px 0 !important;
+        margin-bottom: 20px !important;
+    }
+
+    .quotes-header h1 {
+        font-size: 1.5rem !important;
+        margin-bottom: 4px !important;
+    }
+
+    .quotes-header p {
+        font-size: 0.85rem !important;
+        display: none;
+        /* Hide subtitle on mobile */
+    }
+
+    .quotes-header .btn {
+        font-size: 0.85rem !important;
+        padding: 8px 16px !important;
+        white-space: nowrap;
+    }
+
+    /* Filter Tabs: Horizontal scroll for narrow screens */
+    .quotes-tabs-wrapper {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 16px;
+    }
+
+    .quotes-tabs-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+
+    .quotes-tabs .nav-pills {
+        flex-wrap: nowrap !important;
+        padding: 0 !important;
+    }
+
+    .quotes-tabs .nav-link {
+        font-size: 0.85rem !important;
+        padding: 10px 14px !important;
+        white-space: nowrap;
+        min-width: max-content;
+    }
+
+    .quotes-tabs .badge {
+        font-size: 0.7rem !important;
+        padding: 2px 6px !important;
+    }
+
+    /* Quote Cards: Ultra-compact mobile layout */
+    .quote-card-mobile {
+        border: 1px solid #e5e7eb !important;
+        border-radius: 14px !important;
+        padding: 12px !important;
+        margin-bottom: 12px !important;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+        transition: box-shadow 0.15s ease;
+    }
+
+    .quote-card-mobile:active {
+        box-shadow: 0 2px 6px rgba(139, 92, 246, 0.15) !important;
+    }
+
+    /* Quote Title: 1-line with ellipsis */
+    .quote-title-mobile {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #8B5CF6;
+        margin-bottom: 6px;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Quote Meta: Location + Date */
+    .quote-meta-mobile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+    }
+
+    .quote-meta-mobile .meta-item {
+        font-size: 0.8rem;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .quote-meta-mobile .meta-item i {
+        font-size: 0.75rem;
+        opacity: 0.7;
+    }
+
+    /* Quote Description: 2 lines max */
+    .quote-desc-mobile {
+        font-size: 0.85rem;
+        color: #6b7280;
+        line-height: 1.4;
+        margin-bottom: 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Quote Footer: Price + Status + Action */
+    .quote-footer-mobile {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .quote-price-mobile {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #10b981;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .quote-price-mobile .duration {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 400;
+    }
+
+    .quote-status-mobile {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 12px;
+        white-space: nowrap;
+    }
+
+    .quote-action-mobile {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        white-space: nowrap;
+    }
+
+    /* Empty State: Compact */
+    .quotes-empty-mobile {
+        padding: 40px 20px !important;
+        text-align: center;
+    }
+
+    .quotes-empty-mobile i {
+        font-size: 3rem !important;
+    }
+
+    .quotes-empty-mobile h3 {
+        font-size: 1.1rem !important;
+        margin-top: 16px !important;
+    }
+
+    .quotes-empty-mobile p {
+        font-size: 0.9rem !important;
+    }
+
+    /* Pagination: Compact */
+    .quotes-pagination-mobile .pagination {
+        gap: 4px;
+    }
+
+    .quotes-pagination-mobile .page-link {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+}
+
+/* ========== DESKTOP IMPROVEMENTS (992px+) ========== */
+@media (min-width: 992px) {
+
+    /* Header: Professional spacing */
+    .quotes-header {
+        padding: 32px 0 !important;
+        margin-bottom: 32px !important;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .quotes-header h1 {
+        font-size: 2rem !important;
+        font-weight: 700;
+    }
+
+    .quotes-header p {
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
+    /* Filter Tabs: Better hover and active states */
+    .quotes-tabs .nav-link {
+        padding: 16px 24px !important;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .quotes-tabs .nav-link:hover:not(.active) {
+        background-color: rgba(139, 92, 246, 0.08) !important;
+        transform: translateY(-1px);
+    }
+
+    .quotes-tabs .nav-link.active {
+        box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+    }
+
+    .quotes-tabs .badge {
+        font-size: 0.8rem;
+        padding: 3px 8px;
+    }
+
+    /* Quote Cards: Enhanced desktop layout */
+    .quote-card-desktop {
+        border: 1px solid #e5e7eb !important;
+        border-radius: 16px !important;
+        padding: 24px !important;
+        margin-bottom: 20px !important;
+        transition: all 0.25s ease;
+        background: #fff;
+    }
+
+    .quote-card-desktop:hover {
+        box-shadow: 0 8px 24px rgba(139, 92, 246, 0.12) !important;
+        border-color: rgba(139, 92, 246, 0.3) !important;
+        transform: translateY(-2px);
+    }
+
+    .quote-title-desktop {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #8B5CF6;
+        margin-bottom: 12px;
+        transition: color 0.2s ease;
+    }
+
+    .quote-card-desktop:hover .quote-title-desktop {
+        color: #7C3AED;
+    }
+
+    .quote-meta-desktop {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+
+    .quote-meta-desktop .meta-item {
+        font-size: 0.9rem;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .quote-desc-desktop {
+        font-size: 0.95rem;
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 16px;
+    }
+
+    .quote-price-desktop {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #10b981;
+        margin-bottom: 8px;
+    }
+
+    .quote-price-desktop .duration {
+        font-size: 0.85rem;
+        color: #6b7280;
+        font-weight: 400;
+        display: block;
+        margin-top: 4px;
+    }
+
+    .quote-status-desktop {
+        padding: 8px 16px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .quote-action-desktop {
+        transition: all 0.2s ease;
+    }
+
+    .quote-action-desktop:hover {
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
+    }
+
+    /* Empty State: Professional */
+    .quotes-empty-desktop {
+        padding: 80px 20px !important;
+        text-align: center;
+    }
+
+    .quotes-empty-desktop i {
+        font-size: 4rem !important;
+        opacity: 0.3;
+    }
+
+    .quotes-empty-desktop h3 {
+        font-size: 1.5rem !important;
+        margin-top: 24px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .quotes-empty-desktop p {
+        font-size: 1rem !important;
+        max-width: 500px;
+        margin: 0 auto 32px;
+    }
+}
+
+/* ========== STATUS BADGES (all viewports) ========== */
+.badge-pending {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+}
+
+.badge-accepted {
+    background-color: #d1fae5 !important;
+    color: #065f46 !important;
+}
+
+.badge-rejected {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+}
+
+.badge-declined {
+    background-color: #e5e7eb !important;
+    color: #374151 !important;
+}
+
+/* ========== UTILITY CLASSES ========== */
+.text-ellipsis-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.text-ellipsis-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/**
+ * My Quotes - Simplified Mobile UX
+ * Ultra-simple, intuitive design with clear icons and explicit text labels
+ * Large touch targets, semantic colors, no emoji
+ */
+
+/* ========== MOBILE ONLY (up to 991.98px) ========== */
+@media (max-width: 991.98px) {
+
+    /* Header: Simple with icon */
+    .quotes-header-kid {
+        padding: 20px 0;
+        text-align: center;
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        color: white;
+        border-radius: 0 0 24px 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    }
+
+    .quotes-header-kid h1 {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+
+    .quotes-header-kid i {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .quotes-header-kid p {
+        font-size: 0.95rem;
+        opacity: 0.95;
+        margin: 0;
+    }
+
+    /* Filter Tabs: Large icons + text */
+    .quotes-tabs-kid {
+        padding: 0 16px;
+        margin-bottom: 20px;
+    }
+
+    .quotes-tabs-kid .nav-pills {
+        gap: 8px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+    }
+
+    .quotes-tabs-kid .nav-pills::-webkit-scrollbar {
+        display: none;
+    }
+
+    .quotes-tabs-kid .nav-link {
+        border-radius: 16px;
+        padding: 12px 16px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        white-space: nowrap;
+        border: 2px solid #e5e7eb;
+        background: white;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: auto;
+        transition: all 0.2s ease;
+    }
+
+    .quotes-tabs-kid .nav-link i {
+        font-size: 1.1rem;
+    }
+
+    .quotes-tabs-kid .nav-link .label {
+        font-size: 0.9rem;
+    }
+
+    .quotes-tabs-kid .nav-link.active {
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        color: white;
+        border-color: #8B5CF6;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        transform: scale(1.05);
+    }
+
+    /* Quote Card: Simplified with big touch targets */
+    .quote-card-kid {
+        background: white;
+        border-radius: 20px;
+        padding: 16px;
+        margin-bottom: 16px;
+        border: 2px solid #e5e7eb;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        transition: all 0.2s ease;
+    }
+
+    .quote-card-kid:active {
+        transform: scale(0.98);
+        box-shadow: 0 4px 16px rgba(139, 92, 246, 0.15);
+    }
+
+    /* Status badge with icon at top */
+    .quote-status-kid {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    .quote-status-kid i {
+        font-size: 1rem;
+    }
+
+    .status-waiting {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-failed {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* Title: Large and clear */
+    .quote-title-kid {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 10px;
+        line-height: 1.4;
+        display: block;
+        text-decoration: none;
+    }
+
+    .quote-title-kid:hover {
+        color: #8B5CF6;
+    }
+
+    /* Info row: Location and date with icons */
+    .quote-info-kid {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+
+    .quote-info-kid .info-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .quote-info-kid .info-item i {
+        font-size: 0.9rem;
+    }
+
+    /* Description: Clear and readable */
+    .quote-desc-kid {
+        font-size: 0.9rem;
+        color: #4b5563;
+        line-height: 1.5;
+        margin-bottom: 14px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Price section: Big and prominent */
+    .quote-price-kid {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-top: 1px dashed #e5e7eb;
+        margin-bottom: 12px;
+    }
+
+    .quote-price-kid .price {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #10b981;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .quote-price-kid .price i {
+        font-size: 1.1rem;
+    }
+
+    .quote-price-kid .duration {
+        font-size: 0.8rem;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .quote-price-kid .duration i {
+        font-size: 0.85rem;
+    }
+
+    /* Action button: Full-width, big, clear text */
+    .quote-action-kid {
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        font-size: 1rem;
+        font-weight: 700;
+        border: none;
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .quote-action-kid:hover,
+    .quote-action-kid:active {
+        background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+        color: white;
+        transform: scale(0.98);
+        box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+    }
+
+    .quote-action-kid i {
+        font-size: 1.1rem;
+    }
+
+    /* Empty state: Friendly and encouraging */
+    .quotes-empty-kid {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .quotes-empty-kid i {
+        font-size: 4rem;
+        display: block;
+        margin-bottom: 16px;
+        opacity: 0.3;
+        color: #8B5CF6;
+    }
+
+    .quotes-empty-kid h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 8px;
+    }
+
+    .quotes-empty-kid p {
+        font-size: 0.95rem;
+        color: #6b7280;
+        margin-bottom: 24px;
+    }
+
+    .quotes-empty-kid .btn {
+        padding: 14px 28px;
+        border-radius: 14px;
+        font-size: 1rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        border: none;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .quotes-empty-kid .btn i {
+        font-size: 1.1rem;
+    }
+
+    /* Floating action button: Quick search */
+    .quotes-fab-kid {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        color: white;
+        border: none;
+        box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        z-index: 1000;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .quotes-fab-kid:active {
+        transform: scale(0.9);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        color: white;
+    }
+
+    .quotes-fab-kid i {
+        font-size: 1.5rem;
+    }
+
+    /* Pagination: Simple and clear */
+    .quotes-pagination-kid {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 24px;
+        padding: 0 16px;
+    }
+
+    .quotes-pagination-kid .page-btn {
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: 2px solid #e5e7eb;
+        background: white;
+        color: #6b7280;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .quotes-pagination-kid .page-btn:active {
+        transform: scale(0.95);
+        background: #f3f4f6;
+    }
+
+    .quotes-pagination-kid .page-btn.active {
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        color: white;
+        border-color: #8B5CF6;
+    }
+
+    /* Helper: Guide tooltip */
+    .helper-tooltip-kid {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 12px 16px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        font-size: 0.9rem;
+        color: #92400e;
+        display: flex;
+        align-items: start;
+        gap: 10px;
+    }
+
+    .helper-tooltip-kid i {
+        font-size: 1.3rem;
+        flex-shrink: 0;
+        color: #f59e0b;
+    }
+
+    .helper-tooltip-kid .text {
+        line-height: 1.4;
+    }
+}
+
+/* ========== DESKTOP: Keep existing professional design ========== */
+@media (min-width: 992px) {
+
+    .quotes-header-kid,
+    .quotes-tabs-kid,
+    .quote-card-kid,
+    .quotes-empty-kid,
+    .quotes-fab-kid,
+    .helper-tooltip-kid {
+        display: none !important;
+    }
+
+    /* Desktop header with purple background */
+    .quotes-header {
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        padding: 24px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    }
+
+    .quotes-header h1,
+    .quotes-header h1 i {
+        color: #fff !important;
+    }
+
+    .quotes-header p {
+        color: rgba(255, 255, 255, 0.9);
+    }
+}

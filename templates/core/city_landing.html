@@ -480,43 +480,6 @@
     </div>
 </div>
 
-<style>
-.city-landing-page .hero {
-    position: relative;
-}
-
-.city-landing-page .stat-item {
-    min-width: 150px;
-}
-
-.city-landing-page .content ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.city-landing-page .content ul li:before {
-    content: "✓ ";
-    color: #8B5CF6;
-    font-weight: bold;
-    margin-right: 8px;
-}
-
-.city-landing-page .content strong {
-    color: #1f2937;
-}
-
-@media (max-width: 768px) {
-    .city-landing-page .hero {
-        padding: 2rem 0 3rem;
-    }
-
-    .city-landing-page .display-4 {
-        font-size: 2rem;
-    }
-
-    .city-landing-page .lead {
-        font-size: 1.1rem;
-    }
-}
-</style>
+{% block extra_css %}
+    {% static_css 'css/pages/core/city_landing.css' %}
 {% endblock %}

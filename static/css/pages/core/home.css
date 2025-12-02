@@ -1,0 +1,116 @@
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+/* Hover Effects */
+.hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+.step-icon {
+    font-size: 2rem;
+}
+
+/* Phase 9: Tier Badges */
+.tier-badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.tier-plus {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+    color: white;
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.3);
+}
+
+.tier-pro {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: white;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+}
+
+.tier-badge i {
+    font-size: 0.7rem;
+}
+
+/* BETA Section Styles */
+.beta-counter-card {
+    background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
+    border-radius: 16px;
+    border: 2px solid #10b981;
+}
+
+.beta-progress-ring {
+    position: relative;
+    display: inline-block;
+}
+
+.beta-count-number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #10b981;
+    line-height: 1;
+}
+
+.beta-count-total {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #6b7280;
+    line-height: 1;
+}
+
+.beta-faq .accordion-button {
+    font-weight: 600;
+    color: #1f2937 !important;
+    padding: 1rem 1.25rem;
+}
+
+.beta-faq .accordion-button.collapsed {
+    color: #1f2937 !important;
+}
+
+.beta-faq .accordion-button:not(.collapsed) {
+    background-color: #10b981;
+    color: #1f2937 !important;
+}
+
+.beta-faq .accordion-button:not(.collapsed) .fas {
+    color: #10b981 !important;
+}
+
+.beta-faq .accordion-button.collapsed .fas {
+    color: #10b981 !important;
+}
+
+.beta-faq .accordion-body {
+    padding: 1rem 1.25rem;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+/* Link Hover Effects */
+.hover-link {
+    transition: all 0.2s ease;
+}
+
+.hover-link:hover {
+    color: #8B5CF6 !important;
+    transform: translateX(3px);
+}

@@ -4,7 +4,7 @@
 {% block title %}Adaugă Serviciu - Bricli{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/service-form-enhanced.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/services/add_craftsman_service.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -31,7 +31,7 @@
                 <div class="card-body">
                     <form id="serviceForm" method="post">
                         {% csrf_token %}
-                        
+
                         <div class="mb-4">
                             <label for="{{ form.service.id_for_label }}" class="form-label">
                                 <i class="fas fa-tools me-2"></i>Serviciu *
@@ -169,49 +169,5 @@
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const serviceSelect = document.getElementById('{{ form.service.id_for_label }}');
-    const priceFromInput = document.getElementById('{{ form.price_from.id_for_label }}');
-    const priceToInput = document.getElementById('{{ form.price_to.id_for_label }}');
-    const priceUnitInput = document.getElementById('{{ form.price_unit.id_for_label }}');
-    
-    const previewService = document.getElementById('preview-service');
-    const previewCategory = document.getElementById('preview-category');
-    const previewPrice = document.getElementById('preview-price');
-    const previewUnit = document.getElementById('preview-unit');
-    
-    function updatePreview() {
-        // Update service name and category
-        if (serviceSelect.selectedIndex > 0) {
-            const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
-            previewService.textContent = selectedOption.text;
-            // You might need to add data attributes to options for category
-        }
-        
-        // Update price
-        const priceFrom = priceFromInput.value;
-        const priceTo = priceToInput.value;
-        const unit = priceUnitInput.value;
-        
-        let priceText = 'Preț la cerere';
-        if (priceFrom && priceTo) {
-            priceText = `${priceFrom} - ${priceTo} RON`;
-        } else if (priceFrom) {
-            priceText = `De la ${priceFrom} RON`;
-        } else if (priceTo) {
-            priceText = `Până la ${priceTo} RON`;
-        }
-        
-        previewPrice.textContent = priceText;
-        previewUnit.textContent = unit ? `/ ${unit}` : '';
-    }
-    
-    // Add event listeners
-    serviceSelect.addEventListener('change', updatePreview);
-    priceFromInput.addEventListener('input', updatePreview);
-    priceToInput.addEventListener('input', updatePreview);
-    priceUnitInput.addEventListener('input', updatePreview);
-});
-</script>
+<script src="{% static 'js/pages/services/add_craftsman_service.js' %}"></script>
 {% endblock %}

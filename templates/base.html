@@ -55,7 +55,7 @@
     <!-- Preload critical CSS -->
     {% preload_css 'css/style.css' %}
     {% preload_css 'css/custom.css' %}
-    
+
     <!-- Load CSS files -->
     {% static_css 'css/style.css' %}
     {% static_css 'css/custom.css' %}
@@ -87,7 +87,7 @@
             {% endif %}
                 <i class="fas fa-hammer me-2"></i>Bricli
             </a>
-            
+
             <!-- Mobile User Info & Toggle -->
             <div class="d-flex align-items-center d-lg-none">
                 {% if user.is_authenticated %}
@@ -394,28 +394,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </div>
-        <script>
-        // Remember dismissal for 7 days using localStorage
-        document.addEventListener('DOMContentLoaded', function() {
-            const banner = document.getElementById('beta-banner');
-            const closeBtn = banner?.querySelector('.btn-close');
-
-            // Check if banner was dismissed recently
-            const dismissedTime = localStorage.getItem('beta_banner_dismissed');
-            if (dismissedTime) {
-                const daysSince = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24);
-                if (daysSince < 7) {
-                    // Still within 7 days - hide banner
-                    banner.remove();
-                }
-            }
-
-            // Save dismissal time when close button clicked
-            closeBtn?.addEventListener('click', function() {
-                localStorage.setItem('beta_banner_dismissed', Date.now().toString());
-            });
-        });
-        </script>
+        <script src="{% static 'js/core/beta-banner.js' %}"></script>
         {% endif %}
 
         {% include "partials/messages.html" %}
@@ -441,7 +420,7 @@
                         <a href="#" class="text-light me-3"><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Pentru clienți</h6>
                     <ul class="list-unstyled">
@@ -452,7 +431,7 @@
                         <li><a href="{% url 'core:how_it_works' %}" class="text-light text-decoration-none">Cum funcționează</a></li>
                     </ul>
                 </div>
-                
+
                 {% if user.user_type != 'craftsman' %}
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Pentru meșteri</h6>
@@ -463,7 +442,7 @@
                     </ul>
                 </div>
                 {% endif %}
-                
+
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Companie</h6>
                     <ul class="list-unstyled">
@@ -472,7 +451,7 @@
                         <li><a href="{% url 'core:faq' %}" class="text-light text-decoration-none">Întrebări frecvente</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Suport</h6>
                     <ul class="list-unstyled">

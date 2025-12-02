@@ -1,0 +1,695 @@
+/* Violet Gradient Header */
+.quote-header {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    color: white;
+    padding: 2.5rem 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+}
+
+.quote-header h1 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.quote-header p {
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+/* Order Summary Card */
+.order-summary-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: none;
+}
+
+.order-summary-card h6 {
+    color: #1f2937;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.order-summary-card .order-title {
+    color: #8B5CF6;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.order-info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    color: #4b5563;
+}
+
+.order-info-item i {
+    color: #8B5CF6;
+    width: 20px;
+    margin-right: 0.75rem;
+}
+
+.budget-display {
+    color: #8B5CF6;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.urgency-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.urgency-low {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.urgency-medium {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.urgency-high {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Tips Section */
+.tips-card {
+    background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%);
+    border-left: 4px solid #8B5CF6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.tips-card h6 {
+    color: #5B21B6;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.tips-card h6 i {
+    margin-right: 0.5rem;
+}
+
+.tip-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 0.75rem;
+}
+
+.tip-item:last-child {
+    margin-bottom: 0;
+}
+
+.tip-icon {
+    background: #8B5CF6;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+}
+
+.tip-content {
+    flex: 1;
+}
+
+.tip-content strong {
+    display: block;
+    color: #5B21B6;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.tip-content small {
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+/* Form Container */
+.form-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    border: none;
+}
+
+.form-container h5 {
+    color: #1f2937;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-container h5 i {
+    color: #8B5CF6;
+    margin-right: 0.75rem;
+}
+
+.form-label {
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-label i {
+    color: #8B5CF6;
+    margin-right: 0.5rem;
+}
+
+.form-control,
+.form-select {
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #8B5CF6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.form-control-lg {
+    padding: 1rem 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.price-input-wrapper {
+    position: relative;
+}
+
+.price-currency {
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8B5CF6;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.form-text {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.char-counter {
+    text-align: right;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Submit Button */
+.btn-submit-quote {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    border: none;
+    color: white;
+    padding: 1rem 3rem;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    width: 100%;
+    max-width: 400px;
+}
+
+.btn-submit-quote:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+    color: white;
+}
+
+.btn-submit-quote:active {
+    transform: translateY(0);
+}
+
+.btn-back {
+    background: white;
+    border: 2px solid #8B5CF6;
+    color: #8B5CF6;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: #8B5CF6;
+    color: white;
+}
+
+/* Duration Input Group - Inline Layout */
+.duration-input-group {
+    display: flex;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+.duration-number {
+    flex: 1;
+    min-width: 0;
+    /* Allow flex shrink */
+}
+
+.duration-unit-select {
+    flex: 1;
+    min-width: 0;
+}
+
+.duration-input,
+.duration-unit {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.duration-input:focus,
+.duration-unit:focus {
+    border-color: #8B5CF6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    outline: none;
+}
+
+/* Flatpickr Custom Purple Theme */
+.flatpickr-calendar {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3) !important;
+    border: 2px solid #8B5CF6 !important;
+}
+
+.flatpickr-months {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-current-month .numInputWrapper input {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.flatpickr-prev-month,
+.flatpickr-next-month {
+    fill: white !important;
+}
+
+.flatpickr-prev-month:hover,
+.flatpickr-next-month:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.flatpickr-weekdays {
+    background: #F3E8FF;
+}
+
+.flatpickr-weekday {
+    color: #5B21B6 !important;
+    font-weight: 700 !important;
+}
+
+.flatpickr-day {
+    color: #374151 !important;
+    border-radius: 8px !important;
+}
+
+.flatpickr-day:hover:not(.flatpickr-disabled) {
+    background: #F3E8FF !important;
+    color: #8B5CF6 !important;
+    border-color: #8B5CF6 !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover {
+    background: #8B5CF6 !important;
+    border-color: #8B5CF6 !important;
+    color: white !important;
+}
+
+.flatpickr-day.today {
+    border-color: #8B5CF6 !important;
+    color: #8B5CF6 !important;
+    font-weight: 700 !important;
+}
+
+.flatpickr-day.today:hover {
+    background: #8B5CF6 !important;
+    color: white !important;
+}
+
+/* Date input with calendar icon */
+#id_proposed_start_date {
+    padding-right: 3rem !important;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%238B5CF6' viewBox='0 0 24 24'%3E%3Cpath d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.5rem;
+}
+
+/* Flatpickr Mobile Optimization */
+@media (max-width: 768px) {
+
+    /* Scale calendar for mobile screens */
+    .flatpickr-calendar {
+        max-width: calc(100vw - 2rem) !important;
+        font-size: 14px !important;
+    }
+
+    /* Larger touch targets for days */
+    .flatpickr-day {
+        max-height: 40px !important;
+        line-height: 40px !important;
+        font-size: 14px !important;
+    }
+
+    /* Larger navigation arrows */
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        padding: 12px !important;
+    }
+
+    .flatpickr-prev-month svg,
+    .flatpickr-next-month svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    /* Month/year dropdowns easier to tap */
+    .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .flatpickr-current-month .numInputWrapper {
+        padding: 6px 8px !important;
+        font-size: 14px !important;
+    }
+
+    /* Weekday headers */
+    .flatpickr-weekday {
+        font-size: 12px !important;
+    }
+
+    /* Calendar input with larger icon on mobile */
+    #id_proposed_start_date {
+        background-size: 1.75rem !important;
+    }
+}
+
+/* Mobile Responsiveness - Complete Optimization */
+@media (max-width: 768px) {
+
+    /* Header */
+    .quote-header {
+        padding: 1.5rem 0;
+    }
+
+    .quote-header h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .quote-header p {
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .btn-back {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        min-width: 44px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Cards */
+    .form-container {
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .order-summary-card {
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .tips-card {
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    /* Form inputs - Larger touch targets */
+    .form-control,
+    .form-select {
+        font-size: 16px !important;
+        /* Prevent zoom on iOS */
+        padding: 0.875rem 1rem;
+        min-height: 48px;
+    }
+
+    .form-control-lg {
+        font-size: 1.125rem !important;
+        padding: 1rem 1.25rem;
+        min-height: 56px;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        font-size: 16px !important;
+    }
+
+    /* Duration inputs - Larger for mobile */
+    .duration-input,
+    .duration-unit {
+        font-size: 16px !important;
+        padding: 0.875rem 1rem;
+        min-height: 48px;
+    }
+
+    /* Submit button */
+    .btn-submit-quote {
+        width: 100%;
+        max-width: none;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        min-height: 56px;
+    }
+
+    /* Order info items - Better spacing */
+    .order-info-item {
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .order-title {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Tips card - Compact on mobile */
+    .tip-item {
+        margin-bottom: 0.875rem;
+        gap: 0.5rem;
+    }
+
+    .tip-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+
+    .tip-content strong {
+        font-size: 0.875rem;
+    }
+
+    .tip-content small {
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+
+    /* Budget display */
+    .budget-display {
+        font-size: 1.1rem;
+    }
+
+    .urgency-badge {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.75rem;
+    }
+
+    /* Price currency indicator */
+    .price-currency {
+        font-size: 1.1rem;
+        right: 1rem;
+    }
+
+    /* Form labels with icons */
+    .form-label {
+        font-size: 0.9rem;
+    }
+
+    .form-label i {
+        font-size: 0.85rem;
+    }
+
+    /* Character counter */
+    .char-counter {
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile: Stack duration fields vertically on very small screens */
+@media (max-width: 480px) {
+    .quote-header h1 {
+        font-size: 1.25rem;
+    }
+
+    .quote-header p {
+        font-size: 0.8rem;
+    }
+
+    .duration-input-group {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .duration-number,
+    .duration-unit-select {
+        width: 100%;
+    }
+
+    /* Form container - Less padding on tiny screens */
+    .form-container,
+    .order-summary-card,
+    .tips-card {
+        padding: 1rem;
+    }
+
+    /* Compact tips on very small screens */
+    .tips-card h6 {
+        font-size: 0.95rem;
+    }
+
+    .tip-content strong {
+        font-size: 0.825rem;
+    }
+
+    .tip-content small {
+        font-size: 0.75rem;
+    }
+}
+
+/* Expand/Collapse Button for Description */
+.btn-expand-description {
+    background: none;
+    border: none;
+    color: #8B5CF6;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 0.5rem;
+}
+
+.btn-expand-description:hover {
+    color: #7C3AED;
+    text-decoration: underline;
+}
+
+/* Mobile: Buton touchable min 44x44px */
+@media (max-width: 768px) {
+    .btn-expand-description {
+        display: block;
+        margin-top: 0.5rem;
+        margin-left: 0;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+        background: #F3E8FF;
+        border-radius: 8px;
+    }
+}
+
+/* Smooth expand/collapse animation */
+#order-description-full {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+    }
+
+    to {
+        opacity: 1;
+        max-height: 500px;
+    }
+}
+
+/* Error Styling */
+.text-danger {
+    color: #dc2626 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.is-invalid {
+    border-color: #dc2626 !important;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-container,
+.tips-card,
+.order-summary-card {
+    animation: fadeInUp 0.5s ease-out;
+}

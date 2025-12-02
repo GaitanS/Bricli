@@ -8,7 +8,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container py-4 notification-detail-container"
+     data-notification-id="{{ notification.id }}"
+     data-auto-mark-read="{% if not notification.is_read %}true{% else %}false{% endif %}"
+     data-list-url="{% url 'notifications:list' %}">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
             <!-- Breadcrumb -->
@@ -60,7 +63,7 @@
                                 </span>
                             </div>
                         </div>
-                        
+
                         <!-- Action buttons -->
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-outline-secondary btn-sm toggle-read-btn"
@@ -81,14 +84,14 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="card-body">
                     <!-- Notification content -->
                     <div class="notification-content mb-4">
                         <div class="message-content">
                             {{ notification.message|linebreaks }}
                         </div>
-                        
+
                         {% if notification.data %}
                             <div class="additional-data mt-4">
                                 <h6 class="text-muted mb-3">Informații suplimentare</h6>
@@ -124,7 +127,7 @@
                             </div>
                         {% endif %}
                     </div>
-                    
+
                     <!-- Action URL -->
                     {% if notification.action_url %}
                         <div class="action-section">
@@ -138,7 +141,7 @@
                         </div>
                     {% endif %}
                 </div>
-                
+
                 <div class="card-footer bg-light">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="text-muted small">
@@ -150,7 +153,7 @@
                                 Necitită
                             {% endif %}
                         </div>
-                        
+
                         <div>
                             <a href="{% url 'notifications:list' %}" class="btn btn-outline-secondary btn-sm">
                                 <i class="fas fa-arrow-left me-1"></i>
@@ -160,7 +163,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Related notifications -->
             {% if related_notifications %}
                 <div class="card shadow-sm mt-4">
@@ -173,7 +176,7 @@
                     <div class="card-body">
                         <div class="list-group list-group-flush">
                             {% for related in related_notifications %}
-                                <a href="{% url 'notifications:detail' related.pk %}" 
+                                <a href="{% url 'notifications:detail' related.pk %}"
                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
                                     <div class="flex-grow-1">
                                         <h6 class="mb-1">
@@ -213,96 +216,5 @@
 
 {% block extra_js %}
 <script src="{% static 'js/notifications.js' %}"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize notification manager
-    const notificationManager = new NotificationManager();
-    
-    // Mark as read when viewing (if not already read)
-    {% if not notification.is_read %}
-        notificationManager.toggleReadStatus({{ notification.id }}, true);
-    {% endif %}
-    
-    // Toggle read status
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.toggle-read-btn')) {
-            const btn = e.target.closest('.toggle-read-btn');
-            const notificationId = btn.dataset.notificationId;
-            const isRead = btn.dataset.isRead === 'true';
-            
-            notificationManager.toggleReadStatus(notificationId, !isRead)
-                .then(() => {
-                    // Update button state
-                    btn.dataset.isRead = (!isRead).toString();
-                    const icon = btn.querySelector('i');
-                    
-                    if (!isRead) {
-                        icon.className = 'fas fa-envelope';
-                        btn.title = 'Marchează ca necitită';
-                        showToast('Notificarea a fost marcată ca citită.', 'success');
-                    } else {
-                        icon.className = 'fas fa-envelope-open';
-                        btn.title = 'Marchează ca citită';
-                        showToast('Notificarea a fost marcată ca necitită.', 'info');
-                    }
-                });
-        }
-    });
-    
-    // Delete notification
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.delete-btn')) {
-            const btn = e.target.closest('.delete-btn');
-            const notificationId = btn.dataset.notificationId;
-            
-            if (confirm('Sigur doriți să ștergeți această notificare?')) {
-                notificationManager.deleteNotification(notificationId)
-                    .then(() => {
-                        showToast('Notificarea a fost ștearsă.', 'success');
-                        // Redirect to notifications list after 2 seconds
-                        setTimeout(() => {
-                            window.location.href = "{% url 'notifications:list' %}";
-                        }, 2000);
-                    });
-            }
-        }
-    });
-    
-    // Expandable content functionality
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('expand-btn')) {
-            const container = e.target.closest('.expandable-content');
-            const preview = container.querySelector('.content-preview');
-            const full = container.querySelector('.content-full');
-            
-            preview.classList.add('d-none');
-            full.classList.remove('d-none');
-        }
-        
-        if (e.target.classList.contains('collapse-btn')) {
-            const container = e.target.closest('.expandable-content');
-            const preview = container.querySelector('.content-preview');
-            const full = container.querySelector('.content-full');
-            
-            full.classList.add('d-none');
-            preview.classList.remove('d-none');
-        }
-    });
-});
-
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('notification-toast');
-    const toastBody = toast.querySelector('.toast-body');
-    
-    // Update toast content
-    toastBody.textContent = message;
-    
-    // Update toast style based on type
-    toast.className = `toast bg-${type === 'error' ? 'danger' : type} text-white`;
-    
-    // Show toast
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
-}
-</script>
+<script src="{% static 'js/pages/notifications/notification_detail.js' %}"></script>
 {% endblock %}

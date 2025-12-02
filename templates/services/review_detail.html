@@ -231,15 +231,6 @@
 <!-- Load Lightbox Script -->
 {% if review_images %}
 <script src="{% static 'js/lightbox.js' %}"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Review Images Lightbox Initialization
-    BricliLightbox.init('.review-image-thumbnail', {
-        title: 'Imagini Recenzie',
-        showCaption: true,
-        initGuardKey: 'reviewImagesLightboxInit'
-    });
-});
-</script>
+<script src="{% static 'js/pages/services/review_detail.js' %}"></script>
 {% endif %}
 {% endblock %}

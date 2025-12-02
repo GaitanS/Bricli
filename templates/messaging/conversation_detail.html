@@ -15,23 +15,23 @@
                 </a>
                 <div class="d-flex align-items-center">
                     {% if other_participant.user_type == 'craftsman' and other_participant.craftsman_profile and other_participant.craftsman_profile.profile_photo %}
-                        <img src="{{ other_participant.craftsman_profile.profile_photo.url }}?v={% image_version other_participant.craftsman_profile.profile_photo fallback_dt=other_participant.craftsman_profile.updated_at %}" 
-                             class="rounded-circle me-3" 
-                             width="50" height="50" 
+                        <img src="{{ other_participant.craftsman_profile.profile_photo.url }}?v={% image_version other_participant.craftsman_profile.profile_photo fallback_dt=other_participant.craftsman_profile.updated_at %}"
+                             class="rounded-circle me-3"
+                             width="50" height="50"
                              alt="{{ other_participant.get_full_name|default:'Utilizator' }}"
                              loading="lazy"
                              style="object-fit: cover;">
                     {% elif other_participant.profile_picture %}
-                        <img src="{{ other_participant.profile_picture.url }}?v={% profile_img_version other_participant %}" 
-                             class="rounded-circle me-3" 
-                             width="50" height="50" 
+                        <img src="{{ other_participant.profile_picture.url }}?v={% profile_img_version other_participant %}"
+                             class="rounded-circle me-3"
+                             width="50" height="50"
                              alt="{{ other_participant.get_full_name|default:'Utilizator' }}"
                              loading="lazy"
                              style="object-fit: cover;">
                     {% else %}
-                        <img src="{% static 'images/avatar.svg' %}" 
-                             class="rounded-circle me-3" 
-                             width="50" height="50" 
+                        <img src="{% static 'images/avatar.svg' %}"
+                             class="rounded-circle me-3"
+                             width="50" height="50"
                              alt="{{ other_participant.get_full_name|default:'Utilizator' }}"
                              loading="lazy"
                              style="object-fit: cover;">
@@ -50,7 +50,7 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-0">
-                    <div class="messages-container" style="max-height: 500px; overflow-y: auto;">
+                    <div class="messages-container" style="max-height: 500px; overflow-y: auto;" data-mark-read-url="{% url 'messaging:mark_conversation_read' conversation.pk %}">
                         {% for message in messages %}
                         <div class="message-item p-4 {% if message.sender == user %}sent{% else %}received{% endif %} {% if not forloop.last %}border-bottom{% endif %}">
                             <div class="d-flex {% if message.sender == user %}justify-content-end{% endif %}">
@@ -95,7 +95,7 @@
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="message" class="form-label">Răspunsul tău</label>
-                            <textarea class="form-control" id="message" name="message" rows="4" 
+                            <textarea class="form-control" id="message" name="message" rows="4"
                                       placeholder="Scrie răspunsul tău aici..." required></textarea>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
@@ -114,46 +114,7 @@
     </div>
 </div>
 
-<style>
-.message-item.sent {
-    background-color: #f8f9fa;
-}
+<link rel="stylesheet" href="{% static 'css/pages/messaging/conversation_detail.css' %}">
 
-.message-item.received {
-    background-color: #ffffff;
-}
-
-.messages-container {
-    padding: 0;
-}
-
-.message-content {
-    word-wrap: break-word;
-}
-
-@media (max-width: 768px) {
-    .message-content {
-        max-width: 90% !important;
-    }
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Scroll to bottom of messages
-    const messagesContainer = document.querySelector('.messages-container');
-    if (messagesContainer) {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-    
-    // Mark conversation as read
-    fetch("{% url 'messaging:mark_conversation_read' conversation.pk %}", {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            'Content-Type': 'application/json',
-        },
-    });
-});
-</script>
+<script src="{% static 'js/pages/messaging/conversation_detail.js' %}"></script>
 {% endblock %}

@@ -6,74 +6,7 @@
 
 {% block extra_css %}
 <link href="{% static 'css/custom.css' %}" rel="stylesheet">
-<style>
-.invite-header {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    color: white;
-    padding: 2rem 0;
-    margin-bottom: 2rem;
-}
-
-.craftsman-card {
-    border: 1px solid #e9ecef;
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.craftsman-card:hover {
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
-}
-
-.craftsman-card.selected {
-    border-color: #8B5CF6;
-    background-color: rgba(139, 92, 246, 0.1);
-}
-
-.craftsman-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.rating-stars {
-    color: #ffc107;
-}
-
-.btn-invite {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    border: none;
-    color: white;
-    padding: 1rem 3rem;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-}
-
-.btn-invite:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
-    color: white;
-}
-
-.btn-invite:disabled {
-    background: #6c757d;
-    transform: none;
-    box-shadow: none;
-}
-
-.order-summary {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-}
-</style>
+<link href="{% static 'css/pages/services/invite_craftsmen.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -101,7 +34,7 @@
         <h5 class="mb-3">
             <i class="fas fa-info-circle text-primary me-2"></i>Rezumat Comandă
         </h5>
-        
+
         <div class="row">
             <div class="col-md-8">
                 <h6 class="text-primary">{{ order.title }}</h6>
@@ -133,7 +66,7 @@
                 </small>
             </div>
         </div>
-        
+
         {% if invited_count > 0 %}
         <div class="mt-3 p-2 bg-info bg-opacity-10 border border-info rounded">
             <i class="fas fa-info-circle text-info me-2"></i>
@@ -158,38 +91,38 @@
             {% if craftsmen %}
                 <form method="post" id="invite-form">
                     {% csrf_token %}
-                    
+
                     {% for craftsman in craftsmen %}
                     <div class="craftsman-card" data-craftsman-id="{{ craftsman.user.id }}">
                         <div class="d-flex align-items-center">
                             <div class="form-check me-3">
-                                <input class="form-check-input craftsman-checkbox" 
-                                       type="checkbox" 
-                                       name="craftsman_ids" 
-                                       value="{{ craftsman.user.id }}" 
+                                <input class="form-check-input craftsman-checkbox"
+                                       type="checkbox"
+                                       name="craftsman_ids"
+                                       value="{{ craftsman.user.id }}"
                                        id="craftsman_{{ craftsman.user.id }}">
                             </div>
-                            
+
                             {% if craftsman.profile_photo %}
-                                <img src="{{ craftsman.profile_photo.url }}?v={% image_version craftsman.profile_photo fallback_dt=craftsman.updated_at %}" 
-                                     alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}" 
+                                <img src="{{ craftsman.profile_photo.url }}?v={% image_version craftsman.profile_photo fallback_dt=craftsman.updated_at %}"
+                                     alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}"
                                      class="craftsman-avatar me-3" loading="lazy" style="object-fit: cover;">
                             {% elif craftsman.user.profile_picture %}
-                                <img src="{{ craftsman.user.profile_picture.url }}?v={% profile_img_version craftsman.user %}" 
-                                     alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}" 
+                                <img src="{{ craftsman.user.profile_picture.url }}?v={% profile_img_version craftsman.user %}"
+                                     alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}"
                                      class="craftsman-avatar me-3" loading="lazy" style="object-fit: cover;">
                             {% else %}
-                                <img src="{% static 'images/avatar.svg' %}" 
-                                     alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}" 
+                                <img src="{% static 'images/avatar.svg' %}"
+                                     alt="{{ craftsman.user.get_full_name|default:craftsman.user.username }}"
                                      class="craftsman-avatar me-3" loading="lazy" style="object-fit: cover;">
                             {% endif %}
-                            
+
                             <div class="flex-grow-1">
                                 <h6 class="mb-1">{{ craftsman.user.get_full_name|default:craftsman.user.username }}</h6>
                                 {% if craftsman.company_name %}
                                     <p class="text-muted mb-1">{{ craftsman.company_name }}</p>
                                 {% endif %}
-                                
+
                                 <div class="d-flex align-items-center mb-2">
                                     {% if craftsman.average_rating > 0 %}
                                         <div class="rating-stars me-3">
@@ -203,18 +136,18 @@
                                             <span class="ms-1">{{ craftsman.average_rating|floatformat:1 }}</span>
                                         </div>
                                     {% endif %}
-                                    
+
                                     <small class="text-muted">
-                                        {{ craftsman.total_reviews }} recenzii • 
+                                        {{ craftsman.total_reviews }} recenzii •
                                         {{ craftsman.experience_years }} ani experiență
                                     </small>
                                 </div>
-                                
+
                                 {% if craftsman.description %}
                                     <p class="text-muted mb-0">{{ craftsman.description|truncatewords:20 }}</p>
                                 {% endif %}
                             </div>
-                            
+
                             <div class="text-end">
                                 {% if craftsman.city %}
                                     <small class="text-muted">{{ craftsman.city.name }}</small>
@@ -226,7 +159,7 @@
                         </div>
                     </div>
                     {% endfor %}
-                    
+
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-invite" id="invite-btn" disabled>
                             <i class="fas fa-paper-plane me-2"></i>
@@ -239,13 +172,13 @@
                     <i class="fas fa-users fa-3x text-muted mb-3"></i>
                     <h5 class="text-muted">Nu sunt meșteri disponibili</h5>
                     <p class="text-muted">
-                        Nu am găsit meșteri disponibili pentru această categorie în zona ta, 
+                        Nu am găsit meșteri disponibili pentru această categorie în zona ta,
                         sau toți meșterii au fost deja invitați sau au ofertat.
                     </p>
                 </div>
             {% endif %}
         </div>
-        
+
         <!-- Sidebar -->
         <div class="col-lg-4">
             <div class="card shadow-sm">
@@ -254,7 +187,7 @@
                         <i class="fas fa-lightbulb text-warning me-2"></i>
                         Sfaturi pentru Invitații
                     </h6>
-                    
+
                     <ul class="list-unstyled">
                         <li class="mb-2">
                             <i class="fas fa-check text-success me-2"></i>
@@ -275,14 +208,14 @@
                     </ul>
                 </div>
             </div>
-            
+
             <div class="card shadow-sm mt-4">
                 <div class="card-body">
                     <h6 class="card-title">
                         <i class="fas fa-info-circle text-info me-2"></i>
                         Cum Funcționează
                     </h6>
-                    
+
                     <ol class="small">
                         <li>Selectezi meșterii pe care vrei să îi inviți</li>
                         <li>Ei primesc o notificare cu detaliile comenzii</li>
@@ -298,53 +231,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const checkboxes = document.querySelectorAll('.craftsman-checkbox');
-    const inviteBtn = document.getElementById('invite-btn');
-    const selectedCount = document.getElementById('selected-count');
-    const craftsmanCards = document.querySelectorAll('.craftsman-card');
-    
-    // Handle card clicks
-    craftsmanCards.forEach(card => {
-        card.addEventListener('click', function(e) {
-            if (e.target.type !== 'checkbox') {
-                const checkbox = this.querySelector('.craftsman-checkbox');
-                checkbox.checked = !checkbox.checked;
-                updateSelection();
-            }
-        });
-    });
-    
-    // Handle checkbox changes
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateSelection);
-    });
-    
-    function updateSelection() {
-        const selected = document.querySelectorAll('.craftsman-checkbox:checked');
-        const count = selected.length;
-        
-        selectedCount.textContent = count;
-        inviteBtn.disabled = count === 0;
-        
-        // Update card styles
-        craftsmanCards.forEach(card => {
-            const checkbox = card.querySelector('.craftsman-checkbox');
-            if (checkbox.checked) {
-                card.classList.add('selected');
-            } else {
-                card.classList.remove('selected');
-            }
-        });
-        
-        // Update button text
-        if (count > 0) {
-            inviteBtn.innerHTML = `<i class="fas fa-paper-plane me-2"></i>Invită ${count} Meșteri`;
-        } else {
-            inviteBtn.innerHTML = `<i class="fas fa-paper-plane me-2"></i>Trimite Invitații`;
-        }
-    }
-});
-</script>
+<script src="{% static 'js/pages/services/invite_craftsmen.js' %}"></script>
 {% endblock %}

@@ -7,149 +7,7 @@
 
 {% block extra_css %}
 <link href="{% static 'css/custom.css' %}" rel="stylesheet">
-<style>
-.edit-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 2rem 0;
-    margin-bottom: 2rem;
-}
-
-.form-container {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    padding: 2rem;
-}
-
-.form-section {
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.form-section:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.section-title {
-    color: #495057;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #8B5CF6;
-    display: inline-block;
-}
-
-.btn-update {
-    background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%);
-    border: none;
-    color: white;
-    padding: 1rem 3rem;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-}
-
-.btn-update:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
-    color: white;
-}
-
-.budget-inputs {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.budget-separator {
-    font-weight: bold;
-    color: #6c757d;
-}
-
-.urgency-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-top: 0.5rem;
-}
-
-.urgency-option {
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
-    padding: 1rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.urgency-option:hover {
-    border-color: #8B5CF6;
-    background-color: #f8f9fa;
-}
-
-.urgency-option.selected {
-    border-color: #8B5CF6;
-    background-color: rgba(139, 92, 246, 0.1);
-}
-
-.urgency-option input[type="radio"] {
-    display: none;
-}
-
-.urgency-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-.urgency-low .urgency-icon { color: #28a745; }
-.urgency-medium .urgency-icon { color: #ffc107; }
-.urgency-high .urgency-icon { color: #fd7e14; }
-.urgency-urgent .urgency-icon { color: #dc3545; }
-
-.order-preview {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.preview-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.preview-item:last-child {
-    border-bottom: none;
-}
-
-.location-selects {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-@media (max-width: 768px) {
-    .location-selects {
-        grid-template-columns: 1fr;
-    }
-    
-    .budget-inputs {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .urgency-options {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
+<link href="{% static 'css/pages/services/edit_order.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -177,13 +35,13 @@
             <div class="form-container">
                 <form method="post" id="editOrderForm">
                     {% csrf_token %}
-                    
+
                     <!-- Basic Information -->
                     <div class="form-section">
                         <h5 class="section-title">
                             <i class="fas fa-info-circle me-2"></i>Informații de Bază
                         </h5>
-                        
+
                         <div class="mb-3">
                             <label for="id_title" class="form-label">
                                 <strong>Titlul Comenzii *</strong>
@@ -193,21 +51,21 @@
                                 <div class="text-danger mt-1">{{ form.title.errors }}</div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="id_description" class="form-label">
                                 <strong>Descrierea Detaliată *</strong>
                             </label>
                             {{ form.description|add_class:"form-control" }}
                             <small class="form-text text-muted">
-                                Descrie în detaliu lucrarea de care ai nevoie. Cu cât mai multe detalii, 
+                                Descrie în detaliu lucrarea de care ai nevoie. Cu cât mai multe detalii,
                                 cu atât mai precise vor fi ofertele primite.
                             </small>
                             {% if form.description.errors %}
                                 <div class="text-danger mt-1">{{ form.description.errors }}</div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="id_service" class="form-label">
                                 <strong>Categoria și Serviciul *</strong>
@@ -224,7 +82,7 @@
                         <h5 class="section-title">
                             <i class="fas fa-map-marker-alt me-2"></i>Locația Lucrării
                         </h5>
-                        
+
                         <div class="location-selects mb-3">
                             <div>
                                 <label for="id_county" class="form-label">
@@ -235,7 +93,7 @@
                                     <div class="text-danger mt-1">{{ form.county.errors }}</div>
                                 {% endif %}
                             </div>
-                            
+
                             <div>
                                 <label for="id_city" class="form-label">
                                     <strong>Orașul *</strong>
@@ -246,7 +104,7 @@
                                 {% endif %}
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="id_address" class="form-label">
                                 <strong>Adresa (Opțional)</strong>
@@ -266,7 +124,7 @@
                         <h5 class="section-title">
                             <i class="fas fa-euro-sign me-2"></i>Buget și Timp
                         </h5>
-                        
+
                         <div class="mb-4">
                             <label class="form-label">
                                 <strong>Bugetul Estimat (RON)</strong>
@@ -286,7 +144,7 @@
                                 Poți completa doar una dintre valori sau ambele pentru un interval.
                             </small>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">
                                 <strong>Când ai nevoie de această lucrare? *</strong>
@@ -294,7 +152,7 @@
                             <div class="urgency-options">
                                 {% for value, label in form.urgency.field.choices %}
                                 <div class="urgency-option urgency-{{ value }} {% if form.urgency.value == value %}selected{% endif %}">
-                                    <input type="radio" name="urgency" value="{{ value }}" id="urgency_{{ value }}" 
+                                    <input type="radio" name="urgency" value="{{ value }}" id="urgency_{{ value }}"
                                            {% if form.urgency.value == value %}checked{% endif %}>
                                     <div class="urgency-icon">
                                         {% if value == 'low' %}<i class="fas fa-leaf"></i>
@@ -312,7 +170,7 @@
                                 <div class="text-danger mt-2">{{ form.urgency.errors }}</div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="id_preferred_date" class="form-label">
                                 <strong>Data Preferată (Opțional)</strong>
@@ -345,22 +203,22 @@
                     <i class="fas fa-eye text-primary me-2"></i>
                     Previzualizare Comandă
                 </h6>
-                
+
                 <div class="preview-item">
                     <strong>Status:</strong>
                     <span class="badge bg-secondary">{{ order.get_status_display }}</span>
                 </div>
-                
+
                 <div class="preview-item">
                     <strong>Creată:</strong>
                     <span>{{ order.created_at|date:"d F Y" }}</span>
                 </div>
-                
+
                 <div class="preview-item">
                     <strong>Oferte primite:</strong>
                     <span class="badge bg-info">{{ order.quotes.count }}</span>
                 </div>
-                
+
                 {% if order.quotes.count > 0 %}
                 <div class="mt-3">
                     <small class="text-warning">
@@ -379,7 +237,7 @@
                         Ai nevoie de ajutor?
                     </h6>
                     <p class="card-text">
-                        Dacă ai întrebări despre editarea comenzii sau despre procesul de primire a ofertelor, 
+                        Dacă ai întrebări despre editarea comenzii sau despre procesul de primire a ofertelor,
                         nu ezita să ne contactezi.
                     </p>
                     <a href="{% url 'core:contact' %}" class="btn btn-outline-info btn-sm">
@@ -393,90 +251,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle urgency selection
-    const urgencyOptions = document.querySelectorAll('.urgency-option');
-    urgencyOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            // Remove selected class from all options
-            urgencyOptions.forEach(opt => opt.classList.remove('selected'));
-            
-            // Add selected class to clicked option
-            this.classList.add('selected');
-            
-            // Check the radio button
-            const radio = this.querySelector('input[type="radio"]');
-            if (radio) {
-                radio.checked = true;
-            }
-        });
-    });
-    
-    // Auto-resize description textarea
-    const descriptionTextarea = document.getElementById('id_description');
-    if (descriptionTextarea) {
-        descriptionTextarea.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        });
-        
-        // Initial resize
-        descriptionTextarea.style.height = 'auto';
-        descriptionTextarea.style.height = (descriptionTextarea.scrollHeight) + 'px';
-    }
-    
-    // Handle county/city dependency
-    const countySelect = document.getElementById('id_county');
-    const citySelect = document.getElementById('id_city');
-    
-    if (countySelect && citySelect) {
-        countySelect.addEventListener('change', function() {
-            const countyId = this.value;
-            
-            // Clear city options
-            citySelect.innerHTML = '<option value="">Selectează orașul</option>';
-            
-            if (countyId) {
-                // Fetch cities for selected county
-                fetch(`/api/cities/${countyId}/`)
-                    .then(response => response.json())
-                    .then(cities => {
-                        cities.forEach(city => {
-                            const option = document.createElement('option');
-                            option.value = city.id;
-                            option.textContent = city.name;
-                            citySelect.appendChild(option);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error fetching cities:', error);
-                    });
-            }
-        });
-    }
-    
-    // Format budget inputs
-    const budgetInputs = document.querySelectorAll('#id_budget_min, #id_budget_max');
-    budgetInputs.forEach(input => {
-        input.addEventListener('input', function(e) {
-            // Remove non-numeric characters except decimal point
-            let value = e.target.value.replace(/[^\d.]/g, '');
-            
-            // Ensure only one decimal point
-            const parts = value.split('.');
-            if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
-            }
-            
-            // Limit decimal places to 2
-            if (parts[1] && parts[1].length > 2) {
-                value = parts[0] + '.' + parts[1].substring(0, 2);
-            }
-            
-            e.target.value = value;
-        });
-    });
-});
-</script>
+<script src="{% static 'js/pages/services/edit_order.js' %}"></script>
 {% endblock %}

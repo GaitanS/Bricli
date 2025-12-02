@@ -1,0 +1,21 @@
+.message-item.sent {
+    background-color: #f8f9fa;
+}
+
+.message-item.received {
+    background-color: #ffffff;
+}
+
+.messages-container {
+    padding: 0;
+}
+
+.message-content {
+    word-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+    .message-content {
+        max-width: 90% !important;
+    }
+}

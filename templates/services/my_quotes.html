@@ -4,8 +4,7 @@
 {% block title %}Ofertele mele - Bricli{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/my-quotes-pro.css' %}">
-<link rel="stylesheet" href="{% static 'css/my-quotes-kid-friendly.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/services/my_quotes.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -643,33 +642,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<style>
-/* Purple theme for nav pills */
-.nav-pills .nav-link.active {
-    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
-    color: white !important;
-}
-
-.nav-pills .nav-link:hover:not(.active) {
-    background-color: rgba(139, 92, 246, 0.1) !important;
-    color: #8B5CF6 !important;
-}
-
-.nav-pills .nav-link {
-    color: #6B7280;
-    transition: all 0.3s ease;
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle tab switching
-    const tabs = document.querySelectorAll('#quoteTabs button[data-bs-toggle="tab"]');
-    tabs.forEach(tab => {
-        tab.addEventListener('shown.bs.tab', function(event) {
-            // Optional: analytics tracking or URL updates
-        });
-    });
-});
-</script>
+<script src="{% static 'js/pages/services/my_quotes.js' %}"></script>
 {% endblock %}
