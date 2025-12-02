@@ -10,6 +10,7 @@ urlpatterns = [
     path("comenzi/", views.OrdersRedirectView.as_view(), name="orders_redirect"),
 
     path("categorii/", views.ServiceCategoryListView.as_view(), name="categories"),
+    path("cautare/", views.ServiceSearchView.as_view(), name="search"),
     path("categorii/<slug:slug>/", views.ServiceCategoryDetailView.as_view(), name="category_detail"),
     path("comanda/creare/", views.CreateOrderView.as_view(), name="create_order"),
     path("comanda/<int:pk>/", views.OrderDetailView.as_view(), name="order_detail"),

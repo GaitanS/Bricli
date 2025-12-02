@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rezultate căutare: {{ query }} - Bricli{% endblock %}
+
+{% block content %}
+<section class="py-6 bg-light">
+    <div class="container">
+        <div class="mb-5">
+            <h1 class="display-5 fw-bold mb-3">Rezultate pentru "{{ query }}"</h1>
+            <p class="lead text-muted">
+                {% if results %}
+                    Am găsit {{ results.count }} categorii care se potrivesc căutării tale.
+                {% else %}
+                    Nu am găsit rezultate pentru această căutare.
+                {% endif %}
+            </p>
+        </div>
+
+        {% if results %}
+        <div class="row g-4">
+            {% for category in results %}
+            <div class="col-md-6 col-lg-4">
+                <a href="{{ category.get_absolute_url }}" class="text-decoration-none">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas
+                            {% if category.slug == 'constructii' %}fa-hard-hat
+                            {% elif category.slug == 'instalatii' %}fa-tools
+                            {% elif category.slug == 'electrice' %}fa-bolt
+                            {% elif category.slug == 'amenajari' %}fa-paint-roller
+                            {% elif category.slug == 'curatenie' %}fa-broom
+                            {% elif category.slug == 'gradinarit' %}fa-leaf
+                            {% elif category.slug == 'auto' %}fa-car
+                            {% elif category.slug == 'electrocasnice' %}fa-plug
+                            {% else %}fa-hammer{% endif %}"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">{{ category.name }}</h3>
+                        <p class="text-muted mb-4">{{ category.description|truncatewords:15 }}</p>
+                        <div class="mt-auto text-accent fw-bold">
+                            Vezi Servicii <i class="fas fa-arrow-right ms-2"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-search fa-3x text-muted opacity-50"></i>
+            </div>
+            <h3 class="h4 fw-bold mb-3">Nu am găsit ce cauți?</h3>
+            <p class="text-muted mb-4">Încearcă să cauți folosind alți termeni sau explorează toate categoriile.</p>
+            <a href="{% url 'services:categories' %}" class="btn btn-outline-primary">Vezi Toate Categoriile</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

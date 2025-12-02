@@ -21,6 +21,12 @@
     <meta name="twitter:title" content="{% block twitter_title %}Bricli - Găsește meșteri verificați{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}Platformă pentru găsirea meșterilor verificați în România{% endblock %}">
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+
+    <!-- Custom CSS with Cache Busting -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2025">
+
     {% block extra_head %}{% endblock %}
 
     <!-- Schema.org LocalBusiness Markup -->
@@ -77,6 +83,11 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="spinner-premium"></div>
+    </div>
+
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
@@ -380,18 +391,21 @@
     <main style="margin-top: 76px;">
         <!-- BETA Banner (Global - All Pages) -->
         {% if not SUBSCRIPTIONS_ENABLED %}
-        <div class="container mt-3">
-            <div id="beta-banner" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-left: 4px solid #10b981;">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-rocket fa-2x me-3 text-success"></i>
-                    <div class="flex-grow-1">
-                        <h6 class="alert-heading mb-1 fw-bold">🎉 Bricli BETA - 100% Gratuit!</h6>
-                        <small class="mb-0">
-                            Primii <strong>100 meseriași</strong> din România beneficiază de acces gratuit nelimitat. Fără taxe ascunse!
-                        </small>
+        <div class="container mt-3 reveal-on-scroll">
+            <div id="beta-banner" class="alert border-0 shadow-lg text-white position-relative overflow-hidden" role="alert" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 16px;">
+                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 40%); pointer-events: none;"></div>
+                <div class="d-flex align-items-center position-relative z-1">
+                    <div class="rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.1); width: 48px; height: 48px;">
+                        <i class="fas fa-rocket text-warning" style="font-size: 1.2rem;"></i>
                     </div>
+                    <div class="flex-grow-1">
+                        <h6 class="alert-heading mb-1 fw-bold" style="font-family: 'Outfit', sans-serif;">Bricli BETA 2025</h6>
+                        <p class="mb-0 text-white-50 small">
+                            Acces gratuit nelimitat pentru primii <strong>100 meșteri</strong>. Fără comisioane.
+                        </p>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </div>
         <script src="{% static 'js/core/beta-banner.js' %}"></script>
@@ -543,5 +557,40 @@
     {% endif %}
 
     {% block extra_js %}{% endblock %}
+
+    <!-- Custom Scripts -->
+    <script>
+        // Preloader
+        window.addEventListener('load', function() {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                setTimeout(() => {
+                    preloader.style.opacity = '0';
+                    preloader.style.visibility = 'hidden';
+                }, 500); // Small delay to ensure smooth transition
+            }
+        });
+
+        // Scroll Reveal
+        document.addEventListener('DOMContentLoaded', function() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Only animate once
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
 </body>
 </html>

@@ -100,6 +100,36 @@ class ServiceCategoryListView(ListView):
         return context
 
 
+class ServiceSearchView(ListView):
+    """
+    Search view for services and categories.
+    """
+    model = ServiceCategory
+    template_name = "services/search_results.html"
+    context_object_name = "results"
+
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+        if not query:
+            return ServiceCategory.objects.none()
+
+        from django.db.models import Q
+        from .models import Service
+
+        # Search in categories and services
+        return ServiceCategory.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(services__name__icontains=query) |
+            Q(services__description__icontains=query)
+        ).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["query"] = self.request.GET.get("q", "")
+        return context
+
+
 class ServiceCategoryDetailView(DetailView):
     model = ServiceCategory
     template_name = "services/category_detail.html"
