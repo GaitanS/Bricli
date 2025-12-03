@@ -23,582 +23,171 @@
 {% endblock %}
 
 {% block content %}
-<!-- Modern Blog Post Design -->
-<article class="blog-post-modern">
-    <!-- Breadcrumbs - Compact pentru mobile -->
-    <div class="breadcrumb-wrapper">
-        <div class="container">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 py-3">
-                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Acasă</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'blog:post_list' %}">Articole</a></li>
-                    {% if post.category %}
-                    <li class="breadcrumb-item"><a href="{{ post.category.get_absolute_url }}">{{ post.category.name }}</a></li>
-                    {% endif %}
-                </ol>
-            </nav>
+<!-- Hero Section -->
+<section class="hero-2025" style="min-height: 40vh; padding-top: 120px; padding-bottom: 60px;">
+    <!-- Glows -->
+    <div class="glow-point" style="top: -50%; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);"></div>
+
+    <div class="container position-relative z-2 text-center">
+        {% if post.category %}
+        <div class="mb-3">
+            <a href="{{ post.category.get_absolute_url }}" class="badge bg-primary text-white border border-primary border-opacity-25 text-decoration-none rounded-pill px-3 py-2">
+                {% if post.category.icon %}<i class="{{ post.category.icon }} me-2"></i>{% endif %}
+                {{ post.category.name }}
+            </a>
         </div>
-    </div>
+        {% endif %}
 
-    <!-- Article Header - Full Width Background -->
-    <div class="article-header">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10 col-xl-8">
-                    {% if post.category %}
-                    <div class="category-badge mb-3">
-                        <span class="badge-custom">
-                            {% if post.category.icon %}<i class="{{ post.category.icon }} me-2"></i>{% endif %}
-                            {{ post.category.name }}
-                        </span>
-                    </div>
-                    {% endif %}
+        <h1 class="display-4 fw-bold mb-4 text-white">{{ post.title }}</h1>
 
-                    <h1 class="article-title">{{ post.title }}</h1>
-
-                    <div class="article-meta">
-                        <div class="meta-item">
-                            <i class="far fa-calendar"></i>
-                            <span>{{ post.published_at|date:"d M Y" }}</span>
-                        </div>
-                        <div class="meta-divider">•</div>
-                        <div class="meta-item">
-                            <i class="far fa-clock"></i>
-                            <span>{{ post.read_time_minutes }} min citire</span>
-                        </div>
-                        <div class="meta-divider">•</div>
-                        <div class="meta-item">
-                            <i class="far fa-eye"></i>
-                            <span>{{ post.views_count }} vizualizări</span>
-                        </div>
-                    </div>
-
-                    {% if post.excerpt %}
-                    <p class="article-excerpt">{{ post.excerpt }}</p>
-                    {% endif %}
-                </div>
+        <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 text-white opacity-75 small">
+            <div class="d-flex align-items-center">
+                <i class="far fa-calendar me-2"></i>
+                <span>{{ post.published_at|date:"d M Y" }}</span>
+            </div>
+            <div class="d-none d-md-block">•</div>
+            <div class="d-flex align-items-center">
+                <i class="far fa-clock me-2"></i>
+                <span>{{ post.read_time_minutes }} min citire</span>
+            </div>
+            <div class="d-none d-md-block">•</div>
+            <div class="d-flex align-items-center">
+                <i class="far fa-eye me-2"></i>
+                <span>{{ post.views_count }} vizualizări</span>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Main Content Area -->
-    <div class="article-body">
-        <div class="container">
-            <div class="row justify-content-center">
+<div class="container position-relative z-2 pb-5" style="margin-top: -40px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card-premium p-4 p-md-5">
+                <!-- Featured Image -->
+                {% if post.featured_image %}
+                <div class="rounded-4 overflow-hidden mb-5 shadow-lg border border-white border-opacity-10">
+                    <img src="{{ post.featured_image.url }}"
+                         alt="{{ post.featured_image_alt|default:post.title }}"
+                         class="w-100 h-auto d-block">
+                </div>
+                {% endif %}
+
                 <!-- Article Content -->
-                <div class="col-lg-10 col-xl-8">
-                    <!-- Featured Image -->
-                    {% if post.featured_image %}
-                    <div class="featured-image-wrapper mb-5">
-                        <img src="{{ post.featured_image.url }}"
-                             alt="{{ post.featured_image_alt|default:post.title }}"
-                             class="featured-image">
-                    </div>
+                <div class="article-content text-white">
+                    {% if post.excerpt %}
+                    <p class="lead text-white mb-5 fw-medium">{{ post.excerpt }}</p>
                     {% endif %}
 
-                    <!-- Article Content -->
-                    <div class="prose">
+                    <div class="prose-dark">
                         {{ post.content|safe }}
                     </div>
+                </div>
 
-                    <!-- Tags -->
-                    {% if post.tags.exists %}
-                    <div class="tags-section">
-                        <h6 class="tags-title"><i class="fas fa-tags me-2"></i>Etichete:</h6>
-                        <div class="tags-list">
-                            {% for tag in post.tags.all %}
-                            <a href="{{ tag.get_absolute_url }}" class="tag-badge">{{ tag.name }}</a>
-                            {% endfor %}
-                        </div>
+                <!-- Tags -->
+                {% if post.tags.exists %}
+                <div class="mt-5 pt-4 border-top border-white border-opacity-10">
+                    <h6 class="text-white fw-bold mb-3"><i class="fas fa-tags me-2 text-accent"></i>Etichete:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tag in post.tags.all %}
+                        <a href="{{ tag.get_absolute_url }}" class="badge bg-white bg-opacity-10 text-white text-decoration-none hover-bg-accent transition-colors border border-white border-opacity-10 py-2 px-3">
+                            {{ tag.name }}
+                        </a>
+                        {% endfor %}
                     </div>
-                    {% endif %}
+                </div>
+                {% endif %}
 
-                    <!-- Share Section -->
-                    <div class="share-section">
-                        <h6 class="share-title">Distribuie articolul:</h6>
-                        <div class="share-buttons">
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
-                               target="_blank" class="share-btn share-facebook">
-                                <i class="fab fa-facebook-f"></i>
-                                <span>Facebook</span>
-                            </a>
-                            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.title|urlencode }}"
-                               target="_blank" class="share-btn share-twitter">
-                                <i class="fab fa-twitter"></i>
-                                <span>Twitter</span>
-                            </a>
-                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}"
-                               target="_blank" class="share-btn share-linkedin">
-                                <i class="fab fa-linkedin-in"></i>
-                                <span>LinkedIn</span>
-                            </a>
-                            <a href="https://wa.me/?text={{ post.title|urlencode }}%20{{ request.build_absolute_uri }}"
-                               target="_blank" class="share-btn share-whatsapp">
-                                <i class="fab fa-whatsapp"></i>
-                                <span>WhatsApp</span>
-                            </a>
-                        </div>
+                <!-- Share Section -->
+                <div class="mt-5 p-4 bg-white bg-opacity-5 rounded-3 border border-white border-opacity-10">
+                    <h6 class="text-white fw-bold mb-3">Distribuie articolul:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="btn btn-outline-light btn-sm">
+                            <i class="fab fa-facebook-f me-2"></i>Facebook
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.title|urlencode }}" target="_blank" class="btn btn-outline-light btn-sm">
+                            <i class="fab fa-twitter me-2"></i>Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank" class="btn btn-outline-light btn-sm">
+                            <i class="fab fa-linkedin-in me-2"></i>LinkedIn
+                        </a>
+                        <a href="https://wa.me/?text={{ post.title|urlencode }}%20{{ request.build_absolute_uri }}" target="_blank" class="btn btn-outline-light btn-sm">
+                            <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                        </a>
                     </div>
+                </div>
 
-                    <!-- CTA Box - Mobile Optimized -->
-                    <div class="cta-box">
-                        <div class="cta-content">
-                            <h3 class="cta-title">Cauți un meșter profesionist?</h3>
-                            <p class="cta-text">Postează gratuit cererea ta și primește oferte personalizate de la meșteri verificați din zona ta în 24 de ore.</p>
-                            <a href="{% url 'services:create_order' %}" class="cta-button">
-                                <i class="fas fa-plus me-2"></i>Postează comanda gratuită
-                            </a>
-                        </div>
+                <!-- CTA Box -->
+                <div class="mt-5 p-5 text-center rounded-4 position-relative overflow-hidden" style="background: linear-gradient(135deg, var(--accent-violet) 0%, var(--accent-cyan) 100%);">
+                    <div class="position-relative z-2">
+                        <h3 class="fw-bold text-white mb-3">Cauți un meșter profesionist?</h3>
+                        <p class="text-white opacity-90 mb-4">Postează gratuit cererea ta și primește oferte personalizate de la meșteri verificați din zona ta.</p>
+                        <a href="{% url 'services:create_order' %}" class="btn btn-light text-primary fw-bold rounded-pill px-4 py-2 shadow-sm">
+                            <i class="fas fa-plus me-2"></i>Postează comanda gratuită
+                        </a>
                     </div>
-
-                    <!-- Related Posts -->
-                    {% if related_posts %}
-                    <div class="related-posts">
-                        <h3 class="related-title">Articole similare</h3>
-                        <div class="related-grid">
-                            {% for related_post in related_posts %}
-                            <a href="{{ related_post.get_absolute_url }}" class="related-card">
-                                {% if related_post.featured_image %}
-                                <div class="related-image">
-                                    <img src="{{ related_post.featured_image.url }}" alt="{{ related_post.title }}">
-                                </div>
-                                {% endif %}
-                                <div class="related-content">
-                                    <h6 class="related-card-title">{{ related_post.title }}</h6>
-                                    <p class="related-excerpt">{{ related_post.excerpt|truncatewords:15 }}</p>
-                                    <div class="related-meta">
-                                        <span><i class="far fa-clock"></i> {{ related_post.read_time_minutes }} min</span>
-                                    </div>
-                                </div>
-                            </a>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
+
+            <!-- Related Posts -->
+            {% if related_posts %}
+            <div class="mt-5">
+                <h3 class="text-white fw-bold mb-4">Articole similare</h3>
+                <div class="row g-4">
+                    {% for related_post in related_posts %}
+                    <div class="col-md-6">
+                        <div class="card-premium h-100 p-0 overflow-hidden hover-scale transition-all">
+                            {% if related_post.featured_image %}
+                            <a href="{{ related_post.get_absolute_url }}" class="d-block position-relative overflow-hidden" style="height: 200px;">
+                                <img src="{{ related_post.featured_image.url }}" alt="{{ related_post.title }}" class="w-100 h-100 object-fit-cover transition-transform">
+                            </a>
+                            {% endif %}
+                            <div class="p-4">
+                                <h5 class="card-title mb-2">
+                                    <a href="{{ related_post.get_absolute_url }}" class="text-white text-decoration-none hover-text-accent fw-bold">
+                                        {{ related_post.title }}
+                                    </a>
+                                </h5>
+                                <p class="small text-white opacity-75 mb-0">{{ related_post.excerpt|truncatewords:15 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
-</article>
+</div>
 
 <style>
-/* Modern Blog Post Styles - Mobile First */
-
-/* Breadcrumb Wrapper */
-.breadcrumb-wrapper {
-    background: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.breadcrumb {
-    font-size: 0.875rem;
-}
-
-.breadcrumb-item + .breadcrumb-item::before {
-    content: "›";
-    font-size: 1.2rem;
-}
-
-/* Article Header */
-.article-header {
-    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
-    color: white;
-    padding: 2rem 0 3rem;
-    position: relative;
-}
-
-.category-badge {
-    margin-bottom: 1rem;
-}
-
-.badge-custom {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.article-title {
-    font-size: 1.75rem;
-    font-weight: 800;
-    line-height: 1.3;
-    margin-bottom: 1.5rem;
-    color: white;
-}
-
-.article-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 1.5rem;
-}
-
-.meta-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.meta-divider {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.article-excerpt {
-    font-size: 1.125rem;
-    line-height: 1.7;
-    color: rgba(255, 255, 255, 0.95);
-    margin: 0;
-}
-
-/* Article Body */
-.article-body {
-    background: white;
-    padding: 2rem 0;
-}
-
-.featured-image-wrapper {
-    margin-top: -3rem;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-}
-
-.featured-image {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-/* Prose - Content Styling */
-.prose {
-    font-size: 1.0625rem;
-    line-height: 1.8;
-    color: #374151;
-}
-
-.prose h2 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-top: 3rem;
-    margin-bottom: 1.25rem;
-    color: #1f2937;
-    line-height: 1.3;
-}
-
-.prose h3 {
-    font-size: 1.375rem;
-    font-weight: 700;
-    margin-top: 2.5rem;
-    margin-bottom: 1rem;
-    color: #374151;
-}
-
-.prose h4 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
-    color: #4b5563;
-}
-
-.prose p {
-    margin-bottom: 1.5rem;
-}
-
-.prose strong {
-    font-weight: 700;
-    color: #1f2937;
-}
-
-.prose ul, .prose ol {
-    margin-bottom: 1.5rem;
-    padding-left: 1.5rem;
-}
-
-.prose li {
-    margin-bottom: 0.75rem;
-    line-height: 1.7;
-}
-
-.prose ul li::marker {
-    color: #8B5CF6;
-}
-
-/* Tags Section */
-.tags-section {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 2px solid #e5e7eb;
-}
-
-.tags-title {
-    font-size: 0.875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #6b7280;
-    margin-bottom: 1rem;
-    letter-spacing: 0.05em;
-}
-
-.tags-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.tag-badge {
-    display: inline-block;
-    background: #f3f4f6;
-    color: #374151;
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.tag-badge:hover {
-    background: #8B5CF6;
-    color: white;
-    transform: translateY(-2px);
-}
-
-/* Share Section */
-.share-section {
-    margin-top: 2.5rem;
-    padding: 2rem;
-    background: #f9fafb;
-    border-radius: 12px;
-}
-
-.share-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #374151;
-    margin-bottom: 1rem;
-}
-
-.share-buttons {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 0.75rem;
-}
-
-.share-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-decoration: none;
-    color: white;
-    transition: all 0.2s ease;
-}
-
-.share-facebook { background: #1877f2; }
-.share-twitter { background: #1da1f2; }
-.share-linkedin { background: #0a66c2; }
-.share-whatsapp { background: #25d366; }
-
-.share-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    color: white;
-}
-
-/* CTA Box */
-.cta-box {
-    margin-top: 3rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 16px;
-    padding: 2.5rem;
-    text-align: center;
-    color: white;
-}
-
-.cta-title {
-    font-size: 1.75rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-}
-
-.cta-text {
-    font-size: 1.0625rem;
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-    color: rgba(255, 255, 255, 0.95);
-}
-
-.cta-button {
-    display: inline-block;
-    background: white;
-    color: #764ba2;
-    padding: 1rem 2rem;
-    border-radius: 50px;
-    font-size: 1rem;
-    font-weight: 700;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.cta-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-    color: #764ba2;
-}
-
-/* Related Posts */
-.related-posts {
-    margin-top: 4rem;
-}
-
-.related-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    color: #1f2937;
-}
-
-.related-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-}
-
-.related-card {
-    display: flex;
-    flex-direction: column;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    overflow: hidden;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.related-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-    border-color: #8B5CF6;
-}
-
-.related-image {
-    width: 100%;
-    height: 180px;
-    overflow: hidden;
-}
-
-.related-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.related-card:hover .related-image img {
-    transform: scale(1.05);
-}
-
-.related-content {
-    padding: 1.25rem;
-}
-
-.related-card-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 0.75rem;
-    line-height: 1.4;
-}
-
-.related-excerpt {
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin-bottom: 0.75rem;
-    line-height: 1.6;
-}
-
-.related-meta {
-    font-size: 0.8125rem;
-    color: #9ca3af;
-}
-
-/* Tablet & Desktop */
-@media (min-width: 768px) {
-    .article-title {
-        font-size: 2.5rem;
+    .prose-dark {
+        color: white;
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+    .prose-dark h2, .prose-dark h3, .prose-dark h4 {
+        color: white;
+        font-weight: 700;
+        margin-top: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .prose-dark h2 { font-size: 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
+    .prose-dark h3 { font-size: 1.5rem; color: var(--accent-cyan); }
+    .prose-dark p { margin-bottom: 1.5rem; }
+    .prose-dark ul, .prose-dark ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    .prose-dark li { margin-bottom: 0.5rem; }
+    .prose-dark strong { color: var(--accent-cyan); }
+    .prose-dark a { color: var(--accent-cyan); text-decoration: underline; }
+    .prose-dark blockquote {
+        border-left: 4px solid var(--accent-violet);
+        padding-left: 1.5rem;
+        font-style: italic;
+        color: rgba(255,255,255,0.8);
+        margin: 2rem 0;
     }
 
-    .article-excerpt {
-        font-size: 1.25rem;
-    }
-
-    .prose {
-        font-size: 1.125rem;
-    }
-
-    .prose h2 {
-        font-size: 2rem;
-    }
-
-    .prose h3 {
-        font-size: 1.5rem;
-    }
-
-    .share-buttons {
-        grid-template-columns: repeat(4, 1fr);
-    }
-
-    .related-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    }
-
-    .cta-box {
-        padding: 3rem;
-    }
-
-    .cta-title {
-        font-size: 2rem;
-    }
-}
-
-/* Large Desktop */
-@media (min-width: 1024px) {
-    .article-header {
-        padding: 3rem 0 4rem;
-    }
-
-    .article-body {
-        padding: 3rem 0;
-    }
-
-    .featured-image-wrapper {
-        margin-top: -4rem;
-    }
-}
-
-/* Print Styles */
-@media print {
-    .breadcrumb-wrapper,
-    .share-section,
-    .cta-box,
-    .related-posts {
-        display: none;
-    }
-}
+    .hover-scale:hover img { transform: scale(1.05); }
+    .hover-bg-accent:hover { background-color: var(--accent-violet) !important; border-color: var(--accent-violet) !important; }
+    .hover-text-accent:hover { color: var(--accent-cyan) !important; }
 </style>
 {% endblock %}

@@ -6,59 +6,158 @@
 {% block extra_css %}
     {% load static %}
     <link href="{% static 'css/pages/services/create_order.css' %}" rel="stylesheet">
+    <style>
+        /* Dark Premium Overrides for Create Order Page */
+        .step-wizard .step .step-number {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .step-wizard .step.active .step-number {
+            background: var(--accent-violet);
+            border-color: var(--accent-violet);
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+        }
+        .step-wizard .step.completed .step-number {
+            background: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            color: black;
+        }
+        .step-wizard .step .step-title {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .step-wizard .step.active .step-title {
+            color: white;
+        }
+        .step-wizard .step:not(:last-child)::after {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Cards */
+        .category-card, .urgency-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .category-card:hover, .urgency-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-violet);
+            color: white;
+        }
+        .category-card.selected, .urgency-card.selected {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: var(--accent-violet);
+            color: white;
+        }
+        .category-card i {
+            color: var(--accent-cyan);
+        }
+        .category-card small, .urgency-card small {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        /* Form Elements */
+        .form-control, .form-select {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(0, 0, 0, 0.4);
+            border-color: var(--accent-violet);
+            color: white;
+            box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
+        }
+        .form-label {
+            color: white;
+        }
+        .form-text {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Photo Upload */
+        .photo-upload-container {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .photo-upload-area:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-violet);
+        }
+        .photo-preview-item {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Alerts */
+        .alert-info {
+            background-color: rgba(13, 202, 240, 0.15);
+            border-color: rgba(13, 202, 240, 0.3);
+            color: #fff;
+        }
+
+        /* Summary */
+        .card.bg-light {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            {% if is_quote_request and craftsman %}
-            <!-- Quote Request Header -->
-            <div class="alert alert-info mb-4">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h5 class="mb-1">
-                            <i class="fas fa-handshake me-2"></i>Solicitare ofertă de la {{ craftsman.user.get_full_name|default:craftsman.user.username }}
-                        </h5>
-                        <p class="mb-0">Completează formularul pentru a solicita o ofertă personalizată de la acest meșter.</p>
-                    </div>
-                    <div class="col-md-4 text-md-end">
-                        <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-arrow-left me-2"></i>Înapoi la profil
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
+<section class="hero-2025" style="min-height: 100vh; padding-top: 100px; padding-bottom: 60px;">
+    <!-- Glows -->
+    <div class="glow-point" style="top: 10%; left: 10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);"></div>
+    <div class="glow-point" style="bottom: 10%; right: 10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);"></div>
 
-            <!-- Step Wizard -->
-            <div class="step-wizard">
-                <div class="step active" data-step="1">
-                    <div class="step-number">1</div>
-                    <div class="step-title">Categorie</div>
-                </div>
-                <div class="step" data-step="2">
-                    <div class="step-number">2</div>
-                    <div class="step-title">Locație</div>
-                </div>
-                <div class="step" data-step="3">
-                    <div class="step-number">3</div>
-                    <div class="step-title">Detalii</div>
-                </div>
-                <div class="step" data-step="4">
-                    <div class="step-number">4</div>
-                    <div class="step-title">{% if not is_authenticated %}Contact{% else %}Buget{% endif %}</div>
-                </div>
-                {% if not is_authenticated %}
-                <div class="step" data-step="5">
-                    <div class="step-number">5</div>
-                    <div class="step-title">Finalizare</div>
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                {% if is_quote_request and craftsman %}
+                <!-- Quote Request Header -->
+                <div class="alert alert-info mb-4 border-0 shadow-sm backdrop-blur">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="mb-1 fw-bold">
+                                <i class="fas fa-handshake me-2"></i>Solicitare ofertă de la {{ craftsman.user.get_full_name|default:craftsman.user.username }}
+                            </h5>
+                            <p class="mb-0 opacity-75">Completează formularul pentru a solicita o ofertă personalizată de la acest meșter.</p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{% url 'accounts:craftsman_detail' craftsman.pk %}" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-arrow-left me-2"></i>Înapoi la profil
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 {% endif %}
-            </div>
 
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-4">
+                <!-- Step Wizard -->
+                <div class="step-wizard mb-5">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Categorie</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Locație</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Detalii</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-title">{% if not is_authenticated %}Contact{% else %}Buget{% endif %}</div>
+                    </div>
+                    {% if not is_authenticated %}
+                    <div class="step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-title">Finalizare</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-premium p-4 p-md-5">
                     <form method="post" id="orderForm" class="needs-live-validate" novalidate>
                         {% csrf_token %}
 
@@ -66,9 +165,9 @@
                         <div class="step-content active" id="step-1">
                             {% if is_quote_request and craftsman_services %}
                                 <!-- For craftsman quote requests, show services directly -->
-                                <div class="text-center mb-4">
-                                    <h3 class="fw-bold">Ce serviciu dorești de la {{ craftsman.user.get_full_name|default:craftsman.user.username }}?</h3>
-                                    <p class="text-muted">Selectează din serviciile oferite de acest meșter</p>
+                                <div class="text-center mb-5">
+                                    <h3 class="fw-bold text-white mb-2">Ce serviciu dorești de la {{ craftsman.user.get_full_name|default:craftsman.user.username }}?</h3>
+                                    <p class="text-white opacity-75">Selectează din serviciile oferite de acest meșter</p>
                                 </div>
 
                                 <div class="category-grid" id="craftsman-services-grid">
@@ -84,9 +183,9 @@
                                 <!-- For general orders, show category → service flow -->
                                 <!-- Step 1a: Category Selection -->
                                 <div id="category-selection">
-                                    <div class="text-center mb-4">
-                                        <h3 class="fw-bold">Ce categorie de serviciu cauți?</h3>
-                                        <p class="text-muted">Selectează categoria care se potrivește nevoilor tale</p>
+                                    <div class="text-center mb-5">
+                                        <h3 class="fw-bold text-white mb-2">Ce categorie de serviciu cauți?</h3>
+                                        <p class="text-white opacity-75">Selectează categoria care se potrivește nevoilor tale</p>
                                     </div>
 
                                     <div class="category-grid" id="categories-grid">
@@ -101,12 +200,12 @@
 
                                 <!-- Step 1b: Service Selection (hidden initially) -->
                                 <div id="service-selection" style="display: none;">
-                                    <div class="text-center mb-4">
-                                        <button type="button" class="btn btn-link text-decoration-none" id="backToCategoriesBtn">
+                                    <div class="text-center mb-5">
+                                        <button type="button" class="btn btn-link text-white text-decoration-none mb-3 opacity-75 hover-opacity-100" id="backToCategoriesBtn">
                                             <i class="fas fa-arrow-left me-2"></i>Înapoi la categorii
                                         </button>
-                                        <h3 class="fw-bold mt-2" id="selected-category-title">Selectează serviciul</h3>
-                                        <p class="text-muted">Alege serviciul specific de care ai nevoie</p>
+                                        <h3 class="fw-bold text-white mb-2" id="selected-category-title">Selectează serviciul</h3>
+                                        <p class="text-white opacity-75">Alege serviciul specific de care ai nevoie</p>
                                     </div>
 
                                     <div class="category-grid" id="services-grid">
@@ -115,8 +214,8 @@
                                 </div>
                             {% endif %}
 
-                            <div class="d-flex justify-content-end mt-4">
-                                <button type="button" class="btn btn-primary btn-lg" id="step1Next" disabled>
+                            <div class="d-flex justify-content-end mt-5">
+                                <button type="button" class="btn btn-primary btn-lg rounded-pill px-5" id="step1Next" disabled>
                                     Continuă <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
@@ -124,9 +223,9 @@
 
                         <!-- Step 2: Location -->
                         <div class="step-content" id="step-2">
-                            <div class="text-center mb-4">
-                                <h3 class="fw-bold">Unde este localizată lucrarea?</h3>
-                                <p class="text-muted">Selectează județul și orașul pentru a găsi meșteri din zona ta</p>
+                            <div class="text-center mb-5">
+                                <h3 class="fw-bold text-white mb-2">Unde este localizată lucrarea?</h3>
+                                <p class="text-white opacity-75">Selectează județul și orașul pentru a găsi meșteri din zona ta</p>
                             </div>
 
                             <div class="location-selector">
@@ -148,11 +247,11 @@
                                 <div class="form-text">Adresa exactă unde va avea loc lucrarea (strada, numărul, etajul, etc.)</div>
                             </div>
 
-                            <div class="d-flex justify-content-between mt-4">
-                                <button type="button" class="btn btn-outline-secondary btn-lg" id="step2Prev">
+                            <div class="d-flex justify-content-between mt-5">
+                                <button type="button" class="btn btn-outline-light btn-lg rounded-pill px-4" id="step2Prev">
                                     <i class="fas fa-arrow-left me-2"></i>Înapoi
                                 </button>
-                                <button type="button" class="btn btn-primary btn-lg" id="step2Next" disabled>
+                                <button type="button" class="btn btn-primary btn-lg rounded-pill px-5" id="step2Next" disabled>
                                     Continuă <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
@@ -160,9 +259,9 @@
 
                         <!-- Step 3: Details -->
                         <div class="step-content" id="step-3">
-                            <div class="text-center mb-4">
-                                <h3 class="fw-bold">Descrie lucrarea în detaliu</h3>
-                                <p class="text-muted">Cu cât mai multe detalii oferi, cu atât ofertele vor fi mai precise</p>
+                            <div class="text-center mb-5">
+                                <h3 class="fw-bold text-white mb-2">Descrie lucrarea în detaliu</h3>
+                                <p class="text-white opacity-75">Cu cât mai multe detalii oferi, cu atât ofertele vor fi mai precise</p>
                             </div>
 
                             <div class="mb-4">
@@ -198,13 +297,11 @@
                                 </div>
                             </div>
 
-
-
                             <div class="mb-4">
                                 <label for="{{ form.preferred_date.id_for_label }}" class="form-label fw-semibold">Data preferată (opțional)</label>
                                 <div class="input-group">
                                     {{ form.preferred_date }}
-                                    <span class="input-group-text">
+                                    <span class="input-group-text bg-dark border-secondary text-white">
                                         <i class="fas fa-calendar-alt"></i>
                                     </span>
                                 </div>
@@ -217,9 +314,9 @@
                                 <div class="photo-upload-container">
                                     <div class="photo-upload-area" id="photo-upload-area">
                                         <div class="upload-placeholder">
-                                            <i class="fas fa-camera fs-1 text-muted mb-3"></i>
-                                            <h6 class="text-muted">Adaugă poze pentru o estimare mai precisă</h6>
-                                            <p class="text-muted small mb-3">Poți adăuga până la 10 poze (JPG, PNG, max 5MB fiecare)</p>
+                                            <i class="fas fa-camera fs-1 text-white opacity-50 mb-3"></i>
+                                            <h6 class="text-white opacity-75">Adaugă poze pentru o estimare mai precisă</h6>
+                                            <p class="text-white opacity-50 small mb-3">Poți adăuga până la 10 poze (JPG, PNG, max 5MB fiecare)</p>
                                             <button type="button" class="btn btn-outline-primary" id="add-photos-btn">
                                                 <i class="fas fa-plus me-2"></i>Adaugă poze
                                             </button>
@@ -234,11 +331,11 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-between mt-4">
-                                <button type="button" class="btn btn-outline-secondary btn-lg" id="step3Prev">
+                            <div class="d-flex justify-content-between mt-5">
+                                <button type="button" class="btn btn-outline-light btn-lg rounded-pill px-4" id="step3Prev">
                                     <i class="fas fa-arrow-left me-2"></i>Înapoi
                                 </button>
-                                <button type="button" class="btn btn-primary btn-lg" id="step3Next" disabled>
+                                <button type="button" class="btn btn-primary btn-lg rounded-pill px-5" id="step3Next" disabled>
                                     Continuă <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
@@ -247,9 +344,9 @@
                         <!-- Step 4: Authentication (Anonymous Users Only) -->
                         {% if not is_authenticated %}
                         <div class="step-content" id="step-4">
-                            <div class="text-center mb-4">
-                                <h3 class="fw-bold">Detalii de Contact</h3>
-                                <p class="text-muted">Introdu datele tale pentru a continua</p>
+                            <div class="text-center mb-5">
+                                <h3 class="fw-bold text-white mb-2">Detalii de Contact</h3>
+                                <p class="text-white opacity-75">Introdu datele tale pentru a continua</p>
                             </div>
 
                             <div class="alert alert-info" id="existing-user-alert" style="display: none;">
@@ -325,11 +422,11 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-between mt-4">
-                                <button type="button" class="btn btn-outline-secondary btn-lg" id="step4Prev">
+                            <div class="d-flex justify-content-between mt-5">
+                                <button type="button" class="btn btn-outline-light btn-lg rounded-pill px-4" id="step4Prev">
                                     <i class="fas fa-arrow-left me-2"></i>Înapoi
                                 </button>
-                                <button type="button" class="btn btn-primary btn-lg" id="step4Next" disabled>
+                                <button type="button" class="btn btn-primary btn-lg rounded-pill px-5" id="step4Next" disabled>
                                     Continuă <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
@@ -338,9 +435,9 @@
 
                         <!-- Step 5 (or 4 for authenticated): Budget & Finalize -->
                         <div class="step-content" id="step-{% if not is_authenticated %}5{% else %}4{% endif %}">
-                            <div class="text-center mb-4">
-                                <h3 class="fw-bold">Care este bugetul tău?</h3>
-                                <p class="text-muted">Stabilește o fourchette de preț pentru a primi oferte relevante</p>
+                            <div class="text-center mb-5">
+                                <h3 class="fw-bold text-white mb-2">Care este bugetul tău?</h3>
+                                <p class="text-white opacity-75">Stabilește o fourchette de preț pentru a primi oferte relevante</p>
                             </div>
 
                             <div class="budget-range">
@@ -349,7 +446,7 @@
                                     {{ form.budget_min }}
                                 </div>
                                 <div class="text-center">
-                                    <i class="fas fa-minus text-muted"></i>
+                                    <i class="fas fa-minus text-white opacity-50"></i>
                                 </div>
                                 <div>
                                     <label for="{{ form.budget_max.id_for_label }}" class="form-label fw-semibold">Până la (RON)</label>
@@ -365,31 +462,31 @@
                             <!-- Order Summary -->
                             <div class="card bg-light mt-4">
                                 <div class="card-body">
-                                    <h5 class="fw-bold mb-3">Rezumatul comenzii</h5>
+                                    <h5 class="fw-bold mb-3 text-white">Rezumatul comenzii</h5>
                                     <div class="row">
-                                        <div class="col-sm-4"><strong>Serviciu:</strong></div>
-                                        <div class="col-sm-8" id="summary-service">-</div>
+                                        <div class="col-sm-4 text-white opacity-75"><strong>Serviciu:</strong></div>
+                                        <div class="col-sm-8 text-white" id="summary-service">-</div>
                                     </div>
                                     <div class="row mt-2">
-                                        <div class="col-sm-4"><strong>Locație:</strong></div>
-                                        <div class="col-sm-8" id="summary-location">-</div>
+                                        <div class="col-sm-4 text-white opacity-75"><strong>Locație:</strong></div>
+                                        <div class="col-sm-8 text-white" id="summary-location">-</div>
                                     </div>
                                     <div class="row mt-2">
-                                        <div class="col-sm-4"><strong>Titlu:</strong></div>
-                                        <div class="col-sm-8" id="summary-title">-</div>
+                                        <div class="col-sm-4 text-white opacity-75"><strong>Titlu:</strong></div>
+                                        <div class="col-sm-8 text-white" id="summary-title">-</div>
                                     </div>
                                     <div class="row mt-2">
-                                        <div class="col-sm-4"><strong>Urgență:</strong></div>
-                                        <div class="col-sm-8" id="summary-urgency">-</div>
+                                        <div class="col-sm-4 text-white opacity-75"><strong>Urgență:</strong></div>
+                                        <div class="col-sm-8 text-white" id="summary-urgency">-</div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-between mt-4">
-                                <button type="button" class="btn btn-outline-secondary btn-lg" id="step{% if not is_authenticated %}5{% else %}4{% endif %}Prev">
+                            <div class="d-flex justify-content-between mt-5">
+                                <button type="button" class="btn btn-outline-light btn-lg rounded-pill px-4" id="step{% if not is_authenticated %}5{% else %}4{% endif %}Prev">
                                     <i class="fas fa-arrow-left me-2"></i>Înapoi
                                 </button>
-                                <button type="submit" class="btn btn-success btn-lg">
+                                <button type="submit" class="btn btn-success btn-lg rounded-pill px-5">
                                     <i class="fas fa-check me-2"></i>Postează comanda
                                 </button>
                             </div>
@@ -403,8 +500,7 @@
             </div>
         </div>
     </div>
-</div>
-
+</section>
 {% endblock %}
 
 {% block extra_js %}

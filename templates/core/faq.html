@@ -5,30 +5,54 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="py-5 bg-gradient-primary text-white">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8 mx-auto text-center">
-                <h1 class="display-4 fw-bold mb-4">Întrebări frecvente</h1>
-                <p class="lead">
+<section class="hero-2025 position-relative overflow-hidden d-flex align-items-center justify-content-center" style="min-height: 40vh;">
+    <!-- Animated Background -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark">
+        <div class="position-absolute top-0 start-0 w-100 h-100 opacity-20"
+             style="background: radial-gradient(circle at 50% 50%, var(--accent-violet), transparent 70%);"></div>
+        <div class="position-absolute bottom-0 end-0 w-100 h-100 opacity-20"
+             style="background: radial-gradient(circle at 80% 80%, var(--accent-cyan), transparent 70%);"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="container position-relative z-2 text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-20 backdrop-blur mb-4">
+                    <span class="width-8 height-8 rounded-circle bg-accent-cyan shadow-glow-cyan"></span>
+                    <span class="text-white small fw-medium tracking-wide text-uppercase">Suport & Ajutor</span>
+                </div>
+                <h1 class="display-3 fw-bold text-white mb-4 tracking-tight">
+                    Întrebări <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-accent-violet">Frecvente</span>
+                </h1>
+                <p class="lead text-white-75 mb-0">
                     Găsește răspunsuri la cele mai comune întrebări despre platforma Bricli.
                 </p>
             </div>
         </div>
     </div>
+
+    <!-- Glow Effects -->
+    <div class="glow-point" style="top: 20%; left: 10%; width: 300px; height: 300px; background: var(--accent-violet); opacity: 0.15; filter: blur(80px);"></div>
+    <div class="glow-point" style="bottom: 20%; right: 10%; width: 250px; height: 250px; background: var(--accent-cyan); opacity: 0.15; filter: blur(60px);"></div>
 </section>
 
 <!-- Search FAQ -->
-<section class="py-4 bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6 mx-auto">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="faq-search" 
-                           placeholder="Caută în întrebări frecvente...">
-                    <button class="btn btn-primary" type="button">
-                        <i class="fas fa-search"></i>
-                    </button>
+<section class="py-5 bg-dark position-relative">
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card-premium p-1">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-transparent border-0 text-accent-cyan ps-4">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control bg-transparent border-0 text-white placeholder-white-50" id="faq-search"
+                               placeholder="Caută în întrebări frecvente..." style="box-shadow: none;">
+                        <button class="btn btn-primary rounded-pill px-4 m-1" type="button">
+                            Caută
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -36,53 +60,62 @@
 </section>
 
 <!-- FAQ Content -->
-<section class="py-5">
-    <div class="container">
-        <div class="row">
+<section class="py-5 bg-dark position-relative">
+    <div class="container position-relative z-2">
+        <div class="row g-4">
+            <!-- Sidebar -->
             <div class="col-lg-3">
                 <div class="sticky-top" style="top: 100px;">
-                    <h5 class="fw-bold mb-3">Categorii</h5>
-                    <div class="list-group">
-                        <a href="#general" class="list-group-item list-group-item-action">
-                            <i class="fas fa-info-circle me-2"></i>Informații generale
-                        </a>
-                        <a href="#clients" class="list-group-item list-group-item-action">
-                            <i class="fas fa-user me-2"></i>Pentru clienți
-                        </a>
-                        <a href="#craftsmen" class="list-group-item list-group-item-action">
-                            <i class="fas fa-hammer me-2"></i>Pentru meșteri
-                        </a>
-                        <a href="#payments" class="list-group-item list-group-item-action">
-                            <i class="fas fa-credit-card me-2"></i>Plăți și facturare
-                        </a>
-                        <a href="#safety" class="list-group-item list-group-item-action">
-                            <i class="fas fa-shield-alt me-2"></i>Siguranță
-                        </a>
+                    <div class="card-premium p-3">
+                        <h5 class="fw-bold text-white mb-3 px-3">Categorii</h5>
+                        <div class="list-group list-group-flush">
+                            <a href="#general" class="list-group-item list-group-item-action bg-transparent text-white-75 border-0 rounded px-3 py-2 mb-1 d-flex align-items-center gap-2 hover-bg-white-10">
+                                <i class="fas fa-info-circle width-20 text-center text-accent-cyan"></i>
+                                <span>Informații generale</span>
+                            </a>
+                            <a href="#clients" class="list-group-item list-group-item-action bg-transparent text-white-75 border-0 rounded px-3 py-2 mb-1 d-flex align-items-center gap-2 hover-bg-white-10">
+                                <i class="fas fa-user width-20 text-center text-accent-violet"></i>
+                                <span>Pentru clienți</span>
+                            </a>
+                            <a href="#craftsmen" class="list-group-item list-group-item-action bg-transparent text-white-75 border-0 rounded px-3 py-2 mb-1 d-flex align-items-center gap-2 hover-bg-white-10">
+                                <i class="fas fa-hammer width-20 text-center text-warning"></i>
+                                <span>Pentru meșteri</span>
+                            </a>
+                            <a href="#payments" class="list-group-item list-group-item-action bg-transparent text-white-75 border-0 rounded px-3 py-2 mb-1 d-flex align-items-center gap-2 hover-bg-white-10">
+                                <i class="fas fa-credit-card width-20 text-center text-success"></i>
+                                <span>Plăți și facturare</span>
+                            </a>
+                            <a href="#safety" class="list-group-item list-group-item-action bg-transparent text-white-75 border-0 rounded px-3 py-2 mb-1 d-flex align-items-center gap-2 hover-bg-white-10">
+                                <i class="fas fa-shield-alt width-20 text-center text-danger"></i>
+                                <span>Siguranță</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-            
+
+            <!-- Content -->
             <div class="col-lg-9">
                 <!-- Dynamic FAQ from database -->
                 {% if faqs %}
-                    <div class="accordion" id="dynamicFaqAccordion">
+                    <div class="accordion custom-accordion" id="dynamicFaqAccordion">
                         {% for faq in faqs %}
-                        <div class="accordion-item">
+                        <div class="accordion-item bg-transparent border-0 mb-3">
                             <h2 class="accordion-header" id="heading{{ forloop.counter }}">
-                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
-                                        type="button" 
-                                        data-bs-toggle="collapse" 
-                                        data-bs-target="#collapse{{ forloop.counter }}" 
-                                        aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" 
+                                <button class="accordion-button collapsed card-premium text-white"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapse{{ forloop.counter }}"
+                                        aria-expanded="false"
                                         aria-controls="collapse{{ forloop.counter }}">
                                     {{ faq.question }}
                                 </button>
                             </h2>
-                            <div id="collapse{{ forloop.counter }}" 
-                                 class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
-                                 aria-labelledby="heading{{ forloop.counter }}" 
+                            <div id="collapse{{ forloop.counter }}"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="heading{{ forloop.counter }}"
                                  data-bs-parent="#dynamicFaqAccordion">
-                                <div class="accordion-body">
+                                <div class="accordion-body text-white-75 ps-4 border-start border-accent-cyan ms-3 mt-2">
                                     {{ faq.answer|linebreaks }}
                                 </div>
                             </div>
@@ -92,53 +125,56 @@
                 {% else %}
                     <!-- Static FAQ content when no database entries -->
                     <div id="general" class="faq-section mb-5">
-                        <h2 class="fw-bold mb-4">
-                            <i class="fas fa-info-circle text-primary me-2"></i>Informații generale
-                        </h2>
-                        
-                        <div class="accordion" id="generalAccordion">
-                            <div class="accordion-item">
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="width-10 height-10 rounded-circle bg-accent-cyan shadow-glow-cyan d-flex align-items-center justify-content-center">
+                                <i class="fas fa-info-circle text-white small"></i>
+                            </div>
+                            <h2 class="h3 fw-bold text-white mb-0">Informații generale</h2>
+                        </div>
+
+                        <div class="accordion custom-accordion" id="generalAccordion">
+                            <div class="accordion-item bg-transparent border-0 mb-3">
                                 <h2 class="accordion-header">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                                    <button class="accordion-button card-premium text-white" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#general1">
                                         Ce este Bricli?
                                     </button>
                                 </h2>
                                 <div id="general1" class="accordion-collapse collapse show" data-bs-parent="#generalAccordion">
-                                    <div class="accordion-body">
-                                        Bricli este o platformă digitală care conectează clienții cu meșteri verificați din România. 
-                                        Oferim o modalitate sigură, rapidă și eficientă de a găsi specialiști pentru toate 
+                                    <div class="accordion-body text-white-75 ps-4 border-start border-accent-cyan ms-3 mt-2">
+                                        Bricli este o platformă digitală care conectează clienții cu meșteri verificați din România.
+                                        Oferim o modalitate sigură, rapidă și eficientă de a găsi specialiști pentru toate
                                         nevoile de construcții, renovări și reparații.
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="accordion-item">
+
+                            <div class="accordion-item bg-transparent border-0 mb-3">
                                 <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    <button class="accordion-button collapsed card-premium text-white" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#general2">
                                         În ce orașe funcționează Bricli?
                                     </button>
                                 </h2>
                                 <div id="general2" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
-                                    <div class="accordion-body">
-                                        Bricli funcționează în toate județele României. Avem meșteri verificați în toate 
+                                    <div class="accordion-body text-white-75 ps-4 border-start border-accent-cyan ms-3 mt-2">
+                                        Bricli funcționează în toate județele României. Avem meșteri verificați în toate
                                         orașele mari și în majoritatea localităților din țară.
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="accordion-item">
+
+                            <div class="accordion-item bg-transparent border-0 mb-3">
                                 <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    <button class="accordion-button collapsed card-premium text-white" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#general3">
                                         Ce tipuri de servicii pot găsi pe Bricli?
                                     </button>
                                 </h2>
                                 <div id="general3" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
-                                    <div class="accordion-body">
-                                        Pe Bricli găsești specialiști pentru: construcții, renovări, instalații sanitare și electrice, 
-                                        vopsitorii, dulgheri, zidari, amenajări interioare și exterioare, curățenie, transport, 
+                                    <div class="accordion-body text-white-75 ps-4 border-start border-accent-cyan ms-3 mt-2">
+                                        Pe Bricli găsești specialiști pentru: construcții, renovări, instalații sanitare și electrice,
+                                        vopsitorii, dulgheri, zidari, amenajări interioare și exterioare, curățenie, transport,
                                         și multe alte servicii pentru casă și grădină.
                                     </div>
                                 </div>
@@ -147,20 +183,23 @@
                     </div>
 
                     <div id="clients" class="faq-section mb-5">
-                        <h2 class="fw-bold mb-4">
-                            <i class="fas fa-user text-success me-2"></i>Pentru clienți
-                        </h2>
-                        
-                        <div class="accordion" id="clientsAccordion">
-                            <div class="accordion-item">
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="width-10 height-10 rounded-circle bg-accent-violet shadow-glow-violet d-flex align-items-center justify-content-center">
+                                <i class="fas fa-user text-white small"></i>
+                            </div>
+                            <h2 class="h3 fw-bold text-white mb-0">Pentru clienți</h2>
+                        </div>
+
+                        <div class="accordion custom-accordion" id="clientsAccordion">
+                            <div class="accordion-item bg-transparent border-0 mb-3">
                                 <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    <button class="accordion-button collapsed card-premium text-white" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#clients1">
                                         Cum postez o comandă?
                                     </button>
                                 </h2>
                                 <div id="clients1" class="accordion-collapse collapse" data-bs-parent="#clientsAccordion">
-                                    <div class="accordion-body">
+                                    <div class="accordion-body text-white-75 ps-4 border-start border-accent-violet ms-3 mt-2">
                                         1. Creează un cont gratuit pe Bricli<br>
                                         2. Apasă pe "Postează o comandă"<br>
                                         3. Descrie lucrarea de care ai nevoie<br>
@@ -169,17 +208,17 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="accordion-item">
+
+                            <div class="accordion-item bg-transparent border-0 mb-3">
                                 <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    <button class="accordion-button collapsed card-premium text-white" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#clients2">
                                         Cât timp durează să primesc oferte?
                                     </button>
                                 </h2>
                                 <div id="clients2" class="accordion-collapse collapse" data-bs-parent="#clientsAccordion">
-                                    <div class="accordion-body">
-                                        De obicei, primești primele oferte în câteva ore după publicarea comenzii. 
+                                    <div class="accordion-body text-white-75 ps-4 border-start border-accent-violet ms-3 mt-2">
+                                        De obicei, primești primele oferte în câteva ore după publicarea comenzii.
                                         Majoritatea clienților primesc între 3-7 oferte în primele 24 de ore.
                                     </div>
                                 </div>
@@ -193,18 +232,20 @@
 </section>
 
 <!-- Contact CTA -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="text-center">
-            <h3 class="fw-bold mb-3">Nu ai găsit răspunsul la întrebarea ta?</h3>
-            <p class="text-muted mb-4">
+<section class="py-5 bg-dark position-relative overflow-hidden">
+    <div class="container position-relative z-2">
+        <div class="card-premium p-5 text-center position-relative overflow-hidden">
+            <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-r from-accent-violet to-accent-cyan opacity-10"></div>
+
+            <h3 class="fw-bold text-white mb-3 position-relative z-2">Nu ai găsit răspunsul la întrebarea ta?</h3>
+            <p class="text-white-75 mb-4 position-relative z-2">
                 Echipa noastră de suport este aici să te ajute cu orice întrebare sau problemă.
             </p>
-            <div class="d-flex gap-3 justify-content-center flex-wrap">
-                <a href="{% url 'core:contact' %}" class="btn btn-primary">
+            <div class="d-flex gap-3 justify-content-center flex-wrap position-relative z-2">
+                <a href="{% url 'core:contact' %}" class="btn btn-primary rounded-pill px-4">
                     <i class="fas fa-envelope me-2"></i>Contactează-ne
                 </a>
-                <a href="mailto:support@bricli.ro" class="btn btn-outline-primary">
+                <a href="mailto:support@bricli.ro" class="btn btn-outline-light rounded-pill px-4">
                     <i class="fas fa-life-ring me-2"></i>Suport tehnic
                 </a>
             </div>
@@ -212,12 +253,79 @@
     </div>
 </section>
 
+<style>
+    /* Global text color override for this page */
+    .card-premium, .card-premium h5, .card-premium span, .card-premium i {
+        color: #ffffff !important;
+    }
+
+    /* Search Input */
+    #faq-search {
+        color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    #faq-search::placeholder {
+        color: rgba(255, 255, 255, 0.6) !important;
+        opacity: 1;
+    }
+
+    /* Sidebar Links */
+    .list-group-item {
+        color: rgba(255, 255, 255, 0.8) !important;
+        background: transparent !important;
+        border: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .list-group-item:hover {
+        color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        transform: translateX(5px);
+    }
+
+    .list-group-item i {
+        width: 24px;
+        text-align: center;
+    }
+
+    /* Accordion Styles */
+    .custom-accordion .accordion-button {
+        background-color: rgba(255, 255, 255, 0.03) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        color: #ffffff !important;
+        box-shadow: none !important;
+    }
+
+    .custom-accordion .accordion-button:not(.collapsed) {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+    }
+
+    /* Force White Chevron */
+    .accordion-button::after {
+        filter: brightness(0) invert(1) !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+    }
+
+    .custom-accordion .accordion-button:focus {
+        box-shadow: none !important;
+        border-color: var(--accent-cyan) !important;
+    }
+
+    .accordion-body {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+</style>
+
 <script>
 // FAQ Search functionality
 document.getElementById('faq-search').addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
     const accordionItems = document.querySelectorAll('.accordion-item');
-    
+
     accordionItems.forEach(item => {
         const text = item.textContent.toLowerCase();
         if (text.includes(searchTerm)) {
