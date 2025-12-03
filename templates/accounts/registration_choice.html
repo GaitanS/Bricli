@@ -4,79 +4,185 @@
 {% block title %}Înregistrare - Alege tipul de cont{% endblock %}
 
 {% block content %}
-<section class="py-4">
-    <div class="container">
-        <div class="mb-4 text-center">
-            <h1 class="h-hero fw-bold mb-1">Alege tipul de cont</h1>
-            <p class="lead-hero text-muted mb-0">Selectează varianta potrivită. Poți vedea detaliile fiecărei opțiuni.</p>
+<div class="hero-2025 d-flex align-items-center justify-content-center py-5" style="min-height: 80vh;">
+    <!-- Glows -->
+    <div class="glow-point" style="top: 20%; left: 20%; background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);"></div>
+    <div class="glow-point" style="bottom: 20%; right: 20%; background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);"></div>
+
+    <div class="container position-relative z-2">
+        <div class="mb-5 text-center">
+            <h1 class="display-4 fw-bold mb-3 text-white">Alege tipul de cont</h1>
+            <p class="lead text-white-50">Selectează varianta potrivită. Poți vedea detaliile fiecărei opțiuni.</p>
         </div>
 
-        <div class="row g-3">
+        <div class="row g-4 justify-content-center">
             <!-- CLIENT -->
-            <div class="col-12 col-lg-6">
-                <div class="card choice-card">
-                    <div class="card-body">
-                        <div class="choice-header mb-2">
-                            <div class="choice-icon choice-icon--green"><i class="fas fa-handshake"></i></div>
-                            <div>
-                                <h2 class="h5 mb-1">Sunt Client</h2>
-                                <div class="cost-badge">
-                                    <span class="badge-pill badge-pill--green"><i class="fas fa-gift"></i> 100% GRATUIT</span>
-                                </div>
-                            </div>
+            <div class="col-12 col-md-6 col-lg-5">
+                <div class="card-premium h-100 p-4 p-lg-5 hover-scale transition-all">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="icon-3d-wrapper icon-3d-client me-3">
+                            <i class="fas fa-handshake fa-2x text-white"></i>
                         </div>
-
-                        <ul class="benefits">
-                            <li><i class="fas fa-check me-2"></i>Postezi comanda gratuit</li>
-                            <li><i class="fas fa-check me-2"></i>Primești oferte de la meșteri verificați</li>
-                            <li><i class="fas fa-check me-2"></i>Compari prețuri și recenzii reale</li>
-                            <li><i class="fas fa-check me-2"></i>Plătești doar când ești mulțumit</li>
-                        </ul>
-
-                        <div class="choice-cta mt-3">
-                            <a class="btn btn-success" href="{% url 'auth:register' %}"><i class="fas fa-user-plus me-2"></i>Creează cont Client</a>
+                        <div>
+                            <h2 class="h3 fw-bold text-white mb-2">Sunt Client</h2>
+                            <span class="badge bg-success text-white border-0 rounded-pill px-3 py-2 shadow-sm" style="font-size: 0.9rem;">
+                                <i class="fas fa-gift me-1"></i> 100% GRATUIT
+                            </span>
                         </div>
+                    </div>
+
+                    <ul class="list-unstyled mb-5">
+                        <li class="mb-3 text-white-50 d-flex align-items-start">
+                            <i class="fas fa-check-circle text-primary mt-1 me-3"></i>
+                            <span>Postezi comanda gratuit</span>
+                        </li>
+                        <li class="mb-3 text-white-50 d-flex align-items-start">
+                            <i class="fas fa-check-circle text-primary mt-1 me-3"></i>
+                            <span>Primești oferte de la meșteri verificați</span>
+                        </li>
+                        <li class="mb-3 text-white-50 d-flex align-items-start">
+                            <i class="fas fa-check-circle text-primary mt-1 me-3"></i>
+                            <span>Compari prețuri și recenzii reale</span>
+                        </li>
+                        <li class="mb-0 text-white-50 d-flex align-items-start">
+                            <i class="fas fa-check-circle text-primary mt-1 me-3"></i>
+                            <span>Plătești doar când ești mulțumit</span>
+                        </li>
+                    </ul>
+
+                    <div class="mt-auto">
+                        <a class="btn btn-primary w-100 rounded-pill py-3 shadow-lg fw-bold" href="{% url 'auth:register' %}">
+                            <i class="fas fa-user-plus me-2"></i>Creează cont Client
+                        </a>
                     </div>
                 </div>
             </div>
 
             <!-- MEȘTER -->
-            <div class="col-12 col-lg-6">
-                <div class="card choice-card">
-                    <div class="card-body">
-                        <div class="choice-header mb-2">
-                            <div class="choice-icon choice-icon--green"><i class="fas fa-hammer"></i></div>
-                            <div>
-                                <h2 class="h5 mb-1">Sunt Meșter</h2>
-                                <div class="cost-badge">
-                                    <span class="badge-pill badge-pill--green"><i class="fas fa-gift"></i> 100% GRATUIT</span>
-                                </div>
-                            </div>
+            <div class="col-12 col-md-6 col-lg-5">
+                <div class="card-premium h-100 p-4 p-lg-5 hover-scale transition-all">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="icon-3d-wrapper icon-3d-craftsman me-3">
+                            <i class="fas fa-hammer fa-2x text-white"></i>
                         </div>
-
-                        <ul class="benefits">
-                            <li><i class="fas fa-check me-2"></i>Primești comenzi din zona ta</li>
-                            <li><i class="fas fa-check me-2"></i>Profil verificat + portofoliu</li>
-                            <li><i class="fas fa-check me-2"></i>Recenzii de la clienți reali</li>
-                            <li><i class="fas fa-check me-2"></i>Notificări instant pentru comenzi noi</li>
-                        </ul>
-
-                        <div class="choice-cta mt-3">
-                            <a class="btn btn-success" href="{% url 'auth:craftsman_register' %}"><i class="fas fa-user-cog me-2"></i>Creează cont Meșter</a>
+                        <div>
+                            <h2 class="h3 fw-bold text-white mb-2">Sunt Meșter</h2>
+                            <span class="badge bg-success text-white border-0 rounded-pill px-3 py-2 shadow-sm" style="font-size: 0.9rem;">
+                                <i class="fas fa-gift me-1"></i> 100% GRATUIT
+                            </span>
                         </div>
+                    </div>
+
+                    <ul class="list-unstyled mb-5">
+                        <li class="mb-3 text-white-50 d-flex align-items-start">
+                            <i class="fas fa-check-circle text-accent mt-1 me-3"></i>
+                            <span>Primești comenzi din zona ta</span>
+                        </li>
+                        <li class="mb-3 text-white-50 d-flex align-items-start">
+                            <i class="fas fa-check-circle text-accent mt-1 me-3"></i>
+                            <span>Profil verificat + portofoliu</span>
+                        </li>
+                        <li class="mb-3 text-white-50 d-flex align-items-start">
+                            <i class="fas fa-check-circle text-accent mt-1 me-3"></i>
+                            <span>Recenzii de la clienți reali</span>
+                        </li>
+                        <li class="mb-0 text-white-50 d-flex align-items-start">
+                            <i class="fas fa-check-circle text-accent mt-1 me-3"></i>
+                            <span>Notificări instant pentru comenzi noi</span>
+                        </li>
+                    </ul>
+
+                    <div class="mt-auto">
+                        <a class="btn btn-accent w-100 rounded-pill py-3 shadow-lg fw-bold" href="{% url 'auth:craftsman_register' %}">
+                            <i class="fas fa-user-cog me-2"></i>Creează cont Meșter
+                        </a>
                     </div>
                 </div>
             </div>
-
         </div>
 
         <!-- Login Link -->
-        <div class="text-center mt-4">
-            <p class="text-muted">
+        <div class="text-center mt-5">
+            <p class="text-white-50">
                 Ai deja cont?
-                <a href="{% url 'auth:login' %}" class="fw-semibold text-decoration-none">Autentifică-te aici</a>
+                <a href="{% url 'auth:login' %}" class="fw-bold text-white text-decoration-none hover-underline">Autentifică-te aici</a>
             </p>
         </div>
     </div>
-</section>
+</div>
+
+<style>
+.hover-scale:hover {
+    transform: translateY(-5px);
+}
+.transition-all {
+    transition: all 0.3s ease;
+}
+.hover-underline:hover {
+    text-decoration: underline !important;
+}
+.btn-accent {
+    background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+    border: none;
+    color: white;
+}
+.btn-accent:hover {
+    background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
+    color: white;
+    transform: translateY(-2px);
+}
+.text-accent {
+    color: #8B5CF6 !important;
+}
+.bg-accent {
+    background-color: #8B5CF6 !important;
+}
+
+/* 3D Icon Styling */
+.icon-3d-wrapper {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    position: relative;
+    box-shadow:
+        0 10px 20px rgba(0,0,0,0.3),
+        inset 0 2px 0 rgba(255,255,255,0.2),
+        inset 0 -2px 0 rgba(0,0,0,0.1);
+}
+
+.icon-3d-client {
+    background: radial-gradient(circle at 30% 30%, #4ade80, #166534);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.icon-3d-craftsman {
+    background: radial-gradient(circle at 30% 30%, #a78bfa, #5b21b6);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+}
+
+.icon-3d-wrapper i {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    transform: scale(1);
+    transition: transform 0.3s ease;
+}
+
+.hover-scale:hover .icon-3d-wrapper i {
+    transform: scale(1.1);
+}
+
+.icon-3d-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 5%;
+    left: 10%;
+    width: 40%;
+    height: 20%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+    transform: rotate(-45deg);
+}
+</style>
 {% endblock %}

@@ -14,7 +14,7 @@
 
     <div class="container position-relative z-2 text-center">
         <h1 class="display-4 fw-bold mb-3 text-white">Articole Bricli</h1>
-        <p class="lead text-white opacity-75 mx-auto" style="max-width: 700px;">
+        <p class="lead text-white mx-auto" style="max-width: 700px;">
             Ghiduri complete, sfaturi practice și tot ce trebuie să știi despre renovări și lucrări de construcții
         </p>
     </div>
@@ -42,7 +42,7 @@
                         <div class="card-body p-4 d-flex flex-column flex-grow-1">
                             {% if post.category %}
                             <div class="mb-3">
-                                <a href="{{ post.category.get_absolute_url }}" class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 text-decoration-none">
+                                <a href="{{ post.category.get_absolute_url }}" class="badge bg-primary text-white border border-primary border-opacity-25 text-decoration-none">
                                     {{ post.category.name }}
                                 </a>
                             </div>
@@ -54,10 +54,10 @@
                                 </a>
                             </h5>
 
-                            <p class="card-text text-white opacity-75 small mb-4 flex-grow-1">{{ post.excerpt|truncatewords:20 }}</p>
+                            <p class="card-text text-white small mb-4 flex-grow-1">{{ post.excerpt|truncatewords:20 }}</p>
 
                             <div class="mt-auto pt-3 border-top border-white border-opacity-10">
-                                <div class="d-flex align-items-center justify-content-between text-white opacity-50 small mb-3">
+                                <div class="d-flex align-items-center justify-content-between text-white small mb-3">
                                     <span><i class="fas fa-calendar me-1"></i>{{ post.published_at|date:"d M Y" }}</span>
                                     <span><i class="fas fa-clock me-1"></i>{{ post.read_time_minutes }} min</span>
                                 </div>
@@ -104,7 +104,7 @@
             {% else %}
             <div class="card-premium p-5 text-center">
                 <i class="fas fa-info-circle fa-3x text-accent mb-3"></i>
-                <p class="text-white opacity-75 mb-0">Momentan nu există articole publicate. Revino curând pentru conținut nou!</p>
+                <p class="text-white mb-0">Momentan nu există articole publicate. Revino curând pentru conținut nou!</p>
             </div>
             {% endif %}
         </div>
@@ -114,12 +114,12 @@
             <!-- Categories -->
             {% if categories %}
             <div class="card-premium p-0 mb-4 overflow-hidden">
-                <div class="p-3 bg-white bg-opacity-5 border-bottom border-white border-opacity-10">
+                <div class="p-3 border-bottom border-white border-opacity-10">
                     <h6 class="mb-0 text-white fw-bold"><i class="fas fa-folder me-2 text-accent"></i>Categorii</h6>
                 </div>
                 <div class="list-group list-group-flush bg-transparent">
                     {% for category in categories %}
-                    <a href="{{ category.get_absolute_url }}" class="list-group-item list-group-item-action bg-transparent text-white opacity-75 hover-opacity-100 border-white border-opacity-10">
+                    <a href="{{ category.get_absolute_url }}" class="list-group-item list-group-item-action bg-transparent text-white hover-opacity-100 border-white border-opacity-10">
                         {{ category.name }}
                     </a>
                     {% endfor %}
@@ -130,7 +130,7 @@
             <!-- Popular Tags -->
             {% if popular_tags %}
             <div class="card-premium p-0 mb-4 overflow-hidden">
-                <div class="p-3 bg-white bg-opacity-5 border-bottom border-white border-opacity-10">
+                <div class="p-3 border-bottom border-white border-opacity-10">
                     <h6 class="mb-0 text-white fw-bold"><i class="fas fa-tags me-2 text-accent"></i>Etichete Populare</h6>
                 </div>
                 <div class="p-3">
@@ -146,7 +146,7 @@
             <!-- CTA -->
             <div class="card-premium p-4 text-center">
                 <h5 class="text-white fw-bold mb-3">Cauți un meșter?</h5>
-                <p class="text-white opacity-75 small mb-4">Postează gratuit cererea ta și primește oferte de la meșteri verificați.</p>
+                <p class="text-white small mb-4">Postează gratuit cererea ta și primește oferte de la meșteri verificați.</p>
                 <a href="{% url 'services:create_order' %}" class="btn btn-primary w-100">
                     <i class="fas fa-plus me-2"></i>Postează comandă
                 </a>

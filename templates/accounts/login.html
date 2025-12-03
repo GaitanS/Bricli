@@ -3,72 +3,104 @@
 
 {% block title %}Conectare - Bricli{% endblock %}
 
-{% block extra_css %}
-    {% static_css 'css/pages/accounts/auth.css' %}
-{% endblock %}
-
 {% block content %}
-<div class="login-container">
-    <a href="/" class="back-to-site">
-        <i class="fas fa-arrow-left me-2"></i>Înapoi la Bricli
-    </a>
+<div class="hero-2025 d-flex align-items-center justify-content-center py-5" style="min-height: 80vh;">
+    <!-- Glows -->
+    <div class="glow-point" style="top: 20%; left: 20%; background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);"></div>
+    <div class="glow-point" style="bottom: 20%; right: 20%; background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);"></div>
 
-    <div class="login-card">
-        <div class="login-header">
-            <h1>Bun venit înapoi!</h1>
-            <p>Conectează-te la contul tău</p>
-        </div>
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5 col-xl-4">
+                <div class="card-premium p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h1 class="h3 fw-bold text-white mb-2">Bun venit înapoi!</h1>
+                        <p class="text-white-50">Conectează-te la contul tău</p>
+                    </div>
 
-        {% if form.errors %}
-            <div class="alert alert-danger mb-4">
-                {% for field, errors in form.errors.items %}
-                    {% for error in errors %}
-                        <div><i class="fas fa-exclamation-circle me-2"></i>{{ error }}</div>
-                    {% endfor %}
-                {% endfor %}
+                    {% if form.errors %}
+                        <div class="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-20 text-danger mb-4">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-exclamation-circle me-2"></i>
+                                        <span>{{ error }}</span>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" class="needs-live-validate" novalidate>
+                        {% csrf_token %}
+
+                        <div class="form-floating mb-3">
+                            <input type="text" name="username" class="form-control bg-dark-glass border-white-10 text-white"
+                                   placeholder="Nume utilizator sau email" required id="id_username"
+                                   value="{{ form.username.value|default:'' }}">
+                            <label for="id_username" class="text-white-50">Nume utilizator sau email</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" name="password" class="form-control bg-dark-glass border-white-10 text-white"
+                                   placeholder="Parola" required id="id_password">
+                            <label for="id_password" class="text-white-50">Parola</label>
+                        </div>
+
+                        <div class="d-flex justify-content-end mb-4">
+                            <a href="{% url 'auth:password_reset' %}" class="text-accent text-decoration-none small hover-underline">
+                                Ai uitat parola?
+                            </a>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary rounded-pill py-3 shadow-lg fw-bold hover-scale">
+                                <i class="fas fa-sign-in-alt me-2"></i>Conectează-te
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4 pt-4 border-top border-white border-opacity-10">
+                        <p class="mb-2 text-white-50">Nu ai un cont?
+                            <a href="{% url 'auth:register' %}" class="text-white text-decoration-none fw-bold hover-underline">Înregistrează-te</a>
+                        </p>
+                        <p class="mb-0 text-white-50">Ești meșter?
+                            <a href="{% url 'auth:craftsman_register' %}" class="text-accent text-decoration-none fw-bold hover-underline">
+                                Înregistrează-te ca meșter
+                            </a>
+                        </p>
+                    </div>
+                </div>
             </div>
-        {% endif %}
-
-        <form method="post" class="needs-live-validate" novalidate>
-            {% csrf_token %}
-
-            <div class="form-floating">
-                <input type="text" name="username" class="form-control form-control-lg"
-                       placeholder="Nume utilizator sau email" required id="id_username"
-                       value="{{ form.username.value|default:'' }}">
-                <label for="id_username">Nume utilizator sau email</label>
-            </div>
-
-            <div class="form-floating">
-                <input type="password" name="password" class="form-control form-control-lg"
-                       placeholder="Parola" required id="id_password">
-                <label for="id_password">Parola</label>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div></div>
-                <a href="{% url 'auth:password_reset' %}" class="text-decoration-none" style="color: #8B5CF6; font-size: 0.9rem;">
-                    Ai uitat parola?
-                </a>
-            </div>
-
-            <div class="d-grid">
-                <button type="submit" class="btn btn-login">
-                    <i class="fas fa-sign-in-alt me-2"></i>Conectează-te
-                </button>
-            </div>
-        </form>
-
-        <hr class="my-4">
-
-        <div class="text-center">
-            <p class="mb-2">Nu ai un cont?
-                <a href="{% url 'auth:register' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">Înregistrează-te</a>
-            </p>
-            <p class="mb-0">Ești meșter?
-                <a href="{% url 'auth:craftsman_register' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">Înregistrează-te ca meșter</a>
-            </p>
         </div>
     </div>
 </div>
+
+<style>
+.bg-dark-glass {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+.border-white-10 {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+.form-control:focus {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: var(--accent-violet) !important;
+    color: white !important;
+    box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25) !important;
+}
+.form-floating label {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+.hover-underline:hover {
+    text-decoration: underline !important;
+}
+.hover-scale:hover {
+    transform: translateY(-2px);
+}
+</style>
 {% endblock %}

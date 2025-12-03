@@ -7,95 +7,95 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <!-- Progress Bar -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="mb-0">Configurare Profil Meșter</h4>
-                        <span class="badge bg-primary">Pasul {{ current_step }} din 3</span>
+            <div class="card-premium mb-4 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0 text-white fw-bold">Configurare Profil Meșter</h4>
+                    <span class="badge badge-premium">Pasul {{ current_step }} din 3</span>
+                </div>
+
+                <div class="progress mb-4" style="height: 6px; background: rgba(255,255,255,0.1);">
+                    <div class="progress-bar bg-gradient-primary" role="progressbar"
+                         style="width: {% if current_step == '1' %}33%{% elif current_step == '2' %}66%{% else %}100%{% endif %}">
                     </div>
-                    
-                    <div class="progress mb-3" style="height: 8px;">
-                        <div class="progress-bar" role="progressbar" 
-                             style="width: {% if current_step == '1' %}33%{% elif current_step == '2' %}66%{% else %}100%{% endif %}">
+                </div>
+
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="step-indicator {% if current_step >= '1' %}active{% endif %}">
+                            <div class="step-circle {% if current_step >= '1' %}bg-primary text-white shadow-glow{% else %}bg-glass text-muted{% endif %}">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <small class="d-block mt-2 text-white-50">Profil</small>
                         </div>
                     </div>
-                    
-                    <div class="row text-center">
-                        <div class="col-4">
-                            <div class="step-indicator {% if current_step >= '1' %}active{% endif %}">
-                                <div class="step-circle {% if current_step >= '1' %}bg-primary text-white{% else %}bg-light text-muted{% endif %}">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <small class="d-block mt-2">Profil</small>
+                    <div class="col-4">
+                        <div class="step-indicator {% if current_step >= '2' %}active{% endif %}">
+                            <div class="step-circle {% if current_step >= '2' %}bg-primary text-white shadow-glow{% else %}bg-glass text-muted{% endif %}">
+                                <i class="fas fa-tools"></i>
                             </div>
+                            <small class="d-block mt-2 text-white-50">Competențe</small>
                         </div>
-                        <div class="col-4">
-                            <div class="step-indicator {% if current_step >= '2' %}active{% endif %}">
-                                <div class="step-circle {% if current_step >= '2' %}bg-primary text-white{% else %}bg-light text-muted{% endif %}">
-                                    <i class="fas fa-tools"></i>
-                                </div>
-                                <small class="d-block mt-2">Competențe</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="step-indicator {% if current_step >= '3' %}active{% endif %}">
+                            <div class="step-circle {% if current_step >= '3' %}bg-primary text-white shadow-glow{% else %}bg-glass text-muted{% endif %}">
+                                <i class="fas fa-images"></i>
                             </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="step-indicator {% if current_step >= '3' %}active{% endif %}">
-                                <div class="step-circle {% if current_step >= '3' %}bg-primary text-white{% else %}bg-light text-muted{% endif %}">
-                                    <i class="fas fa-images"></i>
-                                </div>
-                                <small class="d-block mt-2">Portfolio</small>
-                            </div>
+                            <small class="d-block mt-2 text-white-50">Portfolio</small>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Step Content -->
-            <div class="card">
-                <div class="card-body p-5">
+            <div class="card-premium">
+                <div class="p-2">
                     {% if current_step == '1' %}
                         <!-- Step 1: Profile Setup -->
-                        <div class="text-center mb-4">
-                            <i class="fas fa-user text-primary" style="font-size: 3rem;"></i>
-                            <h3 class="mt-3">Completează-ți profilul</h3>
-                            <p class="text-muted">Adaugă informații despre tine și serviciile tale</p>
+                        <div class="text-center mb-5">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 p-4 mb-3">
+                                <i class="fas fa-user text-accent" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h3 class="text-white fw-bold">Completează-ți profilul</h3>
+                            <p class="text-white-50">Adaugă informații despre tine și serviciile tale</p>
                         </div>
 
                         <form method="post" action="?step=1">
                             {% csrf_token %}
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ profile_form.county.id_for_label }}" class="form-label">
-                                        <i class="fas fa-map-marker-alt me-2" style="color: #8B5CF6;"></i>Județul în care lucrezi
+
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label for="{{ profile_form.county.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-map-marker-alt me-2 text-accent"></i>Județul în care lucrezi
                                     </label>
-                                    <small class="text-muted d-block mb-1">Zona principală unde oferi servicii</small>
                                     {{ profile_form.county }}
+                                    <small class="text-white-50 d-block mt-1">Zona principală unde oferi servicii</small>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ profile_form.display_name.id_for_label }}" class="form-label">
-                                        <i class="fas fa-building me-2" style="color: #8B5CF6;"></i>Numele companiei tale
+                                <div class="col-md-6">
+                                    <label for="{{ profile_form.display_name.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-building me-2 text-accent"></i>Numele companiei tale
                                     </label>
-                                    <small class="text-muted d-block mb-1">Opțional - dacă ai o firmă înregistrată</small>
                                     {{ profile_form.display_name }}
+                                    <small class="text-white-50 d-block mt-1">Opțional - dacă ai o firmă înregistrată</small>
                                 </div>
                             </div>
-                            
-                            <div class="mb-3">
-                                <label for="{{ profile_form.bio.id_for_label }}" class="form-label">
-                                    <i class="fas fa-user-edit me-2" style="color: #8B5CF6;"></i>Prezintă-te clienților
+
+                            <div class="mt-4 mb-4">
+                                <label for="{{ profile_form.bio.id_for_label }}" class="form-label text-white">
+                                    <i class="fas fa-user-edit me-2 text-accent"></i>Prezintă-te clienților
                                 </label>
-                                <small class="text-muted d-block mb-1">Descrie experiența ta, specializările și ce te face special (minim 200 caractere)</small>
                                 {{ profile_form.bio }}
+                                <small class="text-white-50 d-block mt-1">Descrie experiența ta, specializările și ce te face special (minim 200 caractere)</small>
                                 {% if profile_form.bio.errors %}
-                                    <div class="text-danger small">{{ profile_form.bio.errors.0 }}</div>
+                                    <div class="text-danger small mt-1">{{ profile_form.bio.errors.0 }}</div>
                                 {% endif %}
                             </div>
-                            
-                            <div class="d-flex justify-content-between mt-4">
-                                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">
+
+                            <div class="d-flex justify-content-between mt-5 pt-3 border-top border-white border-opacity-10">
+                                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-light rounded-pill px-4">
                                     <i class="fas fa-arrow-left me-2"></i>Înapoi la profil
                                 </a>
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-lg hover-scale">
                                     Continuă <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
@@ -103,28 +103,30 @@
 
                     {% elif current_step == '2' %}
                         <!-- Step 2: Skills Selection -->
-                        <div class="text-center mb-4">
-                            <i class="fas fa-tools text-primary" style="font-size: 3rem;"></i>
-                            <h3 class="mt-3">Selectează-ți competențele</h3>
-                            <p class="text-muted">Alege meseriile pe care le practici</p>
+                        <div class="text-center mb-5">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 p-4 mb-3">
+                                <i class="fas fa-tools text-accent" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h3 class="text-white fw-bold">Selectează-ți competențele</h3>
+                            <p class="text-white-50">Alege meseriile pe care le practici</p>
                         </div>
 
                         <form method="post" action="?step=2">
                             {% csrf_token %}
                             <div class="mb-4">
-                                <label for="{{ skills_form.primary_skill.id_for_label }}" class="form-label">{{ skills_form.primary_skill.label }}</label>
+                                <label for="{{ skills_form.primary_skill.id_for_label }}" class="form-label text-white">{{ skills_form.primary_skill.label }}</label>
                                 {{ skills_form.primary_skill }}
                             </div>
-                            
+
                             <div class="mb-4">
-                                <label class="form-label">{{ skills_form.secondary_skills.label }}</label>
-                                <div class="form-text mb-3">{{ skills_form.secondary_skills.help_text }}</div>
-                                <div class="row">
+                                <label class="form-label text-white">{{ skills_form.secondary_skills.label }}</label>
+                                <div class="text-white-50 small mb-3">{{ skills_form.secondary_skills.help_text }}</div>
+                                <div class="row g-3">
                                     {% for choice in skills_form.secondary_skills %}
-                                        <div class="col-md-6 col-lg-4 mb-2">
-                                            <div class="form-check">
+                                        <div class="col-md-6 col-lg-4">
+                                            <div class="form-check p-3 rounded border border-white border-opacity-10 bg-glass h-100">
                                                 {{ choice.tag }}
-                                                <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                                <label class="form-check-label text-white ms-2" for="{{ choice.id_for_label }}">
                                                     {{ choice.choice_label }}
                                                 </label>
                                             </div>
@@ -132,18 +134,18 @@
                                     {% endfor %}
                                 </div>
                             </div>
-                            
+
                             <div class="mb-4">
-                                <label for="{{ skills_form.certifications.id_for_label }}" class="form-label">{{ skills_form.certifications.label }}</label>
+                                <label for="{{ skills_form.certifications.id_for_label }}" class="form-label text-white">{{ skills_form.certifications.label }}</label>
                                 {{ skills_form.certifications }}
-                                <div class="form-text">{{ skills_form.certifications.help_text }}</div>
+                                <div class="text-white-50 small mt-1">{{ skills_form.certifications.help_text }}</div>
                             </div>
-                            
-                            <div class="d-flex justify-content-between mt-4">
-                                <a href="?step=1" class="btn btn-outline-secondary">
+
+                            <div class="d-flex justify-content-between mt-5 pt-3 border-top border-white border-opacity-10">
+                                <a href="?step=1" class="btn btn-outline-light rounded-pill px-4">
                                     <i class="fas fa-arrow-left me-2"></i>Înapoi
                                 </a>
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-lg hover-scale">
                                     Continuă <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
@@ -151,40 +153,46 @@
 
                     {% elif current_step == '3' %}
                         <!-- Step 3: Portfolio Upload -->
-                        <div class="text-center mb-4">
-                            <i class="fas fa-images text-primary" style="font-size: 3rem;"></i>
-                            <h3 class="mt-3">Adaugă imagini în portfolio</h3>
-                            <p class="text-muted">Încarcă imagini cu lucrările tale pentru a atrage clienți</p>
+                        <div class="text-center mb-5">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 p-4 mb-3">
+                                <i class="fas fa-images text-accent" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h3 class="text-white fw-bold">Adaugă imagini în portfolio</h3>
+                            <p class="text-white-50">Încarcă imagini cu lucrările tale pentru a atrage clienți</p>
                         </div>
 
                         <form method="post" action="?step=3" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="mb-4">
-                                <label for="{{ portfolio_form.images.id_for_label }}" class="form-label">{{ portfolio_form.images.label }}</label>
+                                <label for="{{ portfolio_form.images.id_for_label }}" class="form-label text-white">{{ portfolio_form.images.label }}</label>
                                 {{ portfolio_form.images }}
-                                <div class="form-text">{{ portfolio_form.images.help_text }}</div>
+                                <div class="text-white-50 small mt-1">{{ portfolio_form.images.help_text }}</div>
                             </div>
-                            
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle me-2"></i>
-                                <strong>Sfaturi pentru portfolio:</strong>
-                                <ul class="mb-0 mt-2">
-                                    <li>Încarcă imagini de calitate înaltă</li>
-                                    <li>Arată diverse tipuri de lucrări</li>
-                                    <li>Folosește imagini înainte/după dacă este posibil</li>
-                                    <li>Poți sări acest pas și adăuga imagini mai târziu</li>
-                                </ul>
+
+                            <div class="alert bg-glass border border-white border-opacity-10 text-white mb-4">
+                                <div class="d-flex">
+                                    <i class="fas fa-info-circle text-accent me-3 mt-1"></i>
+                                    <div>
+                                        <strong class="text-white">Sfaturi pentru portfolio:</strong>
+                                        <ul class="mb-0 mt-2 ps-3 text-white-50">
+                                            <li>Încarcă imagini de calitate înaltă</li>
+                                            <li>Arată diverse tipuri de lucrări</li>
+                                            <li>Folosește imagini înainte/după dacă este posibil</li>
+                                            <li>Poți sări acest pas și adăuga imagini mai târziu</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <div class="d-flex justify-content-between mt-4">
-                                <a href="?step=2" class="btn btn-outline-secondary">
+
+                            <div class="d-flex justify-content-between mt-5 pt-3 border-top border-white border-opacity-10">
+                                <a href="?step=2" class="btn btn-outline-light rounded-pill px-4">
                                     <i class="fas fa-arrow-left me-2"></i>Înapoi
                                 </a>
                                 <div>
-                                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary me-2">
+                                    <a href="{% url 'accounts:profile' %}" class="btn btn-link text-white-50 text-decoration-none me-3">
                                         Sari acest pas
                                     </a>
-                                    <button type="submit" class="btn btn-success">
+                                    <button type="submit" class="btn btn-success rounded-pill px-5 shadow-lg hover-scale">
                                         <i class="fas fa-check me-2"></i>Finalizează
                                     </button>
                                 </div>
@@ -207,10 +215,44 @@
     justify-content: center;
     font-size: 1.2rem;
     margin: 0 auto;
+    transition: all 0.3s ease;
 }
 
 .step-indicator.active .step-circle {
-    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    transform: scale(1.1);
+}
+
+.shadow-glow {
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+}
+
+/* Form Controls Dark Mode Overrides */
+.form-control, .form-select {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-violet);
+    color: white;
+    box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Checkbox styling */
+.form-check-input {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.form-check-input:checked {
+    background-color: var(--accent-violet);
+    border-color: var(--accent-violet);
 }
 </style>
 {% endblock %}

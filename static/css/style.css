@@ -240,11 +240,8 @@ p {
         padding-top: 100px;
         padding-bottom: 40px;
         min-height: auto !important;
-        /* Allow height to adjust to content */
-    }
-
-    .hero-2025 .lead {
-        font-size: 1rem;
+        display: block !important;
+        /* Disable flex centering on mobile */
     }
 
     /* Cards */

@@ -1,59 +1,47 @@
-<!DOCTYPE html>
-<html lang="ro">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Înregistrare Meșter - Bricli</title>
+{% extends 'base.html' %}
+{% load static %}
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{% block title %}Înregistrare Meșter - Bricli{% endblock %}
 
-    {% load static %}
-    <link href="{% static 'css/pages/accounts/auth.css' %}" rel="stylesheet">
-    <link href="{% static 'css/pages/accounts/craftsman_register.css' %}" rel="stylesheet">
-</head>
-<body>
-    <!-- Back to site link -->
-    <a href="{% url 'core:home' %}" class="back-to-site">
-        <i class="fas fa-arrow-left me-2"></i>Înapoi la Bricli
-    </a>
+{% block content %}
+<div class="hero-2025 d-flex align-items-center justify-content-center py-5">
+    <!-- Glows -->
+    <div class="glow-point" style="top: 20%; left: 20%; background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);"></div>
+    <div class="glow-point" style="bottom: 20%; right: 20%; background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);"></div>
 
-    <div class="registration-container">
-        <div class="col-lg-8 col-xl-7">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-4">
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                <div class="card-premium p-4 p-md-5">
                     <!-- Header -->
-                    <div class="text-center mb-4">
-                        <h2 class="fw-bold mb-2">Înregistrare Meșter</h2>
-                        <p class="text-muted">Găsește clienți în zona ta</p>
+                    <div class="text-center mb-5">
+                        <h2 class="fw-bold mb-2 text-white">Înregistrare Meșter</h2>
+                        <p class="text-white-50">Găsește clienți în zona ta</p>
                     </div>
 
                     <!-- Progress Steps -->
-                    <div class="progress-steps mb-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="step-item active" data-step="1">
-                                <div class="step-circle">
+                    <div class="progress-steps mb-5">
+                        <div class="d-flex justify-content-between align-items-center position-relative">
+                            <!-- Connecting Line -->
+                            <div class="position-absolute w-100 top-50 start-0 translate-middle-y" style="height: 2px; background: rgba(255,255,255,0.1); z-index: 0;"></div>
+
+                            <div class="step-item active position-relative z-1 bg-dark-glass" data-step="1">
+                                <div class="step-circle bg-primary text-white shadow-glow">
                                     <i class="fas fa-user"></i>
                                 </div>
-                                <div class="step-label">Profilul tău</div>
+                                <div class="step-label text-white mt-2">Profilul tău</div>
                             </div>
-                            <div class="step-line"></div>
-                            <div class="step-item" data-step="2">
-                                <div class="step-circle">
+                            <div class="step-item position-relative z-1 bg-dark-glass" data-step="2">
+                                <div class="step-circle bg-glass text-white-50">
                                     <i class="fas fa-briefcase"></i>
                                 </div>
-                                <div class="step-label">Informații business</div>
+                                <div class="step-label text-white-50 mt-2">Informații business</div>
                             </div>
-                            <div class="step-line"></div>
-                            <div class="step-item" data-step="3">
-                                <div class="step-circle">
+                            <div class="step-item position-relative z-1 bg-dark-glass" data-step="3">
+                                <div class="step-circle bg-glass text-white-50">
                                     <i class="fas fa-tools"></i>
                                 </div>
-                                <div class="step-label">Serviciile tale</div>
+                                <div class="step-label text-white-50 mt-2">Serviciile tale</div>
                             </div>
                         </div>
                     </div>
@@ -63,78 +51,78 @@
 
                         <!-- Step 1: Personal Profile -->
                         <div class="step-content" id="step-1">
-                            <div class="step-header mb-4">
-                                <h4 class="fw-bold" style="color: #8B5CF6;">Pasul 1: Profilul tău</h4>
-                                <p class="text-muted">Introdu informațiile tale personale pentru a crea contul</p>
+                            <div class="step-header mb-4 text-center">
+                                <h4 class="fw-bold text-white">Pasul 1: Profilul tău</h4>
+                                <p class="text-white-50">Introdu informațiile tale personale pentru a crea contul</p>
                             </div>
 
-                            <div class="row mb-3">
+                            <div class="row g-3 mb-3">
                                 <div class="col-md-6">
-                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                                        <i class="fas fa-user me-2" style="color: #8B5CF6;"></i>Prenume
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-user me-2 text-accent"></i>Prenume
                                     </label>
                                     {{ form.first_name }}
                                     {% if form.first_name.errors %}
-                                        <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                                        <div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                                        <i class="fas fa-user me-2" style="color: #8B5CF6;"></i>Nume de familie
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-user me-2 text-accent"></i>Nume de familie
                                     </label>
                                     {{ form.last_name }}
                                     {% if form.last_name.errors %}
-                                        <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                                        <div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
+                            <div class="row g-3 mb-3">
                                 <div class="col-md-6">
-                                    <label for="{{ form.email.id_for_label }}" class="form-label">
-                                        <i class="fas fa-envelope me-2" style="color: #8B5CF6;"></i>Adresa de email
+                                    <label for="{{ form.email.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-envelope me-2 text-accent"></i>Adresa de email
                                     </label>
-                                    <small class="text-muted d-block mb-1">Aceasta va fi folosită pentru autentificare</small>
                                     {{ form.email }}
+                                    <small class="text-white-50 d-block mt-1">Aceasta va fi folosită pentru autentificare</small>
                                     {% if form.email.errors %}
-                                        <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                        <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="{{ form.phone_number.id_for_label }}" class="form-label">
-                                        <i class="fas fa-phone me-2" style="color: #8B5CF6;"></i>Numărul tău de telefon
+                                    <label for="{{ form.phone_number.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-phone me-2 text-accent"></i>Numărul tău de telefon
                                     </label>
-                                    <small class="text-muted d-block mb-1">Clienții te vor contacta pe acest număr</small>
                                     {{ form.phone_number }}
+                                    <small class="text-white-50 d-block mt-1">Clienții te vor contacta pe acest număr</small>
                                     {% if form.phone_number.errors %}
-                                        <div class="text-danger small">{{ form.phone_number.errors.0 }}</div>
+                                        <div class="text-danger small mt-1">{{ form.phone_number.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                             </div>
 
-                            <div class="row mb-4">
+                            <div class="row g-3 mb-4">
                                 <div class="col-md-6">
-                                    <label for="{{ form.password.id_for_label }}" class="form-label">
-                                        <i class="fas fa-lock me-2" style="color: #8B5CF6;"></i>Parola
+                                    <label for="{{ form.password.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-lock me-2 text-accent"></i>Parola
                                     </label>
                                     {{ form.password }}
                                     {% if form.password.errors %}
-                                        <div class="text-danger small">{{ form.password.errors.0 }}</div>
+                                        <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="{{ form.password_confirm.id_for_label }}" class="form-label">
-                                        <i class="fas fa-lock me-2" style="color: #8B5CF6;"></i>Confirmă parola
+                                    <label for="{{ form.password_confirm.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-lock me-2 text-accent"></i>Confirmă parola
                                     </label>
                                     {{ form.password_confirm }}
                                     {% if form.password_confirm.errors %}
-                                        <div class="text-danger small">{{ form.password_confirm.errors.0 }}</div>
+                                        <div class="text-danger small mt-1">{{ form.password_confirm.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-primary btn-lg px-4" onclick="nextStep(2)">
+                            <div class="d-flex justify-content-end pt-3 border-top border-white border-opacity-10">
+                                <button type="button" class="btn btn-primary rounded-pill px-5 shadow-lg hover-scale" onclick="nextStep(2)">
                                     Următorul pas <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
@@ -142,50 +130,50 @@
 
                         <!-- Step 2: Business Information -->
                         <div class="step-content" id="step-2" style="display: none;">
-                            <div class="step-header mb-4">
-                                <h4 class="fw-bold" style="color: #8B5CF6;">Pasul 2: Informații business</h4>
-                                <p class="text-muted">Spune-ne mai multe despre activitatea ta profesională</p>
+                            <div class="step-header mb-4 text-center">
+                                <h4 class="fw-bold text-white">Pasul 2: Informații business</h4>
+                                <p class="text-white-50">Spune-ne mai multe despre activitatea ta profesională</p>
                             </div>
 
-                            <div class="row mb-3">
+                            <div class="row g-3 mb-3">
                                 <div class="col-md-6">
-                                    <label for="{{ form.county.id_for_label }}" class="form-label">
-                                        <i class="fas fa-map-marker-alt me-2" style="color: #8B5CF6;"></i>Județul în care lucrezi
+                                    <label for="{{ form.county.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-map-marker-alt me-2 text-accent"></i>Județul în care lucrezi
                                     </label>
-                                    <small class="text-muted d-block mb-1">Zona principală unde oferi servicii</small>
                                     {{ form.county }}
+                                    <small class="text-white-50 d-block mt-1">Zona principală unde oferi servicii</small>
                                     {% if form.county.errors %}
-                                        <div class="text-danger small">{{ form.county.errors.0 }}</div>
+                                        <div class="text-danger small mt-1">{{ form.county.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="{{ form.company_name.id_for_label }}" class="form-label">
-                                        <i class="fas fa-building me-2" style="color: #8B5CF6;"></i>Numele companiei tale
+                                    <label for="{{ form.company_name.id_for_label }}" class="form-label text-white">
+                                        <i class="fas fa-building me-2 text-accent"></i>Numele companiei tale
                                     </label>
-                                    <small class="text-muted d-block mb-1">Opțional - dacă ai o firmă înregistrată</small>
                                     {{ form.company_name }}
+                                    <small class="text-white-50 d-block mt-1">Opțional - dacă ai o firmă înregistrată</small>
                                     {% if form.company_name.errors %}
-                                        <div class="text-danger small">{{ form.company_name.errors.0 }}</div>
+                                        <div class="text-danger small mt-1">{{ form.company_name.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                             </div>
 
                             <div class="mb-4">
-                                <label for="{{ form.bio.id_for_label }}" class="form-label">
-                                    <i class="fas fa-user-edit me-2" style="color: #8B5CF6;"></i>Prezintă-te clienților
+                                <label for="{{ form.bio.id_for_label }}" class="form-label text-white">
+                                    <i class="fas fa-user-edit me-2 text-accent"></i>Prezintă-te clienților
                                 </label>
-                                <small class="text-muted d-block mb-1">Descrie experiența ta, specializările și ce te face special (minim 200 caractere)</small>
                                 {{ form.bio }}
+                                <small class="text-white-50 d-block mt-1">Descrie experiența ta, specializările și ce te face special (minim 200 caractere)</small>
                                 {% if form.bio.errors %}
-                                    <div class="text-danger small">{{ form.bio.errors.0 }}</div>
+                                    <div class="text-danger small mt-1">{{ form.bio.errors.0 }}</div>
                                 {% endif %}
                             </div>
 
-                            <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="prevStep(1)">
+                            <div class="d-flex justify-content-between pt-3 border-top border-white border-opacity-10">
+                                <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(1)">
                                     <i class="fas fa-arrow-left me-2"></i>Pasul anterior
                                 </button>
-                                <button type="button" class="btn btn-primary btn-lg px-4" onclick="nextStep(3)">
+                                <button type="button" class="btn btn-primary rounded-pill px-5 shadow-lg hover-scale" onclick="nextStep(3)">
                                     Următorul pas <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
@@ -193,15 +181,19 @@
 
                         <!-- Step 3: Services -->
                         <div class="step-content" id="step-3" style="display: none;">
-                            <div class="step-header mb-4">
-                                <h4 class="fw-bold" style="color: #8B5CF6;">Pasul 3: Serviciile tale</h4>
-                                <p class="text-muted">Selectează serviciile pe care le oferi clienților (1-10 servicii)</p>
+                            <div class="step-header mb-4 text-center">
+                                <h4 class="fw-bold text-white">Pasul 3: Serviciile tale</h4>
+                                <p class="text-white-50">Selectează serviciile pe care le oferi clienților (1-10 servicii)</p>
                             </div>
 
-                            <div class="alert" style="background-color: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.2); color: #6D28D9;">
-                                <i class="fas fa-info-circle me-2" style="color: #8B5CF6;"></i>
-                                <strong>Servicii selectate: <span id="selected-count" style="color: #6D28D9;">0</span>/10</strong>
-                                <div class="mt-1 small">Alege serviciile în care te specializezi pentru a fi găsit de clienții potriviți</div>
+                            <div class="alert bg-glass border border-white border-opacity-10 text-white mb-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-info-circle text-accent me-3 fs-4"></i>
+                                    <div>
+                                        <strong>Servicii selectate: <span id="selected-count" class="text-accent">0</span>/10</strong>
+                                        <div class="small text-white-50">Alege serviciile în care te specializezi pentru a fi găsit de clienții potriviți</div>
+                                    </div>
+                                </div>
                             </div>
 
                             {% if form.services_by_category %}
@@ -212,22 +204,22 @@
                                     </div>
 
                                     <!-- Compact services grid -->
-                                    <div class="services-grid" style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 1rem;">
+                                    <div class="services-grid custom-scrollbar" style="max-height: 400px; overflow-y: auto; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem;">
                                         {% for category_name, services in form.services_by_category.items %}
-                                            <div class="category-section mb-3" data-category="{{ category_name|lower }}">
-                                                <h6 class="mb-2 category-title" style="color: #8B5CF6;">
-                                                    <i class="fas fa-tools me-1"></i>{{ category_name }}
+                                            <div class="category-section mb-4" data-category="{{ category_name|lower }}">
+                                                <h6 class="mb-3 category-title text-accent fw-bold border-bottom border-white border-opacity-10 pb-2">
+                                                    <i class="fas fa-tools me-2"></i>{{ category_name }}
                                                 </h6>
                                                 <div class="row g-2">
                                                     {% for service in services %}
                                                     <div class="col-md-6 service-item" data-service-name="{{ service.name|lower }}" data-category="{{ category_name|lower }}">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input service-checkbox"
+                                                        <div class="form-check p-2 rounded hover-bg-glass transition-all">
+                                                            <input class="form-check-input service-checkbox mt-1"
                                                                    type="checkbox"
                                                                    name="services"
                                                                    value="{{ service.id }}"
                                                                    id="service_{{ service.id }}">
-                                                            <label class="form-check-label small" for="service_{{ service.id }}">
+                                                            <label class="form-check-label small text-white ms-2 cursor-pointer" for="service_{{ service.id }}">
                                                                 {{ service.name }}
                                                             </label>
                                                         </div>
@@ -240,7 +232,7 @@
 
                                     <!-- Clear search button -->
                                     <div class="mt-2">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="clear-search" style="display: none;">
+                                        <button type="button" class="btn btn-sm btn-outline-light" id="clear-search" style="display: none;">
                                             <i class="fas fa-times me-1"></i>Șterge căutarea
                                         </button>
                                     </div>
@@ -253,69 +245,185 @@
                                 <div class="text-danger small mt-2">{{ form.services.errors.0 }}</div>
                             {% endif %}
 
-                            <div class="d-flex justify-content-between mt-4">
-                                <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="prevStep(2)">
+                            <div class="d-flex justify-content-between mt-4 pt-3 border-top border-white border-opacity-10">
+                                <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(2)">
                                     <i class="fas fa-arrow-left me-2"></i>Pasul anterior
                                 </button>
-                                <button type="submit" class="btn btn-success btn-lg px-4">
+                                <button type="submit" class="btn btn-success rounded-pill px-5 shadow-lg hover-scale">
                                     <i class="fas fa-check me-2"></i>Înregistrează-te gratuit
                                 </button>
                             </div>
                         </div>
 
                         <!-- Terms and conditions (always visible) -->
-                        <div class="form-check mt-4 mb-3">
-                            <input class="form-check-input" type="checkbox" id="terms" required>
-                            <label class="form-check-label small" for="terms">
+                        <div class="form-check mt-4 mb-3 text-center">
+                            <input class="form-check-input float-none d-inline-block align-middle me-2" type="checkbox" id="terms" required>
+                            <label class="form-check-label small text-white-50 align-middle" for="terms">
                                 Prin înregistrare, sunt de acord cu
-                                <a href="{% url 'core:terms' %}" target="_blank" style="color: #8B5CF6; text-decoration: none;">Termenii și Condițiile</a>
-                                și <a href="{% url 'core:privacy' %}" target="_blank" style="color: #8B5CF6; text-decoration: none;">Politica de Confidențialitate</a> Bricli.
+                                <a href="{% url 'core:terms' %}" target="_blank" class="text-accent text-decoration-none">Termenii și Condițiile</a>
+                                și <a href="{% url 'core:privacy' %}" target="_blank" class="text-accent text-decoration-none">Politica de Confidențialitate</a> Bricli.
                             </label>
                         </div>
                     </form>
 
-                    <hr class="my-4">
-
-                    <div class="text-center">
-                        <p class="mb-2">Ai deja un cont?
-                            <a href="{% url 'auth:login' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">Conectează-te</a>
+                    <div class="text-center mt-4 pt-4 border-top border-white border-opacity-10">
+                        <p class="mb-2 text-white-50">Ai deja un cont?
+                            <a href="{% url 'auth:login' %}" class="text-white text-decoration-none fw-bold hover-underline">Conectează-te</a>
                         </p>
-                        <p class="mb-0">Cauți un meșter?
-                            <a href="{% url 'auth:register' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">
+                        <p class="mb-0 text-white-50">Cauți un meșter?
+                            <a href="{% url 'auth:register' %}" class="text-accent text-decoration-none fw-bold hover-underline">
                                 Înregistrează-te ca client
                             </a>
                         </p>
                     </div>
                 </div>
-            </div>
 
-            <!-- Statistics -->
-            <div class="text-center mt-4 text-white">
-                <div class="row">
-                    <div class="col-6">
-                        <div class="mb-1">
-                            <i class="fas fa-briefcase fs-4"></i>
+                <!-- Statistics -->
+                <div class="text-center mt-4 text-white-50">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-1 text-accent">
+                                <i class="fas fa-briefcase fs-4"></i>
+                            </div>
+                            <small>Peste 1000 de lucrări disponibile lunar</small>
                         </div>
-                        <small>Peste 1000 de lucrări disponibile lunar</small>
-                    </div>
-                    <div class="col-6">
-                        <div class="mb-1">
-                            <i class="fas fa-money-bill-wave fs-4"></i>
+                        <div class="col-6">
+                            <div class="mb-1 text-accent">
+                                <i class="fas fa-money-bill-wave fs-4"></i>
+                            </div>
+                            <small>Câștiguri medii de 2500 RON/lună</small>
                         </div>
-                        <small>Câștiguri medii de 2500 RON/lună</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+/* Custom Scrollbar for Services Grid */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
 
-    <!-- Load Static Files -->
-    {% load static %}
-    <script src="{% static 'js/form-live-validate.js' %}"></script>
+/* Hover effect for service items */
+.hover-bg-glass:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
 
-    <script src="{% static 'js/pages/accounts/craftsman_register.js' %}"></script>
-</body>
-</html>
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Step Indicators */
+.step-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.step-item.active .step-circle {
+    transform: scale(1.1);
+}
+
+.bg-dark-glass {
+    /* Transparent background to let the line show through if needed,
+       but here we want the item to sit on top of the line */
+    background-color: transparent;
+}
+
+/* Form Controls Dark Mode Overrides */
+.form-control, .form-select {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-violet);
+    color: white;
+    box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Checkbox styling */
+.form-check-input {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.form-check-input:checked {
+    background-color: var(--accent-violet);
+    border-color: var(--accent-violet);
+}
+
+.hover-underline:hover {
+    text-decoration: underline !important;
+}
+</style>
+
+<script>
+// Simple step navigation script
+function nextStep(step) {
+    // Basic validation could go here
+    document.querySelectorAll('.step-content').forEach(el => el.style.display = 'none');
+    document.getElementById('step-' + step).style.display = 'block';
+
+    // Update indicators
+    document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
+    document.querySelector('.step-item[data-step="' + step + '"]').classList.add('active');
+
+    // Update circles
+    for(let i = 1; i <= 3; i++) {
+        const item = document.querySelector('.step-item[data-step="' + i + '"]');
+        const circle = item.querySelector('.step-circle');
+        if(i < step) {
+            // Completed
+            circle.classList.remove('bg-glass', 'text-white-50');
+            circle.classList.add('bg-success', 'text-white');
+            circle.innerHTML = '<i class="fas fa-check"></i>';
+        } else if(i === step) {
+            // Active
+            circle.classList.remove('bg-glass', 'text-white-50', 'bg-success');
+            circle.classList.add('bg-primary', 'text-white', 'shadow-glow');
+            if(i === 1) circle.innerHTML = '<i class="fas fa-user"></i>';
+            if(i === 2) circle.innerHTML = '<i class="fas fa-briefcase"></i>';
+            if(i === 3) circle.innerHTML = '<i class="fas fa-tools"></i>';
+        } else {
+            // Future
+            circle.classList.remove('bg-primary', 'text-white', 'shadow-glow', 'bg-success');
+            circle.classList.add('bg-glass', 'text-white-50');
+            if(i === 1) circle.innerHTML = '<i class="fas fa-user"></i>';
+            if(i === 2) circle.innerHTML = '<i class="fas fa-briefcase"></i>';
+            if(i === 3) circle.innerHTML = '<i class="fas fa-tools"></i>';
+        }
+    }
+}
+
+function prevStep(step) {
+    nextStep(step);
+}
+</script>
+{% endblock %}

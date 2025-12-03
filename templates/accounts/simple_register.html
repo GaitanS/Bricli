@@ -1,152 +1,172 @@
-<!DOCTYPE html>
-<html lang="ro">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Înregistrare gratuită - Bricli</title>
+{% extends 'base.html' %}
+{% load static %}
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{% block title %}Înregistrare gratuită - Bricli{% endblock %}
 
-    {% load static %}
-    <link href="{% static 'css/pages/accounts/auth.css' %}" rel="stylesheet">
-</head>
-<body>
-    <!-- Back to site link -->
-    <a href="{% url 'core:home' %}" class="back-to-site">
-        <i class="fas fa-arrow-left me-2"></i>Înapoi la Bricli
-    </a>
+{% block content %}
+<div class="hero-2025 d-flex align-items-center justify-content-center py-5">
+    <!-- Glows -->
+    <div class="glow-point" style="top: 20%; left: 20%; background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);"></div>
+    <div class="glow-point" style="bottom: 20%; right: 20%; background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);"></div>
 
-    <div class="registration-container">
-        <div class="col-md-5 col-lg-4">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <h2 class="fw-bold mb-2">Înregistrare gratuită</h2>
-                        <p class="text-muted">Găsește meșteri verificați în zona ta</p>
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card-premium p-4 p-md-5">
+                    <div class="text-center mb-5">
+                        <h2 class="fw-bold mb-2 text-white">Înregistrare gratuită</h2>
+                        <p class="text-white-50">Găsește meșteri verificați în zona ta</p>
                     </div>
 
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
 
                         <div class="mb-3">
-                            <label for="{{ form.first_name.id_for_label }}" class="form-label">Prenume</label>
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label text-white">Prenume</label>
                             {{ form.first_name }}
                             {% if form.first_name.errors %}
-                                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                                <div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>
                             {% endif %}
                         </div>
 
                         <div class="mb-3">
-                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Nume de familie</label>
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label text-white">Nume de familie</label>
                             {{ form.last_name }}
                             {% if form.last_name.errors %}
-                                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                                <div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>
                             {% endif %}
                         </div>
 
                         <div class="mb-3">
-                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                            <label for="{{ form.email.id_for_label }}" class="form-label text-white">Email</label>
                             {{ form.email }}
                             {% if form.email.errors %}
-                                <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
                             {% endif %}
                         </div>
 
                         <div class="mb-3">
-                            <label for="{{ form.phone_number.id_for_label }}" class="form-label">Număr de telefon (opțional)</label>
+                            <label for="{{ form.phone_number.id_for_label }}" class="form-label text-white">Număr de telefon (opțional)</label>
                             {{ form.phone_number }}
                             {% if form.phone_number.errors %}
-                                <div class="text-danger small">{{ form.phone_number.errors.0 }}</div>
+                                <div class="text-danger small mt-1">{{ form.phone_number.errors.0 }}</div>
                             {% endif %}
                         </div>
 
                         <div class="mb-3">
-                            <label for="{{ form.county.id_for_label }}" class="form-label">Județul</label>
+                            <label for="{{ form.county.id_for_label }}" class="form-label text-white">Județul</label>
                             {{ form.county }}
                             {% if form.county.errors %}
-                                <div class="text-danger small">{{ form.county.errors.0 }}</div>
+                                <div class="text-danger small mt-1">{{ form.county.errors.0 }}</div>
                             {% endif %}
                         </div>
 
                         <div class="mb-3">
-                            <label for="{{ form.password.id_for_label }}" class="form-label">Parola</label>
+                            <label for="{{ form.password.id_for_label }}" class="form-label text-white">Parola</label>
                             {{ form.password }}
                             {% if form.password.errors %}
-                                <div class="text-danger small">{{ form.password.errors.0 }}</div>
+                                <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
                             {% endif %}
                         </div>
 
                         <div class="mb-4">
-                            <label for="{{ form.password_confirm.id_for_label }}" class="form-label">Confirmă parola</label>
+                            <label for="{{ form.password_confirm.id_for_label }}" class="form-label text-white">Confirmă parola</label>
                             {{ form.password_confirm }}
                             {% if form.password_confirm.errors %}
-                                <div class="text-danger small">{{ form.password_confirm.errors.0 }}</div>
+                                <div class="text-danger small mt-1">{{ form.password_confirm.errors.0 }}</div>
                             {% endif %}
                         </div>
 
-                        <div class="form-check mb-3">
+                        <div class="form-check mb-4">
                             <input class="form-check-input" type="checkbox" id="terms" required>
-                            <label class="form-check-label small" for="terms">
+                            <label class="form-check-label small text-white-50" for="terms">
                                 Prin înregistrare, sunt de acord cu
-                                <a href="#" class="text-decoration-none">Termenii și Condițiile</a>
-                                și <a href="#" class="text-decoration-none">Politica de Confidențialitate</a> Bricli.
+                                <a href="#" class="text-accent text-decoration-none">Termenii și Condițiile</a>
+                                și <a href="#" class="text-accent text-decoration-none">Politica de Confidențialitate</a> Bricli.
                             </label>
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-lg" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%); border: none; color: white;">
+                            <button type="submit" class="btn btn-primary rounded-pill py-3 fw-bold shadow-lg hover-scale">
                                 Înregistrare gratuită
                             </button>
                         </div>
                     </form>
 
-                    <hr class="my-4">
-
-                    <div class="text-center">
-                        <p class="mb-2">Ai deja un cont?
-                            <a href="{% url 'auth:login' %}" class="text-decoration-none fw-bold">Conectează-te</a>
+                    <div class="text-center mt-4 pt-4 border-top border-white border-opacity-10">
+                        <p class="mb-2 text-white-50">Ai deja un cont?
+                            <a href="{% url 'auth:login' %}" class="text-white text-decoration-none fw-bold hover-underline">Conectează-te</a>
                         </p>
-                        <p class="mb-0">Ești meșter?
-                            <a href="{% url 'auth:craftsman_register' %}" class="text-decoration-none fw-bold" style="color: #8B5CF6;">
+                        <p class="mb-0 text-white-50">Ești meșter?
+                            <a href="{% url 'auth:craftsman_register' %}" class="text-accent text-decoration-none fw-bold hover-underline">
                                 Înregistrează-te ca meșter
                             </a>
                         </p>
                     </div>
                 </div>
-            </div>
 
-            <!-- Trust indicators -->
-            <div class="text-center mt-4 text-white">
-                <div class="row">
-                    <div class="col-4">
-                        <div class="mb-1">
-                            <i class="fas fa-users fs-4"></i>
+                <!-- Trust indicators -->
+                <div class="text-center mt-4 text-white-50">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="mb-1 text-accent">
+                                <i class="fas fa-users fs-4"></i>
+                            </div>
+                            <small>1250+ meșteri</small>
                         </div>
-                        <small>1250+ meșteri</small>
-                    </div>
-                    <div class="col-4">
-                        <div class="mb-1">
-                            <i class="fas fa-check-circle fs-4"></i>
+                        <div class="col-4">
+                            <div class="mb-1 text-accent">
+                                <i class="fas fa-check-circle fs-4"></i>
+                            </div>
+                            <small>5680+ lucrări</small>
                         </div>
-                        <small>5680+ lucrări</small>
-                    </div>
-                    <div class="col-4">
-                        <div class="mb-1">
-                            <i class="fas fa-star fs-4"></i>
+                        <div class="col-4">
+                            <div class="mb-1 text-accent">
+                                <i class="fas fa-star fs-4"></i>
+                            </div>
+                            <small>3420+ recenzii</small>
                         </div>
-                        <small>3420+ recenzii</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<style>
+/* Form Controls Dark Mode Overrides */
+.form-control, .form-select {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-violet);
+    color: white;
+    box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Checkbox styling */
+.form-check-input {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.form-check-input:checked {
+    background-color: var(--accent-violet);
+    border-color: var(--accent-violet);
+}
+
+.hover-underline:hover {
+    text-decoration: underline !important;
+}
+</style>
+{% endblock %}
