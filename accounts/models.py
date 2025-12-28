@@ -1,4 +1,5 @@
 import secrets
+import uuid
 
 import pyotp
 from django.contrib.auth.models import AbstractUser
@@ -7,6 +8,7 @@ from django.db import models
 
 
 class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     USER_TYPE_CHOICES = [
         ("client", "Client"),
         ("craftsman", "Meseriaș"),
@@ -196,7 +198,7 @@ class CraftsmanProfile(models.Model):
     Profil meșter redesigned pentru protecția datelor și profesionalism.
     Câmpuri obligatorii: display_name, city/county, coverage_radius_km, categories, bio, profile_photo, portfolio (min 3 poze)
     """
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="craftsman_profile")
 
     # CÂMPURI OBLIGATORII (temporar opționale pentru migrație)

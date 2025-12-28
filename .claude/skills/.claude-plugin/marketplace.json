@@ -1,0 +1,21 @@
+{
+  "name": "local-skills",
+  "owner": {
+    "name": "Local User",
+    "email": "local@localhost"
+  },
+  "metadata": {
+    "description": "Local development skills",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "hello-world",
+      "description": "A simple demonstration skill",
+      "source": "../hello-world",
+      "skills": [
+        "./"
+      ]
+    }
+  ]
+}

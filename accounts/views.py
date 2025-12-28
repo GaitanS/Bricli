@@ -20,6 +20,8 @@ from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DetailView, FormView, ListView, TemplateView, UpdateView
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 
 from .forms import (
     BulkPortfolioUploadForm,
@@ -52,6 +54,7 @@ class RegisterView(CreateView):
         return response
 
 
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST', block=True), name='dispatch')
 class SimpleRegisterView(CreateView):
     """Simplified registration view similar to MyHammer"""
 
@@ -75,6 +78,7 @@ class SimpleRegisterView(CreateView):
         return response
 
 
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST', block=True), name='dispatch')
 class SimpleCraftsmanRegisterView(CreateView):
     """Simplified craftsman registration view"""
 
@@ -182,6 +186,7 @@ class CraftsmanRegisterView(CreateView):
         return redirect(self.success_url)
 
 
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST', block=True), name='dispatch')
 class LoginView(BaseLoginView):
     template_name = "accounts/login.html"
     redirect_authenticated_user = True

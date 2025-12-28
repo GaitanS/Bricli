@@ -84,3 +84,6 @@ logs/
 *.pyo
 *.pyd
 nul
+
+# Auto Claude data directory
+.auto-claude/

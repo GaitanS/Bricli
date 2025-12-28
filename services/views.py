@@ -8,8 +8,11 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, RedirectView
+from django.db.models import QuerySet
+from typing import Any, Dict, Optional, List, Union
 
 logger = logging.getLogger(__name__)
+from asgiref.sync import sync_to_async
 from accounts.models import County, CraftsmanProfile
 from notifications.models import Notification
 
@@ -43,7 +46,7 @@ class OrdersRedirectView(LoginRequiredMixin, RedirectView):
 
     permanent = False  # Use 302 redirect (temporary) instead of 301
 
-    def get_redirect_url(self, *args, **kwargs):
+    async def get_redirect_url(self, *args: Any, **kwargs: Any) -> Optional[str]:
         user = self.request.user
 
         # Redirect based on user type
@@ -62,41 +65,66 @@ class ServiceCategoryListView(ListView):
     template_name = "services/category_list.html"
     context_object_name = "categories"
 
-    def dispatch(self, request, *args, **kwargs):
+    async def dispatch(self, request, *args: Any, **kwargs: Any) -> Any:
         # Return 404 for authenticated craftsmen trying to access categories page
         if request.user.is_authenticated and getattr(request.user, "user_type", None) == "craftsman":
             raise Http404("Pagina nu a fost găsită")
-        return super().dispatch(request, *args, **kwargs)
+        # Use super().dispatch if it's async-capable, but in Django GCVs it's not always simple
+        # For simple cases, we can just call the parent dispatch or manually handle get
+        return await super().dispatch(request, *args, **kwargs)
 
-    def get_queryset(self):
+    async def get_queryset(self) -> List[ServiceCategory]:
+        """Async implementation of get_queryset that returns a list (cached)"""
         from django.core.cache import cache
-
         from core.cache_utils import CacheManager
 
         cache_key = CacheManager.generate_key("service_categories_with_stats")
 
         # Try to get from cache first
-        cached_result = cache.get(cache_key)
+        cached_result = await sync_to_async(cache.get)(cache_key)
         if cached_result is not None:
             return cached_result
 
-        queryset = (
-            ServiceCategory.objects.filter(is_active=True)
-            .annotate(orders_count=Count("services__order", filter=Q(services__order__status="published")))
-            .order_by("name")  # Alphabetical ordering
-        )
+        # Fetch and cache
+        @sync_to_async
+        def fetch_data():
+            queryset = (
+                ServiceCategory.objects.filter(is_active=True)
+                .annotate(orders_count=Count("services__order", filter=Q(services__order__status="published")))
+                .order_by("name")
+            )
+            return list(queryset)
 
-        # Cache the result for 30 minutes
-        cache.set(cache_key, queryset, 1800)
+        result_list = await fetch_data()
+        await sync_to_async(cache.set)(cache_key, result_list, 1800)
+        return result_list
 
-        return queryset
+    async def get(self, request, *args, **kwargs):
+        """Async version of ListView.get"""
+        self.object_list = await self.get_queryset()
+        context = await self.get_context_data()
+        return await sync_to_async(self.render_to_response)(context)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["categories_count"] = self.get_queryset().count()
-        context["craftsmen_count"] = CraftsmanProfile.objects.filter(
-            user__is_active=True, is_active=True
-        ).count()
+    async def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """Async version of get_context_data"""
+
+        # Base context from ListView attributes
+        context = {
+            'view': self,
+            'object_list': self.object_list,
+            'categories': self.object_list, # context_object_name
+        }
+        context.update(kwargs)
+
+        context["categories_count"] = len(self.object_list)
+
+        @sync_to_async
+        def get_crafts_count():
+            return CraftsmanProfile.objects.filter(
+                user__is_active=True, is_active=True
+            ).count()
+
+        context["craftsmen_count"] = await get_crafts_count()
         return context
 
 
@@ -108,7 +136,7 @@ class ServiceSearchView(ListView):
     template_name = "services/search_results.html"
     context_object_name = "results"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[ServiceCategory]:
         query = self.request.GET.get("q")
         if not query:
             return ServiceCategory.objects.none()
@@ -124,7 +152,7 @@ class ServiceSearchView(ListView):
             Q(services__description__icontains=query)
         ).distinct()
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["query"] = self.request.GET.get("q", "")
         return context
@@ -135,7 +163,7 @@ class ServiceCategoryDetailView(DetailView):
     template_name = "services/category_detail.html"
     context_object_name = "category"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         category = self.object
 
@@ -197,8 +225,9 @@ class CreateOrderView(CreateView):  # SCHIMBAT: Eliminat ClientRequiredMixin pen
 
     # Rate limiting ELIMINAT - nu mai sunt restricții
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         from .models import Service
+        from .schemas import ServiceSchema
         import json
 
         context = super().get_context_data(**kwargs)
@@ -210,18 +239,19 @@ class CreateOrderView(CreateView):  # SCHIMBAT: Eliminat ClientRequiredMixin pen
         # Trimitem toate serviciile pentru JavaScript mapping
         all_services = Service.objects.filter(is_active=True).select_related("category").order_by("category__name", "name")
 
-        # Creăm un mapping JSON: category_id -> [services]
-        services_by_category = {}
+        # Creăm un mapping JSON: category_id -> [services] folosind Pydantic
+        services_by_category: Dict[str, List[Dict[str, Any]]] = {}
         for service in all_services:
             cat_id = str(service.category.id)
             if cat_id not in services_by_category:
                 services_by_category[cat_id] = []
-            services_by_category[cat_id].append({
-                'id': service.id,
-                'name': service.name,
-                'description': service.description or '',
-                'icon': service.category.icon or 'fas fa-tools'
-            })
+
+            # Use Pydantic schema for consistent serialization
+            service_data = ServiceSchema.model_validate(service).model_dump()
+            # Overlay icon from category if it exists
+            service_data['icon'] = service.category.icon or 'fas fa-tools'
+
+            services_by_category[cat_id].append(service_data)
 
         context["services_by_category_json"] = json.dumps(services_by_category)
         context["is_authenticated"] = self.request.user.is_authenticated
@@ -257,7 +287,7 @@ class CreateOrderView(CreateView):  # SCHIMBAT: Eliminat ClientRequiredMixin pen
 
     def _handle_authenticated_user(self, form):
         """Flow existent pentru utilizatori autentificați"""
-        from .models import notify_order_request
+        from .logic import notify_order_request
 
         form.instance.client = self.request.user
 
@@ -813,7 +843,7 @@ class PublishOrderView(LoginRequiredMixin, DetailView):
     model = Order
 
     def post(self, request, *args, **kwargs):
-        from .models import notify_new_order_to_craftsmen
+        from .logic import notify_new_order_to_craftsmen
 
         order = self.get_object()
 
